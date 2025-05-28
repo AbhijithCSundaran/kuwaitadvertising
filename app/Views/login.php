@@ -28,15 +28,17 @@
 				</div>
 				<h4>Hello! let's get started</h4>
 				<h6 class="font-weight-light">Sign in to continue.</h6>
-				<form class="pt-3">
+				<form class="pt-3" id="login-form">
+				 <div class="alert alert-danger" role="alert" id="loginalert" style="display: none;">	
+				</div>
 					<div class="form-group">
-						<input type="email" class="form-control form-control-lg" id="exampleInputEmail1" placeholder="Username">
+						<input type="text" name="email" class="form-control form-control-lg"  placeholder="example@gmail.com">
 					</div>
 					<div class="form-group">
-						<input type="password" class="form-control form-control-lg" id="exampleInputPassword1" placeholder="Password">
+						<input type="password" name="password" class="form-control form-control-lg"  placeholder="Password">
 					</div>
 					<div class="mt-3 d-grid gap-2">
-						<a class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" href="javascript:void(0);">SIGN IN</a>
+						<button type="button" class="enter-btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn">SIGN IN</button>
 					</div>
 					<div class="my-2 d-flex justify-content-between align-items-center">
 						<a href="#" class="auth-link text-black">Forgot password?</a>
@@ -64,4 +66,26 @@
   <script src="<?php echo ASSET_PATH; ?>assets/js/todolist.js"></script>
   <!-- endinject -->
 </body>
+<script>
+	$(document).ready(function(){
+
+	$('.enter-btn').click(function(){
+		debugger;
+	const body = $('#login-form').serialize();
+		var url ='<?= base_url("login/authenticate") ?>';
+		$.post(url, body, function(response){
+			if(response== 1) {
+				window.location.href = "dashboard";
+			}
+			else{
+				$('#loginalert').html('Invalid Credentials');
+				$('#loginalert').fadeIn();
+				setTimeout(function(){
+					$('#loginalert').fadeOut();
+				},3000);
+			}
+		}, 'json');
+	});
+});
+</script>
 </html>

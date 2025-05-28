@@ -1,0 +1,28 @@
+.modal{
+     modal-margin: 76px !important;
+} 
+.btn-warning{
+	background: #6c757d !important;
+	border-color: #6c757d !important;
+}  
+.btn-danger{
+	background: #6c757d !important;
+	border-color: #6c757d !important;
+}
+.form-control{
+	border-color: #6c757d !important;
+}
+.alert{
+	padding-top:10px;
+}
+/* .table{ */
+	/* border-color: #6c757d !important; */
+	/* border-bottom-color: #6c757d !important; */
+/* } */
+.modal{
+	margin: 50px !important;
+	margin-bottom: 50px !important;
+}
+.edit-btn{
+	background: #6c757d !important;
+}
