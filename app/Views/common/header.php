@@ -18,9 +18,23 @@
   <link rel="stylesheet" href="<?php echo ASSET_PATH; ?>assets/css/custom.css">
   <!-- endinject -->
   <link rel="shortcut icon" href="<?php echo ASSET_PATH; ?>assets/images/favicon.ico" />
+  <!-- Add in your header or before closing body tag -->
+   <!-- Add this to your common/header.php if not already present -->
+	<!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">-->
+  <!-- ✅ Load jQuery FIRST -->
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+  <!-- ✅ DataTables CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
+  <!-- ✅ DataTables JS (load after jQuery) -->
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
 </head>
 <body>
-  <div class="container-scroller">
+  <!-- <div class="container-scroller">
     <div class="row p-0 m-0 proBanner" id="proBanner">
       <div class="col-md-12 p-0 m-0">
         <div class="card-body card-body-padding px-3 d-flex align-items-center justify-content-between">
@@ -38,7 +52,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
     <!-- partial:partials/_navbar.html -->
     <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
   <div class="navbar-brand-wrapper d-flex justify-content-center">
@@ -199,20 +213,20 @@
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
   <ul class="nav">
     <li class="nav-item">
-      <a class="nav-link" href="<?= base_url('dashbord') ?>">
+      <a class="nav-link" href="<?= base_url('dashboard') ?>">
         <i class="mdi mdi-home menu-icon"></i>
         <span class="menu-title">Dashboard</span>
       </a>
     </li>    
     <li class="nav-item">
-      <a class="nav-link" href="<?= base_url('manageuser') ?>">
+      <a class="nav-link" href="<?= base_url('adduserlist') ?>">
         <i class="mdi mdi-circle-outline menu-icon"></i>
         <span class="menu-title">Manage User</span>
         
       </a>
     </li>    
     <li class="nav-item">
-      <a class="nav-link" href="<?= base_url('managecompany') ?>">
+      <a class="nav-link" href="<?= base_url('companylist') ?>">
         <i class="mdi mdi-view-headline menu-icon"></i>
         <span class="menu-title">Company Management</span>
         <i class="menu-arrow"></i>
@@ -224,19 +238,15 @@
       </div>
     </li>    
     <li class="nav-item">
-      <a class="nav-link" data-bs-toggle="collapse" href="#charts" aria-expanded="false" aria-controls="charts">
-        <i class="mdi mdi-chart-pie menu-icon"></i>
-        <span class="menu-title">Role Management</span>
-        <i class="menu-arrow"></i>
-      </a>
-      <div class="collapse" id="charts">
-        <ul class="nav flex-column sub-menu">
-          <li class="nav-item"> <a class="nav-link" href="pages/charts/chartjs.html">ChartJs</a></li>
-        </ul>
-      </div>
-    </li>
+	  <a class="nav-link" href="<?= base_url('rolemanagement/rolelist') ?>">
+		<i class="mdi mdi-chart-pie menu-icon"></i>
+		<span class="menu-title">Role Management</span>
+		<i class="menu-arrow"></i>
+	  </a>
+	</li>
+
     <li class="nav-item">
-      <a class="nav-link" data-bs-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables">
+      <a class="nav-link" href="<?= base_url('estimatelist') ?>">
         <i class="mdi mdi-grid-large menu-icon"></i>
         <span class="menu-title">Estimate Generation</span>
         <i class="menu-arrow"></i>

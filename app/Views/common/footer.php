@@ -35,7 +35,15 @@
 
   <!-- End custom js for this page-->
   <script src="assets/js/jquery.cookie.js" type="text/javascript"></script>
+  <!-- Include Bootstrap 5 JS (or adjust if using v4) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   
+  <!-- jQuery ( DataTables) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- DataTables JS -->
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
 
 </body>
 

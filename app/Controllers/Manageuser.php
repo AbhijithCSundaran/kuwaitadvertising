@@ -1,63 +1,111 @@
 <?php
 namespace App\Controllers;
+
 use App\Models\Manageuser_Model;
 use App\Controllers\BaseController;
 
-class Manageuser extends BaseController {
+class Manageuser extends BaseController
+{
+    public function index($uid = null)
+    {
+        $isEdit = !empty($uid);
+        $userData = null;
 
-    // public function index() {
-        // return view('adduser');
-    // }
-	
-	public function index($uid = null) {
-		return view('adduser', ['uid' => $uid]);
-	}
+        if ($isEdit) {
+            $model = new Manageuser_Model();
+            $userData = $model->find($uid);
+        }
 
+        return view('adduser', [
+            'uid'      => $uid,
+            'isEdit'   => $isEdit,
+            'userData' => $userData
+        ]);
+    }
 
-
-    public function add() {
+    public function add()
+    {
         return view('adduserlist');
     }
 
-    public function save() {
-    $model = new Manageuser_Model();
-    $data = [
-        'name'        => $this->request->getPost('name'),
-        'email'       => $this->request->getPost('email'),
-        'password'    => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
-        'phonenumber' => $this->request->getPost('phonenumber'),
-    ];
-
-    $id = $this->request->getPost('uid'); 
-    if ($id) {
-        $model->update($id, $data);
-        $msg = 'User updated successfully.';
-    } else {
-        $model->insert($data);
-        $msg = 'User added successfully.';
-    }
-
-    return $this->response->setJSON(['status' => 'success', 'message' => $msg]);
-}
-    public function getUser($id) {
+    public function save()
+    {
         $model = new Manageuser_Model();
-        return $this->response->setJSON($model->find($id));
-    }
 
-   public function userlist() {
-    $model = new \App\Models\Manageuser_Model();
-    return $this->response->setJSON(['user' => $model->findAll()]);
-	}
+        $id       = $this->request->getPost('uid');
+        $name     = trim($this->request->getPost('name'));
+        $email    = trim($this->request->getPost('email'));
+        $phone    = trim($this->request->getPost('phonenumber'));
+        $password = trim($this->request->getPost('password'));
 
-	public function deleteuser() {
-    $user_id = $this->request->getPost('user_id');
-    if ($user_id) {
-        $model = new \App\Models\Manageuser_Model();
-        if ($model->delete($user_id)) {
-            return $this->response->setJSON(['status' => 'success']);
+        // Basic validation
+        if ($name === '' || $email === '' || (empty($id) && $password === '')) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Please fill all mandatory fields.'
+            ]);
         }
-    }
-    return $this->response->setJSON(['status' => 'error']);
-	}
 
+        $data = [
+            'name'        => $name,
+            'email'       => $email,
+            'phonenumber' => $phone
+        ];
+
+        if (!empty($password)) {
+            $data['password'] = password_hash($password, PASSWORD_DEFAULT);
+        }
+
+        if (!empty($id)) {
+            $existingUser = $model->find($id);
+            if (!$existingUser) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => 'User not found.'
+                ]);
+            }
+
+            $changes = array_diff_assoc($data, $existingUser);
+            $hasChanges = !empty($changes) || isset($data['password']);
+
+            if (!$hasChanges) {
+                return $this->response->setJSON([
+                    'status' => 'nochange',
+                    'message' => 'No changes were made.'
+                ]);
+            }
+
+            $model->update($id, $data);
+            $msg = 'User details updated successfully.';
+        } else {
+            $model->insert($data);
+            $msg = 'User added successfully.';
+        }
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => $msg
+        ]);
+    }
+
+    public function userlist()
+    {
+        $model = new Manageuser_Model();
+        return $this->response->setJSON([
+            'user' => $model->orderBy('user_id', 'DESC')->findAll()
+        ]);
+    }
+
+
+    public function deleteuser()
+    {
+        $user_id = $this->request->getPost('user_id');
+        if ($user_id) {
+            $model = new Manageuser_Model();
+            if ($model->delete($user_id)) {
+                return $this->response->setJSON(['status' => 'success']);
+            }
+        }
+        return $this->response->setJSON(['status' => 'error']);
+    }
 }

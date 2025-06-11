@@ -1,15 +1,15 @@
 <?php include "common/header.php"; ?>
-<div class="form-control">
-    <div class="row">
-        <div class="col-md-6">
-            <h4>Manage Users List</h4>
-        </div>
-        <div class="col-md-6 text-right">
-            <a href="<?= base_url('adduser') ?>"><button class="btn btn-secondary">Add New User</button></a>
-        </div>
-        <div class="col-md-12"><hr/></div>
-    </div>
 
+<div class="form-control mb-3">
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <h3 class="mb-0">User Directory</h3>
+        </div>
+        <div class="col-md-6 text-end">
+            <a href="<?= base_url('adduser') ?>" class="btn btn-secondary">Add New User</a>
+        </div>
+    </div>
+    <hr>
     <div class="card">
         <table class="table table-bordered" id="userTable">
             <thead>
@@ -22,13 +22,10 @@
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody>
-                <!-- Filled by JavaScript -->
-            </tbody>
+            <tbody id ="userTable tbody"></tbody>
         </table>
     </div>
-</div>
-</div>
+
 <?php include "common/footer.php"; ?>
 <script>
 function loadUsers() {
@@ -38,35 +35,46 @@ function loadUsers() {
         dataType: "json",
         success: function(data) {
             let rows = '';
+
             if (data.user && data.user.length > 0) {
-                data.user.forEach(function(u, index) {
+                data.user.forEach(function(data, index) {
                     rows += `<tr>
                         <td>${index + 1}</td>
-                        <td>${u.name}</td>
-                        <td>${u.email}</td>
-                        <td>********</td> 
-						<td>${u.phonenumber}</td> 
+                        <td>${data.name}</td>
+                        <td>${data.email}</td>
+                        <td>********</td>
+                        <td>${data.phonenumber}</td>
                         <td>
-                            <button class="btn btn-sm btn-warning" onclick="editUser(${u.user_id})">Edit</button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteUser(${u.user_id})">Delete</button>
+                            <button class="btn btn-sm btn-warning" onclick="editUser(${data.user_id})">Edit</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteUser(${data.user_id})">Delete</button>
                         </td>
                     </tr>`;
                 });
             } else {
                 rows = `<tr><td colspan="6" class="text-center">No users found</td></tr>`;
             }
+            if ($.fn.DataTable.isDataTable('#userTable')) {
+                $('#userTable').DataTable().clear().destroy();
+            }
             $('#userTable tbody').html(rows);
+            $('#userTable').DataTable({
+                searching: true,
+                lengthChange: true,
+                ordering: true,
+                pageLength: 10,
+                dom: '<"row mb-3"<"col-md-6"l><"col-md-6 text-end"f>>rt<"row mt-3"<"col-md-6"i><"col-md-6"p>>'
+            });
         },
         error: function() {
-            alert('Failed to load user data.');
+            alert("Failed to load user data.");
         }
     });
 }
 
 function editUser(id) {
-    window.location.href = "<?= base_url('adduser') ?>/" + id; 
+    window.location.href = "<?= base_url('adduser') ?>/" + id;
+    
 }
-
 
 function deleteUser(id) {
     if (confirm("Are you sure you want to delete this user?")) {
@@ -77,6 +85,7 @@ function deleteUser(id) {
             dataType: "json",
             success: function(response) {
                 if (response.status === 'success') {
+                    $('#userTable').DataTable();//destroy();
                     loadUsers();
                 } else {
                     alert('Failed to delete user.');
@@ -85,6 +94,7 @@ function deleteUser(id) {
             error: function() {
                 alert('Error occurred while deleting user.');
             }
+            
         });
     }
 }
@@ -93,5 +103,3 @@ $(document).ready(function() {
     loadUsers();
 });
 </script>
-
-
