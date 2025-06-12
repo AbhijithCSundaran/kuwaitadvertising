@@ -21,16 +21,12 @@
   <!-- Add in your header or before closing body tag -->
    <!-- Add this to your common/header.php if not already present -->
 	<!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">-->
-  <!-- ✅ Load jQuery FIRST -->
   <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-
-  <!-- ✅ DataTables CSS -->
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-
-  <!-- ✅ DataTables JS (load after jQuery) -->
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 </head>
 <body>
@@ -55,6 +51,8 @@
     </div> -->
     <!-- partial:partials/_navbar.html -->
     <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+      <!-- <div id="globalAlertContainer" style="position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 400px;"></div> -->
+
   <div class="navbar-brand-wrapper d-flex justify-content-center">
     <div class="navbar-brand-inner-wrapper d-flex justify-content-between align-items-center w-100">
       <a class="navbar-brand brand-logo" href="index.html"><img src="../../../assets/images/logo.svg"
@@ -285,12 +283,12 @@
         </ul>
       </div>
     </li>
-    <li class="nav-item">
-      <a class="nav-link" href="../../../docs/documentation.html">
-        <i class="mdi mdi-cash menu-icon"></i>
-        <span class="menu-title">Expense Manager</span>
+   <li class="nav-item">
+      <a class="nav-link" href="<?= base_url('expense') ?>">
+        <i class="mdi mdi-square-outline menu-icon"></i>
+        <span class="menu-title">Expenses</span>
       </a>
-    </li>
+    </li>    
   </ul>
 </nav>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
