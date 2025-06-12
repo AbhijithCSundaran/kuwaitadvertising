@@ -13,42 +13,41 @@
 			<form id="user-login-form">
                 <div class="alert" role="alert"></div>
 				<div class="form-group">
-					<div class="col-md-4 no-gutters">
-						<label>Name <span class="text-danger">*</span></label>
-						<input type="text" name="name" id="name" class="form-control" value="<?= isset($userData['name']) ? $userData['name'] : '' ?>"/>
-					</div>
+                    <div class="row">
+                        <div class="col-md-6 no-gutters">
+                            <label>Name <span class="text-danger">*</span></label>
+                            <input type="text" name="name" id="name" class="form-control" maxlength="20" pattern="[A-Za-z\s]+" title="Only letters and spaces allowed" value="<?= isset($userData['name']) ? $userData['name'] : '' ?>"/>
+                        </div>
+                            <div class="col-md-6 no-gutters">
+                                <label>Email <span class="text-danger">*</span></label>
+                                <input type="text" name="email" id="email" class="form-control" value="<?= isset($userData['email']) ? $userData['email'] : '' ?>" autocomplete="off"/>
+                            </div>
+                    </div>
 				</div>
 				<div class="form-group">
-					<div class="col-md-4 no-gutters">
-						<label>Email <span class="text-danger">*</span></label>
-						<input type="text" name="email" id="email" class="form-control" value="<?= isset($userData['email']) ? $userData['email'] : '' ?>" autocomplete="off"/>
-					</div>
-				</div>
-				<div class="form-group">
-                    <div class="col-md-4 no-gutters">
-                        <label>Password 
-                            <?php if(!isset($isEdit) || !$isEdit): ?>
-                                <span class="text-danger">*</span>
-                            <?php endif; ?>
-                        </label>
-                        <div class="input-group">
-                            <input type="password" name="password" id="Password" class="form-control" autocomplete="new-password"/>
-                            <span id="togglePassword" style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer; z-index: 10;">
-                                <i class="fa fa-eye-slash"></i>
-                            </span>
+                    <div class="row">
+                        <div class="col-md-6 no-gutters">
+                                <label>Password 
+                                    <?php if(!isset($isEdit) || !$isEdit): ?>
+                                        <span class="text-danger">*</span>
+                                    <?php endif; ?>
+                                </label>
+                                <div class="input-group">
+                                    <input type="password" name="password" id="Password" class="form-control" minlength="6" maxlength="15" autocomplete="new-password"/>
+                                    <span id="togglePassword" style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer; z-index: 10;">
+                                        <i class="fa fa-eye-slash"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        <div class="col-md-6 no-gutters">
+                            <label>Phone Number</label>
+                            <input type="text" name="phonenumber" id="phonenumber" class="form-control" value="<?= isset($userData['phonenumber']) ? $userData['phonenumber'] : '' ?>" maxlength="15" />
                         </div>
                     </div>
-                </div>
-
-				<div class="form-group">
-					<div class="col-md-4 no-gutters">
-						<label>Phone Number</label>
-						<input type="text" name="phonenumber" id="phonenumber" class="form-control" value="<?= isset($userData['phonenumber']) ? $userData['phonenumber'] : '' ?>" maxlength="15" />
-					</div>
 				</div>
 				<div class="form-group">
-					<div class="col-md-4 no-gutters">
-						<button type="button"  class="enter-btn btn btn-primary" id="saveUserBtn">Save User</button>
+					<div class="col-md-12  text-end">
+						<button type="button"  class="enter-btn btn btn-primary" id="saveUserBtn" disabled>Save User</button>
 						<input type="hidden" name="uid" id="uid" value="<?= isset($uid) ? $uid : '' ?>">
 					
 					</div>
@@ -61,6 +60,17 @@
 <?php include "common/footer.php"; ?>
 <script>
 $(document).ready(function () {
+let initialFormData = $('#user-login-form').serialize();
+$('#user-login-form input').on('input change', function () {
+    const currentFormData = $('#user-login-form').serialize();
+
+    if (currentFormData !== initialFormData) {
+        $('#saveUserBtn').prop('disabled', false);
+    } else {
+        $('#saveUserBtn').prop('disabled', true); 
+    }
+});
+
     const uid = "<?= isset($uid) ? $uid : '' ?>";
 
    $('#togglePassword').on('click', function () {
@@ -71,7 +81,9 @@ $(document).ready(function () {
     icon.toggleClass('fa-eye fa-eye-slash');
 });
 
-
+$('#name').on('input', function () {
+    this.value = this.value.replace(/[^a-zA-Z\s]/g, '');
+});
 
     $('#phonenumber').on('input', function () {
         this.value = this.value.replace(/[^0-9]/g, '').slice(0, 15);
@@ -88,16 +100,35 @@ $(document).ready(function () {
 
     const isNewUser = uid === '';
 
-    if (name === '' || email === '' || (isNewUser && password === '')) {
-        $('.alert')
-            .removeClass('alert-success alert-warning')
-            .addClass('alert-danger')
-            .html('Please fill all mandatory fields <span class="text-danger">*</span>.')
-            .show();
-        setTimeout(() => { $('.alert').fadeOut(); }, 3000);
-        return;
-    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+if (name === '' || email === '' || (isNewUser && password === '')) {
+    $('.alert')
+        .removeClass('alert-success alert-warning')
+        .addClass('alert-danger')
+        .html('Please fill all mandatory fields <span class="text-danger">*</span>.')
+        .show();
+    setTimeout(() => { $('.alert').fadeOut(); }, 3000);
+    return;
+}
+if (!emailRegex.test(email)) {
+    $('.alert')
+        .removeClass('alert-success alert-warning')
+        .addClass('alert-danger')
+        .html('Please enter a valid email address.')
+        .show();
+    setTimeout(() => { $('.alert').fadeOut(); }, 3000);
+    return;
+}
+if (isNewUser && (password.length < 6 || password.length > 15)) {
+    $('.alert')
+        .removeClass('alert-success alert-warning')
+        .addClass('alert-danger')
+        .html('Password must be between 6 and 15 characters.')
+        .show();
+    setTimeout(() => { $('.alert').fadeOut(); }, 3000);
+    return;
+}
     const formData = new FormData($('#user-login-form')[0]);
 
     $.ajax({

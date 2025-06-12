@@ -10,11 +10,11 @@
         </div>
     </div>
     <hr>
-    <div class="card">
+    <div class="alert" role="alert" style="display: none;"></div>
         <table class="table table-bordered" id="userTable">
             <thead>
                 <tr>
-                    <th>SI</th>
+                    <th>SI NO</th>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Password</th>
@@ -22,10 +22,11 @@
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody id ="userTable tbody"></tbody>
+            <tbody></tbody>
         </table>
-    </div>
-
+</div>
+</div>
+</div>
 <?php include "common/footer.php"; ?>
 <script>
 function loadUsers() {
@@ -37,26 +38,29 @@ function loadUsers() {
             let rows = '';
 
             if (data.user && data.user.length > 0) {
-                data.user.forEach(function(data, index) {
+                data.user.forEach(function(user, index) {
                     rows += `<tr>
                         <td>${index + 1}</td>
-                        <td>${data.name}</td>
-                        <td>${data.email}</td>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
                         <td>********</td>
-                        <td>${data.phonenumber}</td>
+                        <td>${user.phonenumber}</td>
                         <td>
-                            <button class="btn btn-sm btn-warning" onclick="editUser(${data.user_id})">Edit</button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteUser(${data.user_id})">Delete</button>
+                            <button class="btn btn-sm btn-warning" onclick="editUser(${user.user_id})">Edit</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteUser(${user.user_id})">Delete</button>
                         </td>
                     </tr>`;
                 });
             } else {
                 rows = `<tr><td colspan="6" class="text-center">No users found</td></tr>`;
             }
+
             if ($.fn.DataTable.isDataTable('#userTable')) {
                 $('#userTable').DataTable().clear().destroy();
             }
+
             $('#userTable tbody').html(rows);
+
             $('#userTable').DataTable({
                 searching: true,
                 lengthChange: true,
@@ -73,32 +77,53 @@ function loadUsers() {
 
 function editUser(id) {
     window.location.href = "<?= base_url('adduser') ?>/" + id;
-    
 }
 
 function deleteUser(id) {
     if (confirm("Are you sure you want to delete this user?")) {
         $.ajax({
-            url: "<?= base_url('manageuser/deleteuser') ?>",
-            method: "POST",
-            data: { user_id: id },
-            dataType: "json",
+            url: '<?= base_url('manageuser/delete') ?>/' + id,
+            type: 'POST',
+            dataType: 'json',
             success: function(response) {
                 if (response.status === 'success') {
-                    $('#userTable').DataTable();//destroy();
-                    loadUsers();
+                    $('.alert')
+                        .removeClass('alert-success')
+                        .addClass('alert-danger text-center')
+                        .html('Deleted successfully')
+                        .fadeIn();
+
+                    setTimeout(() => {
+                        $('.alert').fadeOut();
+                        loadUsers(); // Refresh the table after delete
+                    }, 2000);
                 } else {
-                    alert('Failed to delete user.');
+                    $('.alert')
+                        .removeClass('alert-success')
+                        .addClass('alert-danger text-center')
+                        .html('Failed to delete user.')
+                        .fadeIn();
+
+                    setTimeout(() => {
+                        $('.alert').fadeOut();
+                    }, 3000);
                 }
             },
-            error: function() {
-                alert('Error occurred while deleting user.');
+            error: function(xhr) {
+                console.error("AJAX error:", xhr.responseText);
+                $('.alert')
+                    .removeClass('alert-success')
+                    .addClass('alert-danger text-center')
+                    .html('An error occurred while deleting.')
+                    .fadeIn();
+
+                setTimeout(() => {
+                    $('.alert').fadeOut();
+                }, 3000);
             }
-            
         });
     }
 }
-
 $(document).ready(function() {
     loadUsers();
 });

@@ -95,17 +95,16 @@ class Manageuser extends BaseController
             'user' => $model->orderBy('user_id', 'DESC')->findAll()
         ]);
     }
-
-
-    public function deleteuser()
+   public function delete($id)
     {
-        $user_id = $this->request->getPost('user_id');
-        if ($user_id) {
-            $model = new Manageuser_Model();
-            if ($model->delete($user_id)) {
-                return $this->response->setJSON(['status' => 'success']);
-            }
+        $userModel = new \App\Models\Manageuser_Model();
+
+        if ($userModel->delete($id)) {
+            return $this->response->setJSON(['status' => 'success']);
+        } else {
+            return $this->response->setJSON(['status' => 'error']);
         }
-        return $this->response->setJSON(['status' => 'error']);
     }
+
+
 }
