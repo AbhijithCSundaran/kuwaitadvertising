@@ -7,11 +7,12 @@
         <div class="col-md-6 text-end">
             <a href="<?= base_url('expense') ?>" class="btn btn-secondary">Back to List</a>
         </div>
+        <div class="alert d-none w-25 mx-auto text-center fixed top mt-3" role="alert"></div>
     </div>
     <hr>
     <form id="expense-form">
         <div class ="row">
-            <div class="alert d-none" role="alert"></div>
+            
             <div class="form-group col-md-6">
                 <label>Date <span class="text-danger">*</span></label>
                 <input type="date" name="date" class="form-control" value="<?= isset($expense['date']) ? $expense['date'] : '' ?>" required>
@@ -40,7 +41,7 @@
     </div>
         <div class="form-group col-md-12 text-end">
             <input type="hidden" name="id" value="<?= isset($expense['id']) ? $expense['id'] : '' ?>">
-            <button type="button" class="btn btn-primary" id="saveExpenseBtn">Save Expense</button>
+            <button type="button" class="btn btn-primary" id="saveExpenseBtn" disabled>Save Expense</button>
         </div>
     </form>
 </div>
@@ -48,6 +49,17 @@
 <?php include "common/footer.php"; ?>
 <script>
 $(document).ready(function () {
+    let originalData = $('#expense-form').serialize(); // Store original form data
+
+    $('#expense-form input, #expense-form select, #expense-form textarea').on('input change', function () {
+        const currentData = $('#expense-form').serialize();
+
+        if (currentData !== originalData) {
+            $('#saveExpenseBtn').prop('disabled', false); // Enable button on change
+        } else {
+            $('#saveExpenseBtn').prop('disabled', true); // Keep it disabled if nothing changed
+        }
+    });
     $('#saveExpenseBtn').on('click', function () {
         const alertBox = $('.alert');
         const form = $('#expense-form')[0];

@@ -3,15 +3,16 @@
     <div class="row align-items-center">
         <div class="col-md-6">
             <h3 class="mb-0"><?= isset($isEdit) && $isEdit ? 'Edit User' : 'Create New User' ?></h3>
-        </div>
+         </div>
         <div class="col-md-6 text-end">
             <a href="<?= base_url('adduserlist') ?>" class="btn btn-secondary">Back to List</a>
         </div>
+        <div class="alert w-25 mx-auto text-center fixed top mt-3" role="alert" style="z-index: 1000; display: none;"  ></div>
     </div>
 	<div class="col-md-12"><hr/></div>
 		<div class="col-md-12 no-gutters">
 			<form id="user-login-form">
-                <div class="alert" role="alert"></div>
+                <!-- <div class="alert w-25 mx-auto text-center fixed top mt-3" role="alert"  style="z-index: 1050; display: none;" ></div> -->
 				<div class="form-group">
                     <div class="row">
                         <div class="col-md-6 no-gutters">
@@ -155,13 +156,6 @@ if (isNewUser && (password.length < 6 || password.length > 15)) {
                 setTimeout(() => {
                     window.location.href = '<?= base_url('adduserlist') ?>';
                 }, 3000);
-            } else if (response.status === 'nochange') {
-                $('.alert')
-                    .removeClass('alert-success alert-danger')
-                    .addClass('alert-warning')
-                    .text('No changes were made.')
-                    .show();
-                setTimeout(() => { $('.alert').fadeOut(); }, 3000);
             } else {
                 $('.alert')
                     .removeClass('alert-success alert-warning')
