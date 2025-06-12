@@ -1,4 +1,12 @@
-<?php include "common/header.php";?>
+<?php include "common/header.php"; ?>
+<style>
+#estimateTable td {
+    white-space: normal !important;
+    word-break: break-word;
+    vertical-align: top;
+}
+</style>
+
 <div class="form-control mb-3 right_container">
     <div class="row align-items-center">
         <div class="col-md-6">
@@ -14,6 +22,7 @@
             <table class="table table-bordered" id="estimateTable">
                 <thead>
                     <tr>
+                        <th style="display:none;">ID</th> <!-- Hidden column for sorting -->
                         <th>SI</th>
                         <th>Customer Name</th>
                         <th>Customer Address</th>
@@ -44,14 +53,15 @@ $(document).ready(function () {
         },
         paging: true,
         searching: true,
-        ordering: false,
+        ordering: true,
         info: false,
         autoWidth: false,
         lengthMenu: [5, 10, 15, 20, 25],
         pageLength: 10,
-        order: [[5, 'desc']],
+        order: [[0, 'desc']], // Sort by hidden estimate_id
         columns: [
-            { data: null }, // SI
+            { data: "estimate_id" }, // Hidden for sorting
+            { data: null },          // SI
             { data: "customer_name" },
             { data: "customer_address" },
             {
@@ -63,7 +73,7 @@ $(document).ready(function () {
             {
                 data: "discount",
                 render: function (data) {
-                    return parseFloat(data).toFixed(2) + ' KWD';
+                    return parseFloat(data).toFixed(2);
                 }
             },
             {
@@ -91,20 +101,23 @@ $(document).ready(function () {
             }
         ],
         columnDefs: [
-            { searchable: false, orderable: false, targets: 0 } // SI column
-        ],
-        order: [[5, 'desc']] // Sort by date if needed
+            { targets: 0, visible: false }, // Hide estimate_id
+            { targets: 1, searchable: false, orderable: false }, // SI
+            { width: "8%", targets: 5 },   // Discount
+            { width: "12%", targets: 6 },  // Date
+            { width: "22%", targets: 7 }   // Description
+        ]
     });
 
-    // Auto-generate SI numbers
+    // SI number auto-fill
     table.on('order.dt search.dt draw.dt', function () {
-        table.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+        table.column(1, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
             cell.innerHTML = i + 1;
         });
     });
 });
 
-// Keep your deleteEstimate function as-is
+// Delete estimate
 function deleteEstimate(id) {
     if (confirm('Are you sure you want to delete this estimate?')) {
         $.ajax({
@@ -126,5 +139,3 @@ function deleteEstimate(id) {
     }
 }
 </script>
-
-

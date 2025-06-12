@@ -1,5 +1,4 @@
 <?php include "common/header.php";?>
-
 <div class="form-control mb-3 right_container"> 
     <div class="row align-items-center">
         <div class="col-md-6">
@@ -13,6 +12,28 @@
 
     <!-- Bootstrap Alert for Delete Message -->
     <div id="companyDeleteAlert" class="alert alert-success" style="display:none;"></div>
+    
+    <style>
+    table.dataTable thead th {
+        padding-top: 6px !important;
+        padding-bottom: 6px !important;
+        font-size: 14px;
+        line-height: 1.2;
+        vertical-align: middle;
+    }
+
+    table.dataTable tbody td {
+        vertical-align: middle;
+        font-size: 14px;
+    }
+
+    /* Optional: Adjust button size in table */
+    table.dataTable .btn-sm {
+        padding: 2px 6px;
+        font-size: 12px;
+    }
+</style>
+
 
     <table class="table table-bordered fixed-table" id="companiesTable">
         <thead>
@@ -68,8 +89,8 @@ $(document).ready(function () {
         ],
         order: [[6, 'desc']],
         columnDefs: [
-            { searchable: false, orderable: false, targets: 0 }
-        ]
+        { searchable: false, orderable: false, targets: [0, 4, 5] }  // Disable sort for SI NO and Action
+    ]
     });
 
     // Serial numbers

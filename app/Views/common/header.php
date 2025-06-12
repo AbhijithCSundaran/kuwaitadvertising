@@ -206,7 +206,7 @@
   </div>
 </nav>
     <!-- partial -->
-    <div class="container-fluid page-body-wrapper">      
+    <div class="container-fluid page-body-wrapper px-0">      
       <!-- partial:partials/_sidebar.html -->
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
   <ul class="nav">
