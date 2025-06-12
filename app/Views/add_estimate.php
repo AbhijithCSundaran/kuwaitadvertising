@@ -1,4 +1,5 @@
 <?php include "common/header.php";?>
+<div id="estimateAlert" class="alert alert-dismissible fade" style="display: none; position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 250px;"></div>
 <!DOCTYPE html>
 <html>
 <head>
@@ -31,7 +32,7 @@
     </style>
 </head>
 <body>
-    <div class="container mt-5 estimate-box right_container">
+    <div class="mt-1 estimate-box right_container">
         <div class="alert alert-fixed alert-dismissible fade show" role="alert"></div>
             <div class="row mb-3">
                 <div class="col-md-6">
@@ -70,39 +71,36 @@
                     </tr>
                 </thead>
                 <tbody id="item-container">
-        <?php if (isset($items) && count($items) > 0): ?>
-            <?php foreach ($items as $item): ?>
-                <tr class="item-row">
-                    <td><input type="text" name="description[]" class="form-control" value="<?= $item['description'] ?>"></td>
-                    <td><input type="number" name="price[]" class="form-control price" value="<?= $item['price'] ?>"></td>
-                    <td><input type="number" name="quantity[]" class="form-control quantity" value="<?= $item['quantity'] ?>"></td>
-                    <td><input type="number" name="total[]" class="form-control total" value="<?= $item['total'] ?>" readonly></td>
-                    <td class="text-center">
-                        <span class="remove-item-btn" title="Remove">
-                            <i class="fas fa-trash text-danger"></i>
-                        </span>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <tr class="item-row">
-                <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
-                <td><input type="number" name="price[]" class="form-control price"></td>
-                <td><input type="number" name="quantity[]" class="form-control quantity"></td>
-                <td><input type="number" name="total[]" class="form-control total" readonly></td>
-                <td class="text-center">
-                    <span class="remove-item-btn" title="Remove">
-                        <i class="fas fa-trash text-danger"></i>
-                    </span>
-                </td>
-            </tr>
-        <?php endif; ?>
-    </tbody>
-
+                    <?php if (isset($items) && count($items) > 0): ?>
+                        <?php foreach ($items as $item): ?>
+                            <tr class="item-row">
+                                <td><input type="text" name="description[]" class="form-control" value="<?= $item['description'] ?>"></td>
+                                <td><input type="number" name="price[]" class="form-control price" value="<?= $item['price'] ?>"></td>
+                                <td><input type="number" name="quantity[]" class="form-control quantity" value="<?= $item['quantity'] ?>"></td>
+                                <td><input type="number" name="total[]" class="form-control total" value="<?= $item['total'] ?>" readonly></td>
+                                <td class="text-center">
+                                    <span class="remove-item-btn" title="Remove">
+                                        <i class="fas fa-trash text-danger"></i>
+                                    </span>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr class="item-row">
+                            <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
+                            <td><input type="number" name="price[]" class="form-control price"></td>
+                            <td><input type="number" name="quantity[]" class="form-control quantity"></td>
+                            <td><input type="number" name="total[]" class="form-control total" readonly></td>
+                            <td class="text-center">
+                                <span class="remove-item-btn" title="Remove">
+                                    <i class="fas fa-trash text-danger"></i>
+                                </span>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+            </tbody>
             </table>
-
             <button type="button" class="btn btn-outline-secondary mb-34" id="add-item">Add More Item</button>
-
             <table class="table totals">
                 <tr>
                     <td><strong>Sub Total:</strong></td>
@@ -142,12 +140,14 @@ function calculateTotals() {
 
     $('#sub_total_display').text(subtotal.toFixed(2));
 
-    // Treat discount as a percentage
+    // ✅ Treat discount as a percentage
     let discountPercent = parseFloat($('#discount').val()) || 0;
     let discountAmount = (subtotal * discountPercent) / 100;
+
     let grandTotal = subtotal - discountAmount;
 
     $('#total_display').text(grandTotal.toFixed(2));
+    $('#total_amount').val(grandTotal.toFixed(2)); // if you're storing it
 }
 
 
@@ -176,23 +176,6 @@ $(document).ready(function () {
         setTimeout(() => {
             $('.alert').fadeOut();
         }, 3000);
-    }
-
-    function calculateTotals() {
-        let subtotal = 0;
-        $('.item-row').each(function () {
-            let qty = parseFloat($(this).find('.quantity').val()) || 0;
-            let price = parseFloat($(this).find('.price').val()) || 0;
-            let total = qty * price;
-            $(this).find('.total').val(total.toFixed(2));
-            subtotal += total;
-        });
-
-        $('#sub_total_display').text(subtotal.toFixed(2));
-        let discount = parseFloat($('#discount').val()) || 0;
-        let grandTotal = subtotal - discount;
-        $('#total_display').text(grandTotal.toFixed(2));
-        $('#total_amount').val(grandTotal.toFixed(2));
     }
 
     function enableGenerateButton() {
@@ -233,59 +216,73 @@ $(document).ready(function () {
     });
 
     $('#estimate-form').on('submit', function (e) {
-        e.preventDefault();
-        $('.alert').hide();
+    e.preventDefault();
+    $('.alert').hide();
 
-        const customerName = $('input[name="customer_name"]').val().trim();
-        const customerAddress = $('textarea[name="customer_address"]').val().trim();
+    const customerName = $('input[name="customer_name"]').val().trim();
+    const customerAddress = $('textarea[name="customer_address"]').val().trim();
 
-        if (!customerName || !customerAddress) {
-            showAlert('Please fill in Customer Name and Address.', 'danger');
+    const nameRegex = /^[A-Za-z][A-Za-z\s'.-]{2,}$/;
+    const addressRegex = /[A-Za-z0-9]/;
+
+    if (!nameRegex.test(customerName)) {
+        showAlert('Enter a valid Customer Name (letters only, min 3 characters).', 'danger');
+        return;
+    }
+
+    if (!addressRegex.test(customerAddress)) {
+        showAlert('Enter a valid Customer Address.', 'danger');
+        return;
+    }
+
+    let validItems = 0;
+    let invalidItemExists = false;
+
+    $('.item-row').each(function () {
+        const desc = $(this).find('input[name="description[]"]').val().trim();
+        const price = parseFloat($(this).find('input[name="price[]"]').val());
+        const qty = parseFloat($(this).find('input[name="quantity[]"]').val());
+
+        // Clean up blank rows
+        if (!desc && !price && !qty) {
+            $(this).remove();
             return;
         }
 
-        let validItems = 0;
-        let invalidItemExists = false;
-
-        $('.item-row').each(function () {
-            const desc = $(this).find('input[name="description[]"]').val().trim();
-            const price = parseFloat($(this).find('input[name="price[]"]').val());
-            const qty = parseFloat($(this).find('input[name="quantity[]"]').val());
-
-            if (desc && price > 0 && qty > 0) {
-                validItems++;
-            } else if (desc || price || qty) {
-                invalidItemExists = true;
-            } else {
-                $(this).remove(); // clean up blank row before submission
-            }
-        });
-
-        if (validItems === 0 || invalidItemExists) {
-            showAlert('Enter at least one valid item with Description, Price > 0, and Quantity > 0.', 'danger');
-            return;
+        if (desc && price > 0 && qty > 0) {
+            validItems++;
+        } else {
+            invalidItemExists = true;
         }
-
-        $.ajax({
-            url: "<?= site_url('estimate/save') ?>",
-            type: "POST",
-            data: $(this).serialize(),
-            dataType: "json",
-            success: function (response) {
-                if (response.status === 'success') {
-                    showAlert(response.message, 'success');
-                    setTimeout(() => {
-                        window.location.href = "<?= base_url('estimatelist') ?>";
-                    }, 1000);
-                } else {
-                    showAlert(response.message, 'danger');
-                }
-            },
-            error: function () {
-                showAlert('Something went wrong. Please try again.', 'danger');
-            }
-        });
     });
+
+    if (validItems === 0 || invalidItemExists) {
+        showAlert('Enter at least one valid item with Description, Price > 0, and Quantity > 0.', 'danger');
+        return;
+    }
+
+    // 🔄 Now serialize the cleaned-up form
+    $.ajax({
+        url: "<?= site_url('estimate/save') ?>",
+        type: "POST",
+        data: $(this).serialize(),
+        dataType: "json",
+        success: function (response) {
+            if (response.status === 'success') {
+                showAlert(response.message, 'success');
+                setTimeout(() => {
+                    window.location.href = "<?= base_url('estimatelist') ?>";
+                }, 1000);
+            } else {
+                showAlert(response.message, 'danger');
+            }
+        },
+        error: function () {
+            showAlert('Something went wrong. Please try again.', 'danger');
+        }
+    });
+});
+z
 
     if (!isEditMode) {
         $('#add-item').click(); // Only auto add row in create mode

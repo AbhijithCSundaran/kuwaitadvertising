@@ -1,7 +1,7 @@
 <?php include "common/header.php";?>
 
-<div class="content-wrapper right_container">
-    <div class="container-fluid px-4 "> <!-- Added padding for better spacing -->
+<div class="content-wrapper">
+    <div class="px-4 right_container"> <!-- Added padding for better spacing -->
 
         <!-- Heading Row -->
         <div class="row mb-4">

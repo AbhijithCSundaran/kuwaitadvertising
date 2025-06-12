@@ -10,6 +10,7 @@
 
 .form-control {
 	border-color: #6c757d !important;
+	padding: 12px;
 }
 
 .modal {
@@ -92,8 +93,6 @@
 	word-break: break-word;
 	padding: 10px 15px;
 	margin-top: 15px;
-	z-index: 9999;
-	position: relative;
 }
 
 .alert-fixed {
@@ -101,8 +100,8 @@
 	top: 80px;
 	left: 50%;
 	transform: translateX(-50%);
-	z-index: 9999;
-	width: 50%;
+	z-index: 1050;
+	width: 40%;  /* Adjust as needed */
 	display: none;
 }
 
@@ -110,16 +109,6 @@
 .btn-primary:not(.btn-light) {
 	background: #6c757d !important;
 	color: white;
-}
-
-#companyAlert {
-	position: fixed;
-	top: 65px;
-	left: 50%;
-	transform: translateX(-50%);
-	z-index: 1050;
-	width: 60%;
-	display: none;
 }
 
 .dataTables_length label {
@@ -190,14 +179,14 @@ table.dataTable th:first-child {
 }
 
 .footer {
-	margin-left: 259px;
+	margin-left: 257px;
 }
 
 
 .right_container {
-	width: calc(100vw - 275px);
+	width: calc(100vw - 272px);
 	margin-left: auto;
-	padding: 5px;
+	padding: 25px;
 }
 
 .permission-box {
@@ -212,16 +201,10 @@ table.dataTable th:first-child {
 	white-space: normal !important;
 	vertical-align: middle;
 }
-
-#estimateTable td:nth-child(7) {
-	white-space: pre-wrap;
-	word-wrap: break-word;
-	width: 176.825px !important;
-	/* Adjust as needed */
-	padding: 8px;
+#estimateTable th {
+    white-space: nowrap;       /* prevent header text wrap */
+    text-align: center;
 }
-
-#estimateTable td:nth-child(4) {
-	width: 66.85px;
-	/* Adjust as needed */
+.save-comp{
+	margin-right: 120px !important;
 }

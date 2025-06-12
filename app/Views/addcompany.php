@@ -1,35 +1,43 @@
 <?php include "common/header.php";?>
-<div class="container-fluid px-4 mt-3 right_container">
-    <div id="companyAlert" class="alert alert-danger alert-wrapper" style="display: none;"></div>
-
+<div id="companyAlert" class="alert alert-danger text-center alert-fixed" role="alert"></div>
+<div class="form-control right_container">
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h3 class="mb-0"><?= isset($company['company_id']) ? 'Edit Company' : 'Add Company' ?></h3>
             <a href="<?= base_url('companylist') ?>" class="btn btn-secondary">Back to List</a>
         </div>
+        <hr/>
         <div class="card-body">
             <form id="company-form" enctype="multipart/form-data" method="post">
+                <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="company_name" class="form-label">Name</label>
-                    <input type="text" name="company_name" id="company_name" class="form-control"
+                    <input type="text" name="company_name" id="company_name" class="form-control" 
+                    style="height: 40px; width: 80%; font-size: 14px;"
                         value="<?= isset($company['company_name']) ? esc($company['company_name']) : '' ?>" />
                 </div>
 
                 <div class="col-md-6 mb-3">
                     <label for="address" class="form-label">Company Address</label>
-                    <textarea name="address" id="address" class="form-control" rows="3"><?= isset($company['address']) ? esc($company['address']) : '' ?></textarea>
+                    <textarea name="address" id="address" class="form-control" 
+                    style="height: 30px; width: 80%; font-size: 14px;"
+                    rows="3"><?= isset($company['address']) ? esc($company['address']) : '' ?></textarea>
+                </div>
                 </div>
 
+                <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="tax_number" class="form-label">Tax Number</label>
                     <input type="text" name="tax_number" id="tax_number" class="form-control"
+                    style="height: 40px; width: 80%; font-size: 14px;"
                         value="<?= isset($company['tax_number']) ? esc($company['tax_number']) : '' ?>" />
                 </div>
 
                 <div class="col-md-6 mb-3">
                     <label class="form-label">Company Logo</label>
                     <?php if (!isset($company['company_id'])): ?>
-                        <input type="file" name="company_logo" id="company_logo" class="form-control" accept="image/*" />
+                        <input type="file" name="company_logo" id="company_logo" class="form-control" 
+                        style="height: 40px; width: 80%; font-size: 14px;"accept="image/*" />
                     <?php else: ?>
                         <div class="input-group">
                             <button type="button" class="btn btn-outline-secondary" id="btn-browse-file">Choose File</button>
@@ -45,14 +53,16 @@
                     <input type="hidden" name="original_logo" id="original_logo"
                         value="<?= isset($company['company_logo']) ? esc($company['company_logo']) : '' ?>" />
                 </div>
+                </div>
 
                 <input type="hidden" name="uid" id="uid"
                     value="<?= isset($company['company_id']) ? esc($company['company_id']) : '' ?>">
 
-                <div class="mt-4">
-                    <button type="button" class="btn btn-primary enter-btn"
+                <div class="mt-4 save-comp" style="text-align: right;">
+                    <button type="button" class="btn btn-primary enter-btn" 
                         <?= isset($company['company_id']) ? 'disabled style="opacity: 0.6;"' : '' ?>>Save</button>
                 </div>
+
             </form>
         </div>
     </div>

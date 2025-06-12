@@ -1,5 +1,5 @@
 <?php include "common/header.php";?>
-<div class="content-wrapper right_container">
+<div class=" right_container">
     <div class="container mt-4">
         <div class="row mb-3">
             <div class="col-md-6">
