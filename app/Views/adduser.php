@@ -1,5 +1,5 @@
 <?php include "common/header.php";?>
-<div class="form-control mb-3"> 
+<div class="form-control mb-3 right_container"> 
     <div class="row align-items-center">
         <div class="col-md-6">
             <h3 class="mb-0"><?= isset($isEdit) && $isEdit ? 'Edit User' : 'Create New User' ?></h3>

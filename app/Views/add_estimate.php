@@ -1,4 +1,4 @@
-<?php include "common/header.php"; ?>
+<?php include "common/header.php";?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -31,7 +31,7 @@
     </style>
 </head>
 <body>
-    <div class="container mt-5 estimate-box">
+    <div class="container mt-5 estimate-box right_container">
         <div class="alert alert-fixed alert-dismissible fade show" role="alert"></div>
             <div class="row mb-3">
                 <div class="col-md-6">
