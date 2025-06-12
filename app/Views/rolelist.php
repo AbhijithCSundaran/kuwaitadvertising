@@ -1,9 +1,9 @@
 <?php include "common/header.php"; ?>
-<div class="content-wrapper">
+<div class="content-wrapper rolelist-box">
     <div class="container mt-4">
         <div class="row mb-3">
             <div class="col-md-6">
-                <h3 class="mb-12">Roles and Permissions</h3>
+                <h3 class="mb-12 role-permission">Roles and Permissions</h3>
             </div>
             <div class="col-md-6 text-end">
                 <a href="<?= base_url('rolemanagement/create') ?>" class="btn btn-secondary">Add New Role</a>
@@ -15,7 +15,7 @@
             <?php endif; ?>
         </div>
 
-        <div class="card p-3">
+        <div class="card p-3 role-p3">
             <table class="table table-bordered" id="roleTable">
                 <thead>
                     <tr>

@@ -78,7 +78,14 @@ class Estimate extends BaseController
         }
 
         // Update total amount
-        $estimateModel->update($estimate_id, ['total_amount' => $subTotal]);
+        $discount = floatval($this->request->getPost('discount') ?? 0);
+        $discountAmount = ($subTotal * $discount) / 100;
+        $totalAfterDiscount = $subTotal - $discountAmount;
+
+        $estimateModel->update($estimate_id, [
+            'total_amount' => $totalAfterDiscount,
+            'discount'     => $discount 
+        ]);
 
         $db->transComplete();
 

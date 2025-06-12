@@ -51,7 +51,7 @@ class Rolemanagement extends Controller
             }
         }
 
-        return redirect()->to('/rolemanagement/rolelist')->with('success', 'Role created.');
+       return redirect()->to('/rolemanagement/create')->with('success', 'Role created successfully.');
     }
 
     public function rolelist()
@@ -157,7 +157,7 @@ class Rolemanagement extends Controller
 			}
 		}
 
-		return redirect()->to('/rolemanagement/rolelist')->with('success', 'Role updated.');
+		return redirect()->to('/rolemanagement/edit/' . $id)->with('success', 'Role updated successfully.');
 	}
 
 
