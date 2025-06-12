@@ -7,14 +7,9 @@
         <div class="col-md-6 text-end">
             <a href="<?= base_url('addexpense') ?>" class="btn btn-secondary">Add New Expense</a>
         </div>
+        <div class="alert d-none w-25 mx-auto text-center fixed top mt-3" role="alert"></div>
     </div>
     <hr>
-    <!-- <style>
-    #expenseTable thead th {
-        font-weight: bold;
-    } -->
-<!-- </style> -->
-
     <table class="table table-bordered" id="expenseTable">
         <thead>
             <tr>
@@ -36,8 +31,8 @@ $(document).ready(function () {
 let table = $('#expenseTable').DataTable({
     processing: true,
     serverSide: false,
-    lengthChange: true, // allows "Show entries" dropdown
-    pageLength: 10,     // default rows per page
+    lengthChange: true, 
+    pageLength: 10,    
     ajax: {
         url: "<?= base_url('expense/list') ?>",
         type: "POST",
@@ -67,32 +62,43 @@ let table = $('#expenseTable').DataTable({
             }
         }
     ],
-    dom: 'lfrtip' // IMPORTANT: enables length menu (l), filtering (f), table (t), pagination (p)
+    dom: 'lfrtip' 
+});
+function showAlert(message, type = 'danger') {
+    const alertBox = $('.alert');
+    alertBox
+        .removeClass('alert-success alert-danger alert-info')
+        .addClass('alert-' + type)
+        .html(message)
+        .fadeIn();
+
+    setTimeout(() => {
+        alertBox.fadeOut();
+    }, 3000);
+}
+    $(document).on('click', '.delete-expense', function () {
+    const id = $(this).data('id');
+    if (confirm('Are you sure you want to delete this expense?')) {
+        $.ajax({
+            url: "<?= base_url('expense/delete') ?>",
+            method: "POST",
+            data: { id: id },
+            dataType: "json",
+            success: function (res) {
+                if (res.status === 'success') {
+                    showAlert('Deleted successfully', 'danger');
+                    table.ajax.reload();
+                } else {
+                    showAlert('Failed to delete expense.', 'danger');
+                }
+            },
+            error: function () {
+                showAlert('Error deleting expense.', 'danger');
+            }
+        });
+    }
 });
 
-
-    // Delete handler
-    $(document).on('click', '.delete-expense', function () {
-        const id = $(this).data('id');
-        if (confirm('Are you sure you want to delete this expense?')) {
-            $.ajax({
-                url: "<?= base_url('expense/delete') ?>",
-                method: "POST",
-                data: { id: id },
-                dataType: "json",
-                success: function (res) {
-                    if (res.status === 'success') {
-                        table.ajax.reload(); 
-                    } else {
-                        alert('Failed to delete expense.');
-                    }
-                },
-                error: function () {
-                    alert('Error deleting expense.');
-                }
-            });
-        }
-    });
 });
 </script>
 

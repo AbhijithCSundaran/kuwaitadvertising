@@ -8,16 +8,15 @@
         <div class="col-md-6 text-end">
             <a href="<?= base_url('adduser') ?>" class="btn btn-secondary">Add New User</a>
         </div>
+        <div class="alert w-25 mx-auto text-center fixed top mt-3" role="alert" style="z-index: 1000; display: none;"  ></div>
     </div>
     <hr>
-    <div class="alert" role="alert" style="display: none;"></div>
         <table class="table table-bordered" id="userTable">
             <thead>
                 <tr>
                     <th>SI NO</th>
                     <th>Name</th>
                     <th>Email</th>
-                    <th>Password</th>
                     <th>Phone Number</th>
                     <th>Action</th>
                 </tr>
@@ -43,7 +42,6 @@ function loadUsers() {
                         <td>${index + 1}</td>
                         <td>${user.name}</td>
                         <td>${user.email}</td>
-                        <td>********</td>
                         <td>${user.phonenumber}</td>
                         <td>
                             <button class="btn btn-sm btn-warning" onclick="editUser(${user.user_id})">Edit</button>

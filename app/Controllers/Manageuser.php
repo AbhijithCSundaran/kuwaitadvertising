@@ -68,12 +68,6 @@ class Manageuser extends BaseController
             $changes = array_diff_assoc($data, $existingUser);
             $hasChanges = !empty($changes) || isset($data['password']);
 
-            if (!$hasChanges) {
-                return $this->response->setJSON([
-                    'status' => 'nochange',
-                    'message' => 'No changes were made.'
-                ]);
-            }
 
             $model->update($id, $data);
             $msg = 'User details updated successfully.';
