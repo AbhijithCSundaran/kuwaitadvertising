@@ -1,6 +1,6 @@
 <?php include "common/header.php";?>
       <!-- partial -->
-      <div class="main-panel">
+      <div class="main-panel right_container">
         <div class="content-wrapper">
 
           <div class="row">

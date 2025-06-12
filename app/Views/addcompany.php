@@ -1,5 +1,5 @@
-<?php include "common/header.php"; ?>
-<div class="container-fluid px-4 mt-3 add-form">
+<?php include "common/header.php";?>
+<div class="container-fluid px-4 mt-3 right_container">
     <div id="companyAlert" class="alert alert-danger alert-wrapper" style="display: none;"></div>
 
     <div class="card">

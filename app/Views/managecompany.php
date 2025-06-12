@@ -1,7 +1,7 @@
 <?php include "common/header.php";?>
         <!-- partial -->
 	
-        <div class="content-wrapper">
+        <div class="content-wrapper right_container">
 				<div class="form-control">
 					<div class="row">
 						<div class="col-md-6">

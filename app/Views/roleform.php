@@ -1,7 +1,7 @@
-<?php include "common/header.php"; ?>
+<?php include "common/header.php";?>
 
-<div class="content-wrapper">
-    <div class="container-fluid px-4 roleform-box"> <!-- Added padding for better spacing -->
+<div class="content-wrapper right_container">
+    <div class="container-fluid px-4 "> <!-- Added padding for better spacing -->
 
         <!-- Heading Row -->
         <div class="row mb-4">
