@@ -1,5 +1,5 @@
 <?php include "common/header.php"; ?>
-<div class="form-control mb-3">
+<div class="form-control mb-3 estim-b3">
     <div class="row align-items-center">
         <div class="col-md-6">
             <h3 class="mb-0">Estimate Directory</h3>
@@ -35,41 +35,76 @@
 <?php include "common/footer.php"; ?>
 
 <script>
-function loadEstimates() {
-    $.ajax({
-        url: "<?= base_url('estimate/estimatelistajax') ?>",
-        method: "GET",
-        dataType: "json",
-        success: function(data) {
-            let table = $('#estimateTable').DataTable();
-            table.clear();
-
-            if (data.data && data.data.length > 0) {
-                data.data.forEach(function(e, index) {
-                    table.row.add([
-						index + 1,
-						e.customer_name,
-						e.customer_address,
-						parseFloat(e.total_amount).toFixed(2) + " KWD",
-						parseFloat(e.discount).toFixed(2) + " KWD",
-						new Date(e.date).toLocaleDateString(),
-						e.description ? e.description : '-',
-						`
-							<a href="<?= base_url('estimate/edit/') ?>${e.estimate_id}" class="btn btn-sm btn-primary-edit">Edit</a>
-							<button class="btn btn-sm btn-danger" onclick="deleteEstimate(${e.estimate_id})">Delete</button>
-						`
-					]);
-                });
-            }
-
-            table.draw();
+$(document).ready(function () {
+    var table = $('#estimateTable').DataTable({
+        ajax: {
+            url: "<?= base_url('estimate/estimatelistajax') ?>",
+            type: "GET",
+            dataSrc: "data"
         },
-        error: function() {
-            alert('Failed to load estimates.');
-        }
+        paging: true,
+        searching: true,
+        ordering: false,
+        info: false,
+        autoWidth: false,
+        lengthMenu: [5, 10, 15, 20, 25],
+        pageLength: 10,
+        order: [[5, 'desc']],
+        columns: [
+            { data: null }, // SI
+            { data: "customer_name" },
+            { data: "customer_address" },
+            {
+                data: "total_amount",
+                render: function (data) {
+                    return parseFloat(data).toFixed(2) + ' KWD';
+                }
+            },
+            {
+                data: "discount",
+                render: function (data) {
+                    return parseFloat(data).toFixed(2) + ' KWD';
+                }
+            },
+            {
+                data: "date",
+                render: function (data) {
+                    return new Date(data).toLocaleDateString();
+                }
+            },
+            {
+                data: "description",
+                render: function (desc) {
+                    if (!desc) return '-';
+                    let items = desc.split(',').map(item => item.trim());
+                    return items.map((item, i) => `${i + 1}. ${item}`).join('<br>');
+                }
+            },
+            {
+                data: "estimate_id",
+                render: function (id) {
+                    return `
+                        <a href="<?= base_url('estimate/edit/') ?>${id}" class="btn btn-sm btn-primary-edit">Edit</a>
+                        <button class="btn btn-sm btn-danger" onclick="deleteEstimate(${id})">Delete</button>
+                    `;
+                }
+            }
+        ],
+        columnDefs: [
+            { searchable: false, orderable: false, targets: 0 } // SI column
+        ],
+        order: [[5, 'desc']] // Sort by date if needed
     });
-}
 
+    // Auto-generate SI numbers
+    table.on('order.dt search.dt draw.dt', function () {
+        table.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+            cell.innerHTML = i + 1;
+        });
+    });
+});
+
+// Keep your deleteEstimate function as-is
 function deleteEstimate(id) {
     if (confirm('Are you sure you want to delete this estimate?')) {
         $.ajax({
@@ -77,29 +112,19 @@ function deleteEstimate(id) {
             method: "POST",
             data: { estimate_id: id },
             dataType: "json",
-            success: function(response) {
+            success: function (response) {
                 if (response.status === 'success') {
-                    loadEstimates();
+                    $('#estimateTable').DataTable().ajax.reload(null, false);
                 } else {
                     alert('Failed to delete estimate.');
                 }
             },
-            error: function() {
+            error: function () {
                 alert('Error occurred while deleting estimate.');
             }
         });
     }
 }
-
-$(document).ready(function() {
-    $('#estimateTable').DataTable({
-        destroy: true,
-        paging: true,
-        searching: true,
-        ordering: false,
-        info: false
-    });
-
-    loadEstimates();
-});
 </script>
+
+
