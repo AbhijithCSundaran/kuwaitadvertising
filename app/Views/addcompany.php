@@ -1,73 +1,81 @@
 <?php include "common/header.php";?>
-<div id="companyAlert" class="alert alert-danger text-center alert-fixed" role="alert"></div>
-<div class="form-control right_container">
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h3 class="mb-0"><?= isset($company['company_id']) ? 'Edit Company' : 'Add Company' ?></h3>
-            <a href="<?= base_url('companylist') ?>" class="btn btn-secondary">Back to List</a>
-        </div>
-        <hr/>
-        <div class="card-body">
-            <form id="company-form" enctype="multipart/form-data" method="post">
-                <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="company_name" class="form-label">Name</label>
-                    <input type="text" name="company_name" id="company_name" class="form-control" 
-                    style="height: 40px; width: 80%; font-size: 14px;"
-                        value="<?= isset($company['company_name']) ? esc($company['company_name']) : '' ?>" />
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label for="address" class="form-label">Company Address</label>
-                    <textarea name="address" id="address" class="form-control" 
-                    style="height: 30px; width: 80%; font-size: 14px;"
-                    rows="3"><?= isset($company['address']) ? esc($company['address']) : '' ?></textarea>
-                </div>
-                </div>
-
-                <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="tax_number" class="form-label">Tax Number</label>
-                    <input type="text" name="tax_number" id="tax_number" class="form-control"
-                    style="height: 40px; width: 80%; font-size: 14px;"
-                        value="<?= isset($company['tax_number']) ? esc($company['tax_number']) : '' ?>" />
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Company Logo</label>
-                    <?php if (!isset($company['company_id'])): ?>
-                        <input type="file" name="company_logo" id="company_logo" class="form-control" 
-                        style="height: 40px; width: 80%; font-size: 14px;"accept="image/*" />
-                    <?php else: ?>
-                        <div class="input-group">
-                            <button type="button" class="btn btn-outline-secondary" id="btn-browse-file">Choose File</button>
-                            <input type="text" id="fake-file-name" class="form-control" readonly
-                                value="<?= esc($company['company_logo']) ?>" />
-                            <input type="file" name="company_logo" id="company_logo" class="d-none" accept="image/*" />
+<div id="companyAlert" class="alert alert-danger w-25 mx-auto text-center fixed top mt-3 alert-fixed" role="alert"></div>
+    <div class="form-control right_container">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0"><?= isset($company['company_id']) ? 'Edit Company' : 'Add Company' ?></h3>
+                <a href="<?= base_url('companylist') ?>" class="btn btn-secondary">Back to List</a>
+            </div>
+            <hr/>
+            <div class="card-body">
+                <form id="company-form" enctype="multipart/form-data" method="post">
+                    <div class="d-flex flex-wrap">
+                        
+                        <div class="col-6 mb-3 px-2">
+                            <label for="company_name" class="form-label">Name <span class="text-danger">*</span></label>
+                            <input type="text" name="company_name" id="company_name" class="form-control" maxlength="50"
+                            value="<?= isset($company['company_name']) ? esc($company['company_name']) : '' ?>" />
                         </div>
-                        <div class="mt-2">
-                            <strong>Current Logo Preview:</strong><br>
-                            <img id="logo-preview" src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" width="100" class="border p-1" />
+
+                        <div class="col-6 mb-3 px-2">
+                            <label for="address" class="form-label">Company Address <span class="text-danger">*</span></label>
+                            <textarea name="address" id="address" class="form-control" maxlength="150"
+                                style="resize: vertical;"
+                                rows="3"><?= isset($company['address']) ? esc($company['address']) : '' ?></textarea>
                         </div>
-                    <?php endif; ?>
-                    <input type="hidden" name="original_logo" id="original_logo"
-                        value="<?= isset($company['company_logo']) ? esc($company['company_logo']) : '' ?>" />
-                </div>
-                </div>
 
-                <input type="hidden" name="uid" id="uid"
-                    value="<?= isset($company['company_id']) ? esc($company['company_id']) : '' ?>">
+                        <div class="col-6 mb-3 px-2">
+                            <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                            <input type="email" name="email" id="email" class="form-control"
+                            value="<?= isset($company['email']) ? esc($company['email']) : '' ?>" />
+                        </div>
+                        <div class="col-6 mb-3 px-2">
+                            <label for="phone" class="form-label">Phone <span class="text-danger">*</span></label>
+                            <input type="text" name="phone" id="phone" class="form-control" maxlength="10" pattern="\d{10}"
+                            value="<?= isset($company['phone']) ? esc($company['phone']) : '' ?>" />
+                        </div>
+                        
+                        <div class="col-6 mb-3 px-2">
+                            <label for="tax_number" class="form-label">Tax Number <span class="text-danger">*</span></label>
+                            <input type="text" name="tax_number" id="tax_number" class="form-control"
+                            value="<?= isset($company['tax_number']) ? esc($company['tax_number']) : '' ?>" />
+                        </div>
+                        <div class="col-6 mb-3 px-2">
+                            <label class="form-label">Company Logo <span class="text-danger">*</span></label>
+                           <?php if (!isset($company['company_id'])): ?>
+                                <input type="file" name="company_logo" id="company_logo" class="form-control" accept="image/*" />
+                            <?php else: ?>
 
-                <div class="mt-4 save-comp" style="text-align: right;">
-                    <button type="button" class="btn btn-primary enter-btn" 
-                        <?= isset($company['company_id']) ? 'disabled style="opacity: 0.6;"' : '' ?>>Save</button>
-                </div>
+                                <div class="input-group">
+                                    <button type="button" class="btn btn-outline-secondary" id="btn-browse-file">Choose File</button>
+                                    <input type="text" id="fake-file-name" class="form-control" readonly
+                                    value="<?= esc($company['company_logo']) ?>" />
+                                    <input type="file" name="company_logo" id="company_logo" class="d-none" accept="image/*" />
+                                </div>
+                           
+                                <div class="mt-2">
+                                    <strong>Current Logo Preview:</strong><br>
+                                    <img id="logo-preview" src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" width="100" class="border p-1" />
+                                </div>
+                            <?php endif; ?>
+                                <div>
+                                    <input type="hidden" name="original_logo" id="original_logo"
+                                    value="<?= isset($company['company_logo']) ? esc($company['company_logo']) : '' ?>" />
+                                </div>
+                        </div>
 
-            </form>
+                        <input type="hidden" name="uid" id="uid"
+                        value="<?= isset($company['company_id']) ? esc($company['company_id']) : '' ?>" />
+                        <div class="col-12 p-3 d-flex justify-content-end" >
+                               <button type="button" class="btn btn-primary enter-btn" 
+                             <?= isset($company['company_id']) ? 'disabled style="opacity: 0.6;"' : '' ?>>Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
-                    </div>
 <?php include "common/footer.php"; ?>
 <script>
 $(document).ready(function () {
@@ -83,6 +91,8 @@ $(document).ready(function () {
         name: $('#company_name').val(),
         address: $('#address').val(),
         tax: $('#tax_number').val(),
+        email: $('#email').val(),
+        phone: $('#phone').val(),
         logo: $('#original_logo').val()
     };
 
@@ -91,6 +101,8 @@ $(document).ready(function () {
 			name: $('#company_name').val(),
 			address: $('#address').val(),
 			tax: $('#tax_number').val(),
+            email: $('#email').val(),
+            phone: $('#phone').val(),
 			logoChanged: $('#company_logo')[0].files.length > 0
 		};
 
@@ -98,6 +110,8 @@ $(document).ready(function () {
 			currentData.name !== originalData.name ||
 			currentData.address !== originalData.address ||
 			currentData.tax !== originalData.tax ||
+            currentData.email !== originalData.email ||
+            currentData.phone !== originalData.phone ||
 			currentData.logoChanged;
 
 		if (hasChanged) {
@@ -108,7 +122,7 @@ $(document).ready(function () {
 	}
 
 
-    $('#company_name, #address, #tax_number').on('input', checkChanges);
+    $('#company_name, #address, #tax_number, #email, #phone').on('input', checkChanges);
     $('#company_logo').on('change', checkChanges);
 
     <?php if (isset($company['company_id'])): ?>
@@ -146,6 +160,8 @@ $(document).ready(function () {
         let name = $('#company_name').val().trim();
         let address = $('#address').val().trim();
         let tax = $('#tax_number').val().trim();
+        let email = $('#email').val().trim();
+        let phone = $('#phone').val().trim();
         let uid = $('#uid').val().trim();
         let fileInput = $('#company_logo')[0];
         let file = fileInput ? fileInput.files[0] : null;
@@ -170,6 +186,22 @@ $(document).ready(function () {
             return;
         }
 
+        if (!email || !phone) {
+            showMessage('Email and phone number are required.', 'danger');
+            return;
+        }
+        let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            showMessage('Please enter a valid email address.', 'danger');
+            return;
+        }
+
+        let phoneRegex = /^[0-9+\-\s]{7,20}$/;
+        if (!phoneRegex.test(phone)) {
+            showMessage('Please enter a valid phone number.', 'danger');
+            return;
+        }
+        
         if (!file && !uid) {
             showMessage('Please upload a company logo (image file).', 'danger');
             return;

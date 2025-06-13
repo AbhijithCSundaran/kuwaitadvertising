@@ -47,6 +47,8 @@ class Managecompany extends BaseController
 			'company_name' => 'required',
 			'address' => 'required',
 			'tax_number' => 'required',
+			'email' => 'required|valid_email',
+			'phone' => 'required',
 		];
 
 		if (!$uid) {
@@ -74,6 +76,9 @@ class Managecompany extends BaseController
 			'company_name' => $this->request->getPost('company_name'),
 			'address' => $this->request->getPost('address'),
 			'tax_number' => $this->request->getPost('tax_number'),
+			'email' => $this->request->getPost('email'),
+			'phone' => $this->request->getPost('phone'),
+			
 		];
 
 		if ($uid) {
@@ -110,6 +115,8 @@ class Managecompany extends BaseController
 				$newData['company_name'] !== $existing['company_name'] ||
 				$newData['address'] !== $existing['address'] ||
 				$newData['tax_number'] !== $existing['tax_number'] ||
+				$newData['email'] !== $existing['email'] ||
+				$newData['phone'] !== $existing['phone'] ||
 				$newData['company_logo'] !== $existing['company_logo']
 			);
 

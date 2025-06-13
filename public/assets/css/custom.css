@@ -208,3 +208,21 @@ table.dataTable th:first-child {
 .save-comp{
 	margin-right: 120px !important;
 }
+table.dataTable th, table.dataTable td {
+    white-space: nowrap;       /* Prevent wrapping */
+    vertical-align: middle;    /* Align content vertically */
+}
+
+table.dataTable th {
+    min-width: 100px;          /* Minimum width for header cells */
+}
+
+table.dataTable td {
+    word-break: break-word;    /* Allow breaking of long words in cell body */
+}
+th.no-sort::after {
+    display: none !important;
+}
+.dataTables_wrapper .dataTables_length select {
+    width: 50px !important;
+}
