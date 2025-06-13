@@ -48,7 +48,7 @@
     </style>
 
 
-    <table class="table table-bordered fixed-table" id="companiesTable">
+    <table class="table table-bordered fixed-table" id="companiesTable" style="width:100%">
         <thead>
             <tr>
                 <th style="width: 30px !important;">SI NO</th>
@@ -59,10 +59,10 @@
                 <th>Phone</th>
                 <th>Logo</th>
                 <th>Action</th>
-                <th class="d-none">ID</th> <!-- Hidden column for sorting -->
+                <th class="d-none">ID</th> 
             </tr>
         </thead>
-        <tbody></tbody> <!-- Leave empty for AJAX -->
+        <tbody></tbody> 
     </table>
 </div>
 </div>
@@ -83,10 +83,10 @@ $(document).ready(function () {
         columns: [
             { data: null },
             { data: "company_name", className: "wrap-text" },
-            { data: "address", className: "wrap-text" },
-            { data: "tax_number" },
-            { data: "email"},
-            { data: "phone"},
+            { data: "address", className: "wrap-text d-none d-md-table-cell" },// hide on small
+            { data: "tax_number", className: "d-none d-lg-table-cell" },         
+            { data: "email", className: "d-none d-xl-table-cell" }, 
+            { data: "phone", className: "d-none d-xxl-table-cell" },              
             {
                 data: "company_logo",
                 render: function (data) {

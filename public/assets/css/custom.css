@@ -208,6 +208,9 @@ table.dataTable th:first-child {
 .save-comp{
 	margin-right: 120px !important;
 }
+table{
+	max-width: 100% !important;
+}
 table.dataTable th, table.dataTable td {
     white-space: nowrap;       /* Prevent wrapping */
     vertical-align: middle;    /* Align content vertically */

@@ -222,11 +222,11 @@ $(document).ready(function () {
     const customerName = $('input[name="customer_name"]').val().trim();
     const customerAddress = $('textarea[name="customer_address"]').val().trim();
 
-    const nameRegex = /^[A-Za-z][A-Za-z\s'.-]{2,}$/;
+    const nameRegex = /^[A-Za-z][A-Za-z\s'.-]/;
     const addressRegex = /[A-Za-z0-9]/;
 
     if (!nameRegex.test(customerName)) {
-        showAlert('Enter a valid Customer Name (letters only, min 3 characters).', 'danger');
+        showAlert('Enter a valid Customer Name.', 'danger');
         return;
     }
 
