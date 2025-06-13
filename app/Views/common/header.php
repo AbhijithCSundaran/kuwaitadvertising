@@ -62,31 +62,15 @@
       <a class="navbar-brand brand-logo-mini" href="index.html"><img src="../../../assets/images/logo-mini.svg"
           alt="logo" /></a>
       <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
-        <span class="mdi mdi-sort-variant"></span>
+       
       </button>
     </div>
   </div>
   <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
-    <ul class="navbar-nav me-lg-4 w-100">
-      <li class="nav-item nav-search d-none d-lg-block w-100">
-        <div class="input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text" id="search">
-              <i class="mdi mdi-magnify"></i>
-            </span>
-          </div>
-          <input type="text" class="form-control" placeholder="Search now" aria-label="search"
-            aria-describedby="search">
-        </div>
-      </li>
-    </ul>
+    
     <ul class="navbar-nav navbar-nav-right">
       <li class="nav-item dropdown me-1">
-        <a class="nav-link count-indicator dropdown-toggle d-flex justify-content-center align-items-center"
-          id="messageDropdown" href="#" data-bs-toggle="dropdown">
-          <i class="mdi mdi-message-text mx-0"></i>
-          <span class="count"></span>
-        </a>
+        
         <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="messageDropdown">
           <p class="mb-0 font-weight-normal float-left dropdown-header">Messages</p>
           <a class="dropdown-item preview-item">
@@ -128,11 +112,7 @@
         </div>
       </li>
       <li class="nav-item dropdown me-4">
-        <a class="nav-link count-indicator dropdown-toggle d-flex align-items-center justify-content-center notification-dropdown"
-          id="notificationDropdown" href="#" data-bs-toggle="dropdown">
-          <i class="mdi mdi-bell mx-0"></i>
-          <span class="count"></span>
-        </a>
+       
         <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list"
           aria-labelledby="notificationDropdown">
           <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
@@ -178,25 +158,13 @@
         </div>
       </li>
       <li class="nav-item nav-profile dropdown">
-        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" id="profileDropdown">
-          <img src="../../../assets/images/faces/face5.jpg" alt="profile" />
-          <span class="nav-profile-name">Louis Barnett</span>
-        </a>
+        
         <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
           <a class="dropdown-item">
             <i class="mdi mdi-cog text-primary"></i>
             Settings
           </a>
-          <a class="dropdown-item">
-            <i class="mdi mdi-logout text-primary"></i>
-            Logout
-          </a>
         </div>
-      </li>
-      <li class="nav-item nav-settings d-none d-lg-flex">
-        <a class="nav-link" href="#">
-          <i class="mdi mdi-apps"></i>
-        </a>
       </li>
     </ul>
     <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button"
@@ -227,7 +195,7 @@
       <a class="nav-link" href="<?= base_url('companylist') ?>">
         <i class="mdi mdi-view-headline menu-icon"></i>
         <span class="menu-title">Company Management</span>
-        <i class="menu-arrow"></i>
+        
       </a>
       <div class="collapse" id="form-elements">
         <ul class="nav flex-column sub-menu">
@@ -239,7 +207,7 @@
 	  <a class="nav-link" href="<?= base_url('rolemanagement/rolelist') ?>">
 		<i class="mdi mdi-chart-pie menu-icon"></i>
 		<span class="menu-title">Role Management</span>
-		<i class="menu-arrow"></i>
+		
 	  </a>
 	</li>
 
@@ -247,7 +215,7 @@
       <a class="nav-link" href="<?= base_url('estimatelist') ?>">
         <i class="mdi mdi-grid-large menu-icon"></i>
         <span class="menu-title">Estimate Generation</span>
-        <i class="menu-arrow"></i>
+        
       </a>
       <div class="collapse" id="tables">
         <ul class="nav flex-column sub-menu">
@@ -260,7 +228,7 @@
       <a class="nav-link" data-bs-toggle="collapse" href="#icons" aria-expanded="false" aria-controls="icons">
         <i class="mdi mdi-emoticon menu-icon"></i>
         <span class="menu-title">Invoice Generation</span>
-        <i class="menu-arrow"></i>
+        <!-- <i class="menu-arrow"></i> -->
       </a>
       <div class="collapse" id="icons">
         <ul class="nav flex-column sub-menu">          
@@ -272,7 +240,7 @@
       <a class="nav-link" data-bs-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
         <i class="mdi mdi-clipboard menu-icon"></i>
         <span class="menu-title">Reports</span>
-        <i class="menu-arrow"></i>
+        <!-- <i class="menu-arrow"></i> -->
       </a>
       <div class="collapse" id="auth">
         <ul class="nav flex-column sub-menu">
@@ -287,6 +255,12 @@
       <a class="nav-link" href="<?= base_url('expense') ?>">
         <i class="mdi mdi-square-outline menu-icon"></i>
         <span class="menu-title">Expenses</span>
+      </a>
+    </li>   
+    <li class="nav-item">
+      <a class="nav-link" href="<?= base_url('logout') ?>">
+        <i class="mdi mdi-logout menu-icon"></i>
+        <span class="menu-title">Logout</span>
       </a>
     </li>    
   </ul>
