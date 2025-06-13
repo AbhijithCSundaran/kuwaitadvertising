@@ -90,7 +90,6 @@ class Managecompany extends BaseController
 				]);
 			}
 
-			// Check for duplicates (excluding the current one)
 			$duplicate = $this->companyModel
 				->where('company_name', $newData['company_name'])
 				->where('tax_number', $newData['tax_number'])
@@ -127,7 +126,7 @@ class Managecompany extends BaseController
 				]);
 			}
 
-			// Delete old logo file if updated
+			// Delete 
 			if ($logoName && !empty($existing['company_logo']) && file_exists(ROOTPATH . 'public/uploads/' . $existing['company_logo'])) {
 				unlink(ROOTPATH . 'public/uploads/' . $existing['company_logo']);
 			}
@@ -182,8 +181,7 @@ class Managecompany extends BaseController
             return $this->response->setJSON(['status' => 'error', 'message' => 'Failed to delete company']);
         }
     }
-	// Controller: Managecompany.php
-
+	
 	public function companylistjson()
 	{
 		$companies = $this->companyModel->findAll();

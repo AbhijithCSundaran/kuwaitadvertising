@@ -17,29 +17,27 @@
         </div>
     </div>
     <hr>
-    <div class="card">
-        <div class="table-responsive">
-            <table class="table table-bordered" id="estimateTable">
-                <thead>
-                    <tr>
-                        <th style="display:none;">ID</th> <!-- Hidden column for sorting -->
-                        <th>SI</th>
-                        <th>Customer Name</th>
-                        <th>Customer Address</th>
-                        <th>Total Amount</th>
-                        <th>Discount</th>
-                        <th>Date</th>
-                        <th>Description</th> 
-                        <th>Action</th>
-                    </tr>
-                </thead>
+    <div class="table-responsive">
+        <table class="table table-bordered" id="estimateTable">
+            <thead>
+                <tr>
+                    <th style="display:none;">ID</th> <!-- Hidden column for sorting -->
+                    <th>SI</th>
+                    <th>Customer Name</th>
+                    <th>Customer Address</th>
+                    <th>Total Amount</th>
+                    <th>Discount</th>
+                    <th>Date</th>
+                    <th>Description</th> 
+                    <th>Action</th>
+                </tr>
+            </thead>
                 <tbody>
                     <!-- Populated via JavaScript -->
                 </tbody>
             </table>
         </div>
     </div>
-</div>
 </div>
 <?php include "common/footer.php"; ?>
 
