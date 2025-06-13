@@ -8,6 +8,6 @@ class Managecompany_Model extends Model
 {
     protected $table = 'company';
     protected $primaryKey = 'company_id';
-    protected $allowedFields = ['company_name', 'address', 'tax_number', 'company_logo'];
+    protected $allowedFields = ['company_name', 'address', 'tax_number', 'company_logo', 'email', 'phone'];
     
 }

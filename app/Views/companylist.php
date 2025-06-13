@@ -10,8 +10,7 @@
     </div>
     <hr>
 
-    <!-- Bootstrap Alert for Delete Message -->
-    <div id="companyDeleteAlert" class="alert alert-success" style="display:none;"></div>
+    <div id="companyDeleteAlert" class="alert alert-success w-25 mx-auto text-center fixed top mt-3" style="display:none;"></div>
     
     <style>
     table.dataTable thead th {
@@ -27,21 +26,37 @@
         font-size: 14px;
     }
 
-    /* Optional: Adjust button size in table */
+    
     table.dataTable .btn-sm {
         padding: 2px 6px;
         font-size: 12px;
     }
-</style>
+
+     
+    table.dataTable th:nth-child(1),  /* SI NO */
+    table.dataTable td:nth-child(1) {
+        width: 50px;
+        text-align: center;
+    }
+
+    table.dataTable th:nth-child(3),  /* Address */
+    table.dataTable td:nth-child(3) {
+        width: 250px;  
+        word-break: break-word;
+    }
+    
+    </style>
 
 
     <table class="table table-bordered fixed-table" id="companiesTable">
         <thead>
             <tr>
-                <th>SI NO</th>
+                <th style="width: 30px !important;">SI NO</th>
                 <th>Name</th>
-                <th>Address</th>
+                <th style="width: 200px;">Address</th>
                 <th>Tax Number</th>
+                <th style="width: 150px;">Email</th>
+                <th>Phone</th>
                 <th>Logo</th>
                 <th>Action</th>
                 <th class="d-none">ID</th> <!-- Hidden column for sorting -->
@@ -54,7 +69,7 @@
 
 <script>
 $(document).ready(function () {
-    var table = $('#companiesTable').DataTable({
+    var table = $('#companiesTable').DataTable({    
         ajax: {
             url: "<?= base_url('managecompany/getAllCompanies') ?>",
             type: "GET",
@@ -70,6 +85,8 @@ $(document).ready(function () {
             { data: "company_name", className: "wrap-text" },
             { data: "address", className: "wrap-text" },
             { data: "tax_number" },
+            { data: "email"},
+            { data: "phone"},
             {
                 data: "company_logo",
                 render: function (data) {
@@ -87,9 +104,10 @@ $(document).ready(function () {
             },
             { data: "company_id", visible: false }
         ],
-        order: [[6, 'desc']],
+        order: [[8, 'desc']],
+        
         columnDefs: [
-        { searchable: false, orderable: false, targets: [0, 4, 5] }  // Disable sort for SI NO and Action
+        { searchable: false, orderable: false, targets: [0, 2, 3, 4, 5, 6, 7] }
     ]
     });
 
