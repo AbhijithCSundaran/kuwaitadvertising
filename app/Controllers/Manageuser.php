@@ -81,14 +81,15 @@ class Manageuser extends BaseController
             'message' => $msg
         ]);
     }
+// ajax integration
+   public function userlistajax()
+{
+    $model = new \App\Models\Manageuser_Model();
+    $data = $model->orderBy('user_id', 'DESC')->findAll();
 
-    public function userlist()
-    {
-        $model = new Manageuser_Model();
-        return $this->response->setJSON([
-            'user' => $model->orderBy('user_id', 'DESC')->findAll()
-        ]);
-    }
+    return $this->response->setJSON($data);
+}
+
    public function delete($id)
     {
         $userModel = new \App\Models\Manageuser_Model();
