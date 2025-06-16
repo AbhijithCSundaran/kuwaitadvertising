@@ -51,7 +51,9 @@ class Rolemanagement extends Controller
             }
         }
 
-       return redirect()->to('/rolemanagement/create')->with('success', 'Role created successfully.');
+      session()->setFlashdata('success', 'Role created successfully.');
+        return view('roleform', ['menus' => $this->menus]);
+
     }
 
     public function rolelist()
@@ -112,26 +114,23 @@ class Rolemanagement extends Controller
 		$role_name = $this->request->getPost('role_name');
 		$access_data = $this->request->getPost('access') ?? [];
 
-		// Normalize: set all menu items to 0 initially
 		$normalizedAccess = [];
 		foreach ($this->menus as $menu) {
 			$normalizedAccess[$menu] = isset($access_data[$menu]) ? 1 : 0;
 		}
 
-		// Fetch existing data
 		$existingRole = $this->roleModel->find($id);
 		$existingPermissions = $this->roleMenuModel->where('role_id', $id)->findAll();
 
-		// Map existing access
 		$oldAccess = [];
 		foreach ($this->menus as $menu) {
-			$oldAccess[$menu] = 0; // default
+			$oldAccess[$menu] = 0;
 		}
 		foreach ($existingPermissions as $perm) {
 			$oldAccess[$perm['menu_name']] = (int) $perm['access'];
 		}
 
-		// Compare changes
+		
 		$isNameChanged = $existingRole['role_name'] !== $role_name;
 		$isAccessChanged = $normalizedAccess !== $oldAccess;
 
@@ -139,13 +138,13 @@ class Rolemanagement extends Controller
 			return redirect()->back()->with('info', 'No changes detected to update.');
 		}
 
-		// Update name
+		
 		$this->roleModel->update($id, [
 			'role_name' => $role_name,
 			'updated_at' => date('Y-m-d H:i:s'),
 		]);
 
-		// Replace access
+		
 		$this->roleMenuModel->where('role_id', $id)->delete();
 		foreach ($normalizedAccess as $menu => $value) {
 			if ($value == 1) {
@@ -157,9 +156,16 @@ class Rolemanagement extends Controller
 			}
 		}
 
-		return redirect()->to('/rolemanagement/edit/' . $id)->with('success', 'Role updated successfully.');
+		$role = $this->roleModel->find($id);
+            $access = $normalizedAccess;
+
+            session()->setFlashdata('success', 'Role updated successfully.');
+            return view('roleform', [
+                'role' => $role,
+                'access' => $access,
+                'menus' => $this->menus
+            ]);
+
 	}
-
-
 
 }

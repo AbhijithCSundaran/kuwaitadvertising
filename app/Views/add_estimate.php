@@ -38,9 +38,6 @@
                 <div class="col-md-6">
                     <h3><?= isset($estimate['estimate_id']) ? 'Edit Estimate' : 'Estimate Generation' ?></h3>
                 </div>
-                <div class="col-md-6 text-right">
-                    <a href="<?= base_url('estimatelist') ?>" class="btn btn-secondary">Back to List</a>
-                </div>
             </div>
         <form id="estimate-form">
             <div class="row">
@@ -53,12 +50,12 @@
                 </div>
                 <div class="col-md-6">
                     <div class="estimate-title">ESTIMATE</div>
-                    <div class="estimate-details">
-                        <p id="estimate-id-display">Estimate No : <?= isset($estimate['estimate_id']) ? $estimate['estimate_id'] : '' ?></p>
-                        <p>Date : <?= date('d-m-Y') ?></p>
+                        <div class="estimate-details">
+                            <p id="estimate-id-display">Estimate No : <?= isset($estimate['estimate_id']) ? $estimate['estimate_id'] : '' ?></p>
+                            <p>Date : <?= date('d-m-Y') ?></p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
             <table class="table table-bordered mt-4">
                 <thead>
@@ -110,7 +107,7 @@
                     <td><strong>Discount:</strong></td>
                     <td>
                         <input type="number" name="discount" id="discount" class="form-control w-25 d-inline" value="<?= isset($estimate['discount']) ? $estimate['discount'] : '0' ?>" min="0">
-                        KWD
+                        %
                     </td>
                 </tr>
                 <tr>
@@ -120,6 +117,7 @@
             </table>
             <input type="hidden" name="estimate_id" value="<?= isset($estimate['estimate_id']) ? $estimate['estimate_id'] : '' ?>">
             <div class="text-right">
+                <a href="<?= base_url('estimatelist') ?>" class="btn btn-secondary">Discard</a>
                 <button type="submit" id="generate-btn" class="btn btn-primary">Generate Estimate</button>
             </div>
         </form>

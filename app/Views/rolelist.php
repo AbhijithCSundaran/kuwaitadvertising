@@ -1,46 +1,42 @@
 <?php include "common/header.php";?>
-<div class=" right_container">
+<div id="roleDeleteAlert" class="alert text-center alert-fixed" style="display: none;"></div>
+
+<div class="right_container">
     <div class="container mt-4">
         <div class="row mb-3">
             <div class="col-md-6">
                 <h3 class="mb-12 role-permission">Roles and Permissions</h3>
             </div>
-            <div class="col-md-6 text-end">
+            <div class="col-md-6 text-end p-2">
                 <a href="<?= base_url('rolemanagement/create') ?>" class="btn btn-secondary">Add New Role</a>
             </div>
-            <?php if (session()->getFlashdata('success')): ?>
-                <div class="alert alert-success alert-dismissible fade show mt-3" role="alert" id="successAlert">
-                    <?= session()->getFlashdata('success') ?>
-                </div>
-            <?php endif; ?>
+            <hr/>
         </div>
-
-        <div class="card p-3 role-p3">
-            <table class="table table-bordered" id="roleTable">
-                <thead>
-                    <tr>
-                        <th>SI NO</th>
-                        <th>Role Name</th>
-                        <th>Created Date</th>
-                        <th>Updated Date</th>
-                        <th>Permissions</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
+        <table class="table table-bordered" id="roleTable">
+            <thead>
+                <tr>
+                    <th>SI NO</th>
+                    <th style="width: 170px;">Role Name</th>
+                    <th>Created Date</th>
+                    <th>Updated Date</th>
+                    <th>Permissions</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
     </div>
 </div>
 </div>
 <?php include "common/footer.php"; ?>
 
-<!-- DataTables initialization and role loading script -->
+
+
 <script>
 function formatDate(dateStr) {
     const date = new Date(dateStr);
     if (isNaN(date)) return '-';
-    return date.toISOString().split('T')[0]; // format to YYYY-MM-DD
+    return date.toISOString().split('T')[0]; 
 }
 
 function loadRoles() {
@@ -98,7 +94,6 @@ function loadRoles() {
                 info: false
             });
 
-            // Rebind delete buttons
             $('.delete-role').off('click').on('click', function () {
                 const id = $(this).data('id');
                 deleteRole(id);
@@ -114,7 +109,8 @@ function editRole(id) {
     window.location.href = "<?= base_url('rolemanagement/edit') ?>/" + id;
 }
 
-function deleteRole(id) {
+function deleteRole(id) 
+{
     if (confirm('Are you sure you want to delete this role?')) {
         $.ajax({
             url: "<?= base_url('rolemanagement/delete') ?>",
@@ -126,7 +122,6 @@ function deleteRole(id) {
             dataType: "json",
             success: function(response) {
                 if (response.status === 'success') {
-                    // Remove the corresponding row from the table without reload
                     const table = $('#roleTable').DataTable();
                     table.rows().every(function () {
                         const row = this.node();
@@ -134,14 +129,19 @@ function deleteRole(id) {
                             this.remove();
                         }
                     });
-                    table.draw(false); // Redraw without changing pagination
-
-                    // ✅ Show success message
-                    alert('Role successfully deleted.');
+                    table.draw(false);
+                    $('#roleDeleteAlert')
+                        .removeClass()
+                        .addClass('alert alert-danger text-center alert-fixed')
+                        .text('Role successfully deleted.')
+                        .fadeIn()
+                        .delay(3000)
+                        .fadeOut();
                 } else {
                     alert(response.message || 'Failed to delete role.');
                 }
             },
+
             error: function() {
                 alert('Error occurred while deleting role.');
             }
@@ -154,7 +154,7 @@ function deleteRole(id) {
 $(document).ready(function() {
     loadRoles();
 
-    // Fade out success alert
+
     setTimeout(function () {
         $('#successAlert').fadeOut('slow', function () {
             $(this).remove();

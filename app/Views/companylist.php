@@ -10,7 +10,7 @@
     </div>
     <hr>
 
-    <div id="companyDeleteAlert" class="alert alert-success w-25 mx-auto text-center fixed top mt-3" style="display:none;"></div>
+    <div id="companyDeleteAlert" class="alert alert-success w-50 mx-auto text-center fixed top mt-3" style="display:none;"></div>
     
     <style>
     table.dataTable thead th {
@@ -18,7 +18,7 @@
         padding-bottom: 6px !important;
         font-size: 14px;
         line-height: 1.2;
-        vertical-align: middle;
+        vertical-align: middle !important;
     }
 
     table.dataTable tbody td {
@@ -107,7 +107,7 @@ $(document).ready(function () {
         order: [[8, 'desc']],
         
         columnDefs: [
-        { searchable: false, orderable: false, targets: [0, 2, 3, 4, 5, 6, 7] }
+        { searchable: false, orderable: false, targets: [0, 2, 4, 6, 7] }
     ]
     });
 
@@ -131,6 +131,8 @@ $(document).ready(function () {
                 success: function (response) {
                     if (response.status === 'success') {
                         $('#companyDeleteAlert')
+                            .removeClass()
+                            .addClass('alert alert-danger text-center alert-fixed') 
                             .text('Company deleted successfully!')
                             .fadeIn()
                             .delay(3000)
