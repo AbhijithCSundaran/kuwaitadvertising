@@ -1,9 +1,7 @@
 <?php include "common/header.php";?>
-
 <div class="content-wrapper">
-    <div class="px-4 right_container"> <!-- Added padding for better spacing -->
+    <div class="right_container"> 
 
-        <!-- Heading Row -->
         <div class="row mb-4">
             <div class="col-md-6">
                 <h3><?= isset($role['role_id']) ? 'Edit Role' : 'Role Configuration' ?></h3>
@@ -13,7 +11,7 @@
             </div>
         </div>
 
-        <!-- Flash Message Alerts -->
+       
         <div class="row">
             <div class="col-md-12">
                 <?php if(session()->getFlashdata('success')): ?>
@@ -36,17 +34,15 @@
             </div>
         </div>
 
-        <!-- Role Form -->
+       
         <div class="row">
-            <div class="col-lg-10 offset-lg-1">
-                <form id="roleForm" action="<?= isset($role['role_id']) ? base_url('rolemanagement/update/' . $role['role_id']) : base_url('rolemanagement/store') ?>" method="post" class="p-4 border rounded bg-light permission-box">
-                    <!-- Role Name -->
+                <form id="roleForm" action="<?= isset($role['role_id']) ? base_url('rolemanagement/update/' . $role['role_id']) : base_url('rolemanagement/store') ?>" method="post" class="p-4 border rounded bg-light">
+                  
                     <div class="mb-3">
                         <label for="role_name" class="form-label">Role Name:</label>
                         <input type="text" name="role_name" class="form-control" value="<?= isset($role['role_name']) ? esc($role['role_name']) : '' ?>" required>
                     </div>
 
-                    <!-- Permissions -->
                     <div class="card mb-3">
                         <div class="card-header">
                             <h5 class="mb-0">Permissions</h5>
@@ -73,15 +69,14 @@
                         <?= isset($role['role_id']) ? 'Update Role' : 'Save Role' ?>
                     </button>
                 </form>
-            </div>
         </div>
     </div>
 </div>
-</div
+                                </div>
 <?php include "common/footer.php"; ?>
 
 
-<!-- Flash alert auto-hide and redirect if success -->
+
 <script>
     setTimeout(function () {
         ['successAlert', 'infoAlert', 'errorAlert'].forEach(function(id) {

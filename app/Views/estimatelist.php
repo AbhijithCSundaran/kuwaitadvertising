@@ -1,9 +1,18 @@
 <?php include "common/header.php"; ?>
+<div id="estimateDeleteAlert" class="alert text-center alert-fixed" style="display: none;"></div>
+
 <style>
 #estimateTable td {
     white-space: normal !important;
     word-break: break-word;
     vertical-align: top;
+}
+#estimateTable thead th {
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+    line-height: 1.2 !important;
+    vertical-align: middle !important;
+    font-size: 14px;
 }
 </style>
 
@@ -22,9 +31,9 @@
             <thead>
                 <tr>
                     <th style="display:none;">ID</th> <!-- Hidden column for sorting -->
-                    <th>SI</th>
+                    <th>SI NO</th>
                     <th>Customer Name</th>
-                    <th>Customer Address</th>
+                    <th style="width: 200px;">Customer Address</th>
                     <th>Total Amount</th>
                     <th>Discount</th>
                     <th>Date</th>
@@ -61,7 +70,7 @@ $(document).ready(function () {
             { data: "estimate_id" }, // Hidden for sorting
             { data: null },          // SI
             { data: "customer_name" },
-            { data: "customer_address" },
+            { data: "customer_address", className: "d-none d-xxl-table-cell" },
             {
                 data: "total_amount",
                 render: function (data) {
@@ -75,7 +84,7 @@ $(document).ready(function () {
                 }
             },
             {
-                data: "date",
+                data: "date", className: "d-none d-xxl-table-cell",
                 render: function (data) {
                     return new Date(data).toLocaleDateString();
                 }
@@ -101,10 +110,12 @@ $(document).ready(function () {
         columnDefs: [
             { targets: 0, visible: false }, // Hide estimate_id
             { targets: 1, searchable: false, orderable: false }, // SI
-            { width: "8%", targets: 5 },   // Discount
+            { targets: 8, orderable: false }, // Disable sorting on Action column
+            { width: "8%", targets: 2 },   // Discount
             { width: "12%", targets: 6 },  // Date
             { width: "22%", targets: 7 }   // Description
         ]
+
     });
 
     // SI number auto-fill
@@ -124,11 +135,20 @@ function deleteEstimate(id) {
             data: { estimate_id: id },
             dataType: "json",
             success: function (response) {
-                if (response.status === 'success') {
-                    $('#estimateTable').DataTable().ajax.reload(null, false);
-                } else {
-                    alert('Failed to delete estimate.');
-                }
+            if (response.status === 'success') {
+                $('#estimateTable').DataTable().ajax.reload(null, false);
+
+                // Show the success alert message
+                $('#estimateDeleteAlert')
+                    .removeClass()
+                    .addClass('alert alert-danger text-center alert-fixed') // Red for delete
+                    .text('Estimate deleted successfully!')
+                    .fadeIn()
+                    .delay(3000)
+                    .fadeOut();
+            } else {
+                alert('Failed to delete estimate.');
+            }
             },
             error: function () {
                 alert('Error occurred while deleting estimate.');
@@ -137,3 +157,4 @@ function deleteEstimate(id) {
     }
 }
 </script>
+ 

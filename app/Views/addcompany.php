@@ -1,10 +1,9 @@
 <?php include "common/header.php";?>
-<div id="companyAlert" class="alert alert-danger w-25 mx-auto text-center fixed top mt-3 alert-fixed" role="alert"></div>
+<div id="companyAlert" class="alert alert-danger w-50 mx-auto text-center fixed top mt-3 alert-fixed" role="alert"></div>
     <div class="form-control right_container">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h3 class="mb-0"><?= isset($company['company_id']) ? 'Edit Company' : 'Add Company' ?></h3>
-                <a href="<?= base_url('companylist') ?>" class="btn btn-secondary">Back to List</a>
             </div>
             <hr/>
             <div class="card-body">
@@ -66,7 +65,8 @@
 
                         <input type="hidden" name="uid" id="uid"
                         value="<?= isset($company['company_id']) ? esc($company['company_id']) : '' ?>" />
-                        <div class="col-12 p-3 d-flex justify-content-end" >
+                        <div class="col-12 p-3 d-flex justify-content-end gap-2" >
+                            <a href="<?= base_url('companylist') ?>" class="btn btn-secondary">Discard</a>
                                <button type="button" class="btn btn-primary enter-btn" 
                              <?= isset($company['company_id']) ? 'disabled style="opacity: 0.6;"' : '' ?>>Save</button>
                         </div>
