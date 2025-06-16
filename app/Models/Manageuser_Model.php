@@ -6,6 +6,5 @@ use CodeIgniter\Model;
 class Manageuser_Model extends Model{
 	protected $table = 'user';
     protected $primaryKey = 'user_id';
-    protected $allowedFields = ['name', 'uname', 'password', 'email','phonenumber'];
-    protected $returnType = 'array';   
+    protected $allowedFields = ['name', 'email', 'phonenumber', 'password'];
 }

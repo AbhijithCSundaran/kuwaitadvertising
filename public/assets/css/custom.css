@@ -8,8 +8,9 @@
 	border-color: #6c757d !important;
 }
 
+select.form-control,
 .form-control {
-	border-color: #6c757d !important;
+	border: 1px solid #6c757d !important;
 	padding: 12px;
 }
 
@@ -37,7 +38,7 @@
 }
 
 .btn-primary-edit {
-	background: #6c757d !important;
+	background: #686868 !important;
 	color: white !important;
 }
 
@@ -92,7 +93,9 @@
 	word-wrap: break-word;
 	word-break: break-word;
 	padding: 10px 15px;
-	margin-top: 15px;
+	top: 10px;
+	right: 10px;
+	z-index: 9999;
 }
 
 .alert-fixed {
@@ -101,13 +104,14 @@
 	left: 50%;
 	transform: translateX(-50%);
 	z-index: 1050;
-	width: 40%;  /* Adjust as needed */
-	display: none;
+	width: 40%;
+	/* Adjust as needed */
+	/*display: none;*/
 }
 
 
 .btn-primary:not(.btn-light) {
-	background: #6c757d !important;
+	background: #686868 !important;
 	color: white;
 }
 
@@ -124,6 +128,10 @@
 	white-space: nowrap;
 	font-weight: 300;
 	padding: 0.5rem 0.25rem;
+}
+
+.dataTables_wrapper .dataTable thead th {
+	padding: 10px 10px !important;
 }
 
 .table td:last-child,
@@ -189,11 +197,6 @@ table.dataTable th:first-child {
 	padding: 25px;
 }
 
-.permission-box {
-	margin-right: 257px;
-	margin-left: -128px;
-}
-
 
 #estimateTable td {
 	word-wrap: break-word;
@@ -201,31 +204,47 @@ table.dataTable th:first-child {
 	white-space: normal !important;
 	vertical-align: middle;
 }
+
 #estimateTable th {
-    white-space: nowrap;       /* prevent header text wrap */
-    text-align: center;
+	white-space: nowrap;
+	/* prevent header text wrap */
+	text-align: center;
 }
-.save-comp{
+
+.save-comp {
 	margin-right: 120px !important;
 }
-table{
+
+table {
 	max-width: 100% !important;
 }
-table.dataTable th, table.dataTable td {
-    white-space: nowrap;       /* Prevent wrapping */
-    vertical-align: middle;    /* Align content vertically */
+
+table.dataTable th,
+table.dataTable td {
+	white-space: nowrap;
+	/* Prevent wrapping */
+	vertical-align: middle;
+	/* Align content vertically */
 }
 
 table.dataTable th {
-    min-width: 100px;          /* Minimum width for header cells */
+	min-width: 100px;
+	/* Minimum width for header cells */
 }
 
 table.dataTable td {
-    word-break: break-word;    /* Allow breaking of long words in cell body */
+	word-break: break-word;
+	/* Allow breaking of long words in cell body */
 }
+
 th.no-sort::after {
-    display: none !important;
+	display: none !important;
 }
+
 .dataTables_wrapper .dataTables_length select {
-    width: 50px !important;
+	width: 50px !important;
+}
+
+.navbar .navbar-brand-wrapper .navbar-brand-inner-wrapper .navbar-brand img {
+	width: calc(257px - 185px);
 }

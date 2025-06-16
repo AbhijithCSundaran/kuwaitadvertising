@@ -8,8 +8,12 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', 'Home::index');
 $routes->get('dashboard','Dashboard::index');
 
+$routes->get('logout', 'Auth::logout');
+
 $routes->post('login/authenticate', 'Login::authenticate');
 $routes->get('login','Login::index');
+
+
 $routes->get('manageuser/userlistajax', 'Manageuser::userlistajax');
 $routes->get('manageuser', 'Manageuser::index');
 $routes->get('adduser', 'Manageuser::index');

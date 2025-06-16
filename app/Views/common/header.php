@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="<?php echo ASSET_PATH; ?>assets/css/style.css">
   <link rel="stylesheet" href="<?php echo ASSET_PATH; ?>assets/css/custom.css">
   <!-- endinject -->
-  <link rel="shortcut icon" href="<?php echo ASSET_PATH; ?>assets/images/favicon.ico" />
+  <link rel="shortcut icon" href="<?php echo ASSET_PATH; ?>assets/images/adminlogo.jpeg" />
   <!-- Add in your header or before closing body tag -->
    <!-- Add this to your common/header.php if not already present -->
 	<!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">-->
@@ -55,8 +55,10 @@
 
   <div class="navbar-brand-wrapper d-flex justify-content-center">
     <div class="navbar-brand-inner-wrapper d-flex justify-content-between align-items-center w-100">
-      <a class="navbar-brand brand-logo" href="index.html"><img src="../../../assets/images/logo.svg"
-          alt="logo" /></a>
+      <a class="navbar-brand brand-logo" href="#">
+    <img src="<?= ASSET_PATH; ?>assets/images/adminlogo.jpeg" alt="Logo" style="height: 40px;">
+</a>
+
       <a class="navbar-brand brand-logo-white" href="index.html"><img src="../../../assets/images/logo-white.svg"
           alt="logo" /></a>
       <a class="navbar-brand brand-logo-mini" href="index.html"><img src="../../../assets/images/logo-mini.svg"
@@ -262,7 +264,8 @@
         <i class="mdi mdi-logout menu-icon"></i>
         <span class="menu-title">Logout</span>
       </a>
-    </li>    
+    </li>
+
   </ul>
 </nav>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

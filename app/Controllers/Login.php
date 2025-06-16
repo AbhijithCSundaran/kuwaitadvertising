@@ -14,7 +14,7 @@ class Login extends BaseController{
         $password = md5($this->request->getPost('password'));
 		
 		if($email && $password){
-			// $result=$this->Login_Model->authenticateNow($email,$password);
+			$result=$this->Login_Model->authenticateNow($email,$password);
 			$loginModel = new Login_Model();
             $result = $loginModel->authenticateNow($email, $password);
 			if($result){

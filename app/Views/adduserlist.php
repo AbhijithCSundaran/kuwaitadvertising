@@ -1,5 +1,6 @@
 <?php include "common/header.php"; ?>
 <div class="form-control mb-3 right_container">
+    <div class="alert d-none text-center position-fixed" role="alert"></div>
     <div class="row align-items-center">
         <div class="col-md-6">
             <h3 class="mb-0">User Directory</h3>
@@ -7,7 +8,7 @@
         <div class="col-md-6 text-end">
             <a href="<?= base_url('adduser') ?>" class="btn btn-secondary">Add New User</a>
         </div>
-        <div class="alert alert-danger d-none w-25 mx-auto text-center fixed top mt-3" role="alert"></div>
+         <!-- <div class="alert d-none text-center  position-fixed translate-middle-x mt-3 " role="alert"style="top: 0; left: 80%;  z-index: 9999;"></div> -->
     </div>
     <hr>
     <table class="table table-bordered" id="userTable">
@@ -30,7 +31,7 @@
 $(document).ready(function () {
     const table = $('#userTable').DataTable({
         ajax: {
-            url: "<?= base_url('manageuser/userlistajax') ?>", // <- Use AJAX-specific method
+            url: "<?= base_url('manageuser/userlistajax') ?>", 
             type: "GET",
             dataSrc: ""
         },
@@ -78,9 +79,10 @@ $(document).ready(function () {
                 success: function (res) {
                     const alertBox = $('.alert');
                     if (res.status === 'success') {
-                        alertBox.removeClass('d-none').html('Deleted successfully').fadeIn();
+                        alertBox.removeClass('d-none').addClass('alert-danger')
+                        .html('Deleted successfully').fadeIn();
                         setTimeout(() => {
-                            alertBox.fadeOut(() => alertBox.addClass('d-none'));
+                            alertBox.addClass('d-none').removeClass('alert-success');
                         }, 2000);
                         table.ajax.reload(null, false);
                     } else {
