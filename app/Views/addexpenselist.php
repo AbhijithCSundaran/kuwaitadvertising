@@ -1,5 +1,6 @@
 <?php include "common/header.php"; ?>
 <div class="form-control mb-3 right_container">
+     <div class="alert d-none text-center position-fixed" role="alert"></div>
     <div class="row align-items-center">
         <div class="col-md-6">
             <h3 class="mb-0">Expense List</h3>
@@ -7,7 +8,6 @@
         <div class="col-md-6 text-end">
             <a href="<?= base_url('addexpense') ?>" class="btn btn-secondary">Add New Expense</a>
         </div>
-        <div class="alert alert-danger d-none w-25 mx-auto text-center fixed top mt-3" role="alert"></div>
     </div>
     <hr>
     <table class="table table-bordered" id="expenseTable">
@@ -77,10 +77,11 @@ $(document).ready(function () {
                 success: function (res) {
                     const alertBox = $('.alert');
                     if (res.status === 'success') {
-                        alertBox.removeClass('d-none').html('Deleted successfully').fadeIn();
+                        alertBox.removeClass('d-none').addClass('alert-danger')
+                        .html('Deleted successfully').fadeIn();
                         setTimeout(() => {
                             alertBox.fadeOut(() => {
-                                alertBox.addClass('d-none');
+                                alertBox.addClass('d-none').removeClass('alert-success');
                             });
                         }, 2000);
                         table.ajax.reload(null, false);

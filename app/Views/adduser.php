@@ -1,19 +1,19 @@
 <?php include "common/header.php";?>
 <div class="form-control mb-3 right_container"> 
+    <div class="alert d-none text-center position-fixed" role="alert"></div>
     <div class="card">
-    <div class="row align-items-center">
+    <div class="card-header d-flex justify-content-between align-items-center">
         <div class="col-md-6">
             <h3 class="mb-0"><?= isset($isEdit) && $isEdit ? 'Edit User' : 'Create New User' ?></h3>
          </div>
         <div class="col-md-6 text-end">
             <a href="<?= base_url('adduserlist') ?>" class="btn btn-secondary">Back to List</a>
         </div>
-        <div class="alert w-25 mx-auto text-center fixed top mt-3" role="alert" style="z-index: 1000; display: none;"  ></div>
     </div>
+     <!-- <div class="alert text-center right-end position-fixed translate-middle-x mt-3 " role="alert"style="top: 0; left: 80%;  z-index: 9999;"></div> -->
 	<div class="col-md-12"><hr/></div>
-		<div class="col-md-12 no-gutters">
+		<div class="card-body">
 			<form id="user-login-form">
-                <!-- <div class="alert w-25 mx-auto text-center fixed top mt-3" role="alert"  style="z-index: 1050; display: none;" ></div> -->
 				<div class="form-group">
                     <div class="row">
                         <div class="col-md-6 no-gutters">
@@ -63,120 +63,103 @@
 <?php include "common/footer.php"; ?>
 <script>
 $(document).ready(function () {
-let initialFormData = $('#user-login-form').serialize();
-$('#user-login-form input').on('input change', function () {
-    const currentFormData = $('#user-login-form').serialize();
+    let initialFormData = $('#user-login-form').serialize();
 
-    if (currentFormData !== initialFormData) {
-        $('#saveUserBtn').prop('disabled', false);
-    } else {
-        $('#saveUserBtn').prop('disabled', true); 
-    }
-});
+    $('#user-login-form input').on('input change', function () {
+        const currentFormData = $('#user-login-form').serialize();
+        $('#saveUserBtn').prop('disabled', currentFormData === initialFormData);
+    });
 
-    const uid = "<?= isset($uid) ? $uid : '' ?>";
+    // Toggle password show/hide
+    $('#togglePassword').on('click', function () {
+        const passwordInput = $('#Password');
+        const icon = $(this).find('i');
+        const type = passwordInput.attr('type') === 'password' ? 'text' : 'password';
+        passwordInput.attr('type', type);
+        icon.toggleClass('fa-eye fa-eye-slash');
+    });
 
-   $('#togglePassword').on('click', function () {
-    const passwordInput = $('#Password');
-    const icon = $(this).find('i'); 
-    const type = passwordInput.attr('type') === 'password' ? 'text' : 'password';
-    passwordInput.attr('type', type);
-    icon.toggleClass('fa-eye fa-eye-slash');
-});
-
-$('#name').on('input', function () {
-    this.value = this.value.replace(/[^a-zA-Z\s]/g, '');
-});
+    $('#name').on('input', function () {
+        this.value = this.value.replace(/[^a-zA-Z\s]/g, '');
+    });
 
     $('#phonenumber').on('input', function () {
         this.value = this.value.replace(/[^0-9]/g, '').slice(0, 15);
     });
 
-  $('#saveUserBtn').on('click', function (e) {
-    e.preventDefault();
+    $('#saveUserBtn').on('click', function (e) {
+        e.preventDefault();
+        const saveBtn = $(this);
+        saveBtn.prop('disabled', true); // Disable to prevent multiple clicks
 
-    const uid = $('#uid').val().trim();
-    const name = $('#name').val().trim();
-    const email = $('#email').val().trim();
-    const phone = $('#phonenumber').val().trim();
-    const password = $('#Password').val().trim();
+        const uid = $('#uid').val().trim();
+        const name = $('#name').val().trim();
+        const email = $('#email').val().trim();
+        const phone = $('#phonenumber').val().trim();
+        const password = $('#Password').val().trim();
+        const isNewUser = uid === '';
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    const isNewUser = uid === '';
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-if (name === '' || email === '' || (isNewUser && password === '')) {
-    $('.alert')
-        .removeClass('alert-success alert-warning')
-        .addClass('alert-danger')
-        .html('Please fill all mandatory fields <span class="text-danger">*</span>.')
-        .show();
-    setTimeout(() => { $('.alert').fadeOut(); }, 3000);
-    return;
-}
-if (!emailRegex.test(email)) {
-    $('.alert')
-        .removeClass('alert-success alert-warning')
-        .addClass('alert-danger')
-        .html('Please enter a valid email address.')
-        .show();
-    setTimeout(() => { $('.alert').fadeOut(); }, 3000);
-    return;
-}
-if (isNewUser && (password.length < 6 || password.length > 15)) {
-    $('.alert')
-        .removeClass('alert-success alert-warning')
-        .addClass('alert-danger')
-        .html('Password must be between 6 and 15 characters.')
-        .show();
-    setTimeout(() => { $('.alert').fadeOut(); }, 3000);
-    return;
-}
-    const formData = new FormData($('#user-login-form')[0]);
-
-    $.ajax({
-        url: '<?= base_url('manageuser/save') ?>',
-        type: 'POST',
-        data: formData,
-        contentType: false,
-        processData: false,
-        dataType: 'json',
-        success: function (response) {
-            if (response.status === 'success') {
-                $('.alert')
-                    .removeClass('alert-danger alert-warning')
-                    .addClass('alert-success')
-                    .text(response.message)
-                    .show();
-
-                if (isNewUser) {
-                    $('#user-login-form')[0].reset();
-                } else {
-                    $('#user-login-form input').prop('disabled', true); 
-                }
-
-                setTimeout(() => {
-                    window.location.href = '<?= base_url('adduserlist') ?>';
-                }, 3000);
-            } else {
-                $('.alert')
-                    .removeClass('alert-success alert-warning')
-                    .addClass('alert-danger')
-                    .html(response.message)
-                    .show();
-                setTimeout(() => { $('.alert').fadeOut(); }, 3000);
-            }
-        },
-        error: function () {
-            $('.alert')
-                .removeClass('alert-success alert-warning')
-                .addClass('alert-danger')
-                .text('Something went wrong. Please try again.')
-                .show();
-            setTimeout(() => { $('.alert').fadeOut(); }, 3000);
+        if (name === '' || email === '' || (isNewUser && password === '')) {
+            showAlert('Please fill all mandatory fields <span class="text-danger">*</span>.', 'danger');
+            saveBtn.prop('disabled', false);
+            return;
         }
-    });
-});
 
+        if (!emailRegex.test(email)) {
+            showAlert('Please enter a valid email address.', 'danger');
+            saveBtn.prop('disabled', false);
+            return;
+        }
+
+        if (isNewUser && (password.length < 6 || password.length > 15)) {
+            showAlert('Password must be between 6 and 15 characters.', 'danger');
+            saveBtn.prop('disabled', false);
+            return;
+        }
+
+        const formData = new FormData($('#user-login-form')[0]);
+
+        $.ajax({
+            url: '<?= base_url('manageuser/save') ?>',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            dataType: 'json',
+            success: function (response) {
+                if (response.status === 'success') {
+                    showAlert(response.message, 'success');
+                    if (isNewUser) {
+                        $('#user-login-form')[0].reset();
+                        initialFormData = $('#user-login-form').serialize();
+                    }
+                    setTimeout(() => {
+                        window.location.href = '<?= base_url('adduserlist') ?>';
+                    }, 3000);
+                } else {
+                    showAlert(response.message || 'Failed to save user.', 'danger');
+                    saveBtn.prop('disabled', false);
+                }
+            },
+            error: function () {
+                showAlert('Something went wrong. Please try again.', 'danger');
+                saveBtn.prop('disabled', false);
+            }
+        });
+    });
+
+    function showAlert(message, type = 'danger') {
+        $('.alert')
+            .removeClass('d-none alert-success alert-danger alert-warning')
+            .addClass('alert-' + type)
+            .html(message)
+            .fadeIn();
+        setTimeout(() => {
+            $('.alert').fadeOut(() => {
+                $('.alert').addClass('d-none').html('');
+            });
+        }, 3000);
+    }
 });
 </script>
