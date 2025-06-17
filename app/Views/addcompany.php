@@ -232,8 +232,7 @@ $(document).ready(function () {
         let formData = new FormData(form);
 
         
-        $saveBtn.prop('disabled', true).text('Saving...');
-
+        <!--$saveBtn.prop('disabled', true).text('Saving...');-->
         $.ajax({
             url: '<?= base_url('managecompany/save') ?>',
             type: 'POST',
