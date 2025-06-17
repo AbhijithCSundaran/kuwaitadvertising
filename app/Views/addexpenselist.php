@@ -29,6 +29,7 @@
 
 <script>
 $(document).ready(function () {
+    debugger;
     const table = $('#expenseTable').DataTable({
         ajax: {
             url: "<?= base_url('expense/getExpensesAjax') ?>",
@@ -67,7 +68,7 @@ $(document).ready(function () {
              "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
         lengthMenu: [5, 10, 25, 50],
         pageLength: 10,
-        order: [[1, 'desc']],
+        order: [[5, 'desc']],
         columnDefs: [
             { orderable: false, searchable: false, targets: [0, 5] }
         ]
@@ -89,7 +90,7 @@ $(document).ready(function () {
                     const alertBox = $('.alert');
                     if (res.status === 'success') {
                         alertBox.removeClass('d-none').addClass('alert-danger')
-                        .html('Deleted successfully').fadeIn();
+                        .html('Expense Deleted successfully').fadeIn();
                         setTimeout(() => {
                             alertBox.fadeOut(() => {
                                 alertBox.addClass('d-none').removeClass('alert-success');

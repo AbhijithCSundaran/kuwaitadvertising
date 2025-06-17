@@ -8,6 +8,9 @@
 	border-color: #686868 !important;
 }
 
+p{
+	    line-height: 4.3rem;
+}
 select.form-control,
 .form-control {
 	border: 1px solid #686868 !important;
@@ -113,6 +116,7 @@ select.form-control,
 .btn-primary:not(.btn-light) {
 	background: #686868 !important;
 	color: white;
+	border: none;
 }
 
 .dataTables_length label {
