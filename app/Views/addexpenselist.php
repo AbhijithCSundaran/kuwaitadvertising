@@ -38,9 +38,20 @@ $(document).ready(function () {
         columns: [
             { data: null }, 
             { data: "date" },
-            { data: "particular" },
+            {
+                data: "particular",
+                render: function (data) {
+                    return data.replace(/\b\w/g, c => c.toUpperCase());
+                }
+            },
+
             { data: "amount" },
-            { data: "payment_mode" },
+            {
+                data: "payment_mode",
+                render: function (data) {
+                    return data.replace(/\b\w/g, c => c.toUpperCase());
+                }
+            },
             {
                 data: "id",
                 render: function (data) {

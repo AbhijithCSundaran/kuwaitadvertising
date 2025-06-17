@@ -7,9 +7,6 @@
                 <h3 class="mb-0"><?= isset($isEdit) && $isEdit ? 'Edit Expense' : 'Add New Expense' ?></h3>
             </div>    
         </div>
-        <!-- <div class="alert d-none text-center position-fixed mx-auto mt-3 w-50" role="alert"></div> -->
-       
-        <!-- <div class="alert d-none text-center position-fixed top-10 start-50 translate-middle w-50 zindex-sticky" role="alert" style="z-index: 9999;"></div> -->
         <hr>
         <div class="card-body">
             <form id="expense-form">
@@ -34,14 +31,14 @@
                         <label>Payment Mode <span class="text-danger">*</span></label>
                         <select name="payment_mode" class="form-control" required>
                             <option value="">Select</option>
-                            <option value="cash" <?= isset($expense['payment_mode']) && $expense['payment_mode'] == 'cash' ? 'selected' : '' ?>>Cash</option>
-                            <option value="bank transfer" <?= isset($expense['payment_mode']) && $expense['payment_mode'] == 'bank transfer' ? 'selected' : '' ?>>Bank Transfer</option>
+                            <option value="cash" <?= isset($expense['payment_mode']) && $expense['payment_mode'] == 'Cash' ? 'selected' : '' ?>>Cash</option>
+                            <option value="bank transfer" <?= isset($expense['payment_mode']) && $expense['payment_mode'] == 'Bank Transfer' ? 'selected' : '' ?>>Bank Transfer</option>
                             <option value="WAMD" <?= isset($expense['payment_mode']) && $expense['payment_mode'] == 'WAMD' ? 'selected' : '' ?>>WAMD</option>
                         </select>
                     </div>
                 </div>
                 <div class="col-md-12 text-end">
-                <a href="<?= base_url('expense') ?>" class="btn btn-secondary">Back to List</a>
+                <a href="<?= base_url('expense') ?>" class="btn btn-secondary">Discard</a>
             
                 
                     <input type="hidden" name="id" value="<?= isset($expense['id']) ? $expense['id'] : '' ?>">
@@ -59,27 +56,26 @@ $(document).ready(function () {
 
     $('#expense-form input, #expense-form select, #expense-form textarea').on('input change', function () {
         const currentData = $('#expense-form').serialize();
-
-        if (currentData !== originalData) {
-            $('#saveExpenseBtn').prop('disabled', false);
-        } else {
-            $('#saveExpenseBtn').prop('disabled', true); 
-        }
+        $('#saveExpenseBtn').prop('disabled', currentData === originalData);
     });
+
     $('#saveExpenseBtn').on('click', function () {
         const alertBox = $('.alert');
         const form = $('#expense-form')[0];
+
         if (!form.checkValidity()) {
             alertBox
                 .removeClass('d-none alert-success alert-warning')
                 .addClass('alert-danger')
                 .text('Please fill all mandatory fields.');
-            setTimeout(() => {
-                alertBox.addClass('d-none').text('');
-            }, 2000);
+            setTimeout(() => alertBox.addClass('d-none').text(''), 2000);
             return;
         }
+
         const formData = new FormData(form);
+
+        // Disable save button to prevent multiple submissions
+        $('#saveExpenseBtn').prop('disabled', true);
 
         $.ajax({
             url: '<?= base_url('expense/store') ?>',
@@ -94,25 +90,24 @@ $(document).ready(function () {
                         .removeClass('d-none alert-danger alert-warning')
                         .addClass('alert-success')
                         .text(res.message);
-
                     setTimeout(() => {
                         window.location.href = "<?= base_url('expense') ?>";
-                    }, 2000);
+                    }, 1500);
 
                 } else if (res.status === 'nochange') {
                     alertBox
                         .removeClass('d-none alert-success alert-danger')
                         .addClass('alert-warning')
                         .text(res.message);
-
                     setTimeout(() => {
                         window.location.href = "<?= base_url('expense') ?>";
-                    }, 2000);
+                    }, 1500);
                 } else {
                     alertBox
                         .removeClass('d-none alert-success alert-warning')
                         .addClass('alert-danger')
                         .text(res.message || 'Failed to save expense.');
+                    $('#saveExpenseBtn').prop('disabled', false);
                 }
             },
             error: function () {
@@ -120,9 +115,11 @@ $(document).ready(function () {
                     .removeClass('d-none alert-success alert-warning')
                     .addClass('alert-danger')
                     .text('Error occurred while saving expense.');
+                $('#saveExpenseBtn').prop('disabled', false);
             }
         });
     });
 });
+
 </script>
 

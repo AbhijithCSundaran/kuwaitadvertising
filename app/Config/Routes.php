@@ -33,7 +33,7 @@ $routes->get('companylist', 'Managecompany::companyList');
 $routes->get('managecompany/getCompany/(:num)', 'Managecompany::getCompany/$1');
 $routes->get('addcompany', 'Managecompany::add');           
 $routes->get('addcompany/(:num)', 'Managecompany::add/$1');  
-$routes->match(['post', 'delete'], 'managecompany/delete/(:num)', 'Managecompany::delete/$1');
+$routes->post('managecompany/delete', 'Managecompany::delete');
 $routes->get('managecompany/getAllCompanies', 'Managecompany::getAllCompanies'); 
 
 
