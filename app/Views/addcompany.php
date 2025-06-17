@@ -36,7 +36,7 @@
                         </div>
                         
                         <div class="col-6 mb-3 px-2">
-                            <label for="tax_number" class="form-label">Tax Number <span class="text-danger">*</span></label>
+                            <label for="tax_number" class="form-label">Tax Number</label>
                             <input type="text" name="tax_number" id="tax_number" class="form-control"
                             value="<?= isset($company['tax_number']) ? esc($company['tax_number']) : '' ?>" />
                         </div>
@@ -80,13 +80,9 @@
 <?php include "common/footer.php"; ?>
 <script>
 $(document).ready(function () {
-    function containsLetters(str) {
-        return /[a-zA-Z]/.test(str);
-    }
-
-    function containsAlphaNumeric(str) {
-        return /[a-zA-Z0-9]/.test(str);
-    }
+    const isEditMode = $('#uid').val().trim() !== '';
+    const $saveBtn = $('.enter-btn');
+    const $form = $('#company-form');
 
     const originalData = {
         name: $('#company_name').val(),
@@ -97,66 +93,43 @@ $(document).ready(function () {
         logo: $('#original_logo').val()
     };
 
+    if (isEditMode) {
+        $saveBtn.prop('disabled', true).css('opacity', 0.6);
+    }
+
     function checkChanges() {
-		const currentData = {
-			name: $('#company_name').val(),
-			address: $('#address').val(),
-			tax: $('#tax_number').val(),
+        const currentData = {
+            name: $('#company_name').val(),
+            address: $('#address').val(),
+            tax: $('#tax_number').val(),
             email: $('#email').val(),
             phone: $('#phone').val(),
-			logoChanged: $('#company_logo')[0].files.length > 0
-		};
+            logoChanged: $('#company_logo')[0].files.length > 0
+        };
 
-		const hasChanged =
-			currentData.name !== originalData.name ||
-			currentData.address !== originalData.address ||
-			currentData.tax !== originalData.tax ||
+        const hasChanged =
+            currentData.name !== originalData.name ||
+            currentData.address !== originalData.address ||
+            currentData.tax !== originalData.tax ||
             currentData.email !== originalData.email ||
             currentData.phone !== originalData.phone ||
-			currentData.logoChanged;
+            currentData.logoChanged;
 
-		if (hasChanged) {
-			$('.enter-btn').prop('disabled', false).css('opacity', 1);
-		} else {
-			$('.enter-btn').prop('disabled', true).css('opacity', 0.6);
-		}
-	}
-
-
-    $('#company_name, #address, #tax_number, #email, #phone').on('input', checkChanges);
-    $('#company_logo').on('change', checkChanges);
-
-    <?php if (isset($company['company_id'])): ?>
-        $('#btn-browse-file').on('click', function () {
-            $('#company_logo').click();
-        });
-
-        $('#company_logo').on('change', function () {
-            const file = this.files[0];
-            if (file) {
-                const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/gif"];
-                if (!validTypes.includes(file.type)) {
-                    alert('Only JPG, PNG, and GIF image files are allowed.');
-                    $(this).val('');
-                    $('#fake-file-name').val("<?= esc($company['company_logo']) ?>");
-                    $('#logo-preview').attr('src', "<?= base_url('public/uploads/' . $company['company_logo']) ?>");
-                    return;
-                }
-                $('#fake-file-name').val(file.name);
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    $('#logo-preview').attr('src', e.target.result);
-                };
-                reader.readAsDataURL(file);
+        if (isEditMode) {
+            if (hasChanged) {
+                $saveBtn.prop('disabled', false).css('opacity', 1);
             } else {
-                $('#fake-file-name').val("<?= esc($company['company_logo']) ?>");
-                $('#logo-preview').attr('src', "<?= base_url('public/uploads/' . $company['company_logo']) ?>");
+                $saveBtn.prop('disabled', true).css('opacity', 0.6);
             }
-        });
-    <?php endif; ?>
+        }
+    }
 
-    $('.enter-btn').on('click', function (e) {
+    $('#company_name, #address, #tax_number, #email, #phone, #company_logo').on('input change', checkChanges);
+
+    $saveBtn.on('click', function (e) {
         e.preventDefault();
+
+        if ($(this).prop('disabled')) return;
 
         let name = $('#company_name').val().trim();
         let address = $('#address').val().trim();
@@ -167,23 +140,18 @@ $(document).ready(function () {
         let fileInput = $('#company_logo')[0];
         let file = fileInput ? fileInput.files[0] : null;
 
-        if (!name || !address || !tax) {
+        if (!name || !address) {
             showMessage('Please fill in all required fields.', 'danger');
             return;
         }
 
-        if (!containsLetters(name)) {
+        if (!/[a-zA-Z]/.test(name)) {
             showMessage('Company Name must contain at least one letter.', 'danger');
             return;
         }
 
-        if (!containsLetters(address)) {
+        if (!/[a-zA-Z]/.test(address)) {
             showMessage('Company Address must contain at least one letter.', 'danger');
-            return;
-        }
-
-        if (!containsAlphaNumeric(tax)) {
-            showMessage('Tax Number must contain at least one letter or number.', 'danger');
             return;
         }
 
@@ -191,34 +159,32 @@ $(document).ready(function () {
             showMessage('Email and phone number are required.', 'danger');
             return;
         }
-        let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             showMessage('Please enter a valid email address.', 'danger');
             return;
         }
 
-        let phoneRegex = /^[0-9+\-\s]{7,20}$/;
-        if (!phoneRegex.test(phone)) {
+        if (!/^[0-9+\-\s]{7,20}$/.test(phone)) {
             showMessage('Please enter a valid phone number.', 'danger');
             return;
         }
-        
+
         if (!file && !uid) {
             showMessage('Please upload a company logo (image file).', 'danger');
             return;
         }
 
         if (file) {
-            let fileType = file.type;
-            let validImageTypes = ["image/jpeg", "image/png", "image/jpg", "image/gif"];
-            if ($.inArray(fileType, validImageTypes) < 0) {
-                showMessage('Only image files (JPG, PNG, GIF) are allowed for the company logo.', 'danger');
+            const validImageTypes = ["image/jpeg", "image/png", "image/jpg", "image/gif"];
+            if (!validImageTypes.includes(file.type)) {
+                showMessage('Only image files (JPG, PNG, GIF) are allowed.', 'danger');
                 return;
             }
         }
 
-        let form = $('#company-form')[0];
-        let formData = new FormData(form);
+        const formData = new FormData($form[0]);
+        $saveBtn.prop('disabled', true).css('opacity', 0.6); // Prevent double click
 
         $.ajax({
             url: '<?= base_url('managecompany/save') ?>',
@@ -232,6 +198,7 @@ $(document).ready(function () {
 
                 if (response.status === 'error') {
                     showMessage(response.message, 'danger');
+                    $saveBtn.prop('disabled', false).css('opacity', 1);
                 } else {
                     showMessage(response.message, 'success');
                     setTimeout(() => {
@@ -242,6 +209,7 @@ $(document).ready(function () {
             },
             error: function () {
                 showMessage('Something went wrong. Please try again.', 'danger');
+                $saveBtn.prop('disabled', false).css('opacity', 1);
             }
         });
     });
@@ -253,7 +221,7 @@ $(document).ready(function () {
             .html(msg)
             .fadeIn();
 
-        setTimeout(function () {
+        setTimeout(() => {
             $('.alert').fadeOut();
         }, 3000);
     }

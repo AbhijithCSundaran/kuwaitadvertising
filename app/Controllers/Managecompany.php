@@ -46,7 +46,7 @@ class Managecompany extends BaseController
 		$rules = [
 			'company_name' => 'required',
 			'address' => 'required',
-			'tax_number' => 'required',
+			'tax_number' => 'permit_empty',
 			'email' => 'required|valid_email',
 			'phone' => 'required',
 		];

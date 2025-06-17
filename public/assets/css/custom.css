@@ -1,16 +1,16 @@
 .btn-warning {
-	background: #6c757d !important;
-	border-color: #6c757d !important;
+	background: #686868 !important;
+	border-color: #686868 !important;
 }
 
 .btn-danger {
-	background: #6c757d !important;
-	border-color: #6c757d !important;
+	background: #686868 !important;
+	border-color: #686868 !important;
 }
 
 select.form-control,
 .form-control {
-	border: 1px solid #6c757d !important;
+	border: 1px solid #686868 !important;
 	padding: 12px;
 }
 
@@ -20,7 +20,7 @@ select.form-control,
 }
 
 .edit-btn {
-	background: #6c757d !important;
+	background: #686868 !important;
 }
 
 .form-check-input {
