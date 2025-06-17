@@ -29,6 +29,7 @@
 
 <script>
 $(document).ready(function () {
+    debugger;
     const table = $('#expenseTable').DataTable({
         ajax: {
             url: "<?= base_url('expense/getExpensesAjax') ?>",
@@ -67,7 +68,7 @@ $(document).ready(function () {
              "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
         lengthMenu: [5, 10, 25, 50],
         pageLength: 10,
-        order: [[1, 'desc']],
+        order: [[5, 'desc']],
         columnDefs: [
             { orderable: false, searchable: false, targets: [0, 5] }
         ]
@@ -89,7 +90,7 @@ $(document).ready(function () {
                     const alertBox = $('.alert');
                     if (res.status === 'success') {
                         alertBox.removeClass('d-none').addClass('alert-danger')
-                        .html('Deleted successfully').fadeIn();
+                        .html('Remove an existing expense.').fadeIn();
                         setTimeout(() => {
                             alertBox.fadeOut(() => {
                                 alertBox.addClass('d-none').removeClass('alert-success');
@@ -97,7 +98,7 @@ $(document).ready(function () {
                         }, 2000);
                         table.ajax.reload(null, false);
                     } else {
-                        alertBox.removeClass('d-none').html('Failed to delete expense.').fadeIn();
+                        alertBox.removeClass('d-none').html('Failed to remove expense.').fadeIn();
                         setTimeout(() => {
                             alertBox.fadeOut(() => {
                                 alertBox.addClass('d-none');
@@ -107,7 +108,7 @@ $(document).ready(function () {
                 },
                 error: function () {
                     const alertBox = $('.alert');
-                    alertBox.removeClass('d-none').html('Error deleting expense.').fadeIn();
+                    alertBox.removeClass('d-none').html('Error removing expense.').fadeIn();
                     setTimeout(() => {
                         alertBox.fadeOut(() => {
                             alertBox.addClass('d-none');
