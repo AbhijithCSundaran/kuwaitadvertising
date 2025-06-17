@@ -1,5 +1,5 @@
 <?php include "common/header.php";?>
-<div id="estimateAlert" class="alert alert-dismissible fade" style="display: none; position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 250px;"></div>
+<div id="estimateAlert" class="alert d-none text-center position-fixed" role=alert ></div>
 <!DOCTYPE html>
 <html>
 <head>
@@ -106,7 +106,7 @@
                 <tr>
                     <td><strong>Discount:</strong></td>
                     <td>
-                        <input type="number" name="discount" id="discount" class="form-control w-25 d-inline" value="<?= isset($estimate['discount']) ? $estimate['discount'] : '0' ?>" min="0">
+                        <input type="number" name="discount" id="discount" class="form-control w-50 d-inline" value="<?= isset($estimate['discount']) ? $estimate['discount'] : '0' ?>" min="0">
                         %
                     </td>
                 </tr>
@@ -161,7 +161,7 @@ $(document).ready(function () {
     const isEditMode = <?= isset($estimate['estimate_id']) ? 'true' : 'false' ?>;
 
     if (isEditMode) {
-        disableGenerateButton(); // disable on load for edit
+        disableGenerateButton();
     }
 
     function showAlert(message, type = 'success') {
@@ -184,7 +184,7 @@ $(document).ready(function () {
         $('#generate-btn').prop('disabled', true).removeClass('btn-primary').addClass('btn-secondary');
     }
 
-    // Handle dynamic changes
+    
     $(document).on('input change', '.quantity, .price, #discount, input[name="customer_name"], textarea[name="customer_address"], input[name="description[]"]', function () {
         calculateTotals();
         if (isEditMode) enableGenerateButton();
@@ -220,7 +220,8 @@ $(document).ready(function () {
     const customerName = $('input[name="customer_name"]').val().trim();
     const customerAddress = $('textarea[name="customer_address"]').val().trim();
 
-    const nameRegex = /^[A-Za-z][A-Za-z\s'.-]/;
+    const nameRegex = /^[A-Za-z][A-Za-z0-9\s'.-]*$/;
+
     const addressRegex = /[A-Za-z0-9]/;
 
     if (!nameRegex.test(customerName)) {

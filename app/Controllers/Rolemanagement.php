@@ -52,7 +52,7 @@ class Rolemanagement extends Controller
         }
 
       session()->setFlashdata('success', 'Role created successfully.');
-        return view('roleform', ['menus' => $this->menus]);
+        return redirect()->to(base_url('rolemanagement/rolelist'));
 
     }
 
