@@ -31,10 +31,11 @@
                         <label>Payment Mode <span class="text-danger">*</span></label>
                         <select name="payment_mode" class="form-control" required>
                             <option value="">Select</option>
-                            <option value="cash" <?= isset($expense['payment_mode']) && $expense['payment_mode'] == 'Cash' ? 'selected' : '' ?>>Cash</option>
-                            <option value="bank transfer" <?= isset($expense['payment_mode']) && $expense['payment_mode'] == 'Bank Transfer' ? 'selected' : '' ?>>Bank Transfer</option>
-                            <option value="WAMD" <?= isset($expense['payment_mode']) && $expense['payment_mode'] == 'WAMD' ? 'selected' : '' ?>>WAMD</option>
+                            <option value="cash" <?= isset($expense['payment_mode']) && strtolower($expense['payment_mode']) == 'cash' ? 'selected' : '' ?>>Cash</option>
+                            <option value="bank transfer" <?= isset($expense['payment_mode']) && strtolower($expense['payment_mode']) == 'bank transfer' ? 'selected' : '' ?>>Bank Transfer</option>
+                            <option value="wamd" <?= isset($expense['payment_mode']) && strtolower($expense['payment_mode']) == 'wamd' ? 'selected' : '' ?>>WAMD</option>
                         </select>
+
                     </div>
                 </div>
                 <div class="col-md-12 text-end">

@@ -36,7 +36,7 @@ $(document).ready(function () {
             dataSrc: ""
         },
         columns: [
-            { data: null }, // SI NO
+            { data: null }, 
             {
                 data: "name",
                 render: function (data) {
@@ -54,16 +54,16 @@ $(document).ready(function () {
                     `;
                 }
             },
-            { data: "user_id", visible: false } // 🔒 hidden column for sorting
+            { data: "user_id", visible: false }
         ],
-        order: [[5, 'desc']], // ⬆️ Sort by hidden user_id column (latest first)
+        order: [[5, 'desc']], 
         dom: "<'row mb-3'<'col-sm-6'l><'col-sm-6'f>>" +
              "<'row'<'col-sm-12'tr>>" +
              "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
-        lengthMenu: [5, 10, 25, 50],
+        alengthMenu: [5, 10, 25, 50],
         pageLength: 10,
         columnDefs: [
-            { orderable: false, searchable: false, targets: [0, 4] } // SI No and Action
+            { orderable: false, searchable: false, targets: [0, 4] } 
         ]
     });
     table.on('order.dt search.dt draw.dt', function () {
@@ -72,7 +72,6 @@ $(document).ready(function () {
         });
     });
 
-    // Delete user
     $('#userTable').on('click', '.delete-user', function () {
         const id = $(this).data('id');
         if (confirm("Are you sure you want to delete this user?")) {

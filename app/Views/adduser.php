@@ -35,26 +35,13 @@
               <input type="text" name="phonenumber" id="phonenumber" class="form-control"
                 value="<?= $userData['phonenumber'] ?? '' ?>" maxlength="15" />
             </div>
-            <div class="col-md-6 no-gutters mt-3">
-  <label>Role <span class="text-danger">*</span></label>
-  <select name="role_id" id="role_id" class="form-control" required>
-    <option value="">Select Role</option>
-    <?php foreach ($roles as $role): ?>
-      <option value="<?= $role['role_id'] ?>"
-        <?= isset($userData['role_id']) && $userData['role_id'] == $role['role_id'] ? 'selected' : '' ?>>
-        <?= esc($role['role_name']) ?>
-      </option>
-    <?php endforeach; ?>
-  </select>
-</div>
-
 
             <?php if (!isset($isEdit) || !$isEdit): ?>
             <div class="col-md-6">
               <label>Password <span class="text-danger">*</span></label>
               <div class="input-group position-relative mb-2">
                 <input type="password" name="password" id="password" class="form-control" minlength="6" maxlength="15" required />
-                <span class="toggle-password" toggle="#password" style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer;">
+                <span class="toggle-password" toggle="#password">
                   <i class="fa fa-eye-slash"></i>
                 </span>
               </div>
@@ -67,7 +54,7 @@
               <label>New Password</label>
               <div class="input-group position-relative mb-2">
                 <input type="password" name="new_password" id="new_password" class="form-control" minlength="6" maxlength="15" />
-                <span class="toggle-password" toggle="#new_password" style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer;">
+                <span class="toggle-password" toggle="#new_password" >
                   <i class="fa fa-eye-slash"></i>
                 </span>
               </div>
@@ -76,7 +63,7 @@
               <label>Confirm Password</label>
               <div class="input-group position-relative mb-2">
                 <input type="password" name="confirm_new_password" id="confirm_new_password" class="form-control" minlength="6" maxlength="15" />
-                <span class="toggle-password" toggle="#confirm_new_password" style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer;">
+                <span class="toggle-password" toggle="#confirm_new_password" >
                   <i class="fa fa-eye-slash"></i>
                 </span>
               </div>
@@ -104,14 +91,18 @@ $(document).ready(function () {
   $('#user-login-form input').on('input change', function () {
     $('#saveUserBtn').prop('disabled', $('#user-login-form').serialize() === initialFormData);
   });
+$(document).on('click', '.toggle-password', function () {
+  const input = $($(this).attr('toggle'));
+  const icon = $(this).find('i');
 
-  // Show/hide password toggler
-  $(document).on('click', '.toggle-password', function () {
-    const input = $($(this).attr('toggle'));
-    const type = input.attr('type') === 'password' ? 'text' : 'password';
-    input.attr('type', type);
-    $(this).find('i').toggleClass('fa-eye fa-eye-slash');
-  });
+  if (input.attr('type') === 'password') {
+    input.attr('type', 'text');
+    icon.removeClass('fa-eye-slash').addClass('fa-eye');
+  } else {
+    input.attr('type', 'password');
+    icon.removeClass('fa-eye').addClass('fa-eye-slash');
+  }
+});
 
   // Restrict name and phone fields
   $('#name').on('input', function () {
