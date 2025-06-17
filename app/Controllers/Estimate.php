@@ -40,19 +40,20 @@ class Estimate extends BaseController
             $estimate_id = $this->request->getPost('estimate_id');
             $isUpdate = !empty($estimate_id);
 
-            // Sanitize and validate inputs
+            
             $customer_name = trim($this->request->getPost('customer_name'));
             $customer_address = trim($this->request->getPost('customer_address'));
 
-            // Validate customer name: at least 3 letters, letters/spaces/periods/hyphens allowed
-            if (!preg_match('/^[A-Za-z][A-Za-z\s\'.-]{2,}$/', $customer_name)) {
-                return $this->response->setJSON([
-                    'status' => 'error',
-                    'message' => 'Invalid Customer Name. Please enter at least 3 letters and valid characters.'
-                ]);
-            }
+           
+            if (!preg_match('/^[A-Za-z0-9\s\'.-]{2,}$/', $customer_name) || !preg_match('/[A-Za-z]/', $customer_name)) {
+    return $this->response->setJSON([
+        'status' => 'error',
+        'message' => 'Invalid Customer Name. Must be at least 2 characters and contain at least one letter.'
+    ]);
+}
 
-            // Validate customer address: must contain at least one alphanumeric character
+
+        
             if (!preg_match('/[A-Za-z0-9]/', $customer_address)) {
                 return $this->response->setJSON([
                     'status' => 'error',
