@@ -80,10 +80,18 @@
 <?php include "common/footer.php"; ?>
 <script>
 $(document).ready(function () {
+    function containsLetters(str) {
+        return /[a-zA-Z]/.test(str);
+    }
+
+    function containsAlphaNumeric(str) {
+        return /[a-zA-Z0-9]/.test(str);
+    }
+
     const isEditMode = $('#uid').val().trim() !== '';
     const $saveBtn = $('.enter-btn');
-    const $form = $('#company-form');
 
+    
     const originalData = {
         name: $('#company_name').val(),
         address: $('#address').val(),
@@ -93,8 +101,11 @@ $(document).ready(function () {
         logo: $('#original_logo').val()
     };
 
+    
     if (isEditMode) {
-        $saveBtn.prop('disabled', true).css('opacity', 0.6);
+        $saveBtn.prop('disabled', true).hide();
+    } else {
+        $saveBtn.prop('disabled', false).show(); // Always show in Add mode
     }
 
     function checkChanges() {
@@ -117,18 +128,49 @@ $(document).ready(function () {
 
         if (isEditMode) {
             if (hasChanged) {
-                $saveBtn.prop('disabled', false).css('opacity', 1);
+                $saveBtn.prop('disabled', false).show().css('opacity', 1);
             } else {
-                $saveBtn.prop('disabled', true).css('opacity', 0.6);
+                $saveBtn.prop('disabled', true).hide();
             }
         }
     }
 
-    $('#company_name, #address, #tax_number, #email, #phone, #company_logo').on('input change', checkChanges);
+    $('#company_name, #address, #tax_number, #email, #phone').on('input', checkChanges);
+    $('#company_logo').on('change', checkChanges);
+
+    <?php if (isset($company['company_id'])): ?>
+    $('#btn-browse-file').on('click', function () {
+        $('#company_logo').click();
+    });
+
+    $('#company_logo').on('change', function () {
+        const file = this.files[0];
+        if (file) {
+            const validTypes = ["image/jpeg", "image/png", "image/jpg", "image/gif"];
+            if (!validTypes.includes(file.type)) {
+                alert('Only JPG, PNG, and GIF image files are allowed.');
+                $(this).val('');
+                $('#fake-file-name').val("<?= esc($company['company_logo']) ?>");
+                $('#logo-preview').attr('src', "<?= base_url('public/uploads/' . $company['company_logo']) ?>");
+                return;
+            }
+            $('#fake-file-name').val(file.name);
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                $('#logo-preview').attr('src', e.target.result);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            $('#fake-file-name').val("<?= esc($company['company_logo']) ?>");
+            $('#logo-preview').attr('src', "<?= base_url('public/uploads/' . $company['company_logo']) ?>");
+        }
+    });
+    <?php endif; ?>
 
     $saveBtn.on('click', function (e) {
         e.preventDefault();
 
+       
         if ($(this).prop('disabled')) return;
 
         let name = $('#company_name').val().trim();
@@ -145,12 +187,12 @@ $(document).ready(function () {
             return;
         }
 
-        if (!/[a-zA-Z]/.test(name)) {
+        if (!containsLetters(name)) {
             showMessage('Company Name must contain at least one letter.', 'danger');
             return;
         }
 
-        if (!/[a-zA-Z]/.test(address)) {
+        if (!containsLetters(address)) {
             showMessage('Company Address must contain at least one letter.', 'danger');
             return;
         }
@@ -160,12 +202,14 @@ $(document).ready(function () {
             return;
         }
 
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
             showMessage('Please enter a valid email address.', 'danger');
             return;
         }
 
-        if (!/^[0-9+\-\s]{7,20}$/.test(phone)) {
+        let phoneRegex = /^[0-9+\-\s]{7,20}$/;
+        if (!phoneRegex.test(phone)) {
             showMessage('Please enter a valid phone number.', 'danger');
             return;
         }
@@ -176,15 +220,19 @@ $(document).ready(function () {
         }
 
         if (file) {
-            const validImageTypes = ["image/jpeg", "image/png", "image/jpg", "image/gif"];
-            if (!validImageTypes.includes(file.type)) {
-                showMessage('Only image files (JPG, PNG, GIF) are allowed.', 'danger');
+            let fileType = file.type;
+            let validImageTypes = ["image/jpeg", "image/png", "image/jpg", "image/gif"];
+            if ($.inArray(fileType, validImageTypes) < 0) {
+                showMessage('Only image files (JPG, PNG, GIF) are allowed for the company logo.', 'danger');
                 return;
             }
         }
 
-        const formData = new FormData($form[0]);
-        $saveBtn.prop('disabled', true).css('opacity', 0.6); // Prevent double click
+        let form = $('#company-form')[0];
+        let formData = new FormData(form);
+
+        
+        $saveBtn.prop('disabled', true).text('Saving...');
 
         $.ajax({
             url: '<?= base_url('managecompany/save') ?>',
@@ -198,7 +246,7 @@ $(document).ready(function () {
 
                 if (response.status === 'error') {
                     showMessage(response.message, 'danger');
-                    $saveBtn.prop('disabled', false).css('opacity', 1);
+                    $saveBtn.prop('disabled', false).text('Save');
                 } else {
                     showMessage(response.message, 'success');
                     setTimeout(() => {
@@ -209,7 +257,7 @@ $(document).ready(function () {
             },
             error: function () {
                 showMessage('Something went wrong. Please try again.', 'danger');
-                $saveBtn.prop('disabled', false).css('opacity', 1);
+                $saveBtn.prop('disabled', false).text('Save');
             }
         });
     });
@@ -221,7 +269,7 @@ $(document).ready(function () {
             .html(msg)
             .fadeIn();
 
-        setTimeout(() => {
+        setTimeout(function () {
             $('.alert').fadeOut();
         }, 3000);
     }
