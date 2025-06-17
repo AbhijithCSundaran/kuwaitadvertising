@@ -11,10 +11,22 @@
 p{
 	    line-height: 4.3rem;
 }
+.toggle-password {
+	position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 5;
+}
+.form-group.position-relative input {
+  padding-right: 40px;
+}
 select.form-control,
 .form-control {
 	border: 1px solid #686868 !important;
 	padding: 12px;
+	color: black;
 }
 
 .modal {
