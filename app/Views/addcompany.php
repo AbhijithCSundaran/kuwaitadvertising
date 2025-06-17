@@ -1,6 +1,5 @@
 <?php include "common/header.php";?>
 <div class="alert d-none text-center position-fixed" role="alert"></div>
-<!-- <div id="companyAlert" class="alert alert-danger w-50 mx-auto text-center fixed top mt-3 alert-fixed" role="alert"></div> -->
     <div class="form-control right_container">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
@@ -31,13 +30,15 @@
                         </div>
                         <div class="col-6 mb-3 px-2">
                             <label for="phone" class="form-label">Phone <span class="text-danger">*</span></label>
-                            <input type="text" name="phone" id="phone" class="form-control" maxlength="10" pattern="\d{10}"
-                            value="<?= isset($company['phone']) ? esc($company['phone']) : '' ?>" />
+                            <input type="text" name="phone" id="phone" class="form-control" maxlength="15"
+                                pattern="^[0-9]{7,15}$"
+                                title="Please enter a valid phone number (7 to 15 digits)"
+                                value="<?= isset($company['phone']) ? esc($company['phone']) : '' ?>" required>
                         </div>
-                        
+
                         <div class="col-6 mb-3 px-2">
                             <label for="tax_number" class="form-label">Tax Number</label>
-                            <input type="text" name="tax_number" id="tax_number" class="form-control"
+                            <input type="text" name="tax_number" id="tax_number" class="form-control" maxlength="15"
                             value="<?= isset($company['tax_number']) ? esc($company['tax_number']) : '' ?>" />
                         </div>
                         <div class="col-6 mb-3 px-2">
@@ -91,7 +92,9 @@ $(document).ready(function () {
     const isEditMode = $('#uid').val().trim() !== '';
     const $saveBtn = $('.enter-btn');
 
-    
+    $('#phone').on('input', function () {
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
     const originalData = {
         name: $('#company_name').val(),
         address: $('#address').val(),

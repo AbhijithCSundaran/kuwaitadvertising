@@ -24,12 +24,15 @@ class Rolemanagement extends Controller
         return view('roleform', ['menus' => $this->menus]);
     }
 
-    public function store()
+   public function store()
     {
         $role_name = $this->request->getPost('role_name');
         $access_data = $this->request->getPost('access');
 
         if ($this->roleModel->where('role_name', $role_name)->first()) {
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON(['status' => 'error', 'message' => 'Role already exists.']);
+            }
             return redirect()->back()->with('error', 'Role already exists.');
         }
 
@@ -51,10 +54,13 @@ class Rolemanagement extends Controller
             }
         }
 
-      session()->setFlashdata('success', 'Role created successfully.');
-        return redirect()->to(base_url('rolemanagement/rolelist'));
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON(['status' => 'success', 'message' => 'Role created successfully.']);
+        }
 
+        return redirect()->to(base_url('rolemanagement/rolelist'))->with('success', 'Role created successfully.');
     }
+
 
     public function rolelist()
     {
@@ -63,18 +69,31 @@ class Rolemanagement extends Controller
 
     public function rolelistajax()
     {
-        $roles = $this->roleModel->findAll();
-        $rolePermissions = [];
+        $roleModel = new \App\Models\RoleModel();
+        $menuModel = new \App\Models\Rolemanagement_model();
+
+        $roles = $roleModel->findAll();
+        $result = [];
 
         foreach ($roles as $role) {
-            $rolePermissions[$role['role_id']] = $this->roleMenuModel->where('role_id', $role['role_id'])->findAll();
+            $permissions = $menuModel->where('role_id', $role['role_id'])
+                                    ->where('access', 1)
+                                    ->findAll();
+
+            $menuList = array_column($permissions, 'menu_name');
+
+            $result[] = [
+                'role_id'     => $role['role_id'],
+                'role_name'   => $role['role_name'],
+                'created_at'  => $role['created_at'],
+                'updated_at'  => $role['updated_at'],
+                'permissions' => $menuList
+            ];
         }
 
-        return $this->response->setJSON([
-            'roles' => $roles,
-            'rolePermissions' => $rolePermissions,
-        ]);
+        return $this->response->setJSON(['roles' => $result]);
     }
+
 
     public function delete()
 	{
@@ -84,7 +103,7 @@ class Rolemanagement extends Controller
 			return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid role ID']);
 		}
 
-		// Delete from roles and permissions
+		
 		$this->roleModel->delete($role_id);
 		$this->roleMenuModel->where('role_id', $role_id)->delete();
 
@@ -156,15 +175,13 @@ class Rolemanagement extends Controller
 			}
 		}
 
-		$role = $this->roleModel->find($id);
-            $access = $normalizedAccess;
+		if ($this->request->isAJAX()) {
+            return $this->response->setJSON(['status' => 'success', 'message' => 'Role updated successfully.']);
+        }
 
-            session()->setFlashdata('success', 'Role updated successfully.');
-            return view('roleform', [
-                'role' => $role,
-                'access' => $access,
-                'menus' => $this->menus
-            ]);
+        session()->setFlashdata('success', 'Role updated successfully.');
+        return redirect()->to(base_url('rolemanagement/edit/' . $id));
+
 
 	}
 

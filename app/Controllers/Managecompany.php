@@ -102,8 +102,12 @@ class Managecompany extends BaseController
 					'message' => 'Another company with the same name and tax number already exists.'
 				]);
 			}
+			
+			if (!preg_match('/^[0-9]{7,15}$/', $phone)) {
+				return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid phone number']);
+			}
 
-			// Handle logo and update
+			
 			if ($logoName) {
 				$newData['company_logo'] = $logoName;
 			} else {
@@ -126,7 +130,7 @@ class Managecompany extends BaseController
 				]);
 			}
 
-			// Delete 
+			 
 			if ($logoName && !empty($existing['company_logo']) && file_exists(ROOTPATH . 'public/uploads/' . $existing['company_logo'])) {
 				unlink(ROOTPATH . 'public/uploads/' . $existing['company_logo']);
 			}
