@@ -24,7 +24,7 @@
           <div class="col-lg-4 mx-auto">
             <div class="auth-form-light text-left py-5 px-4 px-sm-5">
 				<div class="brand-logo">
-					<img src="<?php echo ASSET_PATH; ?>assets/images/logo.svg" alt="logo">
+					<img src="<?php echo ASSET_PATH; ?>assets/images/adminlogo.jpeg" alt="logo" style="width: 90px; height: auto;">
 				</div>
 				<h4>Hello! let's get started</h4>
 				<h6 class="font-weight-light">Sign in to continue.</h6>
@@ -40,9 +40,9 @@
 					<div class="mt-3 d-grid gap-2">
 						<button type="button" class="enter-btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn">SIGN IN</button>
 					</div>
-					<div class="my-2 d-flex justify-content-between align-items-center">
+					<!--<div class="my-2 d-flex justify-content-between align-items-center">
 						<a href="#" class="auth-link text-black">Forgot password?</a>
-					</div>
+					</div>-->
                 </form>
             </div>
           </div>
