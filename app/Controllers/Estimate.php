@@ -61,7 +61,7 @@ class Estimate extends BaseController
                 ]);
             }
 
-            // Prepare estimate data
+            
             $estimateData = [
                 'company_id'        => 1,
                 'customer_name'     => $customer_name,
@@ -78,7 +78,7 @@ class Estimate extends BaseController
                 $estimate_id = $estimateModel->insert($estimateData);
             }
 
-            // Get item details
+            
             $descriptions = $this->request->getPost('description');
             $prices       = $this->request->getPost('price');
             $quantities   = $this->request->getPost('quantity');
@@ -94,7 +94,7 @@ class Estimate extends BaseController
                     $qty = intval($quantities[$i]);
                     $total = floatval($totals[$i]);
 
-                    // Skip blank/invalid rows
+                   
                     if (empty($desc) || $price <= 0 || $qty <= 0 || $total <= 0) {
                         continue;
                     }
@@ -115,7 +115,7 @@ class Estimate extends BaseController
                 }
             }
 
-            // Ensure at least one valid item exists
+            
             if ($validItemCount === 0) {
                 $db->transRollback();
                 return $this->response->setJSON([
@@ -124,12 +124,11 @@ class Estimate extends BaseController
                 ]);
             }
 
-            // Calculate discount and total
             $discount = floatval($this->request->getPost('discount') ?? 0);
             $discountAmount = ($subTotal * $discount) / 100;
             $totalAfterDiscount = $subTotal - $discountAmount;
 
-            // Update estimate with final amount
+           
             $estimateModel->update($estimate_id, [
                 'total_amount' => $totalAfterDiscount,
                 'discount'     => $discount
@@ -161,7 +160,7 @@ class Estimate extends BaseController
         foreach ($estimates as &$estimate) {
             $items = $itemModel->where('estimate_id', $estimate['estimate_id'])->findAll();
 
-            // Combine descriptions (or you can pick the first only)
+            
             $descriptions = array_column($items, 'description');
             $estimate['description'] = implode(', ', $descriptions);
         }

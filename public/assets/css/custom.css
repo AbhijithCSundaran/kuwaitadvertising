@@ -113,6 +113,7 @@ select.form-control,
 .btn-primary:not(.btn-light) {
 	background: #686868 !important;
 	color: white;
+	border: none;
 }
 
 .dataTables_length label {

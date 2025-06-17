@@ -1,5 +1,5 @@
 <?php include "common/header.php";?>
-<div id="estimateAlert" class="alert d-none text-center position-fixed" role=alert ></div>
+<div class="alert d-none text-center position-fixed" role=alert ></div>
 <!DOCTYPE html>
 <html>
 <head>
@@ -33,7 +33,6 @@
 </head>
 <body>
     <div class="mt-1 estimate-box right_container">
-        <div class="alert alert-fixed alert-dismissible fade show" role="alert"></div>
             <div class="row mb-3">
                 <div class="col-md-6">
                     <h3><?= isset($estimate['estimate_id']) ? 'Edit Estimate' : 'Estimate Generation' ?></h3>
@@ -138,14 +137,14 @@ function calculateTotals() {
 
     $('#sub_total_display').text(subtotal.toFixed(2));
 
-    // ✅ Treat discount as a percentage
+    
     let discountPercent = parseFloat($('#discount').val()) || 0;
     let discountAmount = (subtotal * discountPercent) / 100;
 
     let grandTotal = subtotal - discountAmount;
 
     $('#total_display').text(grandTotal.toFixed(2));
-    $('#total_amount').val(grandTotal.toFixed(2)); // if you're storing it
+    $('#total_amount').val(grandTotal.toFixed(2)); 
 }
 
 
@@ -166,7 +165,7 @@ $(document).ready(function () {
 
     function showAlert(message, type = 'success') {
         $('.alert')
-            .removeClass('alert-success alert-danger')
+            .removeClass('d-none alert-success alert-danger')
             .addClass(type === 'success' ? 'alert-success' : 'alert-danger')
             .text(message)
             .fadeIn();
@@ -216,6 +215,7 @@ $(document).ready(function () {
     $('#estimate-form').on('submit', function (e) {
     e.preventDefault();
     $('.alert').hide();
+    $('#generate-btn').prop('disabled', true).removeClass('btn-primary').addClass('btn-secondary');
 
     const customerName = $('input[name="customer_name"]').val().trim();
     const customerAddress = $('textarea[name="customer_address"]').val().trim();
@@ -242,7 +242,7 @@ $(document).ready(function () {
         const price = parseFloat($(this).find('input[name="price[]"]').val());
         const qty = parseFloat($(this).find('input[name="quantity[]"]').val());
 
-        // Clean up blank rows
+       
         if (!desc && !price && !qty) {
             $(this).remove();
             return;
@@ -260,7 +260,7 @@ $(document).ready(function () {
         return;
     }
 
-    // 🔄 Now serialize the cleaned-up form
+   
     $.ajax({
         url: "<?= site_url('estimate/save') ?>",
         type: "POST",
@@ -284,7 +284,7 @@ $(document).ready(function () {
 z
 
     if (!isEditMode) {
-        $('#add-item').click(); // Only auto add row in create mode
+        $('#add-item').click(); 
     }
 
     calculateTotals();
