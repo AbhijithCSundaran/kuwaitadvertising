@@ -1,20 +1,16 @@
 <?php
 namespace App\Controllers;
 
-use App\Models\Manageuser_Model;
 use App\Controllers\BaseController;
+use App\Models\Manageuser_Model;
 
 class Manageuser extends BaseController
 {
+    // Render form (add/edit user)
     public function index($uid = null)
     {
-        $isEdit = !empty($uid);
-        $userData = null;
-
-        if ($isEdit) {
-            $model = new Manageuser_Model();
-            $userData = $model->find($uid);
-        }
+        $isEdit   = !empty($uid);
+        $userData = $isEdit ? (new Manageuser_Model())->find($uid) : null;
 
         return view('adduser', [
             'uid'      => $uid,
@@ -23,83 +19,114 @@ class Manageuser extends BaseController
         ]);
     }
 
+    // Render listing page
     public function add()
     {
         return view('adduserlist');
     }
 
+    // Save user (create or update)
     public function save()
     {
-        $model = new Manageuser_Model();
+        $model   = new Manageuser_Model();
+        $id      = $this->request->getPost('uid');
+        $name    = trim($this->request->getPost('name'));
+        $email   = trim($this->request->getPost('email'));
+        $phone   = trim($this->request->getPost('phonenumber'));
+        $pw      = trim($this->request->getPost('password'));
+        $newPw   = trim($this->request->getPost('new_password'));
+        $confPw  = trim($this->request->getPost('confirm_new_password'));
 
-        $id       = $this->request->getPost('uid');
-        $name     = trim($this->request->getPost('name'));
-        $email    = trim($this->request->getPost('email'));
-        $phone    = trim($this->request->getPost('phonenumber'));
-        $password = trim($this->request->getPost('password'));
+        $isEdit = !empty($id);
 
-        // Basic validation
-        if ($name === '' || $email === '' || (empty($id) && $password === '')) {
+        // Validate required fields
+        if ($name === '' || $email === '' || (!$isEdit && $pw === '')) {
             return $this->response->setJSON([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'Please fill all mandatory fields.'
             ]);
         }
 
+        // Optional: Email format validation (uncomment if needed)
+        // if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        //     return $this->response->setJSON([
+        //         'status'  => 'error',
+        //         'message' => 'Invalid email format.'
+        //     ]);
+        // }
+
+        // In edit mode, validate new password (if provided)
+        if ($isEdit && ($newPw !== '' || $confPw !== '')) {
+            if (strlen($newPw) < 6 || strlen($newPw) > 15) {
+                return $this->response->setJSON([
+                    'status'  => 'error',
+                    'message' => 'New password must be between 6 and 15 characters.'
+                ]);
+            }
+
+            if ($newPw !== $confPw) {
+                return $this->response->setJSON([
+                    'status'  => 'error',
+                    'message' => 'New password and confirm password do not match.'
+                ]);
+            }
+        }
+
+        // Build data array
         $data = [
             'name'        => $name,
             'email'       => $email,
             'phonenumber' => $phone
         ];
 
-        if (!empty($password)) {
-            $data['password'] = password_hash($password, PASSWORD_DEFAULT);
+        // Password logic
+        if (!$isEdit && $pw !== '') {
+            $data['password'] = password_hash($pw, PASSWORD_DEFAULT);
+        } elseif ($isEdit && $newPw !== '') {
+            $data['password'] = password_hash($newPw, PASSWORD_DEFAULT);
         }
 
-        if (!empty($id)) {
-            $existingUser = $model->find($id);
-            if (!$existingUser) {
+        // Save to DB
+        if (!$isEdit) {
+            $model->insert($data);
+            $message = 'User added successfully.';
+        } else {
+            $existing = $model->find($id);
+            if (!$existing) {
                 return $this->response->setJSON([
-                    'status' => 'error',
+                    'status'  => 'error',
                     'message' => 'User not found.'
                 ]);
             }
 
-            $changes = array_diff_assoc($data, $existingUser);
-            $hasChanges = !empty($changes) || isset($data['password']);
-
-
             $model->update($id, $data);
-            $msg = 'User details updated successfully.';
-        } else {
-            $model->insert($data);
-            $msg = 'User added successfully.';
+            $message = 'User details updated successfully.';
         }
 
         return $this->response->setJSON([
-            'status' => 'success',
-            'message' => $msg
+            'status'  => 'success',
+            'message' => $message
         ]);
     }
-// ajax integration
-   public function userlistajax()
-{
-    $model = new \App\Models\Manageuser_Model();
-    $data = $model->orderBy('user_id', 'DESC')->findAll();
 
-    return $this->response->setJSON($data);
-}
-
-   public function delete($id)
+    // List users via AJAX
+    public function userlistajax()
     {
-        $userModel = new \App\Models\Manageuser_Model();
+        $model = new Manageuser_Model();
+        $data  = $model->orderBy('user_id', 'DESC')->findAll();
 
-        if ($userModel->delete($id)) {
-            return $this->response->setJSON(['status' => 'success']);
-        } else {
-            return $this->response->setJSON(['status' => 'error']);
-        }
+        return $this->response->setJSON($data);
     }
 
+    // Delete a user
+    public function delete($id)
+    {
+        $model = new Manageuser_Model();
+        $ok    = $model->delete($id);
 
+        return $this->response->setJSON([
+            'status'  => $ok ? 'success' : 'error',
+            'message' => $ok ? 'User deleted successfully.' : 'Failed to delete user.'
+        ]);
+    }
 }

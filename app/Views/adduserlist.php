@@ -36,8 +36,13 @@ $(document).ready(function () {
             dataSrc: ""
         },
         columns: [
-            { data: null },
-            { data: "name" },
+            { data: null }, // SI NO
+            {
+                data: "name",
+                render: function (data) {
+                    return data.replace(/\b\w/g, c => c.toUpperCase());
+                }
+            },
             { data: "email" },
             { data: "phonenumber" },
             {
@@ -48,27 +53,26 @@ $(document).ready(function () {
                         <button class="btn btn-sm btn-danger delete-user" data-id="${data}">Delete</button>
                     `;
                 }
-            }
+            },
+            { data: "user_id", visible: false } // 🔒 hidden column for sorting
         ],
+        order: [[5, 'desc']], // ⬆️ Sort by hidden user_id column (latest first)
         dom: "<'row mb-3'<'col-sm-6'l><'col-sm-6'f>>" +
              "<'row'<'col-sm-12'tr>>" +
              "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
         lengthMenu: [5, 10, 25, 50],
         pageLength: 10,
-        order: [[1, 'asc']],
         columnDefs: [
-            { orderable: false, searchable: false, targets: [0, 4] }
+            { orderable: false, searchable: false, targets: [0, 4] } // SI No and Action
         ]
     });
-
-    // Serial Number
     table.on('order.dt search.dt draw.dt', function () {
         table.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
             cell.innerHTML = i + 1;
         });
     });
 
-    // Delete
+    // Delete user
     $('#userTable').on('click', '.delete-user', function () {
         const id = $(this).data('id');
         if (confirm("Are you sure you want to delete this user?")) {
@@ -80,7 +84,7 @@ $(document).ready(function () {
                     const alertBox = $('.alert');
                     if (res.status === 'success') {
                         alertBox.removeClass('d-none').addClass('alert-danger')
-                        .html('Deleted successfully').fadeIn();
+                        .html('User Deleted successfully').fadeIn();
                         setTimeout(() => {
                             alertBox.addClass('d-none').removeClass('alert-success');
                         }, 2000);
@@ -105,3 +109,4 @@ $(document).ready(function () {
     });
 });
 </script>
+
