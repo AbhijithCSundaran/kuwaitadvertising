@@ -92,8 +92,15 @@ $(document).ready(function () {
                 render: function (data) {
                     return data.replace(/\b\w/g, c => c.toUpperCase());
                 }
-             },// hide on small
-            { data: "tax_number", className: "d-none d-lg-table-cell" },         
+             },
+             
+            {
+                data: "tax_number", className: "d-none d-lg-table-cell",
+                render: function (data) {
+                    return data && data.trim() !== "" ? data : '-N/A-';
+                }
+            },
+         
             { data: "email", className: "d-none d-xl-table-cell" }, 
             { data: "phone", className: "d-none d-xxl-table-cell" },              
             {
@@ -120,14 +127,14 @@ $(document).ready(function () {
     ]
     });
 
-    // Serial numbers
+  
     table.on('order.dt search.dt draw.dt', function () {
         table.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
             cell.innerHTML = i + 1;
         });
     });
 	
-	// Handle delete functionality
+	
    $(document).on('click', '.delete-btn', function () {
     const id = $(this).data('id');
     
@@ -151,7 +158,7 @@ $(document).ready(function () {
                         });
                     }, 2000);
 
-                    table.ajax.reload(null, false); // Reload DataTable without reset
+                    table.ajax.reload(null, false); 
                 } else {
                     alertBox.removeClass('d-none alert-success alert-danger alert-warning')
                              .addClass('alert-warning')

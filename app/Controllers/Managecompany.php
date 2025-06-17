@@ -135,7 +135,7 @@ class Managecompany extends BaseController
 			return $this->response->setJSON(['status' => 'success', 'message' => 'Company updated successfully']);
 		} else {
 			
-			// Check for duplicates before inserting
+			
 			$existing = $this->companyModel
 				->where('company_name', $newData['company_name'])
 				->where('tax_number', $newData['tax_number'])
