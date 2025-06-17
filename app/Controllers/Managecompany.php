@@ -173,15 +173,40 @@ class Managecompany extends BaseController
         return $this->response->setJSON($company);
     }
 
-    public function delete($id)
-    {
-        if ($this->companyModel->delete($id)) {
-            return $this->response->setJSON(['status' => 'success']);
-        } else {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Failed to delete company']);
-        }
+   public function delete()
+{
+    $id = $this->request->getPost('id');
+
+    if (!$id) {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'No ID provided.'
+        ]);
     }
-	
+
+    $companyModel = new \App\Models\Managecompany_Model();
+    $company = $companyModel->find($id);
+
+    if (!$company) {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Company not found.'
+        ]);
+    }
+
+    if ($companyModel->delete($id)) {
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'Company deleted successfully.'
+        ]);
+    }
+
+    return $this->response->setJSON([
+        'status' => 'error',
+        'message' => 'Failed to delete company.'
+    ]);
+}
+
 	public function companylistjson()
 	{
 		$companies = $this->companyModel->findAll();

@@ -6,9 +6,6 @@
         <div class="col-md-6">
             <h3 class="mb-0"><?= isset($isEdit) && $isEdit ? 'Edit User' : 'Create New User' ?></h3>
          </div>
-        <div class="col-md-6 text-end">
-            <a href="<?= base_url('adduserlist') ?>" class="btn btn-secondary">Back to List</a>
-        </div>
     </div>
      <!-- <div class="alert text-center right-end position-fixed translate-middle-x mt-3 " role="alert"style="top: 0; left: 80%;  z-index: 9999;"></div> -->
 	<div class="col-md-12"><hr/></div>
@@ -49,6 +46,7 @@
 				</div>
 				<div class="form-group">
 					<div class="col-md-12  text-end">
+                        <a href="<?= base_url('adduserlist') ?>" class="btn btn-secondary">Discard</a>
 						<button type="button"  class="enter-btn btn btn-primary" id="saveUserBtn" disabled>Save User</button>
 						<input type="hidden" name="uid" id="uid" value="<?= isset($uid) ? $uid : '' ?>">
 					

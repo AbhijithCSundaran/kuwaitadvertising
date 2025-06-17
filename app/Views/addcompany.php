@@ -1,5 +1,6 @@
 <?php include "common/header.php";?>
-<div id="companyAlert" class="alert alert-danger w-50 mx-auto text-center fixed top mt-3 alert-fixed" role="alert"></div>
+<div class="alert d-none text-center position-fixed" role="alert"></div>
+<!-- <div id="companyAlert" class="alert alert-danger w-50 mx-auto text-center fixed top mt-3 alert-fixed" role="alert"></div> -->
     <div class="form-control right_container">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
@@ -227,14 +228,14 @@ $(document).ready(function () {
             processData: false,
             dataType: 'json',
             success: function (response) {
-                $('.alert').removeClass('alert-danger alert-success alert-warning');
+                $('.alert').removeClass('d-none alert-danger alert-success alert-warning');
 
                 if (response.status === 'error') {
                     showMessage(response.message, 'danger');
                 } else {
                     showMessage(response.message, 'success');
                     setTimeout(() => {
-                        $('#companyAlert').fadeOut();
+                        $('.alert').fadeOut();
                         window.location.href = "<?= base_url('companylist') ?>";
                     }, 3000);
                 }
@@ -247,13 +248,13 @@ $(document).ready(function () {
 
     function showMessage(msg, type) {
         $('.alert')
-            .removeClass('alert-danger alert-success alert-warning')
+            .removeClass('d-none alert-danger alert-success alert-warning')
             .addClass('alert-' + type)
             .html(msg)
             .fadeIn();
 
         setTimeout(function () {
-            $('#companyAlert').fadeOut();
+            $('.alert').fadeOut();
         }, 3000);
     }
 });

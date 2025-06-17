@@ -1,5 +1,6 @@
 <?php include "common/header.php";?>
 <div class="form-control mb-3 right_container"> 
+    <div class="alert d-none text-center position-fixed" role="alert"></div>
     <div class="row align-items-center">
         <div class="col-md-6">
             <h3 class="mb-0">Manage Companies</h3>
@@ -10,7 +11,7 @@
     </div>
     <hr>
 
-    <div id="companyDeleteAlert" class="alert alert-success w-50 mx-auto text-center fixed top mt-3" style="display:none;"></div>
+    <!-- <div id="companyDeleteAlert" class="alert alert-success w-50 mx-auto text-center top mt-3" style="display:none;"></div> -->
     
     <style>
     table.dataTable thead th {
@@ -82,8 +83,16 @@ $(document).ready(function () {
         pageLength: 10,
         columns: [
             { data: null },
-            { data: "company_name", className: "wrap-text" },
-            { data: "address", className: "wrap-text d-none d-md-table-cell" },// hide on small
+            { data: "company_name", className: "wrap-text",
+                render: function (data) {
+                    return data.replace(/\b\w/g, c => c.toUpperCase());
+                }
+             },
+            { data: "address", className: "wrap-text d-none d-md-table-cell",
+                render: function (data) {
+                    return data.replace(/\b\w/g, c => c.toUpperCase());
+                }
+             },// hide on small
             { data: "tax_number", className: "d-none d-lg-table-cell" },         
             { data: "email", className: "d-none d-xl-table-cell" }, 
             { data: "phone", className: "d-none d-xxl-table-cell" },              
@@ -119,35 +128,60 @@ $(document).ready(function () {
     });
 	
 	// Handle delete functionality
-    $(document).on('click', '.delete-btn', function () {
-        let id = $(this).data('id');
+   $(document).on('click', '.delete-btn', function () {
+    const id = $(this).data('id');
+    
+    if (confirm('Are you sure you want to delete this company?')) {
+        $.ajax({
+            url: "<?= base_url('managecompany/delete') ?>",
+            type: "POST",
+            data: { id: id },
+            dataType: "json",
+            success: function (res) {
+                const alertBox = $('.alert');
+                if (res.status === 'success') {
+                    alertBox.removeClass('d-none alert-success alert-warning alert-danger')
+                             .addClass('alert-danger')
+                             .text('Company deleted successfully!')
+                             .fadeIn();
 
-        if (confirm('Are you sure you want to delete this company?')) {
-            $.ajax({
-                url: '<?= base_url('managecompany/delete') ?>/' + id,
-                type: 'POST',
-                data: { _method: 'DELETE' },
-                dataType: 'json',
-                success: function (response) {
-                    if (response.status === 'success') {
-                        $('#companyDeleteAlert')
-                            .removeClass()
-                            .addClass('alert alert-danger text-center alert-fixed') 
-                            .text('Company deleted successfully!')
-                            .fadeIn()
-                            .delay(3000)
-                            .fadeOut();
-                        table.ajax.reload(null, false); // Reload table without resetting pagination
-                    } else {
-                        alert(response.message || 'Delete failed.');
-                    }
-                },
-                error: function () {
-                    alert('Something went wrong during deletion.');
+                    setTimeout(() => {
+                        alertBox.fadeOut(() => {
+                            alertBox.addClass('d-none').text('');
+                        });
+                    }, 2000);
+
+                    table.ajax.reload(null, false); // Reload DataTable without reset
+                } else {
+                    alertBox.removeClass('d-none alert-success alert-danger alert-warning')
+                             .addClass('alert-warning')
+                             .text(res.message || 'Delete failed.')
+                             .fadeIn();
+
+                    setTimeout(() => {
+                        alertBox.fadeOut(() => {
+                            alertBox.addClass('d-none').text('');
+                        });
+                    }, 3000);
                 }
-            });
-        }
-    });
+            },
+            error: function () {
+                const alertBox = $('.alert');
+                alertBox.removeClass('d-none alert-success alert-warning')
+                        .addClass('alert-danger')
+                        .text('Error deleting company.')
+                        .fadeIn();
+
+                setTimeout(() => {
+                    alertBox.fadeOut(() => {
+                        alertBox.addClass('d-none').text('');
+                    });
+                }, 3000);
+            }
+        });
+    }
+});
+
 });
 </script>
 
