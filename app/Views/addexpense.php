@@ -59,7 +59,6 @@ $(document).ready(function () {
         const currentData = $('#expense-form').serialize();
         $('#saveExpenseBtn').prop('disabled', currentData === originalData);
     });
-
     $('#saveExpenseBtn').on('click', function () {
         const alertBox = $('.alert');
         const form = $('#expense-form')[0];
@@ -68,7 +67,7 @@ $(document).ready(function () {
             alertBox
                 .removeClass('d-none alert-success alert-warning')
                 .addClass('alert-danger')
-                .text('Please fill all mandatory fields.');
+                .text('Please Fill All Mandatory Fields.');
             setTimeout(() => alertBox.addClass('d-none').text(''), 2000);
             return;
         }
@@ -107,7 +106,7 @@ $(document).ready(function () {
                     alertBox
                         .removeClass('d-none alert-success alert-warning')
                         .addClass('alert-danger')
-                        .text(res.message || 'Failed to save expense.');
+                        .text(res.message || 'Failed to Save Expense.');
                     $('#saveExpenseBtn').prop('disabled', false);
                 }
             },
@@ -115,7 +114,7 @@ $(document).ready(function () {
                 alertBox
                     .removeClass('d-none alert-success alert-warning')
                     .addClass('alert-danger')
-                    .text('Error occurred while saving expense.');
+                    .text('Error Occurred While Saving Expense.');
                 $('#saveExpenseBtn').prop('disabled', false);
             }
         });

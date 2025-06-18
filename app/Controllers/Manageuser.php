@@ -43,7 +43,7 @@ class Manageuser extends BaseController
         if ($name === '' || $email === '' || (!$isEdit && $pw === '')) {
             return $this->response->setJSON([
                 'status'  => 'error',
-                'message' => 'Please fill all mandatory fields.'
+                'message' => 'Please Fill All Mandatory Fields.'
             ]);
         }
 
@@ -60,14 +60,14 @@ class Manageuser extends BaseController
             if (strlen($newPw) < 6 || strlen($newPw) > 15) {
                 return $this->response->setJSON([
                     'status'  => 'error',
-                    'message' => 'New password must be between 6 and 15 characters.'
+                    'message' => 'New Password Must Be Between 6 And 15 Characters.'
                 ]);
             }
 
             if ($newPw !== $confPw) {
                 return $this->response->setJSON([
                     'status'  => 'error',
-                    'message' => 'New password and confirm password do not match.'
+                    'message' => 'New Password And Confirm Password Do Not Match.'
                 ]);
             }
         }
@@ -89,7 +89,7 @@ class Manageuser extends BaseController
         // Save to DB
         if (!$isEdit) {
             $model->insert($data);
-            $message = 'User added successfully.';
+            $message = 'User Created Successfully.';
         } else {
             $existing = $model->find($id);
             if (!$existing) {
@@ -100,7 +100,7 @@ class Manageuser extends BaseController
             }
 
             $model->update($id, $data);
-            $message = 'User details updated successfully.';
+            $message = 'User Details Updated Successfully.';
         }
 
         return $this->response->setJSON([
@@ -126,7 +126,7 @@ class Manageuser extends BaseController
 
         return $this->response->setJSON([
             'status'  => $ok ? 'success' : 'error',
-            'message' => $ok ? 'User deleted successfully.' : 'Failed to delete user.'
+            'message' => $ok ? 'User Deleted Successfully.' : 'Failed To Delete User.'
         ]);
     }
 }

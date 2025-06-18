@@ -60,7 +60,7 @@ $(document).ready(function () {
         dom: "<'row mb-3'<'col-sm-6'l><'col-sm-6'f>>" +
              "<'row'<'col-sm-12'tr>>" +
              "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
-        alengthMenu: [5, 10, 25, 50],
+        lengthMenu: [5, 10, 25, 50],
         pageLength: 10,
         columnDefs: [
             { orderable: false, searchable: false, targets: [0, 4] } 
@@ -83,13 +83,13 @@ $(document).ready(function () {
                     const alertBox = $('.alert');
                     if (res.status === 'success') {
                         alertBox.removeClass('d-none').addClass('alert-danger')
-                        .html('User Deleted successfully').fadeIn();
+                        .html('User Deleted Successfully').fadeIn();
                         setTimeout(() => {
                             alertBox.addClass('d-none').removeClass('alert-success');
                         }, 2000);
                         table.ajax.reload(null, false);
                     } else {
-                        alertBox.removeClass('d-none').html('Failed to delete user.').fadeIn();
+                        alertBox.removeClass('d-none').html('Failed To Delete User.').fadeIn();
                         setTimeout(() => {
                             alertBox.fadeOut(() => alertBox.addClass('d-none'));
                         }, 3000);
@@ -98,7 +98,7 @@ $(document).ready(function () {
                 error: function (xhr) {
                     console.error("AJAX error:", xhr.responseText);
                     const alertBox = $('.alert');
-                    alertBox.removeClass('d-none').html('An error occurred.').fadeIn();
+                    alertBox.removeClass('d-none').html('An Error Occurred.').fadeIn();
                     setTimeout(() => {
                         alertBox.fadeOut(() => alertBox.addClass('d-none'));
                     }, 3000);

@@ -90,7 +90,7 @@ $(document).ready(function () {
                     const alertBox = $('.alert');
                     if (res.status === 'success') {
                         alertBox.removeClass('d-none').addClass('alert-danger')
-                        .html('Remove an existing expense.').fadeIn();
+                        .html('Expense Deleted Successfully.').fadeIn();
                         setTimeout(() => {
                             alertBox.fadeOut(() => {
                                 alertBox.addClass('d-none').removeClass('alert-success');
@@ -98,7 +98,7 @@ $(document).ready(function () {
                         }, 2000);
                         table.ajax.reload(null, false);
                     } else {
-                        alertBox.removeClass('d-none').html('Failed to remove expense.').fadeIn();
+                        alertBox.removeClass('d-none').html('Failed To Delete Expense.').fadeIn();
                         setTimeout(() => {
                             alertBox.fadeOut(() => {
                                 alertBox.addClass('d-none');
@@ -108,7 +108,7 @@ $(document).ready(function () {
                 },
                 error: function () {
                     const alertBox = $('.alert');
-                    alertBox.removeClass('d-none').html('Error removing expense.').fadeIn();
+                    alertBox.removeClass('d-none').html('Error Removing Expense.').fadeIn();
                     setTimeout(() => {
                         alertBox.fadeOut(() => {
                             alertBox.addClass('d-none');

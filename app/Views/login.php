@@ -67,25 +67,33 @@
   <!-- endinject -->
 </body>
 <script>
-	$(document).ready(function(){
+  $(document).ready(function () {
+    $('.enter-btn').click(function () {
+      debugger;
+      const body = $('#login-form').serialize();
+      var url = '<?= base_url("login/authenticate") ?>';
 
-	$('.enter-btn').click(function(){
-		debugger;
-	const body = $('#login-form').serialize();
-		var url ='<?= base_url("login/authenticate") ?>';
-		$.post(url, body, function(response){
-			if(response== 1) {
-				window.location.href = "dashboard";
-			}
-			else{
-				$('#loginalert').html('Invalid Credentials');
-				$('#loginalert').fadeIn();
-				setTimeout(function(){
-					$('#loginalert').fadeOut();
-				},3000);
-			}
-		}, 'json');
-	});
-});
+      $.post(url, body, function (response) {
+        if (response == 1) {
+          $('#loginalert').removeClass('alert-danger').addClass('alert-success');
+          $('#loginalert').html('Login Successful');
+          $('#loginalert').fadeIn();
+
+          setTimeout(function () {
+            $('#loginalert').fadeOut();
+            window.location.href = "<?= base_url('dashboard') ?>";
+          }, 2000); 
+        } else {
+          $('#loginalert').removeClass('alert-success').addClass('alert-danger');
+          $('#loginalert').html('Invalid Credentials');
+          $('#loginalert').fadeIn();
+          setTimeout(function () {
+            $('#loginalert').fadeOut();
+          }, 2000);
+        }
+      }, 'json');
+    });
+  });
 </script>
+
 </html>
