@@ -126,24 +126,24 @@ $(document).on('click', '.toggle-password', function () {
     const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!name || !email || (isNew && !pw)) {
-      showAlert('Please fill all mandatory fields <span class="text-danger">*</span>.', 'danger');
+      showAlert('Please Fill All Mandatory Fields <span class="text-danger">*</span>.', 'danger');
       return btn.prop('disabled', false);
     }
     if (!emailRe.test(email)) {
-      showAlert('Please enter a valid email address.', 'danger');
+      showAlert('Please Enter A Valid Email Address.', 'danger');
       return btn.prop('disabled', false);
     }
     if (isNew && (pw.length < 6 || pw.length > 15)) {
-      showAlert('Password must be between 6 and 15 characters.', 'danger');
+      showAlert('Password Must Be Between 6 And 15 Characters.', 'danger');
       return btn.prop('disabled', false);
     }
     if (!isNew && (newPw || confPw)) {
       if (newPw.length < 6 || newPw.length > 15) {
-        showAlert('New Password must be between 6 and 15 characters.', 'danger');
+        showAlert('New Password Must Be Between 6 And 15 Characters.', 'danger');
         return btn.prop('disabled', false);
       }
       if (newPw !== confPw) {
-        showAlert('New Password and Confirm Password must match.', 'danger');
+        showAlert('New Password And Confirm Password Must Match.', 'danger');
         return btn.prop('disabled', false);
       }
     }
@@ -165,12 +165,12 @@ $(document).on('click', '.toggle-password', function () {
           }
           setTimeout(() => window.location.href = '<?= base_url('adduserlist') ?>', 2000);
         } else {
-          showAlert(response.message || 'Failed to save user.', 'danger');
+          showAlert(response.message || 'Failed To Save User.', 'danger');
           btn.prop('disabled', false);
         }
       },
       error: function () {
-        showAlert('Something went wrong. Please try again.', 'danger');
+        showAlert('Something Went Wrong. Please Try Again.', 'danger');
         btn.prop('disabled', false);
       }
     });

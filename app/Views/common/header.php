@@ -26,7 +26,15 @@
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+  <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" > -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" ></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" ></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
 <!-- DataTables with Bootstrap 5 -->
 </head>
 <body>
@@ -260,13 +268,39 @@
       </a>
     </li>   
     <li class="nav-item">
-      <a class="nav-link" href="<?= base_url('logout') ?>">
-        <i class="mdi mdi-logout menu-icon"></i>
-        <span class="menu-title">Logout</span>
-      </a>
+      <a href="#" id="logoutLink" class="nav-link">
+  <i class="mdi mdi-logout menu-icon"></i>
+  <span class="menu-title">Logout</span>
+</a>
     </li>
 
   </ul>
 </nav>
+
+<!-- Logout Confirmation Modal -->
+<div class="modal fade" id="logoutModel" tabindex="-1" role="dialog" aria-labelledby="logoutModelLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <h5 class="modal-title" id="logoutModelLabel">Logout Confirmation</h5>
+        <button type="button" class="close" id="closeModalBtn" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        Are you sure you want to logout?
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="cancelLogoutBtn">Cancel</button>
+        <button type="button" class="btn btn-primary" id="confirmlogout">Logout</button>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>

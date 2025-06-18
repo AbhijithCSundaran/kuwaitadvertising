@@ -8,7 +8,7 @@
 	border-color: #686868 !important;
 }
 
-p{
+.text-muted{
 	    line-height: 4.3rem;
 }
 .toggle-password {
@@ -27,6 +27,11 @@ select.form-control,
 	border: 1px solid #686868 !important;
 	padding: 12px;
 	color: black;
+	appearance: auto; 
+	-webkit-appearance: auto; /* Safari/Chrome */
+	-moz-appearance: auto; /* Firefox */
+	background-image: none; /* Reset any custom background */
+
 }
 
 .modal {

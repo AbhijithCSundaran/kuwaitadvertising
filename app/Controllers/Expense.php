@@ -69,13 +69,13 @@ class Expense extends BaseController
 
             if ($hasChanges) {
                 $expenseModel->update($id, $data);
-                $msg = 'Expense update complete.';
+                $msg = 'Expense Updated Successfully.';
             } else {
-                $msg = 'No changes detected.';
+                $msg = 'No Changes Detected.';
             }
         } else {
             $expenseModel->insert($data);
-            $msg = 'Expense created successfully.';
+            $msg = 'Expense Created Successfully.';
         }
 
         return $this->response->setJSON([
@@ -109,20 +109,20 @@ class Expense extends BaseController
     if (!$expense) {
         return $this->response->setJSON([
             'status' => 'error',
-            'message' => 'Expense not found.'
+            'message' => 'Expense Not Found.'
         ]);
     }
 
     if ($expenseModel->delete($id)) {
         return $this->response->setJSON([
             'status' => 'success',
-            'message' => 'Remove an existing expense.'
+            'message' => 'Expense Deleted Successfully.'
         ]);
     }
 
     return $this->response->setJSON([
         'status' => 'error',
-        'message' => 'Failed to remove expense.'
+        'message' => 'Failed To Remove Expense.'
     ]);
 }
 
