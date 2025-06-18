@@ -27,7 +27,7 @@ class Managecompany extends BaseController
         if ($id) {
             $company = $this->companyModel->find($id);
             if (!$company) {
-                throw PageNotFoundException::forPageNotFound('Company not found.');
+                throw PageNotFoundException::forPageNotFound('Company Not Found.');
             }
             $data['company'] = $company;
         }
@@ -86,7 +86,7 @@ class Managecompany extends BaseController
 			if (!$existing) {
 				return $this->response->setJSON([
 					'status' => 'error',
-					'message' => 'Company not found for update.'
+					'message' => 'Company Not Found For Update.'
 				]);
 			}
 
@@ -99,12 +99,12 @@ class Managecompany extends BaseController
 			if ($duplicate) {
 				return $this->response->setJSON([
 					'status' => 'error',
-					'message' => 'Another company with the same name and tax number already exists.'
+					'message' => 'Another Company With The Same Name And Tax Number Already Exists.'
 				]);
 			}
 			
-			if (!preg_match('/^[0-9]{7,15}$/', $phone)) {
-				return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid phone number']);
+			if (!preg_match('/^[0-9]{7,15}$/', $newData['phone'])) {
+				return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid Phone Number']);
 			}
 
 			
@@ -126,7 +126,7 @@ class Managecompany extends BaseController
 			if (!$hasChanges) {
 				return $this->response->setJSON([
 					'status' => 'warning',
-					'message' => 'No changes detected to update.'
+					'message' => 'No Changes Detected To Update.'
 				]);
 			}
 
@@ -136,7 +136,7 @@ class Managecompany extends BaseController
 			}
 
 			$this->companyModel->update($uid, $newData);
-			return $this->response->setJSON(['status' => 'success', 'message' => 'Company updated successfully']);
+			return $this->response->setJSON(['status' => 'success', 'message' => 'Company Updated Successfully']);
 		} else {
 			
 			
@@ -148,7 +148,7 @@ class Managecompany extends BaseController
 			if ($existing) {
 				return $this->response->setJSON([
 					'status' => 'error',
-					'message' => 'Company with the same name and tax number already exists.'
+					'message' => 'Company With The Same Name And Tax Number Already Exists.'
 				]);
 			}
 
@@ -159,7 +159,7 @@ class Managecompany extends BaseController
 			$this->companyModel->insert($newData);
 			return $this->response->setJSON([
 				'status' => 'success',
-				'message' => 'Company added successfully'
+				'message' => 'Company Added Successfully'
 			]);
 		}
 	}
@@ -194,20 +194,20 @@ class Managecompany extends BaseController
     if (!$company) {
         return $this->response->setJSON([
             'status' => 'error',
-            'message' => 'Company not found.'
+            'message' => 'Company Not Found.'
         ]);
     }
 
     if ($companyModel->delete($id)) {
         return $this->response->setJSON([
             'status' => 'success',
-            'message' => 'Company deleted successfully.'
+            'message' => 'Company Deleted Successfully.'
         ]);
     }
 
     return $this->response->setJSON([
         'status' => 'error',
-        'message' => 'Failed to delete company.'
+        'message' => 'Failed To Delete Company.'
     ]);
 }
 

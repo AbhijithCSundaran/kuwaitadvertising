@@ -38,7 +38,7 @@ label {
                     <th>Customer Name</th>
                     <th style="width: 200px;">Customer Address</th>
                     <th>Total Amount</th>
-                    <th>Discount</th>
+                    <th>Discount %</th>
                     <th>Date</th>
                     <th>Description</th> 
                     <th>Action</th>
@@ -72,8 +72,18 @@ $(document).ready(function () {
         columns: [
             { data: "estimate_id" },
             { data: null },
-            { data: "customer_name" },
-            { data: "customer_address", className: "d-none d-xxl-table-cell" },
+            { data: "customer_name",
+                render: function (data, type, row) {
+                    if (!data || typeof data !== 'string') return '';
+                    return data.replace(/\b\w/g, c => c.toUpperCase());
+                }
+            },
+            { data: "customer_address", className: "d-none d-xxl-table-cell",
+                render: function (data, type, row) {
+                    if (!data || typeof data !== 'string') return '';
+                    return data.replace(/\b\w/g, c => c.toUpperCase());
+                }
+             },
             {
                 data: "total_amount",
                 render: data => parseFloat(data).toFixed(2) + ' KWD'
@@ -89,9 +99,9 @@ $(document).ready(function () {
             {
                 data: "description",
                 render: function (desc) {
-                    if (!desc) return '-';
+                    if (!desc || typeof desc !== 'string') return '-';
                     let items = desc.split(',').map(item => item.trim());
-                    return items.map((item, i) => `${i + 1}. ${item}`).join('<br>');
+                    return items.map((item, i) => `${i + 1}. ${item.charAt(0).toUpperCase() + item.slice(1)}`).join('<br>');
                 }
             },
             {
