@@ -5,7 +5,7 @@
 
 .btn-danger {
 	background: #686868 !important;
-	border-color: #686868 !important;
+	border-color: hsl(0, 0%, 41%) !important;
 }
 
 .text-muted{
