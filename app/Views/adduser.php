@@ -29,13 +29,29 @@
         </div>
 
         <div class="form-group mt-3">
-          <div class="row">
-            <div class="col-md-6">
-              <label>Phone Number</label>
-              <input type="text" name="phonenumber" id="phonenumber" class="form-control"
-                value="<?= $userData['phonenumber'] ?? '' ?>" maxlength="15" />
-            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <label>Phone Number</label>
+                <input type="text" name="phonenumber" id="phonenumber" class="form-control"
+                  value="<?= $userData['phonenumber'] ?? '' ?>" maxlength="15" />
+              </div>
+                <div class="col-md-6">
+                 <label for="role_id">Role</label>
+                <select name="role_id" id="role_id" class="form-control" required>
+                  <option value="">Select Role</option>
+                  <?php if (isset($roles) && !empty($roles)): ?>
+                    <?php foreach ($roles as $role): ?>
+                      <option value="<?= $role['role_id'] ?>" <?= isset($userData['role_id']) && $userData['role_id'] == $role['role_id'] ? 'selected' : '' ?>>
+                        <?= ucfirst($role['role_name']) ?>
+                      </option>
+                    <?php endforeach; ?>
+                  <?php else: ?>
+                    <option value="">No roles available</option>
+                  <?php endif; ?>
+                </select>
 
+                </div>
+            </div>
             <?php if (!isset($isEdit) || !$isEdit): ?>
             <div class="col-md-6">
               <label>Password <span class="text-danger">*</span></label>
@@ -50,28 +66,29 @@
             <div class="col-md-12">
               <p class="text-muted"><b>Enter a new password and confirm it only if you wish to change your current password.</b></p>
             </div>
-            <div class="col-md-6">
-              <label>New Password</label>
-              <div class="input-group position-relative mb-2">
-                <input type="password" name="new_password" id="new_password" class="form-control" minlength="6" maxlength="15" />
-                <span class="toggle-password" toggle="#new_password" >
-                  <i class="fa fa-eye-slash"></i>
-                </span>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <label>Confirm Password</label>
-              <div class="input-group position-relative mb-2">
-                <input type="password" name="confirm_new_password" id="confirm_new_password" class="form-control" minlength="6" maxlength="15" />
-                <span class="toggle-password" toggle="#confirm_new_password" >
-                  <i class="fa fa-eye-slash"></i>
-                </span>
-              </div>
+            <div class="row">
+                <div class="col-md-6">
+                  <label>New Password</label>
+                  <div class="input-group position-relative mb-2">
+                    <input type="password" name="new_password" id="new_password" class="form-control" minlength="6" maxlength="15" />
+                    <span class="toggle-password" toggle="#new_password" >
+                      <i class="fa fa-eye-slash"></i>
+                    </span>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label>Confirm Password</label>
+                  <div class="input-group position-relative mb-2">
+                    <input type="password" name="confirm_new_password" id="confirm_new_password" class="form-control" minlength="6" maxlength="15" />
+                    <span class="toggle-password" toggle="#confirm_new_password" >
+                      <i class="fa fa-eye-slash"></i>
+                    </span>
+                  </div>
+                </div>
             </div>
             <?php endif; ?>
           </div>
         </div>
-
         <div class="form-group mt-3 text-end">
           <input type="hidden" name="uid" id="uid" value="<?= $uid ?? '' ?>">
           <a href="<?= base_url('adduserlist') ?>" class="btn btn-secondary">Discard</a>
