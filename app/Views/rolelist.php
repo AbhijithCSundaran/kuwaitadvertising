@@ -47,7 +47,12 @@ $(document).ready(function () {
         pageLength: 10,
         columns: [
             { data: null }, // SI NO
-            { data: "role_name" },
+            { data: "role_name",
+                render: function (data, type, row) {
+                    if (!data || typeof data !== 'string') return '';
+                    return data.replace(/\b\w/g, c => c.toUpperCase());
+                }
+             },
             {
                 data: "created_at",
                 render: function (data) {

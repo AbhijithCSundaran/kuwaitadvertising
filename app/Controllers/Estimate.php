@@ -73,7 +73,7 @@ class Estimate extends BaseController
 
             if ($isUpdate) {
                 $estimateModel->update($estimate_id, $estimateData);
-                $itemModel->where('estimate_id', $estimate_id)->delete(); // Clear old items
+                $itemModel->where('estimate_id', $estimate_id)->delete(); 
             } else {
                 $estimate_id = $estimateModel->insert($estimateData);
             }
