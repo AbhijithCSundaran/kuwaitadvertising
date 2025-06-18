@@ -33,6 +33,12 @@ select.form-control,
 	background-image: none; /* Reset any custom background */
 
 }
+.nav-link.active {
+  background-color: #f0f0f080;
+  color: #000;
+  font-weight: bold;
+}
+ 
 
 .modal {
 	margin: 50px !important;
@@ -269,3 +275,11 @@ th.no-sort::after {
 .navbar .navbar-brand-wrapper .navbar-brand-inner-wrapper .navbar-brand img {
 	width: calc(257px - 185px);
 }
+.dt-search,.dt-paging {
+	text-align:right !important;
+}
+.dt-column-title,.dt-type-numeric{
+	text-align: center;
+}
+.dt-type-date{
+	text-align:left !important;
