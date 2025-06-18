@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="<?php echo ASSET_PATH; ?>assets/vendors/css/vendor.bundle.base.css">
   <!-- endinject -->
   <!-- plugin css for this page -->
-  <link rel="stylesheet" href="<?php echo ASSET_PATH; ?>assets/vendors/datatables.net-bs4/dataTables.bootstrap4.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.min.css">
   <!-- End plugin css for this page -->
   <!-- inject:css -->
   <link rel="stylesheet" href="<?php echo ASSET_PATH; ?>assets/css/style.css">
@@ -22,10 +22,7 @@
    <!-- Add this to your common/header.php if not already present -->
 	<!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">-->
   <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-  <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+ 
   <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" > -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" ></script>
@@ -188,21 +185,22 @@
       <!-- partial:partials/_sidebar.html -->
       <nav class="sidebar sidebar-offcanvas" id="sidebar">
   <ul class="nav">
+    <?php $uri = service('uri'); ?>
     <li class="nav-item">
-      <a class="nav-link" href="<?= base_url('dashboard') ?>">
+      <a class="nav-link <?= $uri->getSegment(1) == 'dashboard' ? 'active' : '' ?>" href="<?= base_url('dashboard') ?>">
         <i class="mdi mdi-home menu-icon"></i>
         <span class="menu-title">Dashboard</span>
       </a>
     </li>    
     <li class="nav-item">
-      <a class="nav-link" href="<?= base_url('adduserlist') ?>">
+      <a class="nav-link <?= $uri->getSegment(1) == 'adduserlist' ? 'active' : '' ?>" href="<?= base_url('adduserlist') ?>">
         <i class="mdi mdi-circle-outline menu-icon"></i>
         <span class="menu-title">Manage User</span>
         
       </a>
     </li>    
     <li class="nav-item">
-      <a class="nav-link" href="<?= base_url('companylist') ?>">
+      <a class="nav-link <?= $uri->getSegment(1) == 'companylist' ? 'active' : '' ?>" href="<?= base_url('companylist') ?>">
         <i class="mdi mdi-view-headline menu-icon"></i>
         <span class="menu-title">Company Management</span>
         
@@ -214,7 +212,7 @@
       </div>
     </li>    
     <li class="nav-item">
-	  <a class="nav-link" href="<?= base_url('rolemanagement/rolelist') ?>">
+	  <a class="nav-link <?= $uri->getSegment(1) == 'rolemanagement/rolelist' ? 'active' : '' ?>" href="<?= base_url('rolemanagement/rolelist') ?>">
 		<i class="mdi mdi-chart-pie menu-icon"></i>
 		<span class="menu-title">Role Management</span>
 		
@@ -222,7 +220,7 @@
 	</li>
 
     <li class="nav-item">
-      <a class="nav-link" href="<?= base_url('estimatelist') ?>">
+      <a class="nav-link <?= $uri->getSegment(1) == 'estimatelist' ? 'active' : '' ?>" href="<?= base_url('estimatelist') ?>">
         <i class="mdi mdi-grid-large menu-icon"></i>
         <span class="menu-title">Estimate Generation</span>
         
@@ -262,7 +260,7 @@
       </div>
     </li>
    <li class="nav-item">
-      <a class="nav-link" href="<?= base_url('expense') ?>">
+      <a class="nav-link <?= $uri->getSegment(1) == 'expense' ? 'active' : '' ?>" href="<?= base_url('expense') ?>">
         <i class="mdi mdi-square-outline menu-icon"></i>
         <span class="menu-title">Expenses</span>
       </a>
@@ -283,7 +281,7 @@
     <div class="modal-content">
     
       <div class="modal-header">
-        <h5 class="modal-title" id="logoutModelLabel">Logout Confirmation</h5>
+        <h5 class="modal-title" id="logoutModelLabel">Confirmation</h5>
         <button type="button" class="close" id="closeModalBtn" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
