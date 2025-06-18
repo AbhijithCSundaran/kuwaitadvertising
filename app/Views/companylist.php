@@ -18,7 +18,7 @@
         padding-top: 6px !important;
         padding-bottom: 6px !important;
         font-size: 14px;
-        line-height: 1.2;
+        line-height: 1.2 !important;
         vertical-align: middle !important;
     }
 

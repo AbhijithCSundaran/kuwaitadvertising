@@ -3,7 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\RoleModel;
-use App\Models\Rolemanagement_model;
+use App\Models\Rolemanagement_Model;
 use CodeIgniter\Controller;
 
 class Rolemanagement extends Controller
@@ -15,7 +15,7 @@ class Rolemanagement extends Controller
     public function __construct()
     {
         $this->roleModel = new RoleModel();
-        $this->roleMenuModel = new Rolemanagement_model();
+        $this->roleMenuModel = new Rolemanagement_Model();
         helper(['form', 'url']);
     }
 
@@ -24,7 +24,7 @@ class Rolemanagement extends Controller
         return view('roleform', ['menus' => $this->menus]);
     }
 
-   public function store()
+    public function store()
     {
         $role_name = $this->request->getPost('role_name');
         $access_data = $this->request->getPost('access');
@@ -71,44 +71,67 @@ class Rolemanagement extends Controller
     {
         $roleModel = new \App\Models\RoleModel();
         $menuModel = new \App\Models\Rolemanagement_model();
+        
+        $draw = $_POST['draw'];
+        $fromstart = $_POST['start'];
+        $tolimit = $_POST['length'];
+        $order = $_POST['order'][0]['dir'];
+        $search = $_POST['search']['value'];
+		$slno = $fromstart + 1;
+		$condition = "1=1";
+		if($search) {
+			$condition .= " and role_name like '%".trim($search)."%'";
+		}
+		$totalRec = $roleModel->getAllFilteredRecords($condition,$fromstart,$tolimit);
+		$result = [];
 
-        $roles = $roleModel->findAll();
-        $result = [];
-
-        foreach ($roles as $role) {
-            $permissions = $menuModel->where('role_id', $role['role_id'])
-                                    ->where('access', 1)
-                                    ->findAll();
+        foreach ($totalRec as $role) {
+            $permissions = $menuModel->where('role_id', $role->role_id)
+                ->where('access', 1)
+                ->findAll();
 
             $menuList = array_column($permissions, 'menu_name');
 
             $result[] = [
-                'role_id'     => $role['role_id'],
-                'role_name'   => $role['role_name'],
-                'created_at'  => $role['created_at'],
-                'updated_at'  => $role['updated_at'],
+				'slno'=>$slno,
+                'role_id' => $role->role_id,
+                'role_name' => $role->role_name,
+                'created_at' => $role->created_at,
+                'updated_at' => $role->updated_at,
                 'permissions' => $menuList
             ];
+			$slno++;	
         }
-
-        return $this->response->setJSON(['roles' => $result]);
+		//response-
+		$rowResult = $roleModel->getAllRoleCount();
+		$totRoleCount = $rowResult->totroles;
+		$filterRowResult = $roleModel->getFilterRoleCount($condition,$fromstart,$tolimit);
+		$totFilterCounts = $filterRowResult->filRecords;
+		
+		$response = array("draw"=>intval($draw),
+						"iTotalRecords"=>$totRoleCount,
+						"iTotalDisplayRecords"=>$totFilterCounts,
+						"roles"=>$result);
+		
+        //return $this->response->setJSON(['roles' => $result]);
+		echo json_encode($response);
     }
 
 
     public function delete()
-	{
-		$role_id = $this->request->getPost('role_id');
+    {
+        $role_id = $this->request->getPost('role_id');
 
-		if (!$role_id) {
-			return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid role ID']);
-		}
+        if (!$role_id) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid role ID']);
+        }
 
-		
-		$this->roleModel->delete($role_id);
-		$this->roleMenuModel->where('role_id', $role_id)->delete();
 
-		return $this->response->setJSON(['status' => 'success']);
-	}
+        $this->roleModel->delete($role_id);
+        $this->roleMenuModel->where('role_id', $role_id)->delete();
+
+        return $this->response->setJSON(['status' => 'success']);
+    }
 
 
     public function edit($id)
@@ -128,54 +151,54 @@ class Rolemanagement extends Controller
         ]);
     }
 
-   public function update($id)
-	{
-		$role_name = $this->request->getPost('role_name');
-		$access_data = $this->request->getPost('access') ?? [];
+    public function update($id)
+    {
+        $role_name = $this->request->getPost('role_name');
+        $access_data = $this->request->getPost('access') ?? [];
 
-		$normalizedAccess = [];
-		foreach ($this->menus as $menu) {
-			$normalizedAccess[$menu] = isset($access_data[$menu]) ? 1 : 0;
-		}
+        $normalizedAccess = [];
+        foreach ($this->menus as $menu) {
+            $normalizedAccess[$menu] = isset($access_data[$menu]) ? 1 : 0;
+        }
 
-		$existingRole = $this->roleModel->find($id);
-		$existingPermissions = $this->roleMenuModel->where('role_id', $id)->findAll();
+        $existingRole = $this->roleModel->find($id);
+        $existingPermissions = $this->roleMenuModel->where('role_id', $id)->findAll();
 
-		$oldAccess = [];
-		foreach ($this->menus as $menu) {
-			$oldAccess[$menu] = 0;
-		}
-		foreach ($existingPermissions as $perm) {
-			$oldAccess[$perm['menu_name']] = (int) $perm['access'];
-		}
+        $oldAccess = [];
+        foreach ($this->menus as $menu) {
+            $oldAccess[$menu] = 0;
+        }
+        foreach ($existingPermissions as $perm) {
+            $oldAccess[$perm['menu_name']] = (int) $perm['access'];
+        }
 
-		
-		$isNameChanged = $existingRole['role_name'] !== $role_name;
-		$isAccessChanged = $normalizedAccess !== $oldAccess;
 
-		if (!$isNameChanged && !$isAccessChanged) {
-			return redirect()->back()->with('info', 'No changes detected to update.');
-		}
+        $isNameChanged = $existingRole['role_name'] !== $role_name;
+        $isAccessChanged = $normalizedAccess !== $oldAccess;
 
-		
-		$this->roleModel->update($id, [
-			'role_name' => $role_name,
-			'updated_at' => date('Y-m-d H:i:s'),
-		]);
+        if (!$isNameChanged && !$isAccessChanged) {
+            return redirect()->back()->with('info', 'No changes detected to update.');
+        }
 
-		
-		$this->roleMenuModel->where('role_id', $id)->delete();
-		foreach ($normalizedAccess as $menu => $value) {
-			if ($value == 1) {
-				$this->roleMenuModel->insert([
-					'role_id' => $id,
-					'menu_name' => $menu,
-					'access' => 1
-				]);
-			}
-		}
 
-		if ($this->request->isAJAX()) {
+        $this->roleModel->update($id, [
+            'role_name' => $role_name,
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+
+
+        $this->roleMenuModel->where('role_id', $id)->delete();
+        foreach ($normalizedAccess as $menu => $value) {
+            if ($value == 1) {
+                $this->roleMenuModel->insert([
+                    'role_id' => $id,
+                    'menu_name' => $menu,
+                    'access' => 1
+                ]);
+            }
+        }
+
+        if ($this->request->isAJAX()) {
             return $this->response->setJSON(['status' => 'success', 'message' => 'Role updated successfully.']);
         }
 
@@ -183,6 +206,6 @@ class Rolemanagement extends Controller
         return redirect()->to(base_url('rolemanagement/edit/' . $id));
 
 
-	}
+    }
 
 }

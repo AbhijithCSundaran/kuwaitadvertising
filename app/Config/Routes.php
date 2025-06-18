@@ -40,7 +40,7 @@ $routes->get('managecompany/getAllCompanies', 'Managecompany::getAllCompanies');
 $routes->get('rolemanagement/create', 'Rolemanagement::create');
 $routes->post('rolemanagement/store', 'Rolemanagement::store');
 $routes->get('rolemanagement/rolelist', 'Rolemanagement::rolelist');
-$routes->get('rolemanagement/rolelistajax', 'Rolemanagement::rolelistajax');
+$routes->post('rolemanagement/rolelistajax', 'Rolemanagement::rolelistajax');
 $routes->get('rolemanagement/edit/(:num)', 'Rolemanagement::edit/$1');
 $routes->post('rolemanagement/update/(:num)', 'Rolemanagement::update/$1');
 $routes->post('rolemanagement/delete', 'Rolemanagement::delete');

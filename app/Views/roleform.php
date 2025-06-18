@@ -43,7 +43,7 @@
         </div>
     </div>
 </div>
-                            </div>
+</div>
 <?php include "common/footer.php"; ?>
 
 <script>
@@ -91,45 +91,47 @@ $(document).ready(function () {
 
   
     $saveBtn.on('click', function (e) {
-        e.preventDefault();
+    e.preventDefault();
 
-        let roleName = $('#role_name').val().trim();
-        let role_id = $('#role_id').val().trim();
+    let roleName = $('#role_name').val().trim();
+    let role_id = $('#role_id').val().trim();
 
-        if (!roleName.match(/[a-zA-Z]/)) {
-            showMessage('Role name must contain at least one letter.', 'danger');
-            return;
-        }
+    if (!roleName.match(/[a-zA-Z]/)) {
+        showMessage('Role name must contain at least one letter.', 'danger');
+        return;
+    }
 
-        const form = $form[0];
-        const formData = new FormData(form);
+   
+    $saveBtn.prop('disabled', true).css({ opacity: 0.6, pointerEvents: 'none' });
 
-        $.ajax({
-            url: role_id ? '<?= base_url('rolemanagement/update') ?>/' + role_id : '<?= base_url('rolemanagement/store') ?>',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            dataType: 'json',
-            success: function (response) {
-                if (response.status === 'error') {
-                    showMessage(response.message, 'danger');
-                    $saveBtn.prop('disabled', false).css({ opacity: 1, pointerEvents: 'auto' }).text('Save Role');
-                } else {
-                    showMessage(response.message, 'success');
-                    setTimeout(() => {
-                        $('.alert').fadeOut();
-                        window.location.href = "<?= base_url('rolemanagement/rolelist') ?>";
-                    }, 2000);
-                }
-            },
-            error: function () {
-                showMessage('Something went wrong. Please try again.', 'danger');
-                $saveBtn.prop('disabled', false).css({ opacity: 1, pointerEvents: 'auto' }).text('Save Role');
+    const form = $form[0];
+    const formData = new FormData(form);
+
+    $.ajax({
+        url: role_id ? '<?= base_url('rolemanagement/update') ?>/' + role_id : '<?= base_url('rolemanagement/store') ?>',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        dataType: 'json',
+        success: function (response) {
+            if (response.status === 'error') {
+                showMessage(response.message, 'danger');
+                $saveBtn.prop('disabled', false).css({ opacity: 1, pointerEvents: 'auto' });
+            } else {
+                showMessage(response.message, 'success');
+                setTimeout(() => {
+                    $('.alert').fadeOut();
+                    window.location.href = "<?= base_url('rolemanagement/rolelist') ?>";
+                }, 2000);
             }
-        });
+        },
+        error: function () {
+            showMessage('Something went wrong. Please try again.', 'danger');
+            $saveBtn.prop('disabled', false).css({ opacity: 1, pointerEvents: 'auto' });
+        }
     });
-
+});
     function showMessage(msg, type) {
         $('.alert')
             .removeClass('d-none alert-danger alert-success alert-warning')

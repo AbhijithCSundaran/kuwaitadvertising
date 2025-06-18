@@ -19,8 +19,6 @@
   <!-- endinject -->
   <!-- Plugin js for this page-->
   <script src="assets/vendors/chart.js/chart.umd.js"></script>
-  <script src="assets/vendors/datatables.net/jquery.dataTables.js"></script>
-  <script src="assets/vendors/datatables.net-bs4/dataTables.bootstrap4.js"></script>
   <!-- End plugin js for this page-->
   <!-- inject:js -->
   <script src="assets/js/off-canvas.js"></script>
@@ -42,7 +40,7 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
   <!-- DataTables JS -->
-  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
 
 <script>
   $(document).ready(function () {
@@ -57,11 +55,10 @@
       window.location.href = "<?= base_url('logout') ?>";
     });
 
-    $('#closeModalBtn').on('click', function () {
-      $('#logoutModel').modal('hide');
-    });
+    $('#closeModalBtn,#cancelLogoutBtn').on('click', function () {
+      
 
-    $('#cancelLogoutBtn').on('click', function () {
+   
       $('#logoutModel').modal('hide');
     });
   });
