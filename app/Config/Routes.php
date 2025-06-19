@@ -49,6 +49,7 @@ $routes->get('estimatelist', 'Estimate::estimatelist');
 $routes->get('estimate/edit/(:num)', 'Estimate::edit/$1');
 
 $routes->post('customer/create', 'Customer::create');
+$routes->post('customer/get-address', 'Customer::getAddressById');
 
 $routes->get('expense', 'Expense::index'); 
 // $routes->get('addexpenselist', 'Expense::index'); 
