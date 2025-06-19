@@ -90,7 +90,7 @@ select.form-control,
 	width: 257px;
 	overflow-y: auto;
 	background-color: #fff;
-	z-index: 1045;
+	z-index: 1;
 	box-shadow: -4px 2px 5px rgba(0, 0, 0, 0.1);
 }
 
@@ -283,3 +283,4 @@ th.no-sort::after {
 }
 .dt-type-date{
 	text-align:left !important;
+}

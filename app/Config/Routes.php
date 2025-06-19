@@ -13,7 +13,6 @@ $routes->get('logout', 'Auth::logout');
 $routes->post('login/authenticate', 'Login::authenticate');
 $routes->get('login','Login::index');
 
-
 $routes->get('manageuser/userlistajax', 'Manageuser::userlistajax');
 $routes->get('manageuser', 'Manageuser::index');
 $routes->get('adduser', 'Manageuser::index');
@@ -23,8 +22,6 @@ $routes->post('manageuser/save', 'Manageuser::save');
 $routes->get('manageuser/getUser/(:num)', 'Manageuser::getUser/$1');
 $routes->post('manageuser/delete/(:num)', 'Manageuser::delete/$1');
 $routes->post('manageuser/userlist', 'Manageuser::userlist');
-
-
 
 $routes->get('managecompany', 'Managecompany::index'); 
 $routes->post('managecompany/save', 'Managecompany::save'); 
@@ -36,7 +33,6 @@ $routes->get('addcompany/(:num)', 'Managecompany::add/$1');
 $routes->post('managecompany/delete', 'Managecompany::delete');
 $routes->get('managecompany/getAllCompanies', 'Managecompany::getAllCompanies'); 
 
-
 $routes->get('rolemanagement/create', 'Rolemanagement::create');
 $routes->post('rolemanagement/store', 'Rolemanagement::store');
 $routes->get('rolemanagement/rolelist', 'Rolemanagement::rolelist');
@@ -45,13 +41,15 @@ $routes->get('rolemanagement/edit/(:num)', 'Rolemanagement::edit/$1');
 $routes->post('rolemanagement/update/(:num)', 'Rolemanagement::update/$1');
 $routes->post('rolemanagement/delete', 'Rolemanagement::delete');
 
-
 $routes->get('add_estimate', 'Estimate::add_estimate'); 
 $routes->post('estimate/save', 'Estimate::save'); 
 $routes->get('estimate/estimatelistajax', 'Estimate::estimatelistajax');
 $routes->post('estimate/delete', 'Estimate::delete');
 $routes->get('estimatelist', 'Estimate::estimatelist');
 $routes->get('estimate/edit/(:num)', 'Estimate::edit/$1');
+
+$routes->post('customer/create', 'Customer::create');
+$routes->post('customer/get-address', 'Customer::getAddressById');
 
 $routes->get('expense', 'Expense::index'); 
 // $routes->get('addexpenselist', 'Expense::index'); 
@@ -62,4 +60,3 @@ $routes->post('expense/list', 'Expense::expenselistajax');
 $routes->post('expense/delete/(:num)', 'Expense::delete/$1');
 $routes->post('expense/delete', 'Expense::delete'); 
 $routes->get('expense/getExpensesAjax', 'Expense::getExpensesAjax');
-

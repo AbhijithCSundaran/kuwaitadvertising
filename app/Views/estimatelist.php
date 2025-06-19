@@ -45,16 +45,43 @@ label {
                 </tr>
             </thead>
                 <tbody>
-                    <!-- Populated via JavaScript -->
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
 <?php include "common/footer.php"; ?>
 
 <script>
 $(document).ready(function () {
+    $('#addCustomerBtn').on('click', function () {
+        $('#addCustomerModal').modal('show');
+        $('#customerForm')[0].reset();
+        $('#customerError').addClass('d-none').text('');
+    });
+
+    $('#customerForm').on('submit', function (e) {
+        e.preventDefault();
+        $.ajax({
+            url: '<?= base_url("customer/create") ?>',
+            type: 'POST',
+            data: $(this).serialize(),
+            dataType: 'json',
+            success: function (res) {
+                if (res.status === 'success') {
+                    const newOption = new Option(res.customer.name, res.customer.customer_id, true, true);
+                    $('#customer_id').append(newOption).trigger('change');
+                    $('#addCustomerModal').modal('hide');
+                } else {
+                    $('#customerError').removeClass('d-none').text(res.message);
+                }
+            },
+            error: function () {
+                $('#customerError').removeClass('d-none').text('Server error, try again.');
+            }
+        });
+    });
     var table = $('#estimateTable').DataTable({
         ajax: {
             url: "<?= base_url('estimate/estimatelistajax') ?>",

@@ -6,7 +6,7 @@
     <title>Estimate</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-        .estimate-box {
+     .estimate-box {
             border: 1px solid #000;
             padding: 20px;
         }
@@ -41,11 +41,22 @@
         <form id="estimate-form">
             <div class="row">
                 <div class="col-md-6">
-                    <label><strong>Customer Name</strong></label>
-                    <input type="text" name="customer_name" value="<?= isset($estimate['customer_name']) ? $estimate['customer_name'] : '' ?>" class="form-control" required>
-
+                    <label><strong> Customer</strong></label>
+                <div class="input-group mb-2">
+                   <select name="customer_id" id="customer_id" class="form-control py-0" required>
+                        <option value="">Select Customer</option>
+                        <?php foreach ($customers as $customer): ?>
+                            <option value="<?= $customer['customer_id'] ?>">
+                                <?= esc($customer['name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-outline-primary" id="addCustomerBtn">+</button>
+                    </div>
+                </div>
                     <label class="mt-3"><strong>Customer Address</strong></label>
-                    <textarea name="customer_address" class="form-control" rows="3" required><?= isset($estimate['customer_address']) ? $estimate['customer_address'] : '' ?></textarea>
+                    <textarea name="customer_address" id="customer_address" class="form-control" rows="3" required><?= isset($estimate['customer_address']) ? $estimate['customer_address'] : '' ?></textarea>
                 </div>
                 <div class="col-md-6">
                     <div class="estimate-title">ESTIMATE</div>
@@ -122,184 +133,152 @@
         </form>
     </div>
 </div>
+
+<div class="modal fade" id="customerModal" tabindex="-1" role="dialog" aria-labelledby="customerModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <form id="customerForm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add New Customer</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeCustomerModalBtn"><span>&times;</span></button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Customer Name</label>
+            <input type="text" class="form-control" id="popup_name" required>
+          </div>
+          <div class="form-group">
+            <label>Customer Address</label>
+            <textarea class="form-control" id="popup_address" rows="3" required></textarea>
+          </div>
+          <div class="alert alert-danger d-none" id="customerError"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary" id="saveCustomerBtn">Save Customer</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancelCustomerBtn">Cancel</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
 <?php include "common/footer.php"; ?>
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-function calculateTotals() {
-    let subtotal = 0;
-    $('.item-row').each(function () {
-        let qty = parseFloat($(this).find('.quantity').val()) || 0;
-        let price = parseFloat($(this).find('.price').val()) || 0;
-        let total = qty * price;
-        $(this).find('.total').val(total.toFixed(2));
-        subtotal += total;
-    });
-
-    $('#sub_total_display').text(subtotal.toFixed(2));
-
-    
-    let discountPercent = parseFloat($('#discount').val()) || 0;
-    let discountAmount = (subtotal * discountPercent) / 100;
-
-    let grandTotal = subtotal - discountAmount;
-
-    $('#total_display').text(grandTotal.toFixed(2));
-    $('#total_amount').val(grandTotal.toFixed(2)); 
-}
-
-
-function enableGenerateButton() {
-    $('#generate-btn').prop('disabled', false).removeClass('btn-secondary').addClass('btn-primary');
-}
-
-function disableGenerateButton() {
-    $('#generate-btn').prop('disabled', true).removeClass('btn-primary').addClass('btn-secondary');
-}
-
-$(document).ready(function () {
-    const isEditMode = <?= isset($estimate['estimate_id']) ? 'true' : 'false' ?>;
-
-    if (isEditMode) {
-        disableGenerateButton();
+$(function () {
+    function calculateTotals() {
+        let subtotal = 0;
+        $('.item-row').each(function () {
+            let qty = parseFloat($(this).find('.quantity').val()) || 0;
+            let price = parseFloat($(this).find('.price').val()) || 0;
+            let total = qty * price;
+            $(this).find('.total').val(total.toFixed(2));
+            subtotal += total;
+        });
+        $('#sub_total_display').text(subtotal.toFixed(2));
+        let discount = parseFloat($('#discount').val()) || 0;
+        let discountAmt = (subtotal * discount) / 100;
+        let total = subtotal - discountAmt;
+        $('#total_display').text(total.toFixed(2));
     }
 
-    function showAlert(message, type = 'success') {
-        $('.alert')
-            .removeClass('d-none alert-success alert-danger')
-            .addClass(type === 'success' ? 'alert-success' : 'alert-danger')
-            .text(message)
-            .fadeIn();
-
-        setTimeout(() => {
-            $('.alert').fadeOut();
-        }, 3000);
-    }
-
-    function enableGenerateButton() {
-        $('#generate-btn').prop('disabled', false).removeClass('btn-secondary').addClass('btn-primary');
-    }
-
-    function disableGenerateButton() {
-        $('#generate-btn').prop('disabled', true).removeClass('btn-primary').addClass('btn-secondary');
-    }
-
-    
-    $(document).on('input change', '.quantity, .price, #discount, input[name="customer_name"], textarea[name="customer_address"], input[name="description[]"]', function () {
-        calculateTotals();
-        if (isEditMode) enableGenerateButton();
-    });
-
-    $('#add-item').on('click', function () {
-        const newRow = `
+    $('#add-item').click(function () {
+        $('#item-container').append(`
             <tr class="item-row">
-                <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
+                <td><input type="text" name="description[]" class="form-control"></td>
                 <td><input type="number" name="price[]" class="form-control price"></td>
                 <td><input type="number" name="quantity[]" class="form-control quantity"></td>
                 <td><input type="number" name="total[]" class="form-control total" readonly></td>
-                <td class="text-center">
-                    <span class="remove-item-btn" title="Remove">
-                        <i class="fas fa-trash text-danger"></i>
-                    </span>
-                </td>
-            </tr>`;
-        $('#item-container').append(newRow);
-        if (isEditMode) enableGenerateButton();
+                <td class="text-center"><span class="remove-item-btn text-danger">🗑</span></td>
+            </tr>`);
     });
 
     $(document).on('click', '.remove-item-btn', function () {
         $(this).closest('tr').remove();
         calculateTotals();
-        if (isEditMode) enableGenerateButton();
     });
 
-    $('#estimate-form').on('submit', function (e) {
-    e.preventDefault();
-    $('.alert').hide();
-    $('#generate-btn').prop('disabled', true).removeClass('btn-primary').addClass('btn-secondary');
+    $(document).on('input change', '.price, .quantity, #discount', calculateTotals);
+    calculateTotals();
 
-    const customerName = $('input[name="customer_name"]').val().trim();
-    const customerAddress = $('textarea[name="customer_address"]').val().trim();
-
-    const nameRegex = /^[A-Za-z][A-Za-z0-9\s'.-]*$/;
-
-    const addressRegex = /[A-Za-z0-9]/;
-
-    if (!nameRegex.test(customerName)) {
-        showAlert('Enter a valid Customer Name.', 'danger');
-        return;
-    }
-
-    if (!addressRegex.test(customerAddress)) {
-        showAlert('Enter a valid Customer Address.', 'danger');
-        return;
-    }
-
-    let validItems = 0;
-    let invalidItemExists = false;
-
-    $('.item-row').each(function () {
-        const desc = $(this).find('input[name="description[]"]').val().trim();
-        const price = parseFloat($(this).find('input[name="price[]"]').val());
-        const qty = parseFloat($(this).find('input[name="quantity[]"]').val());
-
-       
-        if (!desc && !price && !qty) {
-            $(this).remove();
-            return;
-        }
-
-        if (desc && price > 0 && qty > 0) {
-            validItems++;
-        } else {
-            invalidItemExists = true;
-        }
+    $('#addCustomerBtn').click(function () {
+        $('#customerModal').modal('show');
+    });
+     $('#cancelCustomerBtn, #closeCustomerModalBtn').on('click', function () {
+        $('#customerModal').modal('hide');
     });
 
-    if (validItems === 0 || invalidItemExists) {
-        showAlert('Enter at least one valid item with Description, Price > 0, and Quantity > 0.', 'danger');
+  $('#customer_id').on('change', function () {
+    var customerId = $(this).val();
+    if (customerId === '') {
+        $('#customer_address').val('');
         return;
     }
 
-   
     $.ajax({
-        url: "<?= site_url('estimate/save') ?>",
-        type: "POST",
-        data: $(this).serialize(),
-        dataType: "json",
+        url: '<?= site_url('customer/get-address') ?>',
+        type: 'POST',
+        data: { customer_id: customerId },
+        dataType: 'json',
         success: function (response) {
             if (response.status === 'success') {
-                showAlert(response.message, 'success');
-                setTimeout(() => {
-                    window.location.href = "<?= base_url('estimatelist') ?>";
-                }, 1000);
+                $('#customer_address').val(response.address);
             } else {
-                showAlert(response.message, 'danger');
+                $('#customer_address').val('');
             }
         },
         error: function () {
-            showAlert('Something went wrong. Please try again.', 'danger');
+            $('#customer_address').val('');
         }
     });
 });
-z
 
-    if (!isEditMode) {
-        $('#add-item').click(); 
-    }
+    $('#customerForm').submit(function (e) {
+        e.preventDefault();
+        const name = $('#popup_name').val().trim();
+        const address = $('#popup_address').val().trim();
+        if (!name || !address) {
+            $('#customerError').removeClass('d-none').text('Please enter valid name and address');
+            return;
+        }
+        $.ajax({
+            url: "<?= site_url('customer/create') ?>",
+            type: "POST",
+            data: { name, address },
+            dataType: "json",
+            success: function (res) {
+                if (res.status === 'success') {
+                    const newOption = new Option(res.customer.name, res.customer.customer_id, true, true);
+                    $('#customer_id').append(newOption).trigger('change');
+                    $('#popup_name').val('');
+                    $('#popup_address').val('');
+                    $('#customerModal').modal('hide');
+                } else {
+                    $('#customerError').removeClass('d-none').text(res.message);
+                }
+            },
+            error: function () {
+                $('#customerError').removeClass('d-none').text('Server error occurred.');
+            }
+        });
+    });
 
-    calculateTotals();
+    $('#estimate-form').submit(function (e) {
+        e.preventDefault();
+        $.ajax({
+            url: "<?= site_url('estimate/save') ?>",
+            type: "POST",
+            data: $(this).serialize(),
+            dataType: "json",
+            success: function (res) {
+                if (res.status === 'success') {
+                    alert(res.message);
+                    window.location.href = "<?= site_url('estimatelist') ?>";
+                } else {
+                    alert(res.message);
+                }
+            }
+        });
+    });
 });
-
-$('.alert')
-  .removeClass('alert-danger alert-success')
-  .addClass('alert-success')
-  .text(response.message)
-  .fadeIn();
-
-setTimeout(() => {
-  $('.alert').fadeOut();
-}, 3000);
-
 </script>
-</body>
-</html>
