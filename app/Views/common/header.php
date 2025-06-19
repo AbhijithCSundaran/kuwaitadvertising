@@ -252,12 +252,20 @@
       </a>
       <div class="collapse" id="auth">
         <ul class="nav flex-column sub-menu">
-          <li class="nav-item"> <a class="nav-link" href="pages/samples/blank-page.html"> Customer Ledger </a></li>
-          <li class="nav-item"> <a class="nav-link" href="pages/samples/error-404.html">Company Ledger</a></li>
-          <li class="nav-item"> <a class="nav-link" href="pages/samples/error-500.html">Total Sales Report </a></li>
-          <li class="nav-item"> <a class="nav-link" href="pages/samples/login.html"> Total expense Report</a></li>                            
+            <li class="nav-item">
+                <a class="nav-link" href="<?= base_url('expense/report') ?>">Expense Report</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="<?= base_url('ledger/company') ?>">Company Ledger</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="<?= base_url('report/sales') ?>">Total Sales Report</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="<?= base_url('report/total-expense') ?>">Total Expense Report</a>
+            </li>
         </ul>
-      </div>
+    </div>
     </li>
    <li class="nav-item">
       <a class="nav-link <?= $uri->getSegment(1) == 'expense' ? 'active' : '' ?>" href="<?= base_url('expense') ?>">

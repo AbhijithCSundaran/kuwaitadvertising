@@ -85,46 +85,78 @@ class Expense extends BaseController
     }
 
    public function getExpensesAjax()
-{
-    $expenseModel = new \App\Models\Expense_Model();
-    $expenses = $expenseModel->orderBy('id', 'DESC')->findAll();
+    {
+        $expenseModel = new \App\Models\Expense_Model();
+        $expenses = $expenseModel->orderBy('id', 'DESC')->findAll();
 
-    return $this->response->setJSON($expenses); // Return as plain array
-}
+        return $this->response->setJSON($expenses); // Return as plain array
+    }
 
- public function delete()
-{
-    $id = $this->request->getPost('id');
+    public function delete()
+    {
+        $id = $this->request->getPost('id');
 
-    if (!$id) {
+        if (!$id) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'No ID provided.'
+            ]);
+        }
+
+        $expenseModel = new \App\Models\Expense_Model();
+        $expense = $expenseModel->find($id);
+
+        if (!$expense) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Expense Not Found.'
+            ]);
+        }
+
+        if ($expenseModel->delete($id)) {
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Expense Deleted Successfully.'
+            ]);
+        }
+
         return $this->response->setJSON([
             'status' => 'error',
-            'message' => 'No ID provided.'
+            'message' => 'Failed To Remove Expense.'
         ]);
     }
 
-    $expenseModel = new \App\Models\Expense_Model();
-    $expense = $expenseModel->find($id);
 
-    if (!$expense) {
-        return $this->response->setJSON([
-            'status' => 'error',
-            'message' => 'Expense Not Found.'
-        ]);
+    //for report
+    public function report()
+    {
+        return view('expensereport');
     }
 
-    if ($expenseModel->delete($id)) {
-        return $this->response->setJSON([
-            'status' => 'success',
-            'message' => 'Expense Deleted Successfully.'
-        ]);
+    public function getExpenseReportAjax()
+    {
+        $model = new \App\Models\Expense_Model();
+
+        $date  = $this->request->getPost('date');
+        $month = $this->request->getPost('month');
+        $year  = $this->request->getPost('year');
+
+        $builder = $model->builder()->orderBy('id', 'DESC');
+
+        if ($date) {
+            $builder->where('DATE(date)', $date);
+        } elseif ($month && $year) {
+            $builder->where('MONTH(date)', $month);
+            $builder->where('YEAR(date)', $year);
+        } elseif ($year) {
+            $builder->where('YEAR(date)', $year);
+        }
+
+        $data = $builder->get()->getResult();
+
+        return $this->response->setJSON($data);
     }
 
-    return $this->response->setJSON([
-        'status' => 'error',
-        'message' => 'Failed To Remove Expense.'
-    ]);
-}
 
 
 }
