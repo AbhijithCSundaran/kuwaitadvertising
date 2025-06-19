@@ -29,7 +29,6 @@
             <button id="resetBtn" class="btn btn-secondary">Reset</button>
         </div>
     </div>
-
     <table class="table table-bordered" id="reportTable">
         <thead>
             <tr>
