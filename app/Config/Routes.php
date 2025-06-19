@@ -60,3 +60,9 @@ $routes->post('expense/list', 'Expense::expenselistajax');
 $routes->post('expense/delete/(:num)', 'Expense::delete/$1');
 $routes->post('expense/delete', 'Expense::delete'); 
 $routes->get('expense/getExpensesAjax', 'Expense::getExpensesAjax');
+
+//for report
+$routes->get('expense/report', 'Expense::report');
+$routes->post('expense/getExpenseReportAjax', 'Expense::getExpenseReportAjax');
+
+
