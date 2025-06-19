@@ -17,10 +17,10 @@
             <tr>
                 <th>SI NO</th>
                 <th>Role Name</th>
-                <th>Created Date</th>
-                <th>Updated Date</th>
+                <th style="width: 110px;">Created Date</th>
+                <th  style="width: 110px;">Updated Date</th>
                 <th>Permissions</th>
-                <th>Action</th>
+                <th style="width: 160px;">Action</th>
                 <th class="d-none">ID</th>
             </tr>
         </thead>
@@ -31,7 +31,7 @@
 <?php include "common/footer.php"; ?>
 
 <script>
-    const table="";
+    let table="";
     $(document).ready(function () {
         const alertBox = $('.alert');
         table = $('#roleTable').DataTable({

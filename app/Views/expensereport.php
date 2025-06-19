@@ -1,4 +1,36 @@
 <?php include "common/header.php"; ?>
+<style>
+    #plainExpenseTable th,
+    #plainExpenseTable td {
+        vertical-align: middle;
+        padding: 16px 30px;
+        font-size: 14px;
+    }
+
+    #plainExpenseTable th:nth-child(1),
+    #plainExpenseTable td:nth-child(1) {
+        width: 10%;
+        text-align: center;
+    }
+
+    #plainExpenseTable th:nth-child(2),
+    #plainExpenseTable td:nth-child(2) {
+        width: 15%;
+    }
+
+    #plainExpenseTable th:nth-child(4),
+    #plainExpenseTable td:nth-child(4) {
+        width: 20% !important;
+        text-align: left;
+    }
+
+    #plainExpenseTable th:nth-child(5),
+    #plainExpenseTable td:nth-child(5) {
+        width: 20% !important; /* Reduced from 30% to 20% */
+    }
+</style>
+
+
 <div class="form-control mb-3 right_container">
     <div class="alert d-none text-center position-fixed" role="alert"></div>
 
@@ -19,8 +51,11 @@
         <div class="col-md-3">
             <select id="filterYear" class="form-control">
                 <option value="">Filter by Year</option>
-                <?php for ($y = date('Y'); $y >= 2000; $y--): ?>
-                    <option value="<?= $y ?>"><?= $y ?></option>
+                <?php
+                    $currentYear = date('Y');
+                    $endYear = $currentYear + 5;
+                    for ($y = $endYear; $y >= 2000; $y--): ?>
+                        <option value="<?= $y ?>"><?= $y ?></option>
                 <?php endfor; ?>
             </select>
         </div>
@@ -29,7 +64,8 @@
             <button id="resetBtn" class="btn btn-secondary">Reset</button>
         </div>
     </div>
-    <table class="table table-bordered" id="reportTable">
+
+    <table class="table table-bordered" id="plainExpenseTable">
         <thead>
             <tr>
                 <th>SI No</th>
@@ -40,50 +76,69 @@
             </tr>
         </thead>
         <tbody></tbody>
+        <tfoot>
+            <tr>
+                <th colspan="3" class="text-end">Total:</th>
+                <th id="totalAmount">₹0.00</th>
+                <th></th>
+            </tr>
+        </tfoot>
     </table>
 </div>
-</div>
+                </div>
 <?php include "common/footer.php"; ?>
 
 <script>
 $(document).ready(function () {
-    let reportTable = $('#reportTable').DataTable({
-        ajax: {
+    function loadExpenses() {
+        $.ajax({
             url: "<?= base_url('expense/getExpenseReportAjax') ?>",
             type: "POST",
-            data: function (d) {
-                d.date = $('#filterDate').val();
-                d.month = $('#filterMonth').val();
-                d.year = $('#filterYear').val();
+            data: {
+                date: $('#filterDate').val(),
+                month: $('#filterMonth').val(),
+                year: $('#filterYear').val()
             },
-            dataSrc: ""
-        },
-        columns: [
-            { data: null },
-            { data: "date" },
-            { data: "particular" },
-            { data: "amount" },
-            { data: "payment_mode" }
-        ],
-        order: [[1, 'desc']],
-        columnDefs: [{ orderable: false, targets: 0 }]
-    });
+            dataType: "json",
+            success: function (data) {
+                let rows = '';
+                let total = 0;
 
-    reportTable.on('draw.dt', function () {
-        reportTable.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
-            cell.innerHTML = i + 1;
+                if (data.length > 0) {
+                    data.forEach((item, index) => {
+                        total += parseFloat(item.amount);
+                        rows += `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${item.date}</td>
+                                <td>${item.particular}</td>
+                                <td>₹${parseFloat(item.amount).toFixed(2)}</td>
+                                <td>${item.payment_mode}</td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    rows = `<tr><td colspan="5" class="text-center">No records found.</td></tr>`;
+                }
+
+                $('#plainExpenseTable tbody').html(rows);
+                $('#totalAmount').text('₹' + total.toFixed(2));
+            }
         });
-    });
+    }
 
     $('#filterBtn').click(function () {
-        reportTable.ajax.reload();
+        loadExpenses();
     });
 
     $('#resetBtn').click(function () {
         $('#filterDate').val('');
         $('#filterMonth').val('');
         $('#filterYear').val('');
-        reportTable.ajax.reload();
+        loadExpenses();
     });
+
+    // Initial load
+    loadExpenses();
 });
 </script>

@@ -219,8 +219,21 @@ class Managecompany extends BaseController
 	public function getAllCompanies()
 	{
 		$companies = $this->companyModel->findAll();
+
+		foreach ($companies as &$company) {
+			if (isset($company['tax_number'])) {
+				$trimmedTax = trim($company['tax_number']);
+				if ($trimmedTax === '0' || $trimmedTax === '') {
+					$company['tax_number'] = null;
+				}
+			} else {
+				$company['tax_number'] = null;
+			}
+		}
+
 		return $this->response->setJSON($companies);
 	}
+
 
 
 }
