@@ -135,10 +135,10 @@ $(document).ready(function () {
                 return (data ?? '').replace(/\b\w/g, c => c.toUpperCase());
             }
         },
-        {
+       {
             data: "total_amount",
             render: function (data) {
-                return parseFloat(data).toFixed(2) + ' KWD';
+                return data + ' KWD';
             }
         },
         {
@@ -166,8 +166,13 @@ $(document).ready(function () {
             data: "estimate_id",
             render: function (id) {
                 return `
-                    <a href="<?= base_url('estimate/edit/') ?>${id}" class="btn btn-sm btn-primary">Edit</a>
-                    <button class="btn btn-sm btn-danger delete-btn" data-id="${id}">Delete</button>
+                    
+                    <a href="<?= base_url('estimate/edit/') ?>${id}" title="Edit" style="color:rgb(13, 162, 199); margin-right: 10px;">
+                            <i class="bi bi-pencil-fill"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="delete-btn" data-id="${id}" title="Delete" style="color: #dc3545;">
+                            <i class="bi bi-trash-fill"></i>
+                        </a>
                 `;
             }
         }
@@ -210,7 +215,7 @@ $('#confirmDeleteBtn').on('click', function () {
             if (res.status === 'success') {
                 alertBox.removeClass('d-none alert-success alert-warning alert-danger')
                         .addClass('alert-danger')
-                        .text('Estimate Deleted Successfully!')
+                        .text('Estimate Deleted Successfully')
                         .fadeIn();
 
                 setTimeout(() => {

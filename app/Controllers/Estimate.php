@@ -9,110 +9,104 @@ use App\Models\CustomerModel;
 
 class Estimate extends BaseController
 {
-     public function estimatelist()
+    public function estimatelist()
     {
         return view('estimatelist');
     }
+
     public function add_estimate($id = null)
-{
-    $estimateModel = new EstimateModel();
-    $estimateItemModel = new EstimateItemModel();
-    $customerModel = new \App\Models\CustomerModel();
+    {
+        $estimateModel = new EstimateModel();
+        $estimateItemModel = new EstimateItemModel();
+        $customerModel = new CustomerModel();
 
-    $data['customers'] = $customerModel->findAll();
-    $data['estimate'] = null;
-    $data['items'] = [];
+        $data['customers'] = $customerModel->findAll();
+        $data['estimate'] = null;
+        $data['items'] = [];
 
-    if ($id) {
-        $data['estimate'] = $estimateModel->find($id);
-        $data['items'] = $estimateItemModel->where('estimate_id', $id)->findAll();
+        if ($id) {
+            $data['estimate'] = $estimateModel->find($id);
+            $data['items'] = $estimateItemModel->where('estimate_id', $id)->findAll();
+        }
+
+        return view('add_estimate', $data);
     }
 
-    return view('add_estimate', $data);
-}
+    public function save()
+    {
+        $customerId = $this->request->getPost('customer_id');
+        $address = $this->request->getPost('customer_address');
+        $discount = (float) $this->request->getPost('discount');
+        $description = $this->request->getPost('description');
+        $price = $this->request->getPost('price');
+        $quantity = $this->request->getPost('quantity');
+        $total = $this->request->getPost('total');
 
-public function save()
-{
-    $customerId = $this->request->getPost('customer_id');
-    $address = $this->request->getPost('customer_address');
-    $discount = (float) $this->request->getPost('discount');
-    $description = $this->request->getPost('description');
-    $price = $this->request->getPost('price');
-    $quantity = $this->request->getPost('quantity');
-    $total = $this->request->getPost('total');
+        $subtotal = 0;
+        foreach ($total as $t) {
+            $subtotal += (float)$t;
+        }
+        $discountAmount = ($subtotal * $discount) / 100;
+        $grandTotal = $subtotal - $discountAmount;
 
-    $subtotal = 0;
-    foreach ($total as $t) {
-        $subtotal += (float)$t;
-    }
-    $discountAmount = ($subtotal * $discount) / 100;
-    $grandTotal = $subtotal - $discountAmount;
-
-    $estimateData = [
-        'customer_id' => $customerId,
-        'customer_address' => $address,
-        'discount' => $discount,
-        'total' => $grandTotal,
-        'date' => date('Y-m-d')
-    ];
-
-    $items = [];
-    foreach ($description as $key => $desc) {
-        $items[] = [
-            'description' => $desc,
-            'price' => (float)$price[$key],
-            'quantity' => (float)$quantity[$key],
-            'total' => (float)$total[$key]
+        $estimateData = [
+            'customer_id' => $customerId,
+            'customer_address' => $address,
+            'discount' => $discount,
+            'total_amount' => $grandTotal,
+            'date' => date('Y-m-d')
         ];
+
+        $items = [];
+        foreach ($description as $key => $desc) {
+            $items[] = [
+                'description' => $desc,
+                'price' => (float)$price[$key],
+                'quantity' => (float)$quantity[$key],
+                'total' => (float)$total[$key]
+            ];
+        }
+
+        $estimateModel = new EstimateModel();
+        $estimateId = $estimateModel->insertEstimateWithItems($estimateData, $items);
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'Estimate saved successfully.',
+            'estimate_id' => $estimateId
+        ]);
     }
 
-    $estimateModel = new \App\Models\EstimateModel();
-    $estimateId = $estimateModel->insertEstimateWithItems($estimateData, $items);
+    public function estimatelistajax()
+    {
+        $db = \Config\Database::connect();
+        $estimateModel = new EstimateModel();
+        $itemModel = new EstimateItemModel();
 
-    return $this->response->setJSON([
-        'status' => 'success',
-        'message' => 'Estimate saved successfully.',
-        'estimate_id' => $estimateId
-    ]);
-}
+        $builder = $db->table('estimates');
+        $builder->select('estimates.estimate_id, estimates.date, estimates.total_amount, estimates.discount, customers.name AS customer_name, customers.address AS customer_address');
+        $builder->join('customers', 'customers.customer_id = estimates.customer_id', 'left');
 
+        $query = $builder->get()->getResultArray();
 
-   public function estimatelistajax()
-{
-    $db = \Config\Database::connect();
-    $estimateModel = new EstimateModel();
-    $itemModel = new EstimateItemModel();
- 
-    $estimates = $estimateModel->findAll();
- 
-    $builder = $db->table('estimates');
-    $builder->select('estimates.estimate_id, estimates.date, estimates.total_amount AS total_amount, estimates.discount, customers.name AS customer_name, customers.address AS customer_address');
+        $data = [];
+        foreach ($query as $row) {
+            $items = $itemModel->where('estimate_id',  $row['estimate_id'])->findAll();
+            $descriptions = array_column($items, 'description');
 
-    $builder->join('customers', 'customers.customer_id = estimates.customer_id', 'left');
-    
-    $query = $builder->get()->getResultArray();
+            $data[] = [
+                'estimate_id'       => $row['estimate_id'],
+                'customer_name'     => $row['customer_name'],
+                'customer_address'  => $row['customer_address'],
+                'date'              => $row['date'],
+                'discount'          => $row['discount'],
+                'total_amount'      => $row['total_amount'],
+                'description'       => implode(', ', $descriptions),
+            ];
+        }
 
-    $data = [];
-    foreach ($query as $i => $row) {
-
-        $items = $itemModel->where('estimate_id',  $row['estimate_id'])->findAll();
-        $descriptions = array_column($items, 'description');
-
-        $data[] = [
-            'estimate_id'       => $row['estimate_id'],
-            'customer_name'     => $row['customer_name'],
-            'customer_address'  => $row['customer_address'],
-            'date'              => $row['date'],
-            'discount'          => $row['discount'],
-            'total_amount'      => $row['total_amount'],
-            'description'       => implode(', ', $descriptions), 
-        ];
+        return $this->response->setJSON(['data' => $data]);
     }
-
-    return $this->response->setJSON([
-        'data' => $data
-    ]);
-}
 
     public function delete()
     {
@@ -130,40 +124,39 @@ public function save()
         return $this->response->setJSON(['status' => 'success']);
     }
 
-   public function edit($id)
-{
-    $estimateModel = new EstimateModel();
-    $estimateItemModel = new EstimateItemModel();
-    $customerModel = new CustomerModel();
+    public function edit($id)
+    {
+        $estimateModel = new EstimateModel();
+        $estimateItemModel = new EstimateItemModel();
+        $customerModel = new CustomerModel();
 
-    $data['estimate'] = $estimateModel->find($id); 
-    $data['items'] = $estimateItemModel->where('estimate_id', $id)->findAll(); 
-    $data['customers'] = $customerModel->findAll();
+        $data['estimate'] = $estimateModel->find($id);
+        $data['items'] = $estimateItemModel->where('estimate_id', $id)->findAll();
+        $data['customers'] = $customerModel->findAll();
 
-    if (!$data['estimate']) {
-        return redirect()->to('estimatelist')->with('error', 'Estimate not found.');
+        if (!$data['estimate']) {
+            return redirect()->to('estimatelist')->with('error', 'Estimate not found.');
+        }
+
+        return view('add_estimate', $data);
     }
 
-    return view('add_estimate', $data); 
-}
-
     public function generateestimate($id)
-{
-    $estimateModel = new \App\Models\EstimateModel();
-    $itemModel = new \App\Models\EstimateitemModel();
+    {
+        $estimateModel = new EstimateModel();
+        $itemModel = new EstimateItemModel();
 
-    $estimate = $estimateModel
-        ->select('estimates.*, customers.name AS customer_name')
-        ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
-        ->where('estimate_id', $id)
-        ->first();
+        $estimate = $estimateModel
+            ->select('estimates.*, customers.name AS customer_name')
+            ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
+            ->where('estimate_id', $id)
+            ->first();
 
-    $items = $itemModel->where('estimate_id', $id)->findAll();
+        $items = $itemModel->where('estimate_id', $id)->findAll();
 
-    return view('generateestimate', [
-        'estimate' => $estimate,
-        'items' => $items
-    ]);
-}
-
+        return view('generateEstimate', [
+            'estimate' => $estimate,
+            'items' => $items
+        ]);
+    }
 }

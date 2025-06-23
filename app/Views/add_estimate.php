@@ -52,7 +52,7 @@
                         <?php endforeach; ?>
                     </select>
                     <div class="input-group-append">
-                        <button type="button" class="btn btn-outline-primary" id="addCustomerBtn">+</button>
+                        <button type="button" class="btn btn-outline-secondary" id="addCustomerBtn">+</button>
                     </div>
                 </div>
                     <label class="mt-3"><strong>Customer Address</strong></label>
@@ -302,10 +302,8 @@ $(function () {
                     .addClass('alert-success')
                     .text('Estimate saved successfully.')
                     .fadeIn();
-
-                // Redirect after a short delay
                 setTimeout(function () {
-                    window.location.href = "<?= site_url('estimate/generateestimate/') ?>" + res.estimate_id;
+                    window.location.href = "<?= site_url('estimate/generateEstimate/') ?>" + res.estimate_id;
                 }, 1500);
             } else {
                 $('.alert')
