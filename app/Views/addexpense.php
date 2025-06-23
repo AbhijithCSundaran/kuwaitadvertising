@@ -18,7 +18,7 @@
 
                     <div class="form-group col-md-6">
                         <label>Particular <span class="text-danger">*</span></label>
-                        <input type="text" name="particular" class="form-control" value="<?= isset($expense['particular']) ? $expense['particular'] : '' ?>" required>
+                        <input type="text" name="particular" class="form-control capitalize" value="<?= isset($expense['particular']) ? $expense['particular'] : '' ?>" required>
                     </div>
                 </div>
                 <div class="row">

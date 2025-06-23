@@ -178,71 +178,82 @@ class Managecompany extends BaseController
     }
 
    public function delete()
-{
-    $id = $this->request->getPost('id');
+	{
+		$id = $this->request->getPost('id');
 
-    if (!$id) {
-        return $this->response->setJSON([
-            'status' => 'error',
-            'message' => 'No ID provided.'
-        ]);
-    }
+		if (!$id) {
+			return $this->response->setJSON([
+				'status' => 'error',
+				'message' => 'No ID provided.'
+			]);
+		}
 
-    $companyModel = new \App\Models\Managecompany_Model();
-    $company = $companyModel->find($id);
+		$companyModel = new \App\Models\Managecompany_Model();
+		$company = $companyModel->find($id);
 
-    if (!$company) {
-        return $this->response->setJSON([
-            'status' => 'error',
-            'message' => 'Company Not Found.'
-        ]);
-    }
+		if (!$company) {
+			return $this->response->setJSON([
+				'status' => 'error',
+				'message' => 'Company Not Found.'
+			]);
+		}
 
-    if ($companyModel->delete($id)) {
-        return $this->response->setJSON([
-            'status' => 'success',
-            'message' => 'Company Deleted Successfully.'
-        ]);
-    }
+		if ($companyModel->delete($id)) {
+			return $this->response->setJSON([
+				'status' => 'success',
+				'message' => 'Company Deleted Successfully.'
+			]);
+		}
 
-    return $this->response->setJSON([
-        'status' => 'error',
-        'message' => 'Failed To Delete Company.'
-    ]);
-}
+		return $this->response->setJSON([
+			'status' => 'error',
+			'message' => 'Failed To Delete Company.'
+		]);
+	}
 
 	public function companylistjson()
 	{
 		$draw = $_POST['draw'];
 		$fromstart = $_POST['start'];
-		$tolimit= $_POST['length'];
+		$tolimit = $_POST['length'];
 		$order = $_POST['order'][0]['dir'];
-		$search =$_POST['search']['value'];
+		$search = $_POST['search']['value'];
 		$slno = $fromstart + 1;
+
 		$condition = "1=1";
-		if ($search) {
-			$condition .=" and company_name like '%".trim(string: $search)."%'";
+		if (!empty($search)) {
+			$condition .= " AND (company_name LIKE '%" . trim($search) . "%' OR email LIKE '%" . trim($search) . "%' OR phone LIKE '%" . trim($search) . "%')";
 		}
-		$totalRec = $Managecompany_Model->getAllFilteredRecords(condition: $condition,fromstart: $fromstart,tolimit: $tolimit);
+
+		$companyModel = new \App\Models\Managecompany_Model();
+		$companies = $companyModel->getAllFilteredRecords($condition, $fromstart, $tolimit, $order);
+
 		$result = [];
+		foreach ($companies as $company) {
+			$tax = trim($company['tax_number']);
+			$company['tax_number'] = ($tax === '0' || $tax === '') ? '-N/A-' : $tax;
 
-		foreach ($totalRec as $role) {
-            $permissions = $menuModel->where('role_id', $role->role_id)
-                ->where('access', 1)
-                ->findAll();
+			$result[] = [
+				'slno' => $slno++,
+				'company_id' => $company['company_id'],
+				'company_name' => $company['company_name'],
+				'address' => $company['address'],
+				'tax_number' => $company['tax_number'],
+				'email' => $company['email'],
+				'phone' => $company['phone'],
+				'company_logo' => $company['company_logo']
+			];
+		}
 
-            $menuList = array_column($permissions, 'menu_name');
+		$total = $companyModel->getAllCompanyCount()->totcompanies;
+		$filteredTotal = $companyModel->getFilteredCompanyCount($condition)->filCompanies;
 
-            $result[] = [
-				'slno'=>$slno,
-                'role_id' => $role->role_id,
-                'role_name' => $role->role_name,
-                'created_at' => $role->created_at,
-                'updated_at' => $role->updated_at,
-                'permissions' => $menuList
-            ];
-			$slno++;	
-        }
-
+		return $this->response->setJSON([
+			'draw' => intval($draw),
+			'iTotalRecords' => $total,
+			'iTotalDisplayRecords' => $filteredTotal,
+			'data' => $result
+		]);
+	}
 
 }

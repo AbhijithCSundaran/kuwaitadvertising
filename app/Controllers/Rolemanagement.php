@@ -31,9 +31,9 @@ class Rolemanagement extends Controller
 
         if ($this->roleModel->where('role_name', $role_name)->first()) {
             if ($this->request->isAJAX()) {
-                return $this->response->setJSON(['status' => 'error', 'message' => 'Role already exists.']);
+                return $this->response->setJSON(['status' => 'error', 'message' => 'Role Already Exists.']);
             }
-            return redirect()->back()->with('error', 'Role already exists.');
+            return redirect()->back()->with('error', 'Role Already Exists.');
         }
 
         $this->roleModel->insert([
@@ -55,10 +55,10 @@ class Rolemanagement extends Controller
         }
 
         if ($this->request->isAJAX()) {
-            return $this->response->setJSON(['status' => 'success', 'message' => 'Role created successfully.']);
+            return $this->response->setJSON(['status' => 'success', 'message' => 'Role Created Successfully.']);
         }
 
-        return redirect()->to(base_url('rolemanagement/rolelist'))->with('success', 'Role created successfully.');
+        return redirect()->to(base_url('rolemanagement/rolelist'))->with('success', 'Role Created Successfully.');
     }
 
 
@@ -113,7 +113,6 @@ class Rolemanagement extends Controller
 						"iTotalDisplayRecords"=>$totFilterCounts,
 						"roles"=>$result);
 		
-        //return $this->response->setJSON(['roles' => $result]);
 		echo json_encode($response);
     }
 
@@ -123,7 +122,7 @@ class Rolemanagement extends Controller
         $role_id = $this->request->getPost('role_id');
 
         if (!$role_id) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid role ID']);
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid Role ID']);
         }
 
 
@@ -177,7 +176,7 @@ class Rolemanagement extends Controller
         $isAccessChanged = $normalizedAccess !== $oldAccess;
 
         if (!$isNameChanged && !$isAccessChanged) {
-            return redirect()->back()->with('info', 'No changes detected to update.');
+            return redirect()->back()->with('info', 'No Changes Detected To Update.');
         }
 
 
@@ -199,10 +198,10 @@ class Rolemanagement extends Controller
         }
 
         if ($this->request->isAJAX()) {
-            return $this->response->setJSON(['status' => 'success', 'message' => 'Role updated successfully.']);
+            return $this->response->setJSON(['status' => 'success', 'message' => 'Role Updated Successfully.']);
         }
 
-        session()->setFlashdata('success', 'Role updated successfully.');
+        session()->setFlashdata('success', 'Role Updated Successfully.');
         return redirect()->to(base_url('rolemanagement/edit/' . $id));
 
 

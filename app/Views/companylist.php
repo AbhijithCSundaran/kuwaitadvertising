@@ -1,4 +1,5 @@
-<?php include "common/header.php";?>
+<?php include "common/header.php"; ?>
+
 <div class="form-control mb-3 right_container"> 
     <div class="alert d-none text-center position-fixed" role="alert"></div>
     <div class="row align-items-center">
@@ -10,9 +11,6 @@
         </div>
     </div>
     <hr>
-
-    <!-- <div id="companyDeleteAlert" class="alert alert-success w-50 mx-auto text-center top mt-3" style="display:none;"></div> -->
-    
     <style>
     table.dataTable thead th {
         padding-top: 6px !important;
@@ -67,129 +65,145 @@
     </table>
 </div>
 </div>
-
+<?php include "common/footer.php"; ?>   
 <script>
-$(document).ready(function () {
-    var table = $('#companiesTable').DataTable({    
-        ajax: {
-            url: "<?= base_url('managecompany/getAllCompanies') ?>",
-            type: "GET",
-            dataSrc: ""
-        },
-        dom: "<'row mb-3'<'col-sm-6'l><'col-sm-6'f>>" +
-             "<'row'<'col-sm-12'tr>>" +
-             "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
-        lengthMenu: [5, 10, 15, 20, 25, 30, 35, 40, 45, 50],
-        pageLength: 10,
-        columns: [
-            { data: null },
-            { data: "company_name", className: "wrap-text",
-                render: function (data) {
-                    return data.replace(/\b\w/g, c => c.toUpperCase());
-                }
-             },
-            { data: "address", className: "wrap-text d-none d-md-table-cell",
-                render: function (data) {
-                    return data.replace(/\b\w/g, c => c.toUpperCase());
-                }
-             },
-             
-            {
-                data: "tax_number", className: "d-none d-lg-table-cell",
-                render: function (data) {
-                    return data && data.trim() !== "" ? data : '-N/A-';
-                }
-            },
-         
-            { data: "email", className: "d-none d-xl-table-cell" }, 
-            { data: "phone", className: "d-none d-xxl-table-cell" },              
-            {
-                data: "company_logo",
-                render: function (data) {
-                    return data ? '<img src="<?= base_url('public/uploads/') ?>' + data + '" width="60">' : '';
-                }
-            },
-            {
-                data: "company_id",
-                render: function (data) {
-                    return `
-                        <a href="<?= base_url('addcompany/') ?>${data}" class="btn btn-sm btn-primary">Edit</a>
-                        <button class="btn btn-sm btn-danger delete-btn" data-id="${data}">Delete</button>
-                    `;
-                }
-            },
-            { data: "company_id", visible: false }
-        ],
-        order: [[8, 'desc']],
-        
-        columnDefs: [
-        { searchable: false, orderable: false, targets: [0, 2, 4, 6, 7] }
-    ]
-    });
+    let table="";
+        $(document).ready(function () { 
+            const alertBox = $('.alert');
+            table = $('#companiesTable').DataTable({
+                ajax: {
+                    url: "<?= base_url('managecompany/companylistjson') ?>",
+                    type: "POST",
+                    dataSrc: "data" 
+                },
+                sort:true,
+                searching:true,
+                paging:true,
+                processing: true,
+                serverSide: true,
+                dom: "<'row mb-3'<'col-sm-6'l><'col-sm-6'f>>" +
+                    "<'row'<'col-sm-12'tr>>" +
+                    "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
+                columns: [
+                {
+                    data: "slno",
+                    render: function (data) {
+                        return data;
+                    }
+                },
+                    { 
+                        data: "company_name", 
+                        className: "wrap-text",
+                        render: function (data) {
+                            return data ? data.replace(/\b\w/g, c => c.toUpperCase()) : '';
+                        }
+                    },
+                    { 
+                        data: "address", 
+                        className: "wrap-text d-none d-md-table-cell",
+                        render: function (data) {
+                            return data ? data.replace(/\b\w/g, c => c.toUpperCase()) : '';
+                        }
+                    },
+                    {
+                        data: "tax_number", 
+                        className: "d-none d-lg-table-cell",
+                        render: function (data) {
+                            return data && data.trim() !== "" ? data : '-N/A-';
+                        }
+                    },
+                    { data: "email", className: "d-none d-xl-table-cell" },
+                    { data: "phone", className: "d-none d-xxl-table-cell" },
 
-  
-    table.on('order.dt search.dt draw.dt', function () {
-        table.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
-            cell.innerHTML = i + 1;
-        });
-    });
-	
-	
-   $(document).on('click', '.delete-btn', function () {
-    const id = $(this).data('id');
-    
-    if (confirm('Are you sure you want to delete this company?')) {
-        $.ajax({
-            url: "<?= base_url('managecompany/delete') ?>",
-            type: "POST",
-            data: { id: id },
-            dataType: "json",
-            success: function (res) {
+                    {
+                    data: "company_logo",
+                    className: "logo-col",
+                    render: function (data) {
+                        return data ? '<img src="<?= base_url('public/uploads/') ?>' + data + '" width="30">' : '';
+                    }
+                },
+                                    {
+                        data: "company_id",
+                        render: function (data) {
+                            return `
+                                <div class="d-flex align-items-center gap-3">
+                                    <a href="<?= base_url('addcompany/') ?>${data}" title="Edit" style="color: rgb(13, 162, 199);">
+                                        <i class="bi bi-pencil-fill"></i>
+                                    </a>
+                                    <a href="javascript:void(0);" class="delete-all" data-id="${data}" title="Delete" style="color: #dc3545;">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </a>
+                                </div>
+
+                            `;
+                        }
+                    },
+                    { data: "company_id", visible: false }
+                ],
+                order: [[8, 'desc']],
+                columnDefs: [
+                    { searchable: false, orderable: false, targets: [0, 2, 4, 6, 7] }
+                ]
+            });
+
+           
+            table.on('order.dt search.dt draw.dt', function () {
+                table.column(0, { search: 'applied', order: 'applied' }).nodes()
+                .each(function (cell, i) {
+                    var pageInfo = table.page.info();
+                    cell.innerHTML = pageInfo.start + i + 1;
+                });
+            });
+
+            let deleteId = null;
+            let deleteModal; 
+
+            $(document).ready(function () {
                 const alertBox = $('.alert');
-                if (res.status === 'success') {
-                    alertBox.removeClass('d-none alert-success alert-warning alert-danger')
-                             .addClass('alert-danger')
-                             .text('Company deleted successfully!')
-                             .fadeIn();
+                deleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
 
-                    setTimeout(() => {
-                        alertBox.fadeOut(() => {
-                            alertBox.addClass('d-none').text('');
-                        });
-                    }, 2000);
+                $(document).on('click', '.delete-all', function () {
+                    deleteId = $(this).data('id');
+                    deleteModal.show(); 
+                });
 
-                    table.ajax.reload(null, false); 
-                } else {
-                    alertBox.removeClass('d-none alert-success alert-danger alert-warning')
-                             .addClass('alert-warning')
-                             .text(res.message || 'Delete failed.')
-                             .fadeIn();
+                
+                $(document).on('click', '#confirm-delete-btn', function () {
+                    if (!deleteId) return;
 
-                    setTimeout(() => {
-                        alertBox.fadeOut(() => {
-                            alertBox.addClass('d-none').text('');
-                        });
-                    }, 3000);
-                }
-            },
-            error: function () {
-                const alertBox = $('.alert');
-                alertBox.removeClass('d-none alert-success alert-warning')
-                        .addClass('alert-danger')
-                        .text('Error deleting company.')
-                        .fadeIn();
-
-                setTimeout(() => {
-                    alertBox.fadeOut(() => {
-                        alertBox.addClass('d-none').text('');
+                    $.ajax({
+                        url: "<?= base_url('managecompany/delete') ?>", 
+                        type: "POST",
+                        data: {
+                            id: deleteId,
+                            '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
+                        },
+                        dataType: "json",
+                        success: function (res) {
+                            if (res.status === 'success') {
+                                alertBox.removeClass().addClass('alert alert-danger text-center position-fixed')
+                                    .text('Company deleted successfully.').fadeIn();
+                                setTimeout(() => alertBox.fadeOut(), 2000);
+                                table.ajax.reload(null, false);
+                            } else {
+                                alertBox.removeClass().addClass('alert alert-warning text-center position-fixed')
+                                    .text(res.message || 'Delete failed.').fadeIn();
+                                setTimeout(() => alertBox.fadeOut(), 3000);
+                            }
+                        },
+                        error: function () {
+                            alertBox.removeClass().addClass('alert alert-danger text-center position-fixed')
+                                .text('Error occurred while deleting company.').fadeIn();
+                            setTimeout(() => alertBox.fadeOut(), 3000);
+                        },
+                        complete: function () {
+                            deleteModal.hide();
+                            deleteId = null;
+                        }
                     });
-                }, 3000);
-            }
+
+                });
+            });
+
         });
-    }
-});
-
-});
 </script>
-
-<?php include "common/footer.php"; ?>
