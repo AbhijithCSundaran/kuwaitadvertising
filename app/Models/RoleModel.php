@@ -15,10 +15,11 @@ class RoleModel extends Model
     }
 	public function getAllFilteredRecords($condition,$fromstart,$tolimit) {
 		
-		return $this->db->query("select * from role_acces where ".$condition." limit ".$fromstart.",".$tolimit)->getResult();
+		 return $this->db->query("SELECT * FROM role_acces WHERE $condition ORDER BY role_id DESC LIMIT $fromstart, $tolimit")->getResult();
 	}
 	public function getFilterRoleCount($condition,$fromstart,$tolimit) {
 		
 		return $this->db->query("select count(*) as filRecords from role_acces where ".$condition)->getRow();
 	}
 }
+

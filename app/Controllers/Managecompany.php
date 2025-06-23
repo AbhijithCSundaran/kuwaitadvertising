@@ -213,27 +213,36 @@ class Managecompany extends BaseController
 
 	public function companylistjson()
 	{
-		$companies = $this->companyModel->findAll();
-		return $this->response->setJSON(['companies' => $companies]);
-	}
-	public function getAllCompanies()
-	{
-		$companies = $this->companyModel->findAll();
-
-		foreach ($companies as &$company) {
-			if (isset($company['tax_number'])) {
-				$trimmedTax = trim($company['tax_number']);
-				if ($trimmedTax === '0' || $trimmedTax === '') {
-					$company['tax_number'] = null;
-				}
-			} else {
-				$company['tax_number'] = null;
-			}
+		$draw = $_POST['draw'];
+		$fromstart = $_POST['start'];
+		$tolimit= $_POST['length'];
+		$order = $_POST['order'][0]['dir'];
+		$search =$_POST['search']['value'];
+		$slno = $fromstart + 1;
+		$condition = "1=1";
+		if ($search) {
+			$condition .=" and company_name like '%".trim(string: $search)."%'";
 		}
+		$totalRec = $Managecompany_Model->getAllFilteredRecords(condition: $condition,fromstart: $fromstart,tolimit: $tolimit);
+		$result = [];
 
-		return $this->response->setJSON($companies);
-	}
+		foreach ($totalRec as $role) {
+            $permissions = $menuModel->where('role_id', $role->role_id)
+                ->where('access', 1)
+                ->findAll();
 
+            $menuList = array_column($permissions, 'menu_name');
+
+            $result[] = [
+				'slno'=>$slno,
+                'role_id' => $role->role_id,
+                'role_name' => $role->role_name,
+                'created_at' => $role->created_at,
+                'updated_at' => $role->updated_at,
+                'permissions' => $menuList
+            ];
+			$slno++;	
+        }
 
 
 }
