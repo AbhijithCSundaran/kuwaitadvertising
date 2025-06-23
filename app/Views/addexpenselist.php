@@ -25,6 +25,30 @@
     </table>
 </div>
 </div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Confirmation</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeDeleteModalBtn">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        Are you sure you want to delete this expense?
+      </div>
+
+      <div class="modal-footer">
+         <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancelDeleteBtn">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+      </div>
+
+    </div>
+  </div>
+</div>
 <?php include "common/footer.php"; ?>
 
 <script>
@@ -57,8 +81,12 @@ $(document).ready(function () {
                 data: "id",
                 render: function (data) {
                     return `
-                        <a href="<?= base_url('addexpense/') ?>${data}" class="btn btn-sm btn-warning">Edit</a>
-                        <button class="btn btn-sm btn-danger delete-expense" data-id="${data}">Delete</button>
+                         <a href="<?= base_url('addexpense/') ?>${data}" title="Edit" style="color:rgb(13, 162, 199); margin-right: 10px;">
+                            <i class="bi bi-pencil-fill"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="delete-btn" data-id="${data}" title="Delete" style="color: #dc3545;">
+                            <i class="bi bi-trash-fill"></i>
+                        </a>
                     `;
                 }
             }
@@ -78,45 +106,72 @@ $(document).ready(function () {
             cell.innerHTML = i + 1;
         });
     });
-    $('#expenseTable').on('click', '.delete-expense', function () {
-        const id = $(this).data('id');
-        if (confirm('Are you sure you want to delete this expense?')) {
-            $.ajax({
-                url: "<?= base_url('expense/delete') ?>",
-                type: "POST",
-                data: { id: id },
-                dataType: "json",
-                success: function (res) {
-                    const alertBox = $('.alert');
-                    if (res.status === 'success') {
-                        alertBox.removeClass('d-none').addClass('alert-danger')
-                        .html('Expense Deleted Successfully.').fadeIn();
-                        setTimeout(() => {
-                            alertBox.fadeOut(() => {
-                                alertBox.addClass('d-none').removeClass('alert-success');
-                            });
-                        }, 2000);
-                        table.ajax.reload(null, false);
-                    } else {
-                        alertBox.removeClass('d-none').html('Failed To Delete Expense.').fadeIn();
-                        setTimeout(() => {
-                            alertBox.fadeOut(() => {
-                                alertBox.addClass('d-none');
-                            });
-                        }, 3000);
-                    }
-                },
-                error: function () {
-                    const alertBox = $('.alert');
-                    alertBox.removeClass('d-none').html('Error Removing Expense.').fadeIn();
-                    setTimeout(() => {
-                        alertBox.fadeOut(() => {
-                            alertBox.addClass('d-none');
-                        });
-                    }, 3000);
-                }
-            });
+   let expenseIdToDelete = null;
+
+$(document).on('click', '.delete-btn', function () {
+    expenseIdToDelete = $(this).data('id');
+    $('#deleteModal .modal-body').text('Are you sure you want to delete this expense?');
+    $('#deleteModal').modal('show');
+});
+$('#cancelDeleteBtn, #closeDeleteModalBtn').on('click', function () {
+    $('#deleteModal').modal('hide');
+});
+
+$('#confirmDeleteBtn').on('click', function () {
+    if (!expenseIdToDelete) return;
+
+    $.ajax({
+        url: "<?= base_url('expense/delete') ?>",
+        type: "POST",
+        data: { expense_id: expenseIdToDelete },
+        dataType: "json",
+        success: function (res) {
+            $('#deleteModal').modal('hide');
+            const alertBox = $('.alert');
+
+            if (res.status === 'success') {
+                alertBox.removeClass('d-none alert-warning alert-danger')
+                        .addClass('alert-success')
+                        .text('Expense Deleted Successfully!')
+                        .fadeIn();
+
+                setTimeout(() => {
+                    alertBox.fadeOut(() => {
+                        alertBox.addClass('d-none').text('');
+                    });
+                }, 2000);
+
+                $('#expenseTable').DataTable().ajax.reload(null, false);
+            } else {
+                alertBox.removeClass('d-none alert-success alert-danger')
+                        .addClass('alert-warning')
+                        .text(res.message || 'Delete Failed.')
+                        .fadeIn();
+
+                setTimeout(() => {
+                    alertBox.fadeOut(() => {
+                        alertBox.addClass('d-none').text('');
+                    });
+                }, 3000);
+            }
+        },
+        error: function () {
+            $('#deleteModal').modal('hide');
+            const alertBox = $('.alert');
+
+            alertBox.removeClass('d-none alert-success alert-warning')
+                    .addClass('alert-danger')
+                    .text('Error Deleting Expense.')
+                    .fadeIn();
+
+            setTimeout(() => {
+                alertBox.fadeOut(() => {
+                    alertBox.addClass('d-none').text('');
+                });
+            }, 3000);
         }
     });
+});
+
 });
 </script>

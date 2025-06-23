@@ -5,13 +5,9 @@ use CodeIgniter\Model;
 
 class CustomerModel extends Model
 {
-    protected $table      = 'customers';
+    protected $table = 'customers';
     protected $primaryKey = 'customer_id';
     protected $allowedFields = ['name', 'address'];
-    protected $useTimestamps = false;
+    protected $returnType = 'array';
 
-    public function getCustomerByName($name)
-    {
-        return $this->where('name', $name)->first();
-    }
 }

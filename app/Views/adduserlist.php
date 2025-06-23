@@ -25,6 +25,31 @@
     </table>
 </div>
 </div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+    
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Confirmation</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeDeleteModalBtn">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        Are you sure you want to delete this user?
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancelDeleteBtn">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
 <?php include "common/footer.php"; ?>
 
 <script>
@@ -51,8 +76,12 @@ $(document).ready(function () {
                 data: "user_id",
                 render: function (data) {
                     return `
-                        <a href="<?= base_url('adduser/') ?>${data}" class="btn btn-sm btn-warning">Edit</a>
-                        <button class="btn btn-sm btn-danger delete-user" data-id="${data}">Delete</button>
+                        <a href="<?= base_url('adduser/') ?>${data}" title="Edit" style="color:rgb(13, 162, 199); margin-right: 10px;">
+                            <i class="bi bi-pencil-fill"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="delete-btn" data-id="${data}" title="Delete" style="color: #dc3545;">
+                            <i class="bi bi-trash-fill"></i>
+                        </a>
                     `;
                 }
             },
@@ -74,40 +103,71 @@ $(document).ready(function () {
         });
     });
 
-    $('#userTable').on('click', '.delete-user', function () {
-        const id = $(this).data('id');
-        if (confirm("Are you sure you want to delete this user?")) {
-            $.ajax({
-                url: "<?= base_url('manageuser/delete') ?>/" + id,
-                type: "POST",
-                dataType: "json",
-                success: function (res) {
-                    const alertBox = $('.alert');
-                    if (res.status === 'success') {
-                        alertBox.removeClass('d-none').addClass('alert-danger')
-                        .html('User Deleted Successfully').fadeIn();
-                        setTimeout(() => {
-                            alertBox.addClass('d-none').removeClass('alert-success');
-                        }, 2000);
-                        table.ajax.reload(null, false);
-                    } else {
-                        alertBox.removeClass('d-none').html('Failed To Delete User.').fadeIn();
-                        setTimeout(() => {
-                            alertBox.fadeOut(() => alertBox.addClass('d-none'));
-                        }, 3000);
-                    }
-                },
-                error: function (xhr) {
-                    console.error("AJAX error:", xhr.responseText);
-                    const alertBox = $('.alert');
-                    alertBox.removeClass('d-none').html('An Error Occurred.').fadeIn();
-                    setTimeout(() => {
-                        alertBox.fadeOut(() => alertBox.addClass('d-none'));
-                    }, 3000);
-                }
-            });
+   let userIdToDelete = null;
+
+$(document).on('click', '.delete-btn', function () {
+    userIdToDelete = $(this).data('id');
+    $('#deleteModal .modal-body').text('Are you sure you want to delete this user?'); // optional dynamic message
+    $('#deleteModal').modal('show');
+});
+ $('#cancelDeleteBtn, #closeDeleteModalBtn').on('click', function () {
+    $('#deleteModal').modal('hide');
+});
+$('#confirmDeleteBtn').on('click', function () {
+    if (!userIdToDelete) return;
+
+    $.ajax({
+        url: "<?= base_url('manageuser/delete') ?>",
+        type: "POST",
+        data: { user_id: userIdToDelete },
+        dataType: "json",
+        success: function (res) {
+            $('#deleteModal').modal('hide');
+            const alertBox = $('.alert');
+
+            if (res.status === 'success') {
+                alertBox.removeClass('d-none alert-warning alert-danger')
+                        .addClass('alert-success')
+                        .text('User Deleted Successfully!')
+                        .fadeIn();
+
+                setTimeout(() => {
+                    alertBox.fadeOut(() => {
+                        alertBox.addClass('d-none').text('');
+                    });
+                }, 2000);
+
+                $('#userTable').DataTable().ajax.reload(null, false);
+            } else {
+                alertBox.removeClass('d-none alert-success alert-danger')
+                        .addClass('alert-warning')
+                        .text(res.message || 'Delete Failed.')
+                        .fadeIn();
+
+                setTimeout(() => {
+                    alertBox.fadeOut(() => {
+                        alertBox.addClass('d-none').text('');
+                    });
+                }, 3000);
+            }
+        },
+        error: function () {
+            $('#deleteModal').modal('hide');
+            const alertBox = $('.alert');
+
+            alertBox.removeClass('d-none alert-success alert-warning')
+                    .addClass('alert-danger')
+                    .text('Error Deleting User.')
+                    .fadeIn();
+
+            setTimeout(() => {
+                alertBox.fadeOut(() => {
+                    alertBox.addClass('d-none').text('');
+                });
+            }, 3000);
         }
     });
+});
 });
 </script>
 

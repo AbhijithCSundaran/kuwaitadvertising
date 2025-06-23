@@ -233,52 +233,101 @@ $(function () {
     });
 });
 
-    $('#customerForm').submit(function (e) {
-        e.preventDefault();
-        const name = $('#popup_name').val().trim();
-        const address = $('#popup_address').val().trim();
-        if (!name || !address) {
-            $('#customerError').removeClass('d-none').text('Please enter valid name and address');
-            return;
-        }
-        $.ajax({
-            url: "<?= site_url('customer/create') ?>",
-            type: "POST",
-            data: { name, address },
-            dataType: "json",
-            success: function (res) {
-                if (res.status === 'success') {
-                    const newOption = new Option(res.customer.name, res.customer.customer_id, true, true);
-                    $('#customer_id').append(newOption).trigger('change');
-                    $('#popup_name').val('');
-                    $('#popup_address').val('');
-                    $('#customerModal').modal('hide');
-                } else {
-                    $('#customerError').removeClass('d-none').text(res.message);
-                }
-            },
-            error: function () {
-                $('#customerError').removeClass('d-none').text('Server error occurred.');
-            }
-        });
-    });
+   $('#customerForm').submit(function (e) {
+    e.preventDefault();
+    const name = $('#popup_name').val().trim();
+    const address = $('#popup_address').val().trim();
 
-    $('#estimate-form').submit(function (e) {
-        e.preventDefault();
-        $.ajax({
-            url: "<?= site_url('estimate/save') ?>",
-            type: "POST",
-            data: $(this).serialize(),
-            dataType: "json",
-            success: function (res) {
-                if (res.status === 'success') {
-                    alert(res.message);
-                    window.location.href = "<?= site_url('estimatelist') ?>";
-                } else {
-                    alert(res.message);
-                }
+    if (!name || !address) {
+        $('#customerError').removeClass('d-none').text('Please enter valid name and address');
+        return;
+    }
+
+    $.ajax({
+        url: "<?= site_url('customer/create') ?>",
+        type: "POST",
+        data: { name, address },
+        dataType: "json",
+        success: function (res) {
+            if (res.status === 'success') {
+                const newOption = new Option(res.customer.name, res.customer.customer_id, true, true);
+                $('#customer_id').append(newOption).trigger('change');
+                $('#popup_name').val('');
+                $('#popup_address').val('');
+                $('#customerModal').modal('hide');
+
+                // ✅ Success alert (top right)
+                $('.alert')
+                    .removeClass('d-none alert-danger')
+                    .addClass('alert-success')
+                    .text('Customer created successfully.')
+                    .fadeIn()
+                    .delay(3000)
+                    .fadeOut();
+            } else {
+                // ❌ Failure alert (top right)
+                $('.alert')
+                    .removeClass('d-none alert-success')
+                    .addClass('alert-danger')
+                    .text(res.message || 'Failed to create customer.')
+                    .fadeIn()
+                    .delay(3000)
+                    .fadeOut();
             }
-        });
+        },
+        error: function () {
+            // ❌ Server error alert (top right)
+            $('.alert')
+                .removeClass('d-none alert-success')
+                .addClass('alert-danger')
+                .text('Server error occurred while creating customer.')
+                .fadeIn()
+                .delay(3000)
+                .fadeOut();
+        }
     });
+ });
+
+  $('#estimate-form').submit(function (e) {
+    e.preventDefault();
+    $.ajax({
+        url: "<?= site_url('estimate/save') ?>",
+        type: "POST",
+        data: $(this).serialize(),
+        dataType: "json",
+        success: function (res) {
+            if (res.status === 'success') {
+                $('.alert')
+                    .removeClass('d-none alert-danger')
+                    .addClass('alert-success')
+                    .text('Estimate saved successfully.')
+                    .fadeIn();
+
+                // Redirect after a short delay
+                setTimeout(function () {
+                    window.location.href = "<?= site_url('estimate/generateestimate/') ?>" + res.estimate_id;
+                }, 1500);
+            } else {
+                $('.alert')
+                    .removeClass('d-none alert-success')
+                    .addClass('alert-danger')
+                    .text(res.message)
+                    .fadeIn()
+                    .delay(3000)
+                    .fadeOut();
+            }
+        },
+        error: function () {
+            $('.alert')
+                .removeClass('d-none alert-success')
+                .addClass('alert-danger')
+                .text('Something went wrong while saving the estimate.')
+                .fadeIn()
+                .delay(3000)
+                .fadeOut();
+        }
+    });
+});
+
 });
 </script>

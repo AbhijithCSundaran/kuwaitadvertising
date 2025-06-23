@@ -20,7 +20,7 @@ $routes->get('adduser/(:num)', 'Manageuser::index/$1');
 $routes->get('adduserlist', 'Manageuser::add');
 $routes->post('manageuser/save', 'Manageuser::save');
 $routes->get('manageuser/getUser/(:num)', 'Manageuser::getUser/$1');
-$routes->post('manageuser/delete/(:num)', 'Manageuser::delete/$1');
+$routes->post('manageuser/delete', 'Manageuser::delete');
 $routes->post('manageuser/userlist', 'Manageuser::userlist');
 
 $routes->get('managecompany', 'Managecompany::index'); 
@@ -47,9 +47,15 @@ $routes->get('estimate/estimatelistajax', 'Estimate::estimatelistajax');
 $routes->post('estimate/delete', 'Estimate::delete');
 $routes->get('estimatelist', 'Estimate::estimatelist');
 $routes->get('estimate/edit/(:num)', 'Estimate::edit/$1');
+$routes->get('estimate/generateestimate/(:num)', 'Estimate::generateEstimate/$1');
+
+
+
+// $routes->get('invoicelist', 'Invoice::invoicelist');
 
 $routes->post('customer/create', 'Customer::create');
-$routes->post('customer/get-address', 'Customer::getAddressById');
+$routes->post('customer/get-address', 'Customer::get_address');
+$routes->get('customer/search', 'Customer::search');
 
 $routes->get('expense', 'Expense::index'); 
 // $routes->get('addexpenselist', 'Expense::index'); 
@@ -60,9 +66,11 @@ $routes->post('expense/list', 'Expense::expenselistajax');
 $routes->post('expense/delete/(:num)', 'Expense::delete/$1');
 $routes->post('expense/delete', 'Expense::delete'); 
 $routes->get('expense/getExpensesAjax', 'Expense::getExpensesAjax');
+$routes->get('generateestimate/(:num)', 'Estimate::generateEstimate/$1');
 
 //for report
 $routes->get('expense/report', 'Expense::report');
 $routes->post('expense/getExpenseReportAjax', 'Expense::getExpenseReportAjax');
 
+$routes->get('sales/report', 'Sales::report');
 

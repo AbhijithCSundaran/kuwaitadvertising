@@ -92,39 +92,19 @@ class Expense extends BaseController
         return $this->response->setJSON($expenses); // Return as plain array
     }
 
-    public function delete()
-    {
-        $id = $this->request->getPost('id');
+   public function delete()
+{
+    $expense_id = $this->request->getPost('expense_id');
 
-        if (!$id) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'No ID provided.'
-            ]);
-        }
-
-        $expenseModel = new \App\Models\Expense_Model();
-        $expense = $expenseModel->find($id);
-
-        if (!$expense) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'Expense Not Found.'
-            ]);
-        }
-
-        if ($expenseModel->delete($id)) {
-            return $this->response->setJSON([
-                'status' => 'success',
-                'message' => 'Expense Deleted Successfully.'
-            ]);
-        }
-
-        return $this->response->setJSON([
-            'status' => 'error',
-            'message' => 'Failed To Remove Expense.'
-        ]);
+    if (!$expense_id) {
+        return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid expense ID']);
     }
+
+    $expenseModel = new \App\Models\Expense_Model();
+    $expenseModel->delete($expense_id);
+
+    return $this->response->setJSON(['status' => 'success']);
+}
 
 
     //for report

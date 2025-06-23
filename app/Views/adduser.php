@@ -36,7 +36,7 @@
                   value="<?= $userData['phonenumber'] ?? '' ?>" maxlength="15" />
               </div>
                 <div class="col-md-6">
-                 <label for="role_id">Role</label>
+                 <label for="role_id">Role <span class="text-danger">*</span></label>
                 <select name="role_id" id="role_id" class="form-control" required>
                   <option value="">Select Role</option>
                   <?php if (isset($roles) && !empty($roles)): ?>
