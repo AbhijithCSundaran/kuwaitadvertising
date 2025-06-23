@@ -1,5 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+<style>
+.btn-primary:not(.btn-light) {
+    background: #686868 !important;
+    border: none;
+    color: white;
+}
+</style>
 <head>
 	<!-- Required meta tags -->
 	<meta charset="utf-8">
@@ -34,9 +41,10 @@
 					<div class="form-group">
 						<input type="text" name="email" class="form-control form-control-lg"  placeholder="example@gmail.com">
 					</div>
-					<div class="form-group">
-						<input type="password" name="password" class="form-control form-control-lg"  placeholder="Password">
-					</div>
+					<div class="form-group position-relative">
+            <input type="password" name="password" id="password" class="form-control form-control-lg" placeholder="Password">
+            <i class="mdi mdi-eye-off position-absolute" id="togglePassword" style="top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer;"></i>
+          </div>
 					<div class="mt-3 d-grid gap-2">
 						<button type="button" class="enter-btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn">SIGN IN</button>
 					</div>
@@ -68,6 +76,14 @@
 </body>
 <script>
   $(document).ready(function () {
+
+    $('#togglePassword').click(function () {
+      const passwordField = $('#password');
+      const type = passwordField.attr('type') === 'password' ? 'text' : 'password';
+      passwordField.attr('type', type);
+      $(this).toggleClass('mdi-eye-off mdi-eye');
+    });
+
     $('.enter-btn').click(function () {
       debugger;
       const body = $('#login-form').serialize();

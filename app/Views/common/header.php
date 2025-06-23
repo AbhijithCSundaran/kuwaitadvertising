@@ -25,6 +25,9 @@
  
   <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" > -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+ <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" ></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" ></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"></script>
@@ -64,9 +67,9 @@
     <img src="<?= ASSET_PATH; ?>assets/images/adminlogo.jpeg" alt="Logo" style="height: 40px;">
 </a>
 
-      <a class="navbar-brand brand-logo-white" href="index.html"><img src="../../../assets/images/logo-white.svg"
+      <a class="navbar-brand brand-logo-white" href="index.html"><img src="<?= ASSET_PATH; ?>assets/images/adminlogo.jpeg"
           alt="logo" /></a>
-      <a class="navbar-brand brand-logo-mini" href="index.html"><img src="../../../assets/images/logo-mini.svg"
+      <a class="navbar-brand brand-logo-mini" href="index.html"><img src="<?= ASSET_PATH; ?>assets/images/adminlogo.jpeg"
           alt="logo" /></a>
       <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
        
@@ -74,110 +77,7 @@
     </div>
   </div>
   <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
-    
-    <ul class="navbar-nav navbar-nav-right">
-      <li class="nav-item dropdown me-1">
-        
-        <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="messageDropdown">
-          <p class="mb-0 font-weight-normal float-left dropdown-header">Messages</p>
-          <a class="dropdown-item preview-item">
-            <div class="preview-thumbnail">
-              <img src="../../../assets/images/faces/face4.jpg" alt="image" class="profile-pic">
-            </div>
-            <div class="preview-item-content flex-grow">
-              <h6 class="preview-subject ellipsis font-weight-normal">David Grey
-              </h6>
-              <p class="font-weight-light small-text text-muted mb-0">
-                The meeting is cancelled
-              </p>
-            </div>
-          </a>
-          <a class="dropdown-item preview-item">
-            <div class="preview-thumbnail">
-              <img src="../../../assets/images/faces/face2.jpg" alt="image" class="profile-pic">
-            </div>
-            <div class="preview-item-content flex-grow">
-              <h6 class="preview-subject ellipsis font-weight-normal">Tim Cook
-              </h6>
-              <p class="font-weight-light small-text text-muted mb-0">
-                New product launch
-              </p>
-            </div>
-          </a>
-          <a class="dropdown-item preview-item">
-            <div class="preview-thumbnail">
-              <img src="../../../assets/images/faces/face3.jpg" alt="image" class="profile-pic">
-            </div>
-            <div class="preview-item-content flex-grow">
-              <h6 class="preview-subject ellipsis font-weight-normal"> Johnson
-              </h6>
-              <p class="font-weight-light small-text text-muted mb-0">
-                Upcoming board meeting
-              </p>
-            </div>
-          </a>
-        </div>
-      </li>
-      <li class="nav-item dropdown me-4">
-       
-        <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list"
-          aria-labelledby="notificationDropdown">
-          <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
-          <a class="dropdown-item preview-item">
-            <div class="preview-thumbnail">
-              <div class="preview-icon bg-success">
-                <i class="mdi mdi-information mx-0"></i>
-              </div>
-            </div>
-            <div class="preview-item-content">
-              <h6 class="preview-subject font-weight-normal">Application Error</h6>
-              <p class="font-weight-light small-text mb-0 text-muted">
-                Just now
-              </p>
-            </div>
-          </a>
-          <a class="dropdown-item preview-item">
-            <div class="preview-thumbnail">
-              <div class="preview-icon bg-warning">
-                <i class="mdi mdi-weather-sunny mx-0"></i>
-              </div>
-            </div>
-            <div class="preview-item-content">
-              <h6 class="preview-subject font-weight-normal">Settings</h6>
-              <p class="font-weight-light small-text mb-0 text-muted">
-                Private message
-              </p>
-            </div>
-          </a>
-          <a class="dropdown-item preview-item">
-            <div class="preview-thumbnail">
-              <div class="preview-icon bg-info">
-                <i class="mdi mdi-account-box mx-0"></i>
-              </div>
-            </div>
-            <div class="preview-item-content">
-              <h6 class="preview-subject font-weight-normal">New user registration</h6>
-              <p class="font-weight-light small-text mb-0 text-muted">
-                2 days ago
-              </p>
-            </div>
-          </a>
-        </div>
-      </li>
-      <li class="nav-item nav-profile dropdown">
-        
-        <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
-          <a class="dropdown-item">
-            <i class="mdi mdi-cog text-primary"></i>
-            Settings
-          </a>
-        </div>
-      </li>
-    </ul>
-    <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button"
-      data-toggle="offcanvas">
-      <span class="mdi mdi-menu"></span>
-    </button>
+
   </div>
 </nav>
     <!-- partial -->
@@ -253,7 +153,10 @@
       <div class="collapse" id="auth">
         <ul class="nav flex-column sub-menu">
             <li class="nav-item">
-                <a class="nav-link" href="<?= base_url('expense/report') ?>">Expense Report</a>
+                <a class="nav-link" <?= $uri->getSegment(1) == 'expense/report' ? 'active' : '' ?>href="<?= base_url('expense/report') ?>">Expense Report</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="<?= base_url('sales/report') ?>">Sales Report</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="<?= base_url('ledger/company') ?>">Company Ledger</a>

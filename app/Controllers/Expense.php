@@ -113,22 +113,33 @@ class Expense extends BaseController
         return view('expensereport');
     }
 
-    public function getExpenseReportAjax()
+   public function getExpenseReportAjax()
     {
         $model = new \App\Models\Expense_Model();
 
-        $date  = $this->request->getPost('date');
-        $month = $this->request->getPost('month');
-        $year  = $this->request->getPost('year');
+        $date      = $this->request->getPost('date');       
+        $month     = $this->request->getPost('month');
+        $year      = $this->request->getPost('year');
+        $fromDate  = $this->request->getPost('fromDate');
+        $toDate    = $this->request->getPost('toDate');
 
         $builder = $model->builder()->orderBy('id', 'DESC');
 
-        if ($date) {
+        
+        if (!empty($fromDate) && !empty($toDate)) {
+            $builder->where('date >=', $fromDate)->where('date <=', $toDate);
+        }
+        
+        elseif (!empty($date)) {
             $builder->where('DATE(date)', $date);
-        } elseif ($month && $year) {
+        }
+       
+        elseif (!empty($month) && !empty($year)) {
             $builder->where('MONTH(date)', $month);
             $builder->where('YEAR(date)', $year);
-        } elseif ($year) {
+        }
+        
+        elseif (!empty($year)) {
             $builder->where('YEAR(date)', $year);
         }
 
@@ -136,7 +147,5 @@ class Expense extends BaseController
 
         return $this->response->setJSON($data);
     }
-
-
 
 }

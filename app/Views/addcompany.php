@@ -85,16 +85,32 @@
 <script>
     $(document).ready(function () {
         $('#btn-browse-file').on('click', function () {
-        $('#company_logo').click();
+            $('#company_logo').click();
         });
 
         $('#company_logo').on('change', function () {
-            const fileName = this.files[0] ? this.files[0].name : '';
+            const file = this.files[0];
+            const fileName = file ? file.name : '';
             $('#fake-file-name').val(fileName);
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#logo-preview').attr('src', e.target.result);
+                };
+                reader.readAsDataURL(file);
+
+                if (isEditMode) {
+                    logoChanged = true; // trigger save enable logic
+                    checkChanges();
+                }
+            }
         });
+
         const $saveBtn = $('.enter-btn');
         const $form = $('#company-form');
         const isEditMode = $('#uid').val().trim() !== '';
+        let logoChanged = false;
 
         const initialValues = {
             name: $('#company_name').val(),
@@ -121,7 +137,7 @@
                 phone: $('#phone').val()
             };
 
-            let hasChanged = false;
+            let hasChanged = logoChanged;
             for (let key in currentValues) {
                 if (currentValues[key] !== initialValues[key]) {
                     hasChanged = true;
@@ -155,9 +171,8 @@
 
         $saveBtn.on('click', function (e) {
             e.preventDefault();
-
-       
             if ($saveBtn.prop('disabled')) return;
+
             $saveBtn.prop('disabled', true).css('opacity', 0.6);
 
             let name = $('#company_name').val().trim();
