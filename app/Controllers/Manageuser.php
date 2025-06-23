@@ -144,13 +144,18 @@ class Manageuser extends BaseController
     }
 
     // Delete a user
-    public function delete($id){
-        $model = new Manageuser_Model();
-        $ok    = $model->delete($id);
+   public function delete()
+{
+    $user_id = $this->request->getPost('user_id');
 
-        return $this->response->setJSON([
-            'status'  => $ok ? 'success' : 'error',
-            'message' => $ok ? 'User Deleted Successfully.' : 'Failed To Delete User.'
-        ]);
+    if (!$user_id) {
+        return $this->response->setJSON(['status' => 'error', 'message' => 'User ID is missing']);
     }
+
+    $userModel = new \App\Models\Manageuser_Model();
+    $userModel->delete($user_id);
+
+    return $this->response->setJSON(['status' => 'success']);
+}
+
 }
