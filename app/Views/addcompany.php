@@ -12,13 +12,13 @@
                         
                         <div class="col-6 mb-3 px-2">
                             <label for="company_name" class="form-label">Name <span class="text-danger">*</span></label>
-                            <input type="text" name="company_name" id="company_name" class="form-control" maxlength="50"
+                            <input type="text" name="company_name" id="company_name" class="form-control capitalize" maxlength="50"
                             value="<?= isset($company['company_name']) ? esc($company['company_name']) : '' ?>" />
                         </div>
 
                         <div class="col-6 mb-3 px-2">
                             <label for="address" class="form-label">Company Address <span class="text-danger">*</span></label>
-                            <textarea name="address" id="address" class="form-control" maxlength="150"
+                            <textarea name="address" id="address" class="form-control capitalize" maxlength="150"
                                 style="resize: vertical;"
                                 rows="3"><?= isset($company['address']) ? esc($company['address']) : '' ?></textarea>
                         </div>
@@ -47,7 +47,7 @@
                                 <input type="file" name="company_logo" id="company_logo" class="form-control" accept="image/*" />
                             <?php else: ?>
 
-                                <div class="input-group">
+                                <div class="input-group loggo">
                                     <button type="button" class="btn btn-outline-secondary" id="btn-browse-file">Choose File</button>
                                     <input type="text" id="fake-file-name" class="form-control" readonly
                                     value="<?= esc($company['company_logo']) ?>" />

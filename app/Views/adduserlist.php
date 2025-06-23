@@ -76,12 +76,14 @@ $(document).ready(function () {
                 data: "user_id",
                 render: function (data) {
                     return `
+                    <div class="d-flex align-items-center gap-3">
                         <a href="<?= base_url('adduser/') ?>${data}" title="Edit" style="color:rgb(13, 162, 199); margin-right: 10px;">
                             <i class="bi bi-pencil-fill"></i>
                         </a>
                         <a href="javascript:void(0);" class="delete-btn" data-id="${data}" title="Delete" style="color: #dc3545;">
                             <i class="bi bi-trash-fill"></i>
                         </a>
+                    </div>
                     `;
                 }
             },

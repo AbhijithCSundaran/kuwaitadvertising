@@ -32,6 +32,9 @@ $routes->get('addcompany', 'Managecompany::add');
 $routes->get('addcompany/(:num)', 'Managecompany::add/$1');  
 $routes->post('managecompany/delete', 'Managecompany::delete');
 $routes->get('managecompany/getAllCompanies', 'Managecompany::getAllCompanies'); 
+$routes->post('managecompany/companylistjson', 'Managecompany::companylistjson');
+
+
 
 $routes->get('rolemanagement/create', 'Rolemanagement::create');
 $routes->post('rolemanagement/store', 'Rolemanagement::store');
@@ -48,6 +51,7 @@ $routes->post('estimate/delete', 'Estimate::delete');
 $routes->get('estimatelist', 'Estimate::estimatelist');
 $routes->get('estimate/edit/(:num)', 'Estimate::edit/$1');
 $routes->get('estimate/generateestimate/(:num)', 'Estimate::generateEstimate/$1');
+$routes->post('save', 'Estimate::saveEstimate');
 
 
 

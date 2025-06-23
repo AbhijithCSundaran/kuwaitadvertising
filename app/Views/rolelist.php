@@ -83,15 +83,21 @@
                         if (permissions.length > 0) {
                             return '<ul class="mb-0">' + permissions.map(p => `<li>${p}</li>`).join('') + '</ul>';
                         }
-                        return '<em>No permissions assigned</em>';
+                        return '<em>No Permissions Assigned</em>';
                     }
                 },
                 {
                     data: "role_id",
                     render: function (id) {
                         return `
-                        <a href="<?= base_url('rolemanagement/edit/') ?>${id}" class="btn btn-sm btn-primary">Edit</a>
-                        <button class="btn btn-sm btn-danger delete-role" data-id="${id}">Delete</button>
+                        <div class="d-flex align-items-center gap-3">
+                            <a href="<?= base_url('rolemanagement/edit/') ?>${id}" title="Edit" style="color:rgb(13, 162, 199); margin-right: 10px;">
+                                <i class="bi bi-pencil-fill"></i>
+                            </a>
+                            <a href="javascript:void(0);" class="delete-all" data-id="${id}" title="Delete" style="color: #dc3545;">
+                                <i class="bi bi-trash-fill"></i>
+                            </a>
+                        </div>
                     `;
                     }
                 },
@@ -107,37 +113,52 @@
         table.on('order.dt search.dt draw.dt', function () {
             table.column(0, { search: 'applied', order: 'applied' })
                 .nodes()
-                .each((cell, i) => cell.innerHTML = i + 1);
+                .each(function (cell, i) {
+                    var pageInfo = table.page.info();
+                    cell.innerHTML = pageInfo.start + i + 1;
+                });
         });
 
 
-        $(document).on('click', '.delete-role', function () {
-            const id = $(this).data('id');
-            if (confirm('Are you sure you want to delete this role?')) {
-                $.ajax({
-                    url: "<?= base_url('rolemanagement/delete') ?>",
-                    type: "POST",
-                    data: {
-                        role_id: id,
-                        '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
-                    },
-                    dataType: "json",
-                    success: function (res) {
-                        if (res.status === 'success') {
-                            alertBox.removeClass().addClass('alert alert-danger text-center position-fixed').text('Role deleted successfully.').fadeIn();
-                            setTimeout(() => alertBox.fadeOut(), 2000);
-                            table.ajax.reload(null, false);
-                        } else {
-                            alertBox.removeClass().addClass('alert alert-warning text-center position-fixed').text(res.message || 'Delete failed.').fadeIn();
-                            setTimeout(() => alertBox.fadeOut(), 3000);
-                        }
-                    },
-                    error: function () {
-                        alertBox.removeClass().addClass('alert alert-danger text-center position-fixed').text('Error occurred while deleting role.').fadeIn();
+        let deleteId = null;
+        const deleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+
+        $(document).on('click', '.delete-all', function () {
+            deleteId = $(this).data('id');
+            deleteModal.show(); 
+        });
+
+        $('#confirm-delete-btn').on('click', function () {
+            if (!deleteId) return;
+
+            $.ajax({
+                url: "<?= base_url('rolemanagement/delete') ?>",
+                type: "POST",
+                data: {
+                    role_id: deleteId,
+                    '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
+                },
+                dataType: "json",
+                success: function (res) {
+                    if (res.status === 'success') {
+                        alertBox.removeClass().addClass('alert alert-danger text-center position-fixed').text('Role deleted successfully.').fadeIn();
+                        setTimeout(() => alertBox.fadeOut(), 2000);
+                        table.ajax.reload(null, false);
+                    } else {
+                        alertBox.removeClass().addClass('alert alert-warning text-center position-fixed').text(res.message || 'Delete failed.').fadeIn();
                         setTimeout(() => alertBox.fadeOut(), 3000);
                     }
-                });
-            }
+                },
+                error: function () {
+                    alertBox.removeClass().addClass('alert alert-danger text-center position-fixed').text('Error occurred while deleting role.').fadeIn();
+                    setTimeout(() => alertBox.fadeOut(), 3000);
+                }
+            });
+
+            deleteModal.hide(); 
+            deleteId = null;   
         });
     });
 </script>
+
+

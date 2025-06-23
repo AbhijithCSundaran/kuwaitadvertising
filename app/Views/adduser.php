@@ -16,7 +16,7 @@
           <div class="row">
             <div class="col-md-6">
               <label>Name <span class="text-danger">*</span></label>
-              <input type="text" name="name" id="name" class="form-control" maxlength="20"
+              <input type="text" name="name" id="name" class="form-control capitalize" maxlength="20"
                 pattern="[A-Za-z\s]+" title="Only letters and spaces allowed"
                 value="<?= $userData['name'] ?? '' ?>"/>
             </div>
