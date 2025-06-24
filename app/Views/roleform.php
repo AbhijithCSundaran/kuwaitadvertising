@@ -15,14 +15,14 @@
                 </div>
 
                 <div class="card mb-3">
-                    <div class="card-header d-flex justify-content-between align-items-center">
+                    <div class="card-header">
                         <h5 class="mb-0">Permissions</h5>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="select_all_permissions">
-                            <label class="form-check-label" for="select_all_permissions">Select All</label>
-                        </div>
                     </div>
                     <div class="card-body">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="select_all_permissions">
+                            <label class="form-check-label" for="select_all_permissions" style="font-weight: bold;">Select All</label>
+                        </div>
                         <div class="row">
                             <?php foreach ($menus as $menu): ?>
                                 <div class="col-md-4 mb-3">
@@ -39,7 +39,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="col-12 d-flex justify-content-end gap-2">
                     <a href="<?= base_url('rolemanagement/rolelist') ?>" class="btn btn-secondary">Discard</a>
                     <button type="submit" class="btn btn-primary enter-btn" id="saveBtn">Save Role</button>
@@ -70,10 +69,8 @@ $(document).ready(function () {
         $saveBtn.prop('disabled', true).css({ opacity: 0.6, pointerEvents: 'none' });
     }
 
-    // ✅ Select All Permissions checkbox logic
     $('#select_all_permissions').on('change', function () {
-        const isChecked = $(this).is(':checked');
-        $('.permission-checkbox').prop('checked', isChecked).trigger('change');
+        $('.permission-checkbox').prop('checked', this.checked).trigger('change');
     });
 
     $('.permission-checkbox').on('change', function () {
@@ -81,31 +78,32 @@ $(document).ready(function () {
         $('#select_all_permissions').prop('checked', allChecked);
     });
 
-    // ✅ Set Select All checkbox on page load based on initial state
     const total = $('.permission-checkbox').length;
     const checked = $('.permission-checkbox:checked').length;
     $('#select_all_permissions').prop('checked', total === checked);
 
-    $('#role_name, input.form-check-input').on('input change', function () {
-        let changed = false;
-
+    function checkIfChanged() {
         const currentName = $('#role_name').val().trim();
-        if (currentName !== originalData.roleName) {
-            changed = true;
-        }
+        let changed = currentName !== originalData.roleName;
 
-        $('input.form-check-input').each(function () {
-            if ($(this).prop('checked') !== originalData.checkboxes[$(this).attr('id')]) {
+        $('input.permission-checkbox').each(function () {
+            const id = $(this).attr('id');
+            if ($(this).prop('checked') !== originalData.checkboxes[id]) {
                 changed = true;
             }
         });
 
-        if (changed) {
-            $saveBtn.prop('disabled', false).css({ opacity: 1, pointerEvents: 'auto' });
-        } else {
-            $saveBtn.prop('disabled', true).css({ opacity: 0.6, pointerEvents: 'none' });
+        if (isEdit) {
+            if (changed) {
+                $saveBtn.prop('disabled', false).css({ opacity: 1, pointerEvents: 'auto' });
+            } else {
+                $saveBtn.prop('disabled', true).css({ opacity: 0.6, pointerEvents: 'none' });
+            }
         }
-    });
+    }
+
+    $('#role_name').on('input', checkIfChanged);
+    $('.permission-checkbox').on('change', checkIfChanged);
 
     $saveBtn.on('click', function (e) {
         e.preventDefault();

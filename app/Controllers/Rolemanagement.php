@@ -10,7 +10,7 @@ class Rolemanagement extends Controller
 {
     protected $roleModel;
     protected $roleMenuModel;
-    protected $menus = ['Dashboard', 'Users', 'Companies', 'Estimates', 'invoice', 'expense', 'ledger', 'Reports'];
+    protected $menus = ['Dashboard', 'Users', 'Companies', 'Estimates', 'Invoice', 'Expense', 'Ledger', 'Reports'];
 
     public function __construct()
     {

@@ -44,7 +44,7 @@
     <!-- <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script> -->
 
 <!-- Delete Confirmation Modal -->
-<!-- <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
@@ -60,7 +60,7 @@
       </div>
     </div>
   </div>
-</div> -->
+</div>
 <script>
   $(document).ready(function () {
     $('#logoutLink').on('click', function (e) {
