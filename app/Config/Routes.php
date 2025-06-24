@@ -72,6 +72,13 @@ $routes->post('expense/delete', 'Expense::delete');
 $routes->post('expense/getExpensesAjax', 'Expense::getExpensesAjax');
 
 
+// dashboard
+$routes->post('dashboard/getTodayExpenseTotal', 'Dashboard::getTodayExpenseTotal');
+$routes->post('dashboard/getMonthlyExpenseTotal', 'Dashboard::getMonthlyExpenseTotal');
+
+
+
+
 //for report
 $routes->get('expense/report', 'Expense::report');
 $routes->post('expense/getExpenseReportAjax', 'Expense::getExpenseReportAjax');

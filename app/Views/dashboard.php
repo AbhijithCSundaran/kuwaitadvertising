@@ -81,9 +81,9 @@
                           <div class="icon-box-secondary me-3">
                             <i class="mdi mdi-eye"></i>
                           </div>
-                          <div class="d-flex flex-column justify-content-around">
-                            <small class="mb-1 text-muted">Total Expenses Of The Day</small>
-                            <h5 class="me-2 mb-0">9833550</h5>
+                             <div class="d-flex flex-column justify-content-around">
+                              <small class="mb-1 text-muted">Total Expenses Of The Day</small>
+                              <h5 class="me-2 mb-0" id="dailyExpense">0</h5>
                           </div>
                         </div>
                         <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
@@ -92,7 +92,7 @@
                           </div>
                           <div class="d-flex flex-column justify-content-around">
                             <small class="mb-1 text-muted">Total Income Of The Month</small>
-                            <h5 class="me-2 mb-0">2233783</h5>
+                            <h5 class="me-2 mb-0">0000</h5>
                           </div>
                         </div>
                         <div class="d-flex py-3 border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
@@ -100,8 +100,8 @@
                             <i class="mdi mdi-flag"></i>
                           </div>
                           <div class="d-flex flex-column justify-content-around">
-                            <small class="mb-1 text-muted">Total Expenses Of The Month</small>
-                            <h5 class="me-2 mb-0">3497843</h5>
+                              <small class="mb-1 text-muted">Total Expenses Of The Month</small>
+                              <h5 class="me-2 mb-0" id="monthlyExpense">0</h5>
                           </div>
                         </div>
                       </div>
@@ -775,4 +775,51 @@
         </div>
         <!-- content-wrapper ends -->
         <!-- partial:partials/_footer.html -->
-     <?php include "common/footer.php";?>    
+     <?php include "common/footer.php";?> 
+<script>
+  function fetchTodayExpense() {
+      $.ajax({
+          url: "<?= base_url('dashboard/getTodayExpenseTotal') ?>",
+          type: "POST",
+          dataType: "json",
+          success: function (res) {
+              $('#dailyExpense').text(res.total);
+          },
+          error: function () {
+              $('#dailyExpense').text('0');
+          }
+      });
+  }
+
+  function fetchMonthlyExpense() {
+      $.ajax({
+          url: "<?= base_url('dashboard/getMonthlyExpenseTotal') ?>",
+          type: "POST",
+          dataType: "json",
+          success: function (res) {
+              $('#monthlyExpense').text(res.total);
+          },
+          error: function () {
+              $('#monthlyExpense').text('0');
+          }
+      });
+  }
+
+  $(document).ready(function () {
+      fetchTodayExpense();
+      fetchMonthlyExpense();
+
+      // Auto-refresh both every 10 seconds
+      setInterval(function () {
+          fetchTodayExpense();
+          fetchMonthlyExpense();
+      }, 10000);
+  });
+//   success: function(response) {
+//     console.log(response);
+//     $('#monthlyExpense').text(response.total || 0);
+// }
+</script>
+
+
+        
