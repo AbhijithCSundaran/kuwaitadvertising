@@ -33,7 +33,7 @@
               <div class="col-md-6">
                 <label>Phone Number</label>
                 <input type="text" name="phonenumber" id="phonenumber" class="form-control"
-                  value="<?= $userData['phonenumber'] ?? '' ?>" maxlength="15" />
+                  value="<?= $userData['phonenumber'] ?? '' ?>" minlength="7" maxlength="15" />
               </div>
                 <div class="col-md-6">
                  <label for="role_id">Role <span class="text-danger">*</span></label>
@@ -124,9 +124,7 @@ $(document).on('click', '.toggle-password', function () {
   $('#name').on('input', function () {
     this.value = this.value.replace(/[^A-Za-z\s]/g, '');
   });
-  $('#phonenumber').on('input', function () {
-    this.value = this.value.replace(/\D/g, '').slice(0, 15);
-  });
+
 
   $('#saveUserBtn').on('click', function (e) {
     e.preventDefault();
@@ -140,6 +138,11 @@ $(document).on('click', '.toggle-password', function () {
     const newPw = $('#new_password').val()?.trim() || '';
     const confPw = $('#confirm_new_password').val()?.trim() || '';
     const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+     if ((phone.length < 7) || (phone.length > 15)) {
+        showAlert('Phone Number Must Be 7 To 15 Digits');
+        return btn.prop('disabled', false);
+     }
 
     if (!name || !email || (isNew && !pw)) {
       showAlert('Please Fill All Mandatory Fields <span class="text-danger">*</span>.', 'danger');

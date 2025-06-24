@@ -51,6 +51,7 @@ class Estimate extends BaseController
 
         $estimateData = [
             'customer_id' => $customerId,
+            'customer_address' => $address,
             'discount' => $discount,
             'total_amount' => $grandTotal,
             'date' => date('Y-m-d')
@@ -147,9 +148,15 @@ class Estimate extends BaseController
         $estimateItemModel = new EstimateItemModel();
         $customerModel = new CustomerModel();
 
-        $data['estimate'] = $estimateModel->find($id);
+       
         $data['items'] = $estimateItemModel->where('estimate_id', $id)->findAll();
         $data['customers'] = $customerModel->findAll();
+        $data['estimate'] = $estimateModel
+            ->select('estimates.*, customers.name AS customer_name, customers.address AS customer_address')
+            ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
+            ->where('estimate_id', $id)
+            ->first();
+
 
         if (!$data['estimate']) {
             return redirect()->to('estimatelist')->with('error', 'Estimate not found.');

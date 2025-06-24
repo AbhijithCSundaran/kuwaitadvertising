@@ -44,7 +44,13 @@
                     <label><strong> Customer</strong></label>
                 <div class="input-group mb-2">
                    <select name="customer_id" id="customer_id" class="form-control py-0" required>
-                        <option value="">Select Customer</option>
+                           <?php if (isset($estimate['estimate_id'])): ?>
+                                <!-- Edit mode: pre-select current customer -->
+                                <option value="<?= esc($estimate['estimate_id']) ?>" selected><?= esc($estimate['customer_name']) ?></option>
+                            <?php else: ?>
+                                <!-- Add mode: show default placeholder -->
+                                <option value="" selected disabled>Select Customer</option>
+                            <?php endif; ?>
                         <?php foreach ($customers as $customer): ?>
                             <option value="<?= $customer['customer_id'] ?>">
                                 <?= esc($customer['name']) ?>
