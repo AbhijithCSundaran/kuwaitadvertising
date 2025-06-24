@@ -17,9 +17,9 @@
             <tr>
                 <th>SI NO</th>
                 <th>Role Name</th>
+                <th>Permissions</th>
                 <th style="width: 110px;">Created Date</th>
                 <th  style="width: 110px;">Updated Date</th>
-                <th>Permissions</th>
                 <th style="width: 160px;">Action</th>
                 <th class="d-none">ID</th>
             </tr>
@@ -62,6 +62,17 @@
                         return data.replace(/\b\w/g, c => c.toUpperCase());
                     }
                 },
+
+                {
+                    data: "role_id",
+                    render: function (id, type, row, meta) {
+                        const permissions = row.permissions || [];
+                        if (permissions.length > 0) {
+                            return '<ul class="mb-0">' + permissions.map(p => `<li>${p}</li>`).join('') + '</ul>';
+                        }
+                        return '<em>No Permissions Assigned</em>';
+                    }
+                },
                 {
                     data: "created_at",
                     render: function (data) {
@@ -74,16 +85,6 @@
                     render: function (data) {
                         const d = new Date(data);
                         return isNaN(d) ? '-' : d.toISOString().split('T')[0];
-                    }
-                },
-                {
-                    data: "role_id",
-                    render: function (id, type, row, meta) {
-                        const permissions = row.permissions || [];
-                        if (permissions.length > 0) {
-                            return '<ul class="mb-0">' + permissions.map(p => `<li>${p}</li>`).join('') + '</ul>';
-                        }
-                        return '<em>No Permissions Assigned</em>';
                     }
                 },
                 {

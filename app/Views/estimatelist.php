@@ -37,8 +37,9 @@ label {
                     <th>SI NO</th>
                     <th>Customer Name</th>
                     <th style="width: 200px;">Customer Address</th>
-                    <th>Total Amount</th>
+                    <th>Sub Total</th>
                     <th>Discount %</th>
+                    <th>Total Amount</th>
                     <th>Date</th>
                     <th>Description</th> 
                     <th>Action</th>
@@ -77,6 +78,7 @@ label {
 <?php include "common/footer.php"; ?>
 
 <script>
+    let table="";
 $(document).ready(function () {
     $('#addCustomerBtn').on('click', function () {
         $('#addCustomerModal').modal('show');
@@ -105,158 +107,143 @@ $(document).ready(function () {
             }
         });
     });
-   var table = $('#estimateTable').DataTable({
+    table = $('#estimateTable').DataTable({
+    processing: true,
+    serverSide: true,
     ajax: {
         url: "<?= base_url('estimate/estimatelistajax') ?>",
-        type: "GET",
-        dataSrc: "data"
+        type: "POST"
     },
-    paging: true,
-    searching: true,
-    ordering: true,
-    info: false,
-    autoWidth: false,
-    lengthMenu: [5, 10, 15, 20, 25],
-    pageLength: 10,
-    order: [[0, 'desc']],
     columns: [
-        { data: "estimate_id", visible: false },  
-        { data: null }, 
+        { data: "estimate_id", visible: false },
+        { data: "slno" },
         {
             data: "customer_name",
-            render: function (data) {
-                return (data ?? '').replace(/\b\w/g, c => c.toUpperCase());
-            }
+            render: data => (data ?? '').replace(/\b\w/g, c => c.toUpperCase())
         },
         {
             data: "customer_address",
             className: "d-none d-xxl-table-cell",
-            render: function (data) {
-                return (data ?? '').replace(/\b\w/g, c => c.toUpperCase());
-            }
+            render: data => (data ?? '').replace(/\b\w/g, c => c.toUpperCase())
         },
-       {
-            data: "total_amount",
-            render: function (data) {
-                return data + ' KWD';
-            }
+        {
+            data: "subtotal",
+            render: data => `${data} KWD`
         },
         {
             data: "discount",
-            render: function (data) {
-                return parseFloat(data).toFixed(2) + ' %';
-            }
+            render: data => `${parseFloat(data).toFixed(2)} %`
+        },
+        {
+            data: "total_amount",
+            render: data => `${data} KWD`
         },
         {
             data: "date",
             className: "d-none d-xxl-table-cell",
-            render: function (data) {
-                return new Date(data).toLocaleDateString('en-GB');
-            }
+            render: data => new Date(data).toLocaleDateString('en-GB')
         },
         {
             data: "description",
             render: function (desc) {
-                if (!desc || typeof desc !== 'string') return '-';
-                let items = desc.split(',').map(item => item.trim());
-                return items.map((item, i) => `${i + 1}. ${item.charAt(0).toUpperCase() + item.slice(1)}`).join('<br>');
+                if (!desc) return '-';
+                return desc.split(',').map((item, i) => `${i + 1}. ${item.trim().charAt(0).toUpperCase() + item.trim().slice(1)}`).join('<br>');
             }
         },
         {
             data: "estimate_id",
             render: function (id) {
                 return `
-                    
                     <a href="<?= base_url('estimate/edit/') ?>${id}" title="Edit" style="color:rgb(13, 162, 199); margin-right: 10px;">
-                            <i class="bi bi-pencil-fill"></i>
-                        </a>
-                        <a href="javascript:void(0);" class="delete-btn" data-id="${id}" title="Delete" style="color: #dc3545;">
-                            <i class="bi bi-trash-fill"></i>
-                        </a>
+                        <i class="bi bi-pencil-fill"></i>
+                    </a>
+                    <a href="javascript:void(0);" class="delete-all" data-id="${id}" title="Delete" style="color: #dc3545;">
+                        <i class="bi bi-trash-fill"></i>
+                    </a>
                 `;
             }
         }
     ],
+    order: [[0, 'desc']],
+    lengthMenu: [5, 10, 15, 25],
+    pageLength: 10,
     columnDefs: [
         { targets: 1, searchable: false, orderable: false },
-        { targets: 8, orderable: false }, 
-        { width: "8%", targets: 2 }, 
-        { width: "12%", targets: 6 }, 
-        { width: "22%", targets: 7 } 
+        { targets: 9, orderable: false }
     ]
-});
-table.on('order.dt search.dt draw.dt', function () {
-    table.column(1, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
-        cell.innerHTML = i + 1;
-    });
 });
 
    let estimateIdToDelete = null;
 
-$(document).on('click', '.delete-btn', function () {
-    estimateIdToDelete = $(this).data('id');
-    $('#deleteModal').modal('show');
+        // Trigger the Bootstrap 5 modal
+        $(document).on('click', '.delete-all', function () {
+            estimateIdToDelete = $(this).data('id');
+            const deleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+            deleteModal.show();
+        });
+
+        // Delete confirmation button
+        $('#confirm-delete-btn').on('click', function () {
+            if (!estimateIdToDelete) return;
+
+            $.ajax({
+                url: "<?= base_url('estimate/delete') ?>",
+                type: "POST",
+                data: { estimate_id: estimateIdToDelete },
+                dataType: "json",
+                success: function (res) {
+                    const deleteModalElement = document.getElementById('confirmDeleteModal');
+                    const deleteModalInstance = bootstrap.Modal.getInstance(deleteModalElement);
+                    deleteModalInstance.hide();
+
+                    const alertBox = $('.alert');
+                    if (res.status === 'success') {
+                        alertBox.removeClass('d-none alert-success alert-warning alert-danger')
+                                .addClass('alert-danger')
+                                .text('Estimate Deleted Successfully')
+                                .fadeIn();
+
+                        setTimeout(() => {
+                            alertBox.fadeOut(() => {
+                                alertBox.addClass('d-none').text('');
+                            });
+                        }, 2000);
+
+                        table.ajax.reload(null, false);
+                    } else {
+                        alertBox.removeClass('d-none alert-success alert-warning alert-danger')
+                                .addClass('alert-warning')
+                                .text(res.message || 'Delete Failed.')
+                                .fadeIn();
+
+                        setTimeout(() => {
+                            alertBox.fadeOut(() => {
+                                alertBox.addClass('d-none').text('');
+                            });
+                        }, 3000);
+                    }
+                },
+                error: function () {
+                    const deleteModalElement = document.getElementById('confirmDeleteModal');
+                    const deleteModalInstance = bootstrap.Modal.getInstance(deleteModalElement);
+                    deleteModalInstance.hide();
+
+                    const alertBox = $('.alert');
+                    alertBox.removeClass('d-none alert-success alert-warning alert-danger')
+                            .addClass('alert-danger')
+                            .text('Error Deleting Estimate.')
+                            .fadeIn();
+
+                    setTimeout(() => {
+                        alertBox.fadeOut(() => {
+                            alertBox.addClass('d-none').text('');
+                        });
+                    }, 3000);
+                }
+            });
+
+            estimateIdToDelete = null;
+        });
 });
-  $('#closeDeleteModalBtn, #cancelDeleteBtn').on('click', function () {
-    $('#deleteModal').modal('hide');
-});
-$('#confirmDeleteBtn').on('click', function () {
-    if (!estimateIdToDelete) return;
 
-    $.ajax({
-        url: "<?= base_url('estimate/delete') ?>",
-        type: "POST",
-        data: { estimate_id: estimateIdToDelete },
-        dataType: "json",
-        success: function (res) {
-            $('#deleteModal').modal('hide');
-            const alertBox = $('.alert');
-
-            if (res.status === 'success') {
-                alertBox.removeClass('d-none alert-success alert-warning alert-danger')
-                        .addClass('alert-danger')
-                        .text('Estimate Deleted Successfully')
-                        .fadeIn();
-
-                setTimeout(() => {
-                    alertBox.fadeOut(() => {
-                        alertBox.addClass('d-none').text('');
-                    });
-                }, 2000);
-
-                table.ajax.reload(null, false);
-            } else {
-                alertBox.removeClass('d-none alert-success alert-warning alert-danger')
-                        .addClass('alert-warning')
-                        .text(res.message || 'Delete Failed.')
-                        .fadeIn();
-
-                setTimeout(() => {
-                    alertBox.fadeOut(() => {
-                        alertBox.addClass('d-none').text('');
-                    });
-                }, 3000);
-            }
-        },
-        error: function () {
-            $('#deleteModal').modal('hide');
-            const alertBox = $('.alert');
-
-            alertBox.removeClass('d-none alert-success alert-warning alert-danger')
-                    .addClass('alert-danger')
-                    .text('Error Deleting Estimate.')
-                    .fadeIn();
-
-            setTimeout(() => {
-                alertBox.fadeOut(() => {
-                    alertBox.addClass('d-none').text('');
-                });
-            }, 3000);
-        }
-        
-    });
-  
-
-});
-});
 </script>

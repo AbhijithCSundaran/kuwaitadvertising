@@ -46,11 +46,11 @@ $routes->post('rolemanagement/delete', 'Rolemanagement::delete');
 
 $routes->get('add_estimate', 'Estimate::add_estimate'); 
 $routes->post('estimate/save', 'Estimate::save'); 
-$routes->get('estimate/estimatelistajax', 'Estimate::estimatelistajax');
+$routes->post('estimate/estimatelistajax', 'Estimate::estimatelistajax');
 $routes->post('estimate/delete', 'Estimate::delete');
 $routes->get('estimatelist', 'Estimate::estimatelist');
 $routes->get('estimate/edit/(:num)', 'Estimate::edit/$1');
-$routes->get('estimate/generateestimate/(:num)', 'Estimate::generateEstimate/$1');
+$routes->get('estimate/generateEstimate/(:num)', 'Estimate::generateEstimate/$1');
 $routes->post('save', 'Estimate::saveEstimate');
 
 
