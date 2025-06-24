@@ -112,10 +112,9 @@
       </div>
     </li>    
     <li class="nav-item">
-	  <a class="nav-link <?= $uri->getSegment(1) == 'rolemanagement/rolelist' ? 'active' : '' ?>" href="<?= base_url('rolemanagement/rolelist') ?>">
+	  <a class="nav-link <?= $uri->getSegment(1) == 'rolemanagement' && $uri->getSegment(2) == 'rolelist' ? 'active' : '' ?>" href="<?= base_url('rolemanagement/rolelist') ?>">
 		<i class="mdi mdi-chart-pie menu-icon"></i>
 		<span class="menu-title">Role Management</span>
-		
 	  </a>
 	</li>
 
@@ -143,7 +142,16 @@
           <li class="nav-item"> <a class="nav-link" href="pages/icons/font-awesome.html">Font Awesome</a></li>                              
         </ul>
       </div>
-    </li>    
+    </li>  
+    <?php
+    $isExpenseActive = $uri->getSegment(1) == 'expense' && $uri->getSegment(2) == '';
+    ?>
+    <li class="nav-item">
+      <a class="nav-link <?= $isExpenseActive ? 'active' : '' ?>" href="<?= base_url('expense') ?>">
+        <i class="mdi mdi-square-outline menu-icon"></i>
+        <span class="menu-title">Expenses</span>
+      </a>
+    </li>  
     <?php
     $segment1 = $uri->getSegment(1);
     $segment2 = $uri->getSegment(2);
@@ -179,16 +187,6 @@
             </ul>
         </div>
     </li>
-   <?php
-    $isExpenseActive = $uri->getSegment(1) == 'expense' && $uri->getSegment(2) == '';
-    ?>
-    <li class="nav-item">
-      <a class="nav-link <?= $isExpenseActive ? 'active' : '' ?>" href="<?= base_url('expense') ?>">
-        <i class="mdi mdi-square-outline menu-icon"></i>
-        <span class="menu-title">Expenses</span>
-      </a>
-    </li>
-
     <li class="nav-item">
       <a href="#" id="logoutLink" class="nav-link">
   <i class="mdi mdi-logout menu-icon"></i>

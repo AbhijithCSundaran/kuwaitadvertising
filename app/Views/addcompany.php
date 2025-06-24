@@ -201,8 +201,8 @@
                 return;
             }
 
-            if (!email || !phone) {
-                showMessage('Email and Phone Number Are Required.', 'danger');
+            if (!email) {
+                showMessage('Please Enter a Valid Email Address To Continue.', 'danger');
                 $saveBtn.prop('disabled', false).css('opacity', 1);
                 return;
             }
@@ -214,12 +214,19 @@
                 return;
             }
 
+            if (!phone) {
+                showMessage('Please Enter a Valid Phone Number.', 'danger');
+                $saveBtn.prop('disabled', false).css('opacity', 1);
+                return;
+            }
+
             let phoneRegex = /^[0-9+\-\s]{7,20}$/;
             if (!phoneRegex.test(phone)) {
                 showMessage('Please Enter a Valid Phone Number.', 'danger');
                 $saveBtn.prop('disabled', false).css('opacity', 1);
                 return;
             }
+
 
             if (!file && !uid) {
                 showMessage('Please Upload a Company Logo (image file).', 'danger');

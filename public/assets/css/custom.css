@@ -26,7 +26,7 @@ select.form-control,
 .form-control {
 	border: 1px solid #686868 !important;
 	    padding: 15px;
-    width: 485px;
+    /* width: 485px; */
 	color: black;
 	appearance: auto; 
 	-webkit-appearance: auto; /* Safari/Chrome */
@@ -329,7 +329,7 @@ td.logo-col {
 ;
     flex-wrap: wrap;
     align-items: stretch;
-    width: 87%;
+    width: 100%;
 }
 .capitalize {
     text-transform: capitalize;

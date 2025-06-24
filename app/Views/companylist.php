@@ -1,5 +1,4 @@
 <?php include "common/header.php"; ?>
-
 <div class="form-control mb-3 right_container"> 
     <div class="alert d-none text-center position-fixed" role="alert"></div>
     <div class="row align-items-center">
