@@ -135,13 +135,47 @@ class Manageuser extends BaseController
     }
 }
 
-    // List users via AJAX
     public function userlistajax(){
-        $model = new Manageuser_Model();
-        $data  = $model->orderBy('user_id', 'DESC')->findAll();
+        $model = new \App\Models\Manageuser_Model();
 
-        return $this->response->setJSON($data);
+    $draw = $_POST['draw'];
+    $fromstart = $_POST['start'];
+    $tolimit = $_POST['length'];
+    $order = isset($_POST['order'][0]['dir']) ? $_POST['order'][0]['dir'] : 'desc';
+    $search = $_POST['search']['value'];
+    $slno = $fromstart + 1;
+
+    $condition = "1=1";
+    if ($search) {
+        $condition .= " AND name LIKE '%" . trim($search) . "%'";
     }
+
+    $totalRec = $model->getAllFilteredRecords($condition, $fromstart, $tolimit);
+
+    $result = [];
+    foreach ($totalRec as $user) {
+        $result[] = [
+            'slno' => $slno++,
+            'user_id' => $user->user_id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'phonenumber' => $user->phonenumber
+        ];
+    }
+
+    $totUserCount = $model->getAllUserCount();
+    $totFilterCounts = $model->getFilterUserCount($condition, $fromstart, $tolimit);
+
+    $response = [
+        "draw" => intval($draw),
+        "iTotalRecords" => $totUserCount->totuser ?? 0,
+        "iTotalDisplayRecords" => $totFilterCounts->filRecords ?? 0,
+        "data" => $result
+    ];
+
+    return $this->response->setJSON($response);
+}
+
 
     // Delete a user
    public function delete()

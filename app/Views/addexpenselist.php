@@ -52,16 +52,30 @@
 <?php include "common/footer.php"; ?>
 
 <script>
+let table="";
 $(document).ready(function () {
-    debugger;
-    const table = $('#expenseTable').DataTable({
+     const alertBox = $('.alert');
+     table = $('#expenseTable').DataTable({
         ajax: {
             url: "<?= base_url('expense/getExpensesAjax') ?>",
-            type: "GET",
-            dataSrc: "" 
+            type: "POST",
+            dataSrc: "data"
         },
+        sort:true,
+        searching:true,
+        paging:true,
+        processing: true,
+        serverSide: true,
+        dom: "<'row mb-3'<'col-sm-6'l><'col-sm-6'f>>" +
+             "<'row'<'col-sm-12'tr>>" +
+             "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
         columns: [
-            { data: null }, 
+            {
+                data: "slno",
+                render: function (data) {
+                    return data;
+                }
+            },
             { data: "date" },
             {
                 data: "particular",
@@ -91,20 +105,18 @@ $(document).ready(function () {
                 }
             }
         ],
-        dom: "<'row mb-3'<'col-sm-6'l><'col-sm-6'f>>" +
-             "<'row'<'col-sm-12'tr>>" +
-             "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
-        lengthMenu: [5, 10, 25, 50],
-        pageLength: 10,
-        order: [[5, 'desc']],
-        columnDefs: [
-            { orderable: false, searchable: false, targets: [0, 5] }
-        ]
+        order: [[6, 'desc']],
+            columnDefs: [
+                { searchable: false, orderable: false, targets: [0, 4, 5] }
+            ]
     });
     table.on('order.dt search.dt draw.dt', function () {
-        table.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
-            cell.innerHTML = i + 1;
-        });
+        table.column(0, { search: 'applied', order: 'applied' })
+            .nodes()
+            .each(function (cell, i) {
+                var pageInfo = table.page.info();
+                cell.innerHTML = pageInfo.start + i + 1;
+            });
     });
    let expenseIdToDelete = null;
 
