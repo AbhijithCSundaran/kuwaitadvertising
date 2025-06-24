@@ -132,7 +132,7 @@ $('#confirmDeleteBtn').on('click', function () {
             if (res.status === 'success') {
                 alertBox.removeClass('d-none alert-warning alert-danger')
                         .addClass('alert-success')
-                        .text('Expense Deleted Successfully!')
+                        .text('Expense Deleted Successfully')
                         .fadeIn();
 
                 setTimeout(() => {
