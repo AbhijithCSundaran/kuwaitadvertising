@@ -87,22 +87,23 @@
                         4. Cancellation of processed order will not be accepted.
                     </div>
                     <div class="col-4 text-end">
-                        <table class="summary-table">
+                       <table class="summary-table">
                             <tr>
                                 <td class="label">SUBTOTAL</td>
-                                <td><?= number_format($estimate['total_amount'] ?? 0, 2) ?> KWD</td>
+                                <td><?= number_format($grandTotal, 2) ?> KWD</td>
                             </tr>
                             <tr>
                                 <td class="label">DISCOUNTS</td>
-                                <td><?= number_format($estimate['discount'] ?? 0, 2) ?> KWD</td>
+                                <td><?= number_format($estimate['discount'] ?? 0, 2) ?>%</td>
                             </tr>
                             <tr>
                                 <td class="label total">TOTAL</td>
                                 <td class="total">
-                                    <?= number_format(($estimate['total_amount'] ?? 0) - ($estimate['discount'] ?? 0), 2) ?> KWD
+                                    <?= number_format($estimate['total_amount'] ?? 0, 2) ?> KWD
                                 </td>
                             </tr>
                         </table>
+
                         </div>
                     </div>
 
@@ -124,7 +125,7 @@ function printEstimate() {
     document.body.innerHTML = printContents;
     window.print();
     document.body.innerHTML = originalContents;
-    location.reload(); // Optional: reloads page after print to restore scripts/events
+    location.reload(); 
 }
 
 </script>

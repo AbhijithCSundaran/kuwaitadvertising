@@ -51,7 +51,6 @@ class Estimate extends BaseController
 
         $estimateData = [
             'customer_id' => $customerId,
-            'customer_address' => $address,
             'discount' => $discount,
             'total_amount' => $grandTotal,
             'date' => date('Y-m-d')

@@ -85,12 +85,48 @@ class Expense extends BaseController
     }
 
    public function getExpensesAjax()
-    {
-        $expenseModel = new \App\Models\Expense_Model();
-        $expenses = $expenseModel->orderBy('id', 'DESC')->findAll();
+{
+    $model = new \App\Models\Expense_Model();
 
-        return $this->response->setJSON($expenses); // Return as plain array
+    $draw = $_POST['draw'];
+    $fromstart = $_POST['start'];
+    $tolimit = $_POST['length'];
+    $order = isset($_POST['order'][0]['dir']) ? $_POST['order'][0]['dir'] : 'desc';
+    $search = $_POST['search']['value'];
+    $slno = $fromstart + 1;
+
+    $condition = "1=1";
+    if ($search) {
+        $condition .= " AND date LIKE '%" . trim($search) . "%'";
     }
+
+    $totalRec = $model->getAllFilteredRecords($condition, $fromstart, $tolimit);
+
+    $result = [];
+    foreach ($totalRec as $expense) {
+        $result[] = [
+            'slno' => $slno++,
+            'id' => $expense->id,
+            'date' => $expense->date,
+            'particular' => $expense->particular,
+            'amount' => $expense->amount,
+            'payment_mode' => $expense->payment_mode 
+        ];
+    }
+
+    $totExpenseCount = $model->getAllExpenseCount();
+    $totFilterCounts = $model->getFilterExpenseCount($condition, $fromstart, $tolimit);
+
+    $response = [
+        "draw" => intval($draw),
+        "iTotalRecords" => $totExpenseCount->totexpense ?? 0,
+        "iTotalDisplayRecords" => $totFilterCounts->filRecords ?? 0,
+        "data" => $result
+    ];
+
+    return $this->response->setJSON($response);
+}
+
 
    public function delete()
 {

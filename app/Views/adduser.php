@@ -105,7 +105,7 @@
 $(document).ready(function () {
   let initialFormData = $('#user-login-form').serialize();
 
-  $('#user-login-form input').on('input change', function () {
+  $('#user-login-form input , #user-login-form select').on('input change', function () {
     $('#saveUserBtn').prop('disabled', $('#user-login-form').serialize() === initialFormData);
   });
 $(document).on('click', '.toggle-password', function () {
@@ -121,7 +121,6 @@ $(document).on('click', '.toggle-password', function () {
   }
 });
 
-  // Restrict name and phone fields
   $('#name').on('input', function () {
     this.value = this.value.replace(/[^A-Za-z\s]/g, '');
   });

@@ -53,17 +53,30 @@
 <?php include "common/footer.php"; ?>
 
 <script>
+let table="";
 $(document).ready(function () {
-    const table = $('#userTable').DataTable({
+    const alertBox = $('.alert');
+    table = $('#userTable').DataTable({
         ajax: {
             url: "<?= base_url('manageuser/userlistajax') ?>", 
-            type: "GET",
-            dataSrc: ""
+            type: "POST",
+            dataSrc: "data"
         },
+        sort:true,
+        searching:true,
+        paging:true,
+        processing: true,
+        serverSide: true,
+        dom: "<'row mb-3'<'col-sm-6'l><'col-sm-6'f>>" +
+             "<'row'<'col-sm-12'tr>>" +
+             "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
         columns: [
-
-            
-            { data: null }, 
+             {
+                data: "slno",
+                render: function (data) {
+                    return data;
+                }
+            },
             {
                 data: "name",
                 render: function (data) {
@@ -89,27 +102,25 @@ $(document).ready(function () {
             },
             { data: "user_id", visible: false }
         ],
-        order: [[5, 'desc']], 
-        dom: "<'row mb-3'<'col-sm-6'l><'col-sm-6'f>>" +
-             "<'row'<'col-sm-12'tr>>" +
-             "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
-        lengthMenu: [5, 10, 25, 50],
-        pageLength: 10,
-        columnDefs: [
-            { orderable: false, searchable: false, targets: [0, 4] } 
-        ]
+       order: [[6, 'desc']],
+            columnDefs: [
+                { searchable: false, orderable: false, targets: [0, 4, 5] }
+            ]
     });
-    table.on('order.dt search.dt draw.dt', function () {
-        table.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
-            cell.innerHTML = i + 1;
-        });
+     table.on('order.dt search.dt draw.dt', function () {
+        table.column(0, { search: 'applied', order: 'applied' })
+            .nodes()
+            .each(function (cell, i) {
+                var pageInfo = table.page.info();
+                cell.innerHTML = pageInfo.start + i + 1;
+            });
     });
 
    let userIdToDelete = null;
 
 $(document).on('click', '.delete-btn', function () {
     userIdToDelete = $(this).data('id');
-    $('#deleteModal .modal-body').text('Are you sure you want to delete this user?'); // optional dynamic message
+    $('#deleteModal .modal-body').text('Are you sure you want to delete this user?');
     $('#deleteModal').modal('show');
 });
  $('#cancelDeleteBtn, #closeDeleteModalBtn').on('click', function () {
@@ -130,7 +141,7 @@ $('#confirmDeleteBtn').on('click', function () {
             if (res.status === 'success') {
                 alertBox.removeClass('d-none alert-warning alert-danger')
                         .addClass('alert-success')
-                        .text('User Deleted Successfully!')
+                        .text('User Deleted Successfully')
                         .fadeIn();
 
                 setTimeout(() => {
