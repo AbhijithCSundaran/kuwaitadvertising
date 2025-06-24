@@ -142,16 +142,16 @@
                 dataType: "json",
                 success: function (res) {
                     if (res.status === 'success') {
-                        alertBox.removeClass().addClass('alert alert-danger text-center position-fixed').text('Role deleted successfully.').fadeIn();
+                        alertBox.removeClass().addClass('alert alert-danger text-center position-fixed').text('Role Deleted Successfully.').fadeIn();
                         setTimeout(() => alertBox.fadeOut(), 2000);
                         table.ajax.reload(null, false);
                     } else {
-                        alertBox.removeClass().addClass('alert alert-warning text-center position-fixed').text(res.message || 'Delete failed.').fadeIn();
+                        alertBox.removeClass().addClass('alert alert-warning text-center position-fixed').text(res.message || 'Delete Failed.').fadeIn();
                         setTimeout(() => alertBox.fadeOut(), 3000);
                     }
                 },
                 error: function () {
-                    alertBox.removeClass().addClass('alert alert-danger text-center position-fixed').text('Error occurred while deleting role.').fadeIn();
+                    alertBox.removeClass().addClass('alert alert-danger text-center position-fixed').text('Error Occurred While Deleting Role.').fadeIn();
                     setTimeout(() => alertBox.fadeOut(), 3000);
                 }
             });

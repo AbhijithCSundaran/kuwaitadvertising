@@ -13,7 +13,7 @@ $routes->get('logout', 'Auth::logout');
 $routes->post('login/authenticate', 'Login::authenticate');
 $routes->get('login','Login::index');
 
-$routes->get('manageuser/userlistajax', 'Manageuser::userlistajax');
+$routes->post('manageuser/userlistajax', 'Manageuser::userlistajax');
 $routes->get('manageuser', 'Manageuser::index');
 $routes->get('adduser', 'Manageuser::index');
 $routes->get('adduser/(:num)', 'Manageuser::index/$1'); 
@@ -69,8 +69,8 @@ $routes->post('expense/store', 'Expense::store');
 $routes->post('expense/list', 'Expense::expenselistajax');
 $routes->post('expense/delete/(:num)', 'Expense::delete/$1');
 $routes->post('expense/delete', 'Expense::delete'); 
-$routes->get('expense/getExpensesAjax', 'Expense::getExpensesAjax');
-$routes->get('generateestimate/(:num)', 'Estimate::generateEstimate/$1');
+$routes->post('expense/getExpensesAjax', 'Expense::getExpensesAjax');
+
 
 //for report
 $routes->get('expense/report', 'Expense::report');
@@ -78,3 +78,7 @@ $routes->post('expense/getExpenseReportAjax', 'Expense::getExpenseReportAjax');
 
 $routes->get('sales/report', 'Sales::report');
 
+
+
+$routes->get('companyledger', 'CompanyLedger::index');
+$routes->post('companyledger/save', 'CompanyLedger::save');

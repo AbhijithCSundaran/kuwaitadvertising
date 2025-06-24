@@ -97,7 +97,6 @@
 <?php include "common/footer.php"; ?>
 
 <script>
-    // Capitalize first letter helper
     function capitalizeFirst(str) {
         return (typeof str === 'string' && str.length > 0)
             ? str.charAt(0).toUpperCase() + str.slice(1)
@@ -105,6 +104,8 @@
     }
 
     $(document).ready(function () {
+        let filterApplied = false; // Track whether filter was applied once
+
         function loadExpenses() {
             $.ajax({
                 url: "<?= base_url('expense/getExpenseReportAjax') ?>",
@@ -143,16 +144,24 @@
             });
         }
 
-        // Reset From/To dates when Month or Year changes
+        // Month or Year change - reset date fields only AFTER filter was applied once
         $('#filterMonth, #filterYear').on('change', function () {
-            $('#fromDate').val('');
-            $('#toDate').val('');
+            if (filterApplied) {
+                $('#fromDate').val('');
+                $('#toDate').val('');
+            }
         });
 
-        // Reset Month/Year when From/To dates are entered
+        // When From or To date changes, auto-set month and year dropdowns
         $('#fromDate, #toDate').on('change', function () {
-            $('#filterMonth').val('');
-            $('#filterYear').val('');
+            const dateValue = $(this).val();
+            if (dateValue) {
+                const dateObj = new Date(dateValue);
+                const month = dateObj.getMonth() + 1;
+                const year = dateObj.getFullYear();
+                $('#filterMonth').val(month);
+                $('#filterYear').val(year);
+            }
         });
 
         // Apply filter button click
@@ -185,6 +194,9 @@
                 return;
             }
 
+            // Set the flag true once the user applies the filter
+            filterApplied = true;
+
             loadExpenses();
         });
 
@@ -194,6 +206,7 @@
             $('#toDate').val('');
             $('#filterMonth').val('');
             $('#filterYear').val('');
+            filterApplied = false;
             loadExpenses();
         });
 
@@ -201,3 +214,5 @@
         loadExpenses();
     });
 </script>
+
+

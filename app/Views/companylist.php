@@ -182,18 +182,18 @@
                         success: function (res) {
                             if (res.status === 'success') {
                                 alertBox.removeClass().addClass('alert alert-danger text-center position-fixed')
-                                    .text('Company deleted successfully.').fadeIn();
+                                    .text('Company Deleted Successfully.').fadeIn();
                                 setTimeout(() => alertBox.fadeOut(), 2000);
                                 table.ajax.reload(null, false);
                             } else {
                                 alertBox.removeClass().addClass('alert alert-warning text-center position-fixed')
-                                    .text(res.message || 'Delete failed.').fadeIn();
+                                    .text(res.message || 'Delete Failed.').fadeIn();
                                 setTimeout(() => alertBox.fadeOut(), 3000);
                             }
                         },
                         error: function () {
                             alertBox.removeClass().addClass('alert alert-danger text-center position-fixed')
-                                .text('Error occurred while deleting company.').fadeIn();
+                                .text('Error Occurred While Deleting Company.').fadeIn();
                             setTimeout(() => alertBox.fadeOut(), 3000);
                         },
                         complete: function () {

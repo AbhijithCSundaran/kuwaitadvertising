@@ -144,35 +144,51 @@
         </ul>
       </div>
     </li>    
+    <?php
+    $segment1 = $uri->getSegment(1);
+    $segment2 = $uri->getSegment(2);
+    $isReportActive = in_array("$segment1/$segment2", [
+        'expense/report',
+    'ledger/company',
+    'report/sales',
+    'report/total-expense'
+]) || $segment1 === 'companyledger';
+    ?>
+
     <li class="nav-item">
-      <a class="nav-link" data-bs-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
-        <i class="mdi mdi-clipboard menu-icon"></i>
-        <span class="menu-title">Reports</span>
-        <!-- <i class="menu-arrow"></i> -->
-      </a>
-      <div class="collapse" id="auth">
-        <ul class="nav flex-column sub-menu">
-            <li class="nav-item">
-                <a class="nav-link" <?= $uri->getSegment(1) == 'expense/report' ? 'active' : '' ?>href="<?= base_url('expense/report') ?>">Expense Report</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="<?= base_url('ledger/company') ?>">Company Ledger</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="<?= base_url('report/sales') ?>">Total Sales Report</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="<?= base_url('report/total-expense') ?>">Total Expense Report</a>
-            </li>
-        </ul>
-    </div>
+        <a class="nav-link <?= $isReportActive ? 'active' : '' ?>" data-bs-toggle="collapse" href="#auth" aria-expanded="<?= $isReportActive ? 'true' : 'false' ?>" aria-controls="auth">
+            <i class="mdi mdi-clipboard menu-icon"></i>
+            <span class="menu-title">Reports</span>
+        </a>
+        <div class="collapse <?= $isReportActive ? 'show' : '' ?>" id="auth">
+            <ul class="nav flex-column sub-menu">
+                <li class="nav-item">
+                    <a class="nav-link <?= "$segment1/$segment2" == 'expense/report' ? 'active' : '' ?>" href="<?= base_url('expense/report') ?>">Expense Report</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <?= ($segment1 === 'companyledger') ? 'active' : '' ?>" href="<?= base_url('companyledger') ?>">
+                        Company Ledger
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <?= "$segment1/$segment2" == 'report/sales' ? 'active' : '' ?>" href="<?= base_url('report/sales') ?>">Total Sales Report</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <?= "$segment1/$segment2" == 'report/total-expense' ? 'active' : '' ?>" href="<?= base_url('report/total-expense') ?>">Total Expense Report</a>
+                </li>
+            </ul>
+        </div>
     </li>
-   <li class="nav-item">
-      <a class="nav-link <?= $uri->getSegment(1) == 'expense' ? 'active' : '' ?>" href="<?= base_url('expense') ?>">
+   <?php
+    $isExpenseActive = $uri->getSegment(1) == 'expense' && $uri->getSegment(2) == '';
+    ?>
+    <li class="nav-item">
+      <a class="nav-link <?= $isExpenseActive ? 'active' : '' ?>" href="<?= base_url('expense') ?>">
         <i class="mdi mdi-square-outline menu-icon"></i>
         <span class="menu-title">Expenses</span>
       </a>
-    </li>   
+    </li>
+
     <li class="nav-item">
       <a href="#" id="logoutLink" class="nav-link">
   <i class="mdi mdi-logout menu-icon"></i>

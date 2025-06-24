@@ -31,11 +31,10 @@
                         <div class="col-6 mb-3 px-2">
                             <label for="phone" class="form-label">Phone <span class="text-danger">*</span></label>
                             <input type="text" name="phone" id="phone" class="form-control" maxlength="15"
-                                pattern="^[0-9]{7,15}$"
-                                title="Please enter a valid phone number (7 to 15 digits)"
+                                pattern="^[0-9]{7,150}$"
+                                title="Please enter a valid phone number (7 to 150 digits)"
                                 value="<?= isset($company['phone']) ? esc($company['phone']) : '' ?>" required>
                         </div>
-
                         <div class="col-6 mb-3 px-2">
                             <label for="tax_number" class="form-label">Tax Number</label>
                             <input type="text" name="tax_number" id="tax_number" class="form-control" maxlength="15"
