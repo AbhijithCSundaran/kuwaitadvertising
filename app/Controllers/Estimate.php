@@ -79,34 +79,52 @@ class Estimate extends BaseController
 
     public function estimatelistajax()
     {
-        $db = \Config\Database::connect();
+        $request = service('request');
+        $draw = $request->getPost('draw');
+        $start = $request->getPost('start');
+        $length = $request->getPost('length');
+        $searchValue = $request->getPost('search')['value'];
+
         $estimateModel = new EstimateModel();
         $itemModel = new EstimateItemModel();
 
-        $builder = $db->table('estimates');
-        $builder->select('estimates.estimate_id, estimates.date, estimates.total_amount, estimates.discount, customers.name AS customer_name, customers.address AS customer_address');
-        $builder->join('customers', 'customers.customer_id = estimates.customer_id', 'left');
-
-        $query = $builder->get()->getResultArray();
+        $totalRecords = $estimateModel->getEstimateCount();
+        $filteredRecords = $estimateModel->getFilteredCount($searchValue);
+        $records = $estimateModel->getFilteredEstimates($searchValue, $start, $length);
 
         $data = [];
-        foreach ($query as $row) {
-            $items = $itemModel->where('estimate_id',  $row['estimate_id'])->findAll();
-            $descriptions = array_column($items, 'description');
+        $slno = $start + 1;
+
+        foreach ($records as $row) {
+            $items = $itemModel->where('estimate_id', $row['estimate_id'])->findAll();
+            $descList = array_column($items, 'description');
+
+            $subtotal = 0;
+            foreach ($items as $item) {
+                $subtotal += (float)$item['total'];
+            }
 
             $data[] = [
+                'slno'              => $slno++,
                 'estimate_id'       => $row['estimate_id'],
                 'customer_name'     => $row['customer_name'],
                 'customer_address'  => $row['customer_address'],
-                'date'              => $row['date'],
+                'subtotal'          => number_format($subtotal, 2),
                 'discount'          => $row['discount'],
-                'total_amount'      => $row['total_amount'],
-                'description'       => implode(', ', $descriptions),
+                'total_amount'      => number_format($row['total_amount'], 2),
+                'date'              => $row['date'],
+                'description'       => implode(', ', $descList),
             ];
         }
 
-        return $this->response->setJSON(['data' => $data]);
+        return $this->response->setJSON([
+            'draw' => intval($draw),
+            'recordsTotal' => $totalRecords,
+            'recordsFiltered' => $filteredRecords,
+            'data' => $data,
+        ]);
     }
+
 
     public function delete()
     {

@@ -21,5 +21,38 @@ class EstimateModel extends Model
 
         return $estimateId;
     }
+    public function getEstimateCount()
+    {
+        return $this->db->table('estimates')->countAllResults();
+    }
+
+    public function getFilteredCount($search = '')
+    {
+        $builder = $this->db->table('estimates')
+            ->join('customers', 'customers.customer_id = estimates.customer_id', 'left');
+
+        if ($search) {
+            $builder->like('customers.name', $search)
+                    ->orLike('customers.address', $search);
+        }
+
+        return $builder->countAllResults();
+    }
+
+    public function getFilteredEstimates($search = '', $start = 0, $length = 10)
+    {
+        $builder = $this->db->table('estimates')
+            ->select('estimates.*, customers.name AS customer_name, customers.address AS customer_address')
+            ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
+            ->orderBy('estimate_id', 'DESC')
+            ->limit($length, $start);
+
+        if ($search) {
+            $builder->like('customers.name', $search)
+                    ->orLike('customers.address', $search);
+        }
+
+        return $builder->get()->getResultArray();
+    }
 }
 

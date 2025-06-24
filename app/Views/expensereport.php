@@ -124,14 +124,14 @@
                         data.forEach((item, index) => {
                             total += parseFloat(item.amount);
                             rows += `
-                            <tr>
-                                <td>${index + 1}</td>
-                                <td>${item.date}</td>
-                                <td>${capitalizeFirst(item.particular)}</td>
-                                <td>₹${parseFloat(item.amount).toFixed(2)}</td>
-                                <td>${capitalizeFirst(item.payment_mode)}</td>
-                            </tr>
-                        `;
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${item.date}</td>
+                                    <td>${capitalizeFirst(item.particular)}</td>
+                                    <td>₹${parseFloat(item.amount).toFixed(2)}</td>
+                                    <td>${capitalizeFirst(item.payment_mode)}</td>
+                                </tr>
+                            `;
                         });
                     } else {
                         rows = `<tr><td colspan="5" class="text-center">No records found.</td></tr>`;
@@ -143,35 +143,52 @@
             });
         }
 
+        // Reset From/To dates when Month or Year changes
+        $('#filterMonth, #filterYear').on('change', function () {
+            $('#fromDate').val('');
+            $('#toDate').val('');
+        });
+
+        // Reset Month/Year when From/To dates are entered
+        $('#fromDate, #toDate').on('change', function () {
+            $('#filterMonth').val('');
+            $('#filterYear').val('');
+        });
+
+        // Apply filter button click
         $('#filterBtn').click(function () {
             const month = $('#filterMonth').val();
             const year = $('#filterYear').val();
             const from = $('#fromDate').val();
             const to = $('#toDate').val();
 
+            const alertBox = $('.alert');
+            alertBox.removeClass('alert-danger alert-success').addClass('d-none');
+
             if (month && !year) {
-                $('.alert')
-                    .removeClass('d-none alert-success')
-                    .addClass('alert-danger')
+                alertBox
+                    .removeClass('d-none')
+                    .addClass('alert alert-danger')
                     .text('Select Both Month And Year.')
                     .fadeIn();
-                setTimeout(() => { $('.alert').fadeOut(); }, 2000);
+                setTimeout(() => alertBox.fadeOut(), 2000);
                 return;
             }
 
             if ((from && !to) || (!from && to)) {
-                $('.alert')
-                    .removeClass('d-none alert-success')
-                    .addClass('alert-danger')
+                alertBox
+                    .removeClass('d-none')
+                    .addClass('alert alert-danger')
                     .text('Please Select Both From and To dates For Report.')
                     .fadeIn();
-                setTimeout(() => { $('.alert').fadeOut(); }, 2000);
+                setTimeout(() => alertBox.fadeOut(), 2000);
                 return;
             }
 
             loadExpenses();
         });
 
+        // Reset all filters
         $('#resetBtn').click(function () {
             $('#fromDate').val('');
             $('#toDate').val('');
@@ -180,6 +197,7 @@
             loadExpenses();
         });
 
-        loadExpenses(); // Initial load
+        // Initial data load
+        loadExpenses();
     });
 </script>
