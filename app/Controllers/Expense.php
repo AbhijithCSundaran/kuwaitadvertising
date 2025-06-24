@@ -182,6 +182,6 @@ class Expense extends BaseController
         $data = $builder->get()->getResult();
 
         return $this->response->setJSON($data);
-    }
+    }   
 
-}
+    }
