@@ -22,6 +22,10 @@ $routes->post('manageuser/save', 'Manageuser::save');
 $routes->get('manageuser/getUser/(:num)', 'Manageuser::getUser/$1');
 $routes->post('manageuser/delete', 'Manageuser::delete');
 $routes->post('manageuser/userlist', 'Manageuser::userlist');
+// $routes->get('adduserlist', 'Manageuser::add'); 
+
+
+
 
 $routes->get('managecompany', 'Managecompany::index'); 
 $routes->post('managecompany/save', 'Managecompany::save'); 
@@ -43,6 +47,7 @@ $routes->post('rolemanagement/rolelistajax', 'Rolemanagement::rolelistajax');
 $routes->get('rolemanagement/edit/(:num)', 'Rolemanagement::edit/$1');
 $routes->post('rolemanagement/update/(:num)', 'Rolemanagement::update/$1');
 $routes->post('rolemanagement/delete', 'Rolemanagement::delete');
+
 
 $routes->get('add_estimate', 'Estimate::add_estimate'); 
 $routes->post('estimate/save', 'Estimate::save'); 
@@ -75,6 +80,8 @@ $routes->post('expense/getExpensesAjax', 'Expense::getExpensesAjax');
 // dashboard
 $routes->post('dashboard/getTodayExpenseTotal', 'Dashboard::getTodayExpenseTotal');
 $routes->post('dashboard/getMonthlyExpenseTotal', 'Dashboard::getMonthlyExpenseTotal');
+$routes->get('estimate/recentEstimates', 'Estimate::recentEstimates');
+
 
 
 

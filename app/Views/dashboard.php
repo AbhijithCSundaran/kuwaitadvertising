@@ -2,7 +2,6 @@
       <!-- partial -->
       <div class="main-panel right_container">
         <div class="content-wrapper">
-
           <div class="row">
             <div class="col-md-12 grid-margin">
               <div class="d-flex justify-content-between flex-wrap">
@@ -50,23 +49,24 @@
                   <div class="tab-content py-0 px-0 border-left-0 border-bottom-0 border-right-0">
                     <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
                       <div class="d-flex flex-wrap justify-content-xl-between">
-                        <div class="d-none d-xl-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
-                          <div class="icon-box-secondary me-3">
-                            <i class="mdi mdi-calendar-heart"></i>
-                          </div>
-                          <div class="d-flex flex-column justify-content-around">
-                            <small class="mb-1 text-muted">Total Customers</small>
-                            <div class="dropdown">
-                              <a class="btn btn-secondary  p-0 bg-transparent border-0 text-dark shadow-none font-weight-medium" href="#" role="button" id="dropdownMenuLinkA" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <h5 class="mb-0 d-inline-block">150</h5>
-                              </a>
-                              <div class="dropdown-menu" aria-l="dropdownMenuLinkA"abelledby>
-                                <!-- <a class="dropdown-item" href="#">23 June 2025</a>
-                                <a class="dropdown-item" href="#">23 June 2025</a>
-                                <a class="dropdown-item" href="#">23 June 2025</a> -->
+                        <?php
+                        use App\Models\Manageuser_Model;
+                        $userModel = new Manageuser_Model();
+                        $userCount = $userModel->getAllUserCount()->totuser ?? 0;
+                        ?>
+
+                        <div class="d-flex flex-wrap justify-content-xl-between">
+                          <a href="<?= base_url('adduserlist') ?>" class="text-decoration-none text-dark">
+                            <div class="d-none d-xl-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item" style="cursor: pointer;">
+                              <div class="icon-box-secondary me-3">
+                                <i class="mdi mdi-account-group"></i>
+                              </div>
+                              <div class="d-flex flex-column justify-content-around p-2 rounded">
+                                <small class="mb-1 text-muted">Total Customers</small>
+                                <h5 class="mb-0"><?= $userCount ?></h5>
                               </div>
                             </div>
-                          </div>
+                          </a>
                         </div>
                         <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
                           <div class="icon-box-secondary me-3">
@@ -228,7 +228,7 @@
               </div>
             </div>
           </div>
-          <div class="row">
+          <!-- <div class="row">
             <div class="col-md-6 col-xl-3 grid-margin stretch-card">
               <div class="card">
                 <div id="cashSalesCarousel" class="carousel slide card-carousel" data-ride="carousel">
@@ -565,8 +565,8 @@
                 </div>    
               </div>
             </div>
-          </div>
-          <div class="row">
+          </div> -->
+          <!-- <div class="row">
             <div class="col-md-7 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
@@ -589,89 +589,25 @@
                 <canvas id="total-sales-chart"></canvas>
               </div>
             </div>
-          </div>
+          </div> -->
           <div class="row">
             <div class="col-md-12 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
-                  <p class="card-title">Recent Purchases</p>
+                  <p class="card-title">Recent Estimates</p>
                   <div class="table-responsive">
-                    <table id="recent-purchases-listing" class="table">
+                     <table class="table">
                       <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Status report</th>
+                            <th>Customer</th>
+                            <th>Status</th>
                             <th>Office</th>
                             <th>Price</th>
                             <th>Date</th>
-                            <th>Gross amount</th>
+                            <th>Gross Amount</th>
                         </tr>
                       </thead>
-                      <tbody>
-                        <tr>
-                            <td>Jeremy Ortega</td>
-                            <td>Levelled up</td>
-                            <td>Catalinaborough</td>
-                            <td>$790</td>
-                            <td>06 Jan 2018</td>
-                            <td>$2274253</td>
-                        </tr>
-                        <tr>
-                            <td>Alvin Fisher</td>
-                            <td>Ui design completed</td>
-                            <td>East Mayra</td>
-                            <td>$23230</td>
-                            <td>18 Jul 2018</td>
-                            <td>$83127</td>
-                        </tr>
-                        <tr>
-                            <td>Emily Cunningham</td>
-                            <td>support</td>
-                            <td>Makennaton</td>
-                            <td>$939</td>
-                            <td>16 Jul 2018</td>
-                            <td>$29177</td>
-                        </tr>
-                        <tr>
-                            <td>Minnie Farmer</td>
-                            <td>support</td>
-                            <td>Agustinaborough</td>
-                            <td>$30</td>
-                            <td>30 Apr 2018</td>
-                            <td>$44617</td>
-                        </tr>
-                        <tr>
-                            <td>Betty Hunt</td>
-                            <td>Ui design not completed</td>
-                            <td>Lake Sandrafort</td>
-                            <td>$571</td>
-                            <td>25 Jun 2018</td>
-                            <td>$78952</td>
-                        </tr>
-                        <tr>
-                            <td>Myrtie Lambert</td>
-                            <td>Ui design completed</td>
-                            <td>Cassinbury</td>
-                            <td>$36</td>
-                            <td>05 Nov 2018</td>
-                            <td>$36422</td>
-                        </tr>
-                        <tr>
-                            <td>Jacob Kennedy</td>
-                            <td>New project</td>
-                            <td>Cletaborough</td>
-                            <td>$314</td>
-                            <td>12 Jul 2018</td>
-                            <td>$34167</td>
-                        </tr>
-                        <tr>
-                            <td>Ernest Wade</td>
-                            <td>Levelled up</td>
-                            <td>West Fidelmouth</td>
-                            <td>$484</td>
-                            <td>08 Sep 2018</td>
-                            <td>$50862</td>
-                        </tr>
+                      <tbody id="recentEstimatesBody">
                       </tbody>
                     </table>
                   </div>
@@ -679,8 +615,8 @@
               </div>
             </div>
           </div>
-          <div class="row">
-            <div class="col-md-4 grid-margin grid-margin-md-0 stretch-card">
+          <!-- <div class="row"> -->
+            <!-- <div class="col-md-4 grid-margin grid-margin-md-0 stretch-card">
               <div class="card border-0 bg-primary text-white">
                 <div id="downloads-carousel" class="carousel slide card-carousel" data-ride="carousel">
                   <div class="carousel-inner">
@@ -709,8 +645,8 @@
                   </a>
                 </div>  
               </div>
-            </div>
-            <div class="col-md-4 grid-margin grid-margin-md-0 stretch-card">
+            </div> -->
+            <!-- <div class="col-md-4 grid-margin grid-margin-md-0 stretch-card">
               <div class="card border-0 bg-warning text-white">
                 <div id="feedbacks-carousel" class="carousel slide card-carousel" data-ride="carousel">
                   <div class="carousel-inner">
@@ -739,8 +675,8 @@
                   </a>
                 </div>  
               </div>
-            </div>
-            <div class="col-md-4 grid-margin grid-margin-md-0 stretch-card">
+            </div> -->
+            <!-- <div class="col-md-4 grid-margin grid-margin-md-0 stretch-card">
               <div class="card border-0 bg-success text-white">
                 <div id="customers-carousel" class="carousel slide card-carousel" data-ride="carousel">
                   <div class="carousel-inner">
@@ -769,57 +705,85 @@
                   </a>
                 </div>  
               </div>
-            </div>
-          </div>
-          
+            </div> -->
+          <!-- </div> -->
         </div>
-        <!-- content-wrapper ends -->
-        <!-- partial:partials/_footer.html -->
      <?php include "common/footer.php";?> 
 <script>
   function fetchTodayExpense() {
-      $.ajax({
-          url: "<?= base_url('dashboard/getTodayExpenseTotal') ?>",
-          type: "POST",
-          dataType: "json",
-          success: function (res) {
-              $('#dailyExpense').text(res.total);
-          },
-          error: function () {
-              $('#dailyExpense').text('0');
-          }
-      });
+    $.ajax({
+      url: "<?= base_url('dashboard/getTodayExpenseTotal') ?>",
+      type: "POST",
+      dataType: "json",
+      success: function (res) {
+        $('#dailyExpense').text(res.total);
+      },
+      error: function () {
+        $('#dailyExpense').text('0');
+      }
+    });
   }
 
   function fetchMonthlyExpense() {
-      $.ajax({
-          url: "<?= base_url('dashboard/getMonthlyExpenseTotal') ?>",
-          type: "POST",
-          dataType: "json",
-          success: function (res) {
-              $('#monthlyExpense').text(res.total);
-          },
-          error: function () {
-              $('#monthlyExpense').text('0');
-          }
-      });
+    $.ajax({
+      url: "<?= base_url('dashboard/getMonthlyExpenseTotal') ?>",
+      type: "POST",
+      dataType: "json",
+      success: function (res) {
+        $('#monthlyExpense').text(res.total);
+      },
+      error: function () {
+        $('#monthlyExpense').text('0');
+      }
+    });
+  }
+
+  function loadRecentEstimates() {
+    $.ajax({
+      url: "<?= base_url('estimate/recentEstimates') ?>",
+      method: "GET",
+      dataType: "json",
+      success: function (data) {
+        let rows = '';
+        if (data.length > 0) {
+          data.forEach(est => {
+            rows += `
+              <tr>
+                <td>${est.customer_name ?? '-'}</td>
+                <td><span class="badge bg-info text-dark">Estimate</span></td>
+                <td>--</td>
+                <td>${parseFloat(est.sub_total || 0).toFixed(2)} KWD</td> <!-- Price -->
+                <td>${new Date(est.date).toLocaleDateString('en-GB')}</td>
+                <td>${parseFloat(est.total_amount || 0).toFixed(2)} KWD</td> <!-- Gross Amount -->
+              </tr>
+            `;
+          });
+        } else {
+          rows = '<tr><td colspan="6" class="text-center">No recent estimates found.</td></tr>';
+        }
+        $('#recentEstimatesBody').html(rows);
+      },
+      error: function () {
+        $('#recentEstimatesBody').html('<tr><td colspan="6" class="text-center text-danger">Error loading estimates.</td></tr>');
+      }
+    });
   }
 
   $(document).ready(function () {
+    fetchTodayExpense();
+    fetchMonthlyExpense();
+    loadRecentEstimates();
+
+    // Auto-refresh all every 10 seconds
+    setInterval(function () {
       fetchTodayExpense();
       fetchMonthlyExpense();
-
-      // Auto-refresh both every 10 seconds
-      setInterval(function () {
-          fetchTodayExpense();
-          fetchMonthlyExpense();
-      }, 10000);
+      loadRecentEstimates();
+    }, 10000);
   });
-//   success: function(response) {
-//     console.log(response);
-//     $('#monthlyExpense').text(response.total || 0);
-// }
 </script>
+
+
 
 
         
