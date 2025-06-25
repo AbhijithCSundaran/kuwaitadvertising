@@ -242,16 +242,32 @@ public function save()
     public function recentEstimates()
     {
         $estimateModel = new \App\Models\EstimateModel();
- 
+        $itemModel = new \App\Models\EstimateItemModel();
+
         $estimates = $estimateModel
             ->select('estimates.*, customers.name AS customer_name')
             ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
             ->orderBy('estimates.estimate_id', 'DESC')
             ->limit(10)
             ->findAll();
- 
+
+        foreach ($estimates as &$est) {
+            $items = $itemModel->where('estimate_id', $est['estimate_id'])->findAll();
+            $subtotal = 0;
+            $descriptions = [];
+
+            foreach ($items as $item) {
+                $subtotal += (float)$item['total'];
+                $descriptions[] = $item['description'];
+            }
+
+            $est['sub_total'] = $subtotal;
+            $est['description'] = implode(', ', $descriptions);
+        }
+
         return $this->response->setJSON($estimates);
     }
- 
+
+
  
 }
