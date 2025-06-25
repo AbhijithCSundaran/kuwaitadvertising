@@ -5,7 +5,7 @@
   <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
       <div class="col-md-6">
-        <h3 class="mb-0"><?= isset($isEdit) && $isEdit ? 'Edit User' : 'Create New User' ?></h3>
+        <h3 class="mb-0"><?= isset($isEdit) && $isEdit ? 'Edit User' : 'Add New User' ?></h3>
       </div>
     </div>
     <div class="col-md-12"><hr/></div>
@@ -14,46 +14,53 @@
       <form id="user-login-form">
         <div class="form-group">
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-6 mb-2">
+              <label for="company_id">Company <span class="text-danger">*</span></label>
+              <select name="company_id" id="company_id" class="form-control" required>
+                  <option value="">Select Company</option>
+                  <?php if (isset($companies) && !empty($companies)): ?>
+                      <?php foreach ($companies as $company): ?>
+                          <option value="<?= $company['company_id'] ?>"
+                              <?= isset($userData['company_id']) && $userData['company_id'] == $company['company_id'] ? 'selected' : '' ?>>
+                              <?= ucfirst($company['company_name']) ?>
+                          </option>
+                      <?php endforeach; ?>
+                  <?php else: ?>
+                      <option value="">No companies available</option>
+                  <?php endif; ?>
+              </select>
+            </div>
+            <div class="col-md-6 mb-2">
               <label>Name <span class="text-danger">*</span></label>
               <input type="text" name="name" id="name" class="form-control capitalize" maxlength="20"
                 pattern="[A-Za-z\s]+" title="Only letters and spaces allowed"
                 value="<?= $userData['name'] ?? '' ?>"/>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 mb-2">
               <label>Email <span class="text-danger">*</span></label>
               <input type="email" name="email" id="email" class="form-control"
                 value="<?= $userData['email'] ?? '' ?>" autocomplete="off"/>
             </div>
-          </div>
-        </div>
-
-        <div class="form-group mt-3">
-            <div class="row">
-              <div class="col-md-6">
-                <label>Phone Number</label>
-                <input type="text" name="phonenumber" id="phonenumber" class="form-control"
-                  value="<?= $userData['phonenumber'] ?? '' ?>" minlength="7" maxlength="15" />
-              </div>
-                <div class="col-md-6">
-                 <label for="role_id">Role <span class="text-danger">*</span></label>
-                <select name="role_id" id="role_id" class="form-control" required>
-                  <option value="">Select Role</option>
+            <div class="col-md-6 mb-2">
+              <label>Phone Number</label>
+              <input type="text" name="phonenumber" id="phonenumber" class="form-control" value="<?= $userData['phonenumber'] ?? '' ?>" minlength="7" maxlength="15" />
+            </div>
+            <div class="col-md-6 mb-2">
+              <label for="role_id">Role <span class="text-danger">*</span></label>
+              <select name="role_id" id="role_id" class="form-control" required>
+                <option value="">Select Role</option>
                   <?php if (isset($roles) && !empty($roles)): ?>
                     <?php foreach ($roles as $role): ?>
                       <option value="<?= $role['role_id'] ?>" <?= isset($userData['role_id']) && $userData['role_id'] == $role['role_id'] ? 'selected' : '' ?>>
-                        <?= ucfirst($role['role_name']) ?>
-                      </option>
+                        <?= ucfirst($role['role_name']) ?></option>
                     <?php endforeach; ?>
                   <?php else: ?>
-                    <option value="">No roles available</option>
-                  <?php endif; ?>
-                </select>
-
-                </div>
-            </div>
+                <option value="">No roles available</option>
+                <?php endif; ?>
+              </select>
+            </div> 
             <?php if (!isset($isEdit) || !$isEdit): ?>
-            <div class="col-md-6">
+            <div class="col-md-6 mb-2">
               <label>Password <span class="text-danger">*</span></label>
               <div class="input-group position-relative mb-2">
                 <input type="password" name="password" id="password" class="form-control" minlength="6" maxlength="15" required />

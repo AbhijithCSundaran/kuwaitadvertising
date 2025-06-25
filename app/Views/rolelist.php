@@ -14,7 +14,7 @@
     <table class="table table-bordered" id="roleTable" style="width:100%">
         <thead>
             <tr>
-                <th>SI NO</th>
+                <th>Sl No</th>
                 <th>Role Name</th>
                 <th>Permissions</th>
                 <th style="width: 110px;">Created Date</th>

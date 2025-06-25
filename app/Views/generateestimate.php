@@ -47,7 +47,7 @@
                 <table class="generate-table ">
                     <thead class="thead-dark">
                         <tr>
-                            <th>SI No</th>
+                            <th>Sl No</th>
                             <th>Description</th>
                             <th>Unit Price</th>
                             <th>Quantity</th>

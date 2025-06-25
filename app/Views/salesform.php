@@ -33,7 +33,7 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>SI NO</th>
+                    <th>Sl No</th>
                     <th>Date</th>
                     <th>Customer</th>
                     <th>Total Amount</th>
