@@ -261,32 +261,28 @@ $(function () {
                 $('#popup_name').val('');
                 $('#popup_address').val('');
                 $('#customerModal').modal('hide');
-
-                // ✅ Success alert (top right)
                 $('.alert')
                     .removeClass('d-none alert-danger')
                     .addClass('alert-success')
-                    .text('Customer created successfully.')
+                    .text('Customer Created Successfully.')
                     .fadeIn()
                     .delay(3000)
                     .fadeOut();
             } else {
-                // ❌ Failure alert (top right)
                 $('.alert')
                     .removeClass('d-none alert-success')
                     .addClass('alert-danger')
-                    .text(res.message || 'Failed to create customer.')
+                    .text(res.message || 'Failed To Create Customer.')
                     .fadeIn()
                     .delay(3000)
                     .fadeOut();
             }
         },
         error: function () {
-            // ❌ Server error alert (top right)
             $('.alert')
                 .removeClass('d-none alert-success')
                 .addClass('alert-danger')
-                .text('Server error occurred while creating customer.')
+                .text('Server Error Occurred While Creating Customer.')
                 .fadeIn()
                 .delay(3000)
                 .fadeOut();
@@ -304,18 +300,26 @@ $(function () {
         success: function (res) {
             if (res.status === 'success') {
                 $('.alert')
-                    .removeClass('d-none alert-danger')
+                    .removeClass('d-none alert-danger alert-warning')
                     .addClass('alert-success')
-                    .text('Estimate saved successfully.')
+                    .text(res.message)
                     .fadeIn();
                 setTimeout(function () {
                     window.location.href = "<?= site_url('estimate/generateEstimate/') ?>" + res.estimate_id;
                 }, 1500);
+            } else if (res.status === 'nochange') {
+                $('.alert')
+                    .removeClass('d-none alert-success alert-danger')
+                    .addClass('alert-warning')
+                    .text(res.message)
+                    .fadeIn()
+                    .delay(3000)
+                    .fadeOut();
             } else {
                 $('.alert')
-                    .removeClass('d-none alert-success')
+                    .removeClass('d-none alert-success alert-warning')
                     .addClass('alert-danger')
-                    .text(res.message)
+                    .text(res.message || 'Failed to save estimate.')
                     .fadeIn()
                     .delay(3000)
                     .fadeOut();
@@ -323,15 +327,14 @@ $(function () {
         },
         error: function () {
             $('.alert')
-                .removeClass('d-none alert-success')
+                .removeClass('d-none alert-success alert-warning')
                 .addClass('alert-danger')
-                .text('Something went wrong while saving the estimate.')
+                .text('Something Went Wrong While Saving The Estimate.')
                 .fadeIn()
                 .delay(3000)
                 .fadeOut();
         }
     });
 });
-
 });
 </script>

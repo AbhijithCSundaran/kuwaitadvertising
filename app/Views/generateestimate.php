@@ -20,12 +20,6 @@
 }
 
 }
-.print-btn{
-    position:absolute;
-    top:49%;
-    right:5%;
-    z-index:10;
-}
 </style>
     <div class="text-right  text-end print-btn" >
         <button onclick="printEstimate()" class="btn btn-primary no print">🖨️ Print Estimate</button>
@@ -43,7 +37,6 @@
                         <p><strong>Date:</strong> <?= date('d-m-Y', strtotime($estimate['date'])) ?></p>
                     </div>
                 </div>
-                <!-- Customer Info -->
                 <div class="row mt-3">
                     <div class="col-md-6">
                         <p><strong>To:</strong></p>

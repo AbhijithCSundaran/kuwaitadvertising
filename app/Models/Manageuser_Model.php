@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 class Manageuser_Model extends Model{
 	protected $table = 'user';
     protected $primaryKey = 'user_id';
-    protected $allowedFields = ['name', 'email', 'phonenumber', 'password','role_id'];
+    protected $allowedFields = ['name', 'email', 'phonenumber', 'password','role_id','company_id'];
 
     public function getAllUserCount() {
         return $this->db->query("select count(*) as totuser from user")->getRow();
