@@ -49,7 +49,7 @@
     <table class="table table-bordered fixed-table" id="companiesTable" style="width:100%">
         <thead>
             <tr>
-                <th style="width: 30px !important;">SI NO</th>
+                <th style="width: 30px !important;">Sl No</th>
                 <th>Name</th>
                 <th style="width: 200px;">Address</th>
                 <th>Tax Number</th>

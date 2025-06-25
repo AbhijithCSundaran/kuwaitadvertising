@@ -1,245 +1,185 @@
 <?php include "common/header.php"; ?>
-<div class="alert d-none position-fixed" role=alert ></div>
 <style>
-#estimateTable td {
-    white-space: normal !important;
-    word-break: break-word;
-    vertical-align: top;
-}
-#estimateTable thead th {
-    padding-top: 6px !important;
-    padding-bottom: 6px !important;
-    line-height: 1.2 !important;
-    vertical-align: middle !important;
-    font-size: 14px;
-}
-label {
-    display: inline-block;
-    padding-bottom: 11px;
-}
+    table.dataTable thead th {
+        padding-top: 4px !important;
+        padding-bottom: 4px !important;
+        font-size: 13px; /* Optional: smaller font */
+        vertical-align: middle !important;
+    }
 </style>
 
 <div class="form-control mb-3 right_container">
+    <div class="alert d-none text-center position-fixed" role="alert"></div>
     <div class="row align-items-center">
         <div class="col-md-6">
-            <h3 class="mb-0">Estimate Directory</h3>
+            <h3 class="mb-0">Estimate List</h3>
         </div>
         <div class="col-md-6 text-end">
             <a href="<?= base_url('add_estimate') ?>" class="btn btn-secondary">Add New Estimate</a>
         </div>
     </div>
     <hr>
-    <div class="table-responsive">
-        <table class="table table-bordered" id="estimateTable">
-            <thead>
-                <tr>
-                    <th style="display:none;">ID</th> 
-                    <th>SI NO</th>
-                    <th>Customer Name</th>
-                    <th style="width: 200px;">Customer Address</th>
-                    <th>Sub Total</th>
-                    <th>Discount %</th>
-                    <th>Total Amount</th>
-                    <th>Date</th>
-                    <th>Description</th> 
-                    <th>Action</th>
-                </tr>
-            </thead>
-                <tbody>
-                </tbody>
-            </table>
-        </div>
-    </div>
+
+    <table class="table table-bordered" id="estimateTable" style="width:100%">
+        <thead>
+            <tr>
+                <th>Sl No</th>
+                <th>Customer</th>
+                <th>Address</th>
+                <th>Subtotal</th>
+                <th>Discount (%)</th>
+                <th>Total (KWD)</th>
+                <th>Date</th>
+                <th style="width: 130px;">Action</th>
+                <th class="d-none">ID</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
 </div>
 
-<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
+<!-- Confirm Delete Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-    
       <div class="modal-header">
-        <h5 class="modal-title" id="deleteModalLabel">Confirmation</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeDeleteModalBtn">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Deletion</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      
       <div class="modal-body">
-        Are you sure you want to delete this estimate?
+        Are You Sure You Want To Delete This Estimate?
       </div>
-      
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancelDeleteBtn">Cancel</button>
-        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" id="confirm-delete-btn" class="btn btn-danger">Delete</button>
       </div>
-      
     </div>
   </div>
 </div>
+
 <?php include "common/footer.php"; ?>
 
 <script>
-    let table="";
+let table = "";
 $(document).ready(function () {
-    $('#addCustomerBtn').on('click', function () {
-        $('#addCustomerModal').modal('show');
-        $('#customerForm')[0].reset();
-        $('#customerError').addClass('d-none').text('');
+    const alertBox = $('.alert');
+    table = $('#estimateTable').DataTable({
+        ajax: {
+            url: "<?= base_url('estimate/estimatelistajax') ?>",
+            type: "POST",
+            dataSrc: "data"
+        },
+        sort:true,
+		searching:true,
+        paging: true,
+        processing: true,
+        serverSide: true,
+        searching: true,
+        dom: "<'row mb-3'<'col-sm-6'l><'col-sm-6'f>>" +
+             "<'row'<'col-sm-12'tr>>" +
+             "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
+        columns: [
+            { data: "slno" },
+            { data: "customer_name" },
+            { data: "customer_address" },
+            {
+                data: "subtotal",
+                render: function (data) {
+                    return parseFloat(data).toFixed(2) + " KWD";
+                }
+            },
+            {
+                data: "discount",
+                render: function (data) {
+                    return data + "%";
+                }
+            },
+            {
+                data: "total_amount",
+                render: function (data) {
+                    return parseFloat(data).toFixed(2) + " KWD";
+                }
+            },
+            {
+                data: "date",
+                render: function (data) {
+                    if (!data) return "-";
+                    const d = new Date(data);
+                    const day = String(d.getDate()).padStart(2, '0');
+                    const month = String(d.getMonth() + 1).padStart(2, '0');
+                    const year = d.getFullYear();
+                    return `${day}-${month}-${year}`;
+                }
+            },
+            {
+                data: "estimate_id",
+                render: function (id) {
+                    return `
+                        <div class="d-flex align-items-center gap-3">
+                            <a href="<?= base_url('estimate/edit/') ?>${id}" title="Edit" style="color:rgb(13, 162, 199); margin-right: 10px;">
+                                <i class="bi bi-pencil-fill"></i>
+                            </a>
+                            <a href="javascript:void(0);" class="delete-estimate" data-id="${id}" title="Delete" style="color: #dc3545;">
+                                <i class="bi bi-trash-fill"></i>
+                            </a>
+                        </div>
+                    `;
+                }
+            },
+            { data: "estimate_id", visible: false }
+        ],
+
+        order: [[8, 'desc']],
+        columnDefs: [
+            { searchable: false, orderable: false, targets: [0, 7] }
+        ]
     });
 
-    $('#customerForm').on('submit', function (e) {
-        e.preventDefault();
+    table.on('order.dt search.dt draw.dt', function () {
+        table.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+            var pageInfo = table.page.info();
+            cell.innerHTML = pageInfo.start + i + 1;
+        });
+    });
+
+    let deleteId = null;
+    const deleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+
+    $(document).on('click', '.delete-estimate', function () {
+        deleteId = $(this).data('id');
+        deleteModal.show();
+    });
+
+    $('#confirm-delete-btn').on('click', function () {
+        if (!deleteId) return;
+
         $.ajax({
-            url: '<?= base_url("customer/create") ?>',
-            type: 'POST',
-            data: $(this).serialize(),
-            dataType: 'json',
+            url: "<?= base_url('estimate/delete') ?>",
+            type: "POST",
+            data: {
+                estimate_id: deleteId,
+                '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
+            },
+            dataType: "json",
             success: function (res) {
                 if (res.status === 'success') {
-                    const newOption = new Option(res.customer.name, res.customer.customer_id, true, true);
-                    $('#customer_id').append(newOption).trigger('change');
-                    $('#addCustomerModal').modal('hide');
+                    alertBox.removeClass().addClass('alert alert-danger text-center position-fixed').text('Estimate Deleted Successfully.').fadeIn();
+                    setTimeout(() => alertBox.fadeOut(), 2000);
+                    table.ajax.reload(null, false);
                 } else {
-                    $('#customerError').removeClass('d-none').text(res.message);
+                    alertBox.removeClass().addClass('alert alert-warning text-center position-fixed').text(res.message || 'Delete Failed.').fadeIn();
+                    setTimeout(() => alertBox.fadeOut(), 3000);
                 }
             },
             error: function () {
-                $('#customerError').removeClass('d-none').text('Server error, try again.');
+                alertBox.removeClass().addClass('alert alert-danger text-center position-fixed').text('Error Occurred While Deleting Estimate.').fadeIn();
+                setTimeout(() => alertBox.fadeOut(), 3000);
             }
         });
+
+        deleteModal.hide();
+        deleteId = null;
     });
-    table = $('#estimateTable').DataTable({
-    processing: true,
-    serverSide: true,
-    ajax: {
-        url: "<?= base_url('estimate/estimatelistajax') ?>",
-        type: "POST"
-    },
-    columns: [
-        { data: "estimate_id", visible: false },
-        { data: "slno" },
-        {
-            data: "customer_name",
-            render: data => (data ?? '').replace(/\b\w/g, c => c.toUpperCase())
-        },
-        {
-            data: "customer_address",
-            className: "d-none d-xxl-table-cell",
-            render: data => (data ?? '').replace(/\b\w/g, c => c.toUpperCase())
-        },
-        {
-            data: "subtotal",
-            render: data => `${data} KWD`
-        },
-        {
-            data: "discount",
-            render: data => `${parseFloat(data).toFixed(2)} %`
-        },
-        {
-            data: "total_amount",
-            render: data => `${data} KWD`
-        },
-        {
-            data: "date",
-            className: "d-none d-xxl-table-cell",
-            render: data => new Date(data).toLocaleDateString('en-GB')
-        },
-        {
-            data: "description",
-            render: function (desc) {
-                if (!desc) return '-';
-                return desc.split(',').map((item, i) => `${i + 1}. ${item.trim().charAt(0).toUpperCase() + item.trim().slice(1)}`).join('<br>');
-            }
-        },
-        {
-            data: "estimate_id",
-            render: function (id) {
-                return `
-                    <a href="<?= base_url('estimate/edit/') ?>${id}" title="Edit" style="color:rgb(13, 162, 199); margin-right: 10px;">
-                        <i class="bi bi-pencil-fill"></i>
-                    </a>
-                    <a href="javascript:void(0);" class="delete-all" data-id="${id}" title="Delete" style="color: #dc3545;">
-                        <i class="bi bi-trash-fill"></i>
-                    </a>
-                `;
-            }
-        }
-    ],
-    order: [[0, 'desc']],
-    lengthMenu: [5, 10, 15, 25],
-    pageLength: 10,
-    columnDefs: [
-        { targets: 1, searchable: false, orderable: false },
-        { targets: 9, orderable: false }
-    ]
 });
-
-   let estimateIdToDelete = null;
-        $(document).on('click', '.delete-all', function () {
-            estimateIdToDelete = $(this).data('id');
-            const deleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
-            deleteModal.show();
-        });
-        $('#confirm-delete-btn').on('click', function () {
-            if (!estimateIdToDelete) return;
-
-            $.ajax({
-                url: "<?= base_url('estimate/delete') ?>",
-                type: "POST",
-                data: { estimate_id: estimateIdToDelete },
-                dataType: "json",
-                success: function (res) {
-                    const deleteModalElement = document.getElementById('confirmDeleteModal');
-                    const deleteModalInstance = bootstrap.Modal.getInstance(deleteModalElement);
-                    deleteModalInstance.hide();
-
-                    const alertBox = $('.alert');
-                    if (res.status === 'success') {
-                        alertBox.removeClass('d-none alert-success alert-warning alert-danger')
-                                .addClass('alert-danger')
-                                .text('Estimate Deleted Successfully')
-                                .fadeIn();
-
-                        setTimeout(() => {
-                            alertBox.fadeOut(() => {
-                                alertBox.addClass('d-none').text('');
-                            });
-                        }, 2000);
-
-                        table.ajax.reload(null, false);
-                    } else {
-                        alertBox.removeClass('d-none alert-success alert-warning alert-danger')
-                                .addClass('alert-warning')
-                                .text(res.message || 'Delete Failed.')
-                                .fadeIn();
-
-                        setTimeout(() => {
-                            alertBox.fadeOut(() => {
-                                alertBox.addClass('d-none').text('');
-                            });
-                        }, 3000);
-                    }
-                },
-                error: function () {
-                    const deleteModalElement = document.getElementById('confirmDeleteModal');
-                    const deleteModalInstance = bootstrap.Modal.getInstance(deleteModalElement);
-                    deleteModalInstance.hide();
-
-                    const alertBox = $('.alert');
-                    alertBox.removeClass('d-none alert-success alert-warning alert-danger')
-                            .addClass('alert-danger')
-                            .text('Error Deleting Estimate.')
-                            .fadeIn();
-
-                    setTimeout(() => {
-                        alertBox.fadeOut(() => {
-                            alertBox.addClass('d-none').text('');
-                        });
-                    }, 3000);
-                }
-            });
-
-            estimateIdToDelete = null;
-        });
-});
-
 </script>

@@ -3,31 +3,49 @@
     <div class="form-control right_container">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h3 class="mb-0"><?= isset($company['company_id']) ? 'Edit Company' : 'Add Company' ?></h3>
+                <h3 class="mb-0"><?= isset($company['company_id']) ? 'Edit Company' : 'Add New Company' ?></h3>
             </div>
             <hr/>
             <div class="card-body">
                 <form id="company-form" enctype="multipart/form-data" method="post">
                     <div class="d-flex flex-wrap">
-                        
                         <div class="col-6 mb-3 px-2">
                             <label for="company_name" class="form-label">Name <span class="text-danger">*</span></label>
                             <input type="text" name="company_name" id="company_name" class="form-control capitalize" maxlength="50"
                             value="<?= isset($company['company_name']) ? esc($company['company_name']) : '' ?>" />
                         </div>
-
-                        <div class="col-6 mb-3 px-2">
-                            <label for="address" class="form-label">Company Address <span class="text-danger">*</span></label>
-                            <textarea name="address" id="address" class="form-control capitalize" maxlength="150"
-                                style="resize: vertical;"
-                                rows="3"><?= isset($company['address']) ? esc($company['address']) : '' ?></textarea>
-                        </div>
-
+                        
                         <div class="col-6 mb-3 px-2">
                             <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
                             <input type="email" name="email" id="email" class="form-control"
                             value="<?= isset($company['email']) ? esc($company['email']) : '' ?>" />
                         </div>
+                        <!-- address -->
+                        <div class="col-6 mb-3 px-2">
+                            <label for="address" class="form-label">Company Address <span class="text-danger">*</span></label>
+                            <textarea name="address" id="address" class="form-control capitalize" maxlength="150"
+                                style="resize: vertical;" rows="3"><?= isset($company['address']) ? esc($company['address']) : '' ?></textarea>
+                        </div>
+
+                        <?php
+                            $addressVal = isset($company['address']) ? trim($company['address']) : '';
+                            $billingVal = isset($company['billing_address']) ? trim($company['billing_address']) : '';
+                            $isSame = $addressVal !== '' && $addressVal === $billingVal;
+                        ?>
+
+                        <div class="col-6 mb-3 px-2 position-relative">
+                            <label for="billing_address" class="form-label d-flex justify-content-between align-items-center">
+                                <span>Billing Address</span>
+                                <div class="form-check end-0 position-absolute pe-2">
+                                    <input type="checkbox" class="form-check-input" id="sameAddressCheck" <?= $isSame ? 'checked' : '' ?>>
+                                    <label class="form-check-label small m-0" for="sameAddressCheck">Use This Same as Company Address</label>
+                                </div>
+                            </label>
+                            <textarea name="billing_address" id="billing_address" class="form-control capitalize" maxlength="150"
+                                style="resize: vertical;" rows="3"><?= isset($company['billing_address']) ? esc($company['billing_address']) : '' ?></textarea>
+                        </div>
+                        <!-- address -->
+
                         <div class="col-6 mb-3 px-2">
                             <label for="phone" class="form-label">Phone <span class="text-danger">*</span></label>
                             <input type="text" name="phone" id="phone" class="form-control" maxlength="15"
@@ -48,8 +66,8 @@
 
                                 <div class="input-group loggo">
                                     <button type="button" class="btn btn-outline-secondary" id="btn-browse-file">Choose File</button>
-                                    <input type="text" id="fake-file-name" class="form-control" readonly
-                                    value="<?= esc($company['company_logo']) ?>" />
+                                    <input type="text" id="fake-file-name" class="form-control" readonly />
+                                     <!-- value="<?= esc($company['company_logo']) ?>"   -->
                                     <input type="file" name="company_logo" id="company_logo" class="d-none" accept="image/*" />
                                 </div>
                            
@@ -114,6 +132,7 @@
         const initialValues = {
             name: $('#company_name').val(),
             address: $('#address').val(),
+            billing: $('#billing_address').val(),
             tax: $('#tax_number').val(),
             email: $('#email').val(),
             phone: $('#phone').val()
@@ -131,6 +150,7 @@
             const currentValues = {
                 name: $('#company_name').val(),
                 address: $('#address').val(),
+                billing: $('#billing_address').val(),
                 tax: $('#tax_number').val(),
                 email: $('#email').val(),
                 phone: $('#phone').val()
@@ -278,5 +298,16 @@
                 }
             });
         });
+        $('#sameAddressCheck').on('change', function () {
+            if ($(this).is(':checked')) {
+                $('#billing_address').val($('#address').val());
+            }
+        });
+        $('#address').on('input', function () {
+            if ($('#sameAddressCheck').is(':checked')) {
+                $('#billing_address').val($(this).val());
+            }
+        });
+
     });
 </script>

@@ -599,12 +599,13 @@
                      <table class="table">
                       <thead>
                         <tr>
-                            <th>Customer</th>
-                            <th>Status</th>
-                            <th>Office</th>
-                            <th>Price</th>
-                            <th>Date</th>
-                            <th>Gross Amount</th>
+                            <th style="width: 20%;"><strong>Customer</strong></th>
+                            <th style="width: 20%;"><strong>Status</strong></th>
+                            <th style="width: 20%;"><strong>Office</strong></th>
+                            <th style="width: 20%;"><strong>Description</strong></th>
+                            <th style="width: 10%;"><strong>Subtotal</strong></th>
+                            <th style="width: 20%;"><strong>Date</strong></th>
+                            <th style="width: 20%;"><strong>Gross Amount</strong></th>
                         </tr>
                       </thead>
                       <tbody id="recentEstimatesBody">
@@ -750,9 +751,10 @@
             rows += `
               <tr>
                 <td>${est.customer_name ?? '-'}</td>
-                <td><span class="badge bg-info text-dark">Estimate</span></td>
+                <td>Estimate</td>
                 <td>--</td>
-                <td>${parseFloat(est.sub_total || 0).toFixed(2)} KWD</td> <!-- Price -->
+                <td>${est.description || '-'}</td> <!-- Item Description -->
+                <td>${parseFloat(est.sub_total || 0).toFixed(2)} KWD</td> <!-- Subtotal -->
                 <td>${new Date(est.date).toLocaleDateString('en-GB')}</td>
                 <td>${parseFloat(est.total_amount || 0).toFixed(2)} KWD</td> <!-- Gross Amount -->
               </tr>
