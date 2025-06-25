@@ -1,5 +1,4 @@
 <?php
-// app/Models/EstimateModel.php
 namespace App\Models;
 use CodeIgniter\Model;
 
@@ -12,7 +11,7 @@ class EstimateModel extends Model
     public function insertEstimateWithItems($estimateData, $items)
     {
         $estimateId = $this->insert($estimateData);
-        $itemModel = new \App\Models\EstimateitemModel();
+        $itemModel = new \App\Models\EstimateItemModel();
 
         foreach ($items as $item) {
             $item['estimate_id'] = $estimateId;
@@ -20,6 +19,18 @@ class EstimateModel extends Model
         }
 
         return $estimateId;
+    }
+    public function updateEstimateWithItems($estimateId, $estimateData, $items)
+    {
+        $this->update($estimateId, $estimateData);
+        $itemModel = new \App\Models\EstimateItemModel();
+
+        $itemModel->where('estimate_id', $estimateId)->delete();
+
+        foreach ($items as $item) {
+            $item['estimate_id'] = $estimateId;
+            $itemModel->insert($item);
+        }
     }
     public function getEstimateCount()
     {

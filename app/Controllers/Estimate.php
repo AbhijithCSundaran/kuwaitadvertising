@@ -5,7 +5,7 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use App\Models\EstimateModel;
 use App\Models\EstimateItemModel;
-use App\Models\CustomerModel;
+use App\Models\customerModel;
 
 class Estimate extends BaseController
 {
@@ -18,7 +18,7 @@ class Estimate extends BaseController
     {
         $estimateModel = new EstimateModel();
         $estimateItemModel = new EstimateItemModel();
-        $customerModel = new CustomerModel();
+        $customerModel = new customerModel();
 
         $data['customers'] = $customerModel->findAll();
         $data['estimate'] = null;
@@ -32,50 +32,105 @@ class Estimate extends BaseController
         return view('add_estimate', $data);
     }
 
-    public function save()
-    {
-        $customerId = $this->request->getPost('customer_id');
-        $address = $this->request->getPost('customer_address');
-        $discount = (float) $this->request->getPost('discount');
-        $description = $this->request->getPost('description');
-        $price = $this->request->getPost('price');
-        $quantity = $this->request->getPost('quantity');
-        $total = $this->request->getPost('total');
+public function save()
+{
+    $estimateId = $this->request->getPost('estimate_id');
+    $customerId = $this->request->getPost('customer_id');
+    $address = $this->request->getPost('customer_address');
+    $discount = (float) $this->request->getPost('discount');
+    $description = $this->request->getPost('description');
+    $price = $this->request->getPost('price');
+    $quantity = $this->request->getPost('quantity');
+    $total = $this->request->getPost('total');
 
-        $subtotal = 0;
-        foreach ($total as $t) {
-            $subtotal += (float)$t;
-        }
-        $discountAmount = ($subtotal * $discount) / 100;
-        $grandTotal = $subtotal - $discountAmount;
+    if (empty($customerId) || empty($address) || empty($description) || empty($price) || empty($quantity) || empty($total)) {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Please Fill All Mandatory Fields.'
+        ]);
+    }
 
-        $estimateData = [
-            'customer_id' => $customerId,
-            'customer_address' => $address,
-            'discount' => $discount,
-            'total_amount' => $grandTotal,
-            'date' => date('Y-m-d')
+    $subtotal = 0;
+    foreach ($total as $t) {
+        $subtotal += (float)$t;
+    }
+    $discountAmount = ($subtotal * $discount) / 100;
+    $grandTotal = $subtotal - $discountAmount;
+
+    $estimateData = [
+        'customer_id' => $customerId,
+        'customer_address' => $address,
+        'discount' => $discount,
+        'total_amount' => $grandTotal,
+        'date' => date('Y-m-d')
+    ];
+
+    $items = [];
+    foreach ($description as $key => $desc) {
+        $items[] = [
+            'description' => $desc,
+            'price' => (float)$price[$key],
+            'quantity' => (float)$quantity[$key],
+            'total' => (float)$total[$key]
         ];
+    }
 
-        $items = [];
-        foreach ($description as $key => $desc) {
-            $items[] = [
-                'description' => $desc,
-                'price' => (float)$price[$key],
-                'quantity' => (float)$quantity[$key],
-                'total' => (float)$total[$key]
-            ];
+    $estimateModel = new \App\Models\EstimateModel();
+    $estimateItemModel = new \App\Models\EstimateItemModel();
+
+    if (!empty($estimateId)) {
+        // Update mode
+        $existing = $estimateModel->find($estimateId);
+        if (!$existing) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Estimate Not Found.'
+            ]);
         }
 
-        $estimateModel = new EstimateModel();
-        $estimateId = $estimateModel->insertEstimateWithItems($estimateData, $items);
+        $hasChanges = (
+            $existing['customer_id'] != $customerId ||
+            $existing['customer_address'] !== $address ||
+            $existing['discount'] != $discount ||
+            $existing['total_amount'] != $grandTotal
+        );
+
+        if ($hasChanges) {
+            $estimateModel->update($estimateId, $estimateData);
+            $estimateItemModel->where('estimate_id', $estimateId)->delete();
+            foreach ($items as &$item) {
+                $item['estimate_id'] = $estimateId;
+            }
+            $estimateItemModel->insertBatch($items);
+
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Estimate Updated Successfully.',
+                'estimate_id' => $estimateId
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status' => 'nochange',
+                'message' => 'No Changes Detected.',
+                'estimate_id' => $estimateId
+            ]);
+        }
+
+    } else {
+        // Insert mode
+        $estimateId = $estimateModel->insert($estimateData);
+        foreach ($items as &$item) {
+            $item['estimate_id'] = $estimateId;
+        }
+        $estimateItemModel->insertBatch($items);
 
         return $this->response->setJSON([
             'status' => 'success',
-            'message' => 'Estimate saved successfully.',
+            'message' => 'Estimate Saved Successfully.',
             'estimate_id' => $estimateId
         ]);
     }
+}
 
     public function estimatelistajax()
     {
@@ -146,7 +201,7 @@ class Estimate extends BaseController
     {
         $estimateModel = new EstimateModel();
         $estimateItemModel = new EstimateItemModel();
-        $customerModel = new CustomerModel();
+        $customerModel = new customerModel();
 
        
         $data['items'] = $estimateItemModel->where('estimate_id', $id)->findAll();
@@ -165,7 +220,7 @@ class Estimate extends BaseController
         return view('add_estimate', $data);
     }
 
-    public function generateestimate($id)
+    public function generateEstimate($id)
     {
         $estimateModel = new EstimateModel();
         $itemModel = new EstimateItemModel();
@@ -178,9 +233,25 @@ class Estimate extends BaseController
 
         $items = $itemModel->where('estimate_id', $id)->findAll();
 
-        return view('generateEstimate', [
+        return view('generateestimate', [
             'estimate' => $estimate,
             'items' => $items
         ]);
     }
+    // dashboardlisting
+    public function recentEstimates()
+    {
+        $estimateModel = new \App\Models\EstimateModel();
+ 
+        $estimates = $estimateModel
+            ->select('estimates.*, customers.name AS customer_name')
+            ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
+            ->orderBy('estimates.estimate_id', 'DESC')
+            ->limit(10)
+            ->findAll();
+ 
+        return $this->response->setJSON($estimates);
+    }
+ 
+ 
 }

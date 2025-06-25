@@ -25,13 +25,12 @@
 select.form-control,
 .form-control {
 	border: 1px solid #686868 !important;
-	    padding: 15px;
-    /* width: 485px; */
+	padding: 15px;
 	color: black;
 	appearance: auto; 
-	-webkit-appearance: auto; /* Safari/Chrome */
-	-moz-appearance: auto; /* Firefox */
-	background-image: none; /* Reset any custom background */
+	-webkit-appearance: auto;
+	-moz-appearance: auto;
+	background-image: none;
 
 }
 .nav-link.active {
@@ -132,8 +131,6 @@ select.form-control,
 	transform: translateX(-50%);
 	z-index: 1050;
 	width: 40%;
-	/* Adjust as needed */
-	/*display: none;*/
 }
 
 
@@ -235,7 +232,6 @@ table.dataTable th:first-child {
 
 #estimateTable th {
 	white-space: nowrap;
-	/* prevent header text wrap */
 	text-align: center;
 }
 
@@ -250,19 +246,15 @@ table {
 table.dataTable th,
 table.dataTable td {
 	white-space: nowrap;
-	/* Prevent wrapping */
 	vertical-align: middle;
-	/* Align content vertically */
 }
 
 table.dataTable th {
 	min-width: 100px;
-	/* Minimum width for header cells */
 }
 
 table.dataTable td {
 	word-break: break-word;
-	/* Allow breaking of long words in cell body */
 }
 
 th.no-sort::after {
@@ -310,6 +302,12 @@ th.no-sort::after {
 	overflow:hidden;
 	border: 1px solid black;
 	padding:35px;
+}
+.print-btn{
+    position:absolute;
+    top:49%;
+    right:4%;
+    z-index:10;
 }
 .from-date{
     background-color: white !important;

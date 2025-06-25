@@ -1,7 +1,7 @@
 <?php
 namespace App\Controllers;
 
-use App\Models\CustomerModel;
+use App\Models\customerModel;
 use CodeIgniter\Controller;
 
 class Customer extends BaseController
@@ -18,7 +18,7 @@ class Customer extends BaseController
             ]);
         }
 
-        $model = new CustomerModel();
+        $model = new customerModel();
         $data = [
             'name' => $name,
             'address' => $address
@@ -42,7 +42,7 @@ class Customer extends BaseController
     public function get_address()
     {
         $customer_id = $this->request->getPost('customer_id');
-        $model = new CustomerModel();
+        $model = new customerModel();
         $customer = $model->find($customer_id);
 
         if ($customer) {
@@ -55,7 +55,7 @@ class Customer extends BaseController
 {
     $term = $this->request->getGet('term');
 
-    $model = new \App\Models\CustomerModel();
+    $model = new \App\Models\customerModel();
     $results = $model
         ->like('name', $term)
         ->select('customer_id, name, address')

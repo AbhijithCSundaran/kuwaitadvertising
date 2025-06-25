@@ -174,15 +174,11 @@ $(document).ready(function () {
 });
 
    let estimateIdToDelete = null;
-
-        // Trigger the Bootstrap 5 modal
         $(document).on('click', '.delete-all', function () {
             estimateIdToDelete = $(this).data('id');
             const deleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
             deleteModal.show();
         });
-
-        // Delete confirmation button
         $('#confirm-delete-btn').on('click', function () {
             if (!estimateIdToDelete) return;
 
