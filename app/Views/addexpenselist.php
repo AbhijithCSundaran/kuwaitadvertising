@@ -13,7 +13,7 @@
     <table class="table table-bordered" id="expenseTable">
         <thead>
             <tr>
-                <th>SI NO</th>
+                <th>Sl No</th>
                 <th>Date</th>
                 <th>Particular</th>
                 <th>Amount</th>
@@ -76,7 +76,9 @@ $(document).ready(function () {
                     return data;
                 }
             },
-            { data: "date" },
+            { 
+                data: "date" ,
+            },
             {
                 data: "particular",
                 render: function (data) {

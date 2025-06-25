@@ -33,6 +33,7 @@ class Expense extends BaseController
 
         $id           = $this->request->getPost('id');
         $date         = $this->request->getPost('date');
+        $convertedDate = date('Y-m-d', strtotime(str_replace('/', '-', $date)));
         $particular   = $this->request->getPost('particular');
         $amount       = $this->request->getPost('amount');
         $payment_mode = $this->request->getPost('payment_mode');
@@ -45,7 +46,7 @@ class Expense extends BaseController
         }
 
         $data = [
-            'date'         => $date,
+            'date' => $convertedDate,
             'particular'   => $particular,
             'amount'       => $amount,
             'payment_mode' => $payment_mode
@@ -74,17 +75,23 @@ class Expense extends BaseController
                 $msg = 'No Changes Detected.';
             }
         } else {
-            $expenseModel->insert($data);
+           $expenseModel->insert($data);
             $msg = 'Expense Created Successfully.';
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => $msg,
+                'redirect_to_list' => false
+            ]);
         }
 
         return $this->response->setJSON([
             'status' => 'success',
-            'message' => $msg
+            'message' => $msg,
+             'redirect_to_list' => !empty($id)
         ]);
     }
 
-   public function getExpensesAjax()
+ public function getExpensesAjax()
 {
     $model = new \App\Models\Expense_Model();
 
@@ -104,12 +111,13 @@ class Expense extends BaseController
 
     $result = [];
     foreach ($totalRec as $expense) {
+        $formattedDate = date('d-m-Y', strtotime($expense->date)); 
         $result[] = [
-            'slno' => $slno++,
-            'id' => $expense->id,
-            'date' => $expense->date,
-            'particular' => $expense->particular,
-            'amount' => $expense->amount,
+            'slno'         => $slno++,
+            'id'           => $expense->id,
+            'date'         => $formattedDate, 
+            'particular'   => $expense->particular,
+            'amount'       => $expense->amount,
             'payment_mode' => $expense->payment_mode 
         ];
     }
@@ -126,7 +134,6 @@ class Expense extends BaseController
 
     return $this->response->setJSON($response);
 }
-
 
    public function delete()
 {

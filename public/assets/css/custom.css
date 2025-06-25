@@ -33,6 +33,7 @@ select.form-control,
 	background-image: none;
 
 }
+
 .nav-link.active {
   background-color: #f0f0f080;
   color: #000;
@@ -64,7 +65,7 @@ select.form-control,
 }
 
 .btn-primary-edit {
-	background: #686868 !important;
+	/* background: #686868 !important; */
 	color: white !important;
 }
 
@@ -135,7 +136,7 @@ select.form-control,
 
 
 .btn-primary:not(.btn-light) {
-	background: #686868 !important;
+	/* background: #686868 !important; */
 	color: white;
 	border: none;
 }
@@ -344,7 +345,7 @@ td.logo-col {
     text-align: left;
 }
 .generate-table th{
-		background-color: #cf340d;
+		background-color: #a1263a;
 		color: #fff;
 	}
 .footer-f {
@@ -364,7 +365,7 @@ td.logo-col {
     text-align: right;
 }
 .summary-table .total {
-    background-color: #cf340d;
+    background-color: #a1263a;
     color: #fff;
     font-weight: bold;
 }

@@ -14,7 +14,7 @@
     <table class="table table-bordered" id="userTable">
         <thead>
             <tr>
-                <th>SI NO</th>
+                <th>Sl No</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Phone Number</th>

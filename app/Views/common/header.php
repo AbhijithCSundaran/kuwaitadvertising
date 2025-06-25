@@ -179,10 +179,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link <?= "$segment1/$segment2" == 'report/sales' ? 'active' : '' ?>" href="<?= base_url('report/sales') ?>">Total Sales Report</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link <?= "$segment1/$segment2" == 'report/total-expense' ? 'active' : '' ?>" href="<?= base_url('report/total-expense') ?>">Total Expense Report</a>
+                    <a class="nav-link <?= "$segment1/$segment2" == 'sales/report' ? 'active' : '' ?>" href="<?= base_url('sales/report') ?>">Sales Report</a>
                 </li>
             </ul>
         </div>

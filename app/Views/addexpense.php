@@ -1,4 +1,14 @@
 <?php include "common/header.php";?>
+<style>
+input[type=number].no-spinner::-webkit-inner-spin-button,
+input[type=number].no-spinner::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type=number].no-spinner {
+    -moz-appearance: textfield;
+}
+</style>
 <div class="form-control mb-3 right_container">
      <div class="alert d-none text-center position-fixed" role="alert"></div>
     <div class="card">
@@ -11,21 +21,30 @@
         <div class="card-body">
             <form id="expense-form">
                 <div class ="row"> 
-                    <div class="form-group col-md-6">
-                        <label>Date <span class="text-danger">*</span></label>
-                        <input type="date" name="date" class="form-control" value="<?= isset($expense['date']) ? $expense['date'] : '' ?>" required>
-                    </div>
+                    <?php
+                    $defaultDate = !empty($expense['date']) ? $expense['date'] : date('d-m-Y');
+                    ?>
 
                     <div class="form-group col-md-6">
-                        <label>Particular <span class="text-danger">*</span></label>
-                        <input type="text" name="particular" class="form-control capitalize" value="<?= isset($expense['particular']) ? $expense['particular'] : '' ?>" required>
+                        <label>Date <span class="text-danger">*</span></label>
+                        <input type="text" name="date" class="form-control" value="<?= $defaultDate ?>" readonly>
                     </div>
                 </div>
-                <div class="row">
+                <div class ="row"> 
+                    <div class="form-group col-md-6">
+                        <label>Particular <span class="text-danger">*</span></label>
+                        <textarea name="particular" class="form-control capitalize" rows="3" required><?= isset($expense['particular']) ? $expense['particular'] : '' ?></textarea>
+                    </div>
+                    <div class="form-group col-md-6">
+                            <label>Reference</label>
+                            <input type="text" name="reference" class="form-control" />
+                        </div>
+                
                     <div class="form-group col-md-6">
                         <label>Amount <span class="text-danger">*</span></label>
-                        <input type="number" name="amount" step="0.01" class="form-control" value="<?= isset($expense['amount']) ? $expense['amount'] : '' ?>" required>
+                        <input type="number" name="amount" step="0.01" class="form-control no-spinner" value="<?= isset($expense['amount']) ? $expense['amount'] : '' ?>" required>
                     </div>
+
                     <br><br>
                     <div class="form-group col-md-6">
                         <label>Payment Mode <span class="text-danger">*</span></label>
@@ -35,8 +54,8 @@
                             <option value="bank transfer" <?= isset($expense['payment_mode']) && strtolower($expense['payment_mode']) == 'bank transfer' ? 'selected' : '' ?>>Bank Transfer</option>
                             <option value="wamd" <?= isset($expense['payment_mode']) && strtolower($expense['payment_mode']) == 'wamd' ? 'selected' : '' ?>>WAMD</option>
                         </select>
-
                     </div>
+                    
                 </div>
                 <div class="col-md-12 text-end">
                 <a href="<?= base_url('expense') ?>" class="btn btn-secondary">Discard</a>
@@ -73,8 +92,6 @@ $(document).ready(function () {
         }
 
         const formData = new FormData(form);
-
-        // Disable save button to prevent multiple submissions
         $('#saveExpenseBtn').prop('disabled', true);
 
         $.ajax({
@@ -91,9 +108,12 @@ $(document).ready(function () {
                         .addClass('alert-success')
                         .text(res.message);
                     setTimeout(() => {
-                        window.location.href = "<?= base_url('expense') ?>";
+                        if (res.redirect_to_list) {
+                            window.location.href = "<?= base_url('expense') ?>";
+                        } else {
+                            window.location.href = "<?= base_url('addexpense') ?>"; 
+                        }
                     }, 1500);
-
                 } else if (res.status === 'nochange') {
                     alertBox
                         .removeClass('d-none alert-success alert-danger')
