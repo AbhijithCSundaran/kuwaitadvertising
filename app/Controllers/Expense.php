@@ -41,7 +41,7 @@ class Expense extends BaseController
         if (empty($date) || empty($particular) || empty($amount) || empty($payment_mode)) {
             return $this->response->setJSON([
                 'status'  => 'error',
-                'message' => 'Please fill all mandatory fields.'
+                'message' => 'Please Fill All Mandatory Fields.'
             ]);
         }
 
@@ -57,7 +57,7 @@ class Expense extends BaseController
             if (!$existing) {
                 return $this->response->setJSON([
                     'status' => 'error',
-                    'message' => 'Expense not found.'
+                    'message' => 'Expense Not Found.'
                 ]);
             }
 
@@ -104,8 +104,10 @@ class Expense extends BaseController
 
     $condition = "1=1";
     if ($search) {
-        $condition .= " AND date LIKE '%" . trim($search) . "%'";
-    }
+    $search = trim($search);
+    $condition .= " AND (DATE_FORMAT(date, '%d-%m-%Y') LIKE '%$search%' OR payment_mode LIKE '%$search%')";
+}
+
 
     $totalRec = $model->getAllFilteredRecords($condition, $fromstart, $tolimit);
 

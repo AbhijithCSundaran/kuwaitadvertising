@@ -11,7 +11,7 @@
     <div class="col-md-12"><hr/></div>
 
     <div class="card-body">
-      <form id="user-login-form">
+      <form id="user-login-form" autocomplete="off" >
         <div class="form-group">
           <div class="row">
             <div class="col-md-6 mb-2">
@@ -39,11 +39,11 @@
             <div class="col-md-6 mb-2">
               <label>Email <span class="text-danger">*</span></label>
               <input type="email" name="email" id="email" class="form-control"
-                value="<?= $userData['email'] ?? '' ?>" autocomplete="off"/>
+                value="<?= $userData['email'] ?? '' ?>" autocomplete="email"/>
             </div>
             <div class="col-md-6 mb-2">
               <label>Phone Number</label>
-              <input type="text" name="phonenumber" id="phonenumber" class="form-control" value="<?= $userData['phonenumber'] ?? '' ?>" minlength="7" maxlength="15" />
+              <input type="text" name="phonenumber" id="phonenumber" class="form-control" value="<?= $userData['phonenumber'] ?? '' ?>" minlength="7" maxlength="15"  />
             </div>
             <div class="col-md-6 mb-2">
               <label for="role_id">Role <span class="text-danger">*</span></label>
@@ -63,7 +63,7 @@
             <div class="col-md-6 mb-2">
               <label>Password <span class="text-danger">*</span></label>
               <div class="input-group position-relative mb-2">
-                <input type="password" name="password" id="password" class="form-control" minlength="6" maxlength="15" required />
+                <input type="password" name="password" id="password" class="form-control" minlength="6" maxlength="15" autocomplete="new-password" required />
                 <span class="toggle-password" toggle="#password">
                   <i class="fa fa-eye-slash"></i>
                 </span>
@@ -77,7 +77,7 @@
                 <div class="col-md-6">
                   <label>New Password</label>
                   <div class="input-group position-relative mb-2">
-                    <input type="password" name="new_password" id="new_password" class="form-control" minlength="6" maxlength="15" />
+                    <input type="password" name="new_password" id="new_password" class="form-control" minlength="6" maxlength="15" autocomplete="new-password"/>
                     <span class="toggle-password" toggle="#new_password" >
                       <i class="fa fa-eye-slash"></i>
                     </span>
@@ -86,7 +86,7 @@
                 <div class="col-md-6">
                   <label>Confirm Password</label>
                   <div class="input-group position-relative mb-2">
-                    <input type="password" name="confirm_new_password" id="confirm_new_password" class="form-control" minlength="6" maxlength="15" />
+                    <input type="password" name="confirm_new_password" id="confirm_new_password" class="form-control" minlength="6" maxlength="15" autocomplete="new-password" />
                     <span class="toggle-password" toggle="#confirm_new_password" >
                       <i class="fa fa-eye-slash"></i>
                     </span>
@@ -114,6 +114,9 @@ $(document).ready(function () {
 
   $('#user-login-form input , #user-login-form select').on('input change', function () {
     $('#saveUserBtn').prop('disabled', $('#user-login-form').serialize() === initialFormData);
+  });
+  document.getElementById('phonenumber').addEventListener('input', function () {
+    this.value = this.value.replace(/[^0-9]/g, '');
   });
 $(document).on('click', '.toggle-password', function () {
   const input = $($(this).attr('toggle'));
@@ -145,11 +148,12 @@ $(document).on('click', '.toggle-password', function () {
     const newPw = $('#new_password').val()?.trim() || '';
     const confPw = $('#confirm_new_password').val()?.trim() || '';
     const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-     if ((phone.length < 7) || (phone.length > 15)) {
-        showAlert('Phone Number Must Be 7 To 15 Digits');
-        return btn.prop('disabled', false);
-     }
+      if (phone !== '') {
+          if (phone.length < 7 || phone.length > 15) {
+              showAlert('Phone Number must be between 7 to 15 digits');
+              return btn.prop('disabled', false);
+          }
+      }
 
     if (!name || !email || (isNew && !pw)) {
       showAlert('Please Fill All Mandatory Fields <span class="text-danger">*</span>.', 'danger');

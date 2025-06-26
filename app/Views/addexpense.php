@@ -21,13 +21,16 @@ input[type=number].no-spinner {
         <div class="card-body">
             <form id="expense-form">
                 <div class ="row"> 
-                    <?php
-                    $defaultDate = !empty($expense['date']) ? $expense['date'] : date('d-m-Y');
+                   <?php
+                        if (!empty($expense['date'])) {
+                            $defaultDate = date('d-m-Y', strtotime($expense['date']));
+                        } else {
+                            $defaultDate = date('d-m-Y'); 
+                        }
                     ?>
-
                     <div class="form-group col-md-6">
                         <label>Date <span class="text-danger">*</span></label>
-                        <input type="text" name="date" class="form-control" value="<?= $defaultDate ?>" readonly>
+                        <input type="text" name="date" id="date" class="form-control" value="<?= $defaultDate ?>" required>
                     </div>
                 </div>
                 <div class ="row"> 
@@ -70,7 +73,13 @@ input[type=number].no-spinner {
 </div>
 </div>
 <?php include "common/footer.php"; ?>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
+    flatpickr("#date", {
+    dateFormat: "d-m-Y",
+    defaultDate: "<?= $defaultDate ?>"
+});
 $(document).ready(function () {
     let originalData = $('#expense-form').serialize(); 
 
