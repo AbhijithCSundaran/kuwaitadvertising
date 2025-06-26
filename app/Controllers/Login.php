@@ -6,6 +6,8 @@ use App\Controllers\BaseController;
 
 class Login extends BaseController{
 	public function __construct(){
+		$this->session = \Config\Services::session();
+		$this->input = \Config\Services::request();
 		$this->Login_Model= new \App\Models\Login_Model();
 	}
 

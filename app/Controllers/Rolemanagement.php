@@ -36,11 +36,12 @@ class Rolemanagement extends Controller
             return redirect()->back()->with('error', 'Role Already Exists.');
         }
 
-        $this->roleModel->insert([
-            'role_name' => $role_name,
+       $this->roleModel->insert([
+            'role_name'  => $role_name,
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s'),
         ]);
+        
 
         $role_id = $this->roleModel->getInsertID();
 

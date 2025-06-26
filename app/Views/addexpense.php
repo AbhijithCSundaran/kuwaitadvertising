@@ -21,17 +21,43 @@ input[type=number].no-spinner {
         <div class="card-body">
             <form id="expense-form">
                 <div class ="row"> 
-                   <?php
+                    <?php
                         if (!empty($expense['date'])) {
                             $defaultDate = date('d-m-Y', strtotime($expense['date']));
                         } else {
                             $defaultDate = date('d-m-Y'); 
                         }
                     ?>
+                    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+                    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+                    <style>
+                        .calendar-input-wrapper {
+                            position: relative;
+                        }
+
+                        .calendar-icon {
+                            position: absolute;
+                            right: 10px;
+                            top: 50%;
+                            transform: translateY(-50%);
+                            cursor: pointer;
+                            color: #555;
+                        }
+
+                        .calendar-input-wrapper input {
+                            padding-right: 35px; /* Make room for the icon */
+                        }
+                    </style>
+
                     <div class="form-group col-md-6">
                         <label>Date <span class="text-danger">*</span></label>
-                        <input type="text" name="date" id="date" class="form-control" value="<?= $defaultDate ?>" required>
+                        <div class="calendar-input-wrapper">
+                            <input type="text" name="date" id="date" class="form-control" value="<?= $defaultDate ?>" required>
+                            <span class="calendar-icon" id="calendar-icon"><i class="bi bi-calendar"></i></span>
+                        </div>
                     </div>
+
                 </div>
                 <div class ="row"> 
                     <div class="form-group col-md-6">
@@ -73,13 +99,16 @@ input[type=number].no-spinner {
 </div>
 </div>
 <?php include "common/footer.php"; ?>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
-    flatpickr("#date", {
-    dateFormat: "d-m-Y",
-    defaultDate: "<?= $defaultDate ?>"
-});
+    const dateInput = document.getElementById("date");
+    const calendar = flatpickr(dateInput, {
+        dateFormat: "d-m-Y",
+        defaultDate: "<?= $defaultDate ?>"
+    });
+
+    document.getElementById("calendar-icon").addEventListener("click", function () {
+        calendar.open();
+    });
 $(document).ready(function () {
     let originalData = $('#expense-form').serialize(); 
 
