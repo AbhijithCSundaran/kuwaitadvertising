@@ -8,27 +8,28 @@ use App\Models\RoleModel;
 class Manageuser extends BaseController
 {
    public function index($uid = null){
-    $isEdit = !empty($uid);
+        $isEdit = !empty($uid);
 
-    $userModel = new Manageuser_Model();
-    $roleModel = new RoleModel();
-    $managecompany_Model = new \App\Models\Managecompany_Model();
-   $userData = $isEdit ? $userModel->find($uid) : [];
-    $roles    = $roleModel->findAll();
-    $companies = $managecompany_Model->findAll();
+        $userModel = new Manageuser_Model();
+        $roleModel = new RoleModel();
+        $managecompany_Model = new \App\Models\Managecompany_Model();
+        $userData = $isEdit ? $userModel->find($uid) : [];
+        $roles    = $roleModel->findAll();
+        $companies = $managecompany_Model->findAll();
 
-    return view('adduser', [
-        'uid'      => $uid,
-        'isEdit'   => $isEdit,
-        'userData' => $userData,
-        'roles'    => $roles,
-        'companies' => $companies
-    ]);
-}
+        return view('adduser', [
+            'uid'      => $uid,
+            'isEdit'   => $isEdit,
+            'userData' => $userData,
+            'roles'    => $roles,
+            'companies' => $companies
+        ]);
+    }
     public function add(){
         return view('adduserlist');
     }
-   public function save(){
+public function save()
+{
     $model   = new Manageuser_Model();
     $id      = $this->request->getPost('uid');
     $name    = trim($this->request->getPost('name'));
@@ -41,6 +42,7 @@ class Manageuser extends BaseController
     $companyId = $this->request->getPost('company_id');
 
     $isEdit = !empty($id);
+
     if ($name === '' || $email === '' || (!$isEdit && $pw === '')) {
         return $this->response->setJSON([
             'status'  => 'error',
@@ -77,14 +79,13 @@ class Manageuser extends BaseController
             'message' => 'Please select a role.'
         ]);
     }
-    if (empty($companyId)) {
-    return $this->response->setJSON([
-        'status'  => 'error',
-        'message' => 'Please select a company.'
-    ]);
-}
 
-    // Form data
+    if (empty($companyId)) {
+        return $this->response->setJSON([
+            'status'  => 'error',
+            'message' => 'Please select a company.'
+        ]);
+    }
     $data = [
         'name'        => $name,
         'email'       => $email,
@@ -92,74 +93,76 @@ class Manageuser extends BaseController
         'role_id'     => $roleId,
         'company_id'  => $companyId
     ];
-
     if (!$isEdit && $pw !== '') {
         $data['password'] = password_hash($pw, PASSWORD_DEFAULT);
     } elseif ($isEdit && $newPw !== '') {
         $data['password'] = password_hash($newPw, PASSWORD_DEFAULT);
     }
-
     if (!$isEdit) {
         $model->insert($data);
         return $this->response->setJSON([
             'status'  => 'success',
             'message' => 'User Created Successfully.'
         ]);
-    } else {
-        $existing = $model->find($id);
-        if (!$existing) {
-            return $this->response->setJSON([
-                'status'  => 'error',
-                'message' => 'User not found.'
-            ]);
-        }
-        
-        $unchanged = (
-            $existing['name'] === $name &&
-            $existing['email'] === $email &&
-            $existing['phonenumber'] === $phone &&
-            $existing['role_id'] == $roleId &&
-            empty($newPw)
-        );
-
-        if ($unchanged) {
-            return $this->response->setJSON([
-                'status'  => 'info',
-                'message' => 'No changes detected.'
-            ]);
-        }
-
-        $model->update($id, $data);
+    }
+    $existing = $model->find($id);
+    if (!$existing) {
         return $this->response->setJSON([
-            'status'  => 'success',
-            'message' => 'User Details Updated Successfully.'
+            'status'  => 'error',
+            'message' => 'User Not Found.'
         ]);
     }
+    $unchanged = (
+        $existing['name'] === $name &&
+        $existing['email'] === $email &&
+        $existing['phonenumber'] === $phone &&
+        $existing['role_id'] == $roleId &&
+        $existing['company_id'] == $companyId &&
+        empty($newPw)
+    );
+
+    if ($unchanged) {
+        return $this->response->setJSON([
+            'status'  => 'info',
+            'message' => 'No Changes Detected.'
+        ]);
+    }
+    $model->update($id, $data);
+    return $this->response->setJSON([
+        'status'  => 'success',
+        'message' => 'User Updated Successfully.'
+    ]);
 }
 
-    public function userlistajax(){
-        $model = new \App\Models\Manageuser_Model();
+
+    public function userlistajax()
+{
+    $model = new \App\Models\Manageuser_Model();
+    $menuModel = new \App\Models\RoleModel();
 
     $draw = $_POST['draw'];
     $fromstart = $_POST['start'];
     $tolimit = $_POST['length'];
-    $order = isset($_POST['order'][0]['dir']) ? $_POST['order'][0]['dir'] : 'desc';
+    $order = $_POST['order'][0]['dir'] ?? 'desc';
     $search = $_POST['search']['value'];
     $slno = $fromstart + 1;
 
     $condition = "1=1";
     if ($search) {
-        $condition .= " AND name LIKE '%" . trim($search) . "%'";
+        $condition .= " AND name LIKE '%" . trim($search) . "%' OR role_name like '%" . trim($search). "%' OR email LIKE '%" . trim($search) . "%' OR phonenumber LIKE '%" . trim($search) ."%'";
     }
 
     $totalRec = $model->getAllFilteredRecords($condition, $fromstart, $tolimit);
-
     $result = [];
+
     foreach ($totalRec as $user) {
+        $permissions = $menuModel->where('role_id', $user->role_id)->findAll();
+        $menuList = array_column($permissions, 'menu_name');
         $result[] = [
             'slno' => $slno++,
             'user_id' => $user->user_id,
             'name' => $user->name,
+            'role_name' => $user->role_name ?? '',
             'email' => $user->email,
             'phonenumber' => $user->phonenumber
         ];
@@ -178,20 +181,18 @@ class Manageuser extends BaseController
     return $this->response->setJSON($response);
 }
 
-
-    // Delete a user
    public function delete()
-{
-    $user_id = $this->request->getPost('user_id');
+    {
+        $user_id = $this->request->getPost('user_id');
 
-    if (!$user_id) {
-        return $this->response->setJSON(['status' => 'error', 'message' => 'User ID is missing']);
+        if (!$user_id) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'User ID is missing']);
+        }
+
+        $userModel = new Manageuser_Model();
+        $userModel->delete($user_id);
+
+        return $this->response->setJSON(['status' => 'success']);
     }
-
-    $userModel = new \App\Models\Manageuser_Model();
-    $userModel->delete($user_id);
-
-    return $this->response->setJSON(['status' => 'success']);
 }
 
-}

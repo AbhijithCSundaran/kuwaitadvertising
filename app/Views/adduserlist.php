@@ -16,6 +16,7 @@
             <tr>
                 <th>Sl No</th>
                 <th>Name</th>
+                <th>Role Name</th>
                 <th>Email</th>
                 <th>Phone Number</th>
                 <th>Action</th>
@@ -83,6 +84,13 @@ $(document).ready(function () {
                     return data.replace(/\b\w/g, c => c.toUpperCase());
                 }
             },
+             {
+                    data: "role_name",
+                    render: function (data, type, row) {
+                        if (!data || typeof data !== 'string') return '';
+                        return data.replace(/\b\w/g, c => c.toUpperCase());
+                    }
+                },
             { data: "email" },
             { data: "phonenumber" },
             {

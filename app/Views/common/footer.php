@@ -1,10 +1,13 @@
 <footer class="footer">
+  <div class="row">
   <div class="d-sm-flex justify-content-center justify-content-sm-between">
-    <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2024 <a
-        href="https://www.bootstrapdash.com/" target="_blank">Bootstrapdash</a>. All rights reserved.</span>
-    <span class="float-none float-sm-end d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with <i
-        class="mdi mdi-heart text-danger"></i></span>
+    <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2025  All rights reserved.</span>
+    <span class="float-none float-sm-end d-block mt-3 mt-sm-4 text-center">Powered by 
+      <a href="https://www.smartlounge.online/" target="_blank">Smartlounge.online</a>
+    </span>
   </div>
+  <div>
+  </footer>
 </footer>
         <!-- partial -->
       </div>
@@ -42,7 +45,7 @@
   <!-- DataTables JS -->
   <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script> 
     <!-- <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script> -->
-
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <!-- Delete Confirmation Modal -->
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
