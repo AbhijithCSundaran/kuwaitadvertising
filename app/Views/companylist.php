@@ -2,10 +2,10 @@
 <style>
     /* Reduce header height and padding */
     table.dataTable thead th {
-        padding-top: 6px !important;
-        padding-bottom: 6px !important;
-        font-size: 13px;
-        line-height: 1.5 !important;
+        padding-top: 10px !important;
+        padding-bottom: 10px !important;
+        font-size: 16px;
+        line-height: 1.2 !important;
         vertical-align: middle !important;
     }
 
@@ -58,8 +58,8 @@
             </div>
             <div class="modal-body">Are you sure you want to delete this company?</div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" id="confirm-delete-btn" class="btn btn-danger">Delete</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
             </div>
         </div>
     </div>
@@ -95,7 +95,10 @@
             columns: [
 
                 { data: "slno" },
-                { data: "company_name" },
+                {
+                    data: "company_name",
+                    render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''
+                },
                 {
                     data: "address",
                     render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''

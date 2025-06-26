@@ -32,6 +32,6 @@ class CompanyLedger extends BaseController
             'invoice_amount' => 0  // placeholder
         ]);
 
-        return $this->response->setJSON(['status' => 'success', 'message' => 'Ledger entry created for the company.']);
+        return $this->response->setJSON(['status' => 'success', 'message' => 'Ledger Entry Created For The Company.']);
     }
 }

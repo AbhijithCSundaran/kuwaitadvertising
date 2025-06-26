@@ -104,7 +104,7 @@
     }
 
     $(document).ready(function () {
-        let filterApplied = false; // Track whether filter was applied once
+        let filterApplied = false; 
 
         function loadExpenses() {
             $.ajax({
@@ -144,7 +144,7 @@
             });
         }
 
-        // Month or Year change - reset date fields only AFTER filter was applied once
+        
         $('#filterMonth, #filterYear').on('change', function () {
             if (filterApplied) {
                 $('#fromDate').val('');
@@ -152,7 +152,7 @@
             }
         });
 
-        // When From or To date changes, auto-set month and year dropdowns
+        
         $('#fromDate, #toDate').on('change', function () {
             const dateValue = $(this).val();
             if (dateValue) {
@@ -164,7 +164,7 @@
             }
         });
 
-        // Apply filter button click
+      
         $('#filterBtn').click(function () {
             const month = $('#filterMonth').val();
             const year = $('#filterYear').val();
@@ -194,13 +194,12 @@
                 return;
             }
 
-            // Set the flag true once the user applies the filter
             filterApplied = true;
 
             loadExpenses();
         });
 
-        // Reset all filters
+     
         $('#resetBtn').click(function () {
             $('#fromDate').val('');
             $('#toDate').val('');
@@ -210,7 +209,7 @@
             loadExpenses();
         });
 
-        // Initial data load
+       
         loadExpenses();
     });
 </script>

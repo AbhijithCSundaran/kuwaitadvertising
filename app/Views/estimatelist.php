@@ -1,9 +1,9 @@
 <?php include "common/header.php"; ?>
 <style>
     table.dataTable thead th {
-        padding-top: 4px !important;
-        padding-bottom: 4px !important;
-        font-size: 13px; /* Optional: smaller font */
+        padding-top: 10px !important;
+        padding-bottom: 10px !important;
+        font-size: 16px; /* Optional: smaller font */
         vertical-align: middle !important;
     }
 </style>
@@ -51,8 +51,8 @@
         Are You Sure You Want To Delete This Estimate?
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         <button type="button" id="confirm-delete-btn" class="btn btn-danger">Delete</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
       </div>
     </div>
   </div>
@@ -82,8 +82,14 @@ $(document).ready(function () {
         columns: [
             { data: "slno" },
 
-            { data: "customer_name"},
-            { data: "customer_address"},
+            {
+                data: "customer_name",
+                render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''
+            },
+            {
+                data: "customer_address",
+                render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''
+            },
             
             {
                 data: "subtotal",
