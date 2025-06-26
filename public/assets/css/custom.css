@@ -273,7 +273,7 @@ th.no-sort::after {
 	text-align:right !important;
 }
 .dt-column-title,.dt-type-numeric{
-	text-align: center;
+	text-align:left;
 }
 .dt-type-date{
 	text-align:left !important;
@@ -377,3 +377,4 @@ td.logo-col {
 }
 .select2-container--default .select2-selection--single {
     border: 1px solid #495057 !important;
+}

@@ -39,8 +39,8 @@
         Are You Sure You Want To Delete This Role?
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         <button type="button" id="confirm-delete-btn" class="btn btn-danger">Delete</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
       </div>
     </div>
   </div>
@@ -48,6 +48,13 @@
 <?php include "common/footer.php"; ?>
 
 <script>
+    function formatDateToDMY(input) {
+    const date = new Date(input);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // months are 0-based
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+}
     let table="";
     $(document).ready(function () {
         const alertBox = $('.alert');
@@ -94,14 +101,14 @@
                     data: "created_at",
                     render: function (data) {
                         const d = new Date(data);
-                        return isNaN(d) ? '-' : d.toISOString().split('T')[0];
+                        return isNaN(d) ? '-' : formatDateToDMY(d);//d.toISOString().split('T')[0];
                     }
                 },
                 {
                     data: "updated_at",
                     render: function (data) {
                         const d = new Date(data);
-                        return isNaN(d) ? '-' : d.toISOString().split('T')[0];
+                        return isNaN(d) ? '-' : formatDateToDMY(d);
                     }
                 },
                 {
