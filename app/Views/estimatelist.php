@@ -30,7 +30,7 @@
                 <th>Discount (%)</th>
                 <th>Total (KWD)</th>
                 <th>Date</th>
-                <th style="width: 130px;">Action</th>
+                <th>Action</th>
                 <th class="d-none">ID</th>
             </tr>
         </thead>
@@ -81,8 +81,10 @@ $(document).ready(function () {
              "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
         columns: [
             { data: "slno" },
-            { data: "customer_name" },
-            { data: "customer_address" },
+
+            { data: "customer_name"},
+            { data: "customer_address"},
+            
             {
                 data: "subtotal",
                 render: function (data) {
@@ -92,9 +94,13 @@ $(document).ready(function () {
             {
                 data: "discount",
                 render: function (data) {
-                    return data + "%";
+                    if (data === null || data === '' || parseFloat(data) === 0) {
+                        return '-N/A-';
+                    }
+                    return parseFloat(data).toFixed(2) + '%';
                 }
             },
+
             {
                 data: "total_amount",
                 render: function (data) {
@@ -132,6 +138,8 @@ $(document).ready(function () {
 
         order: [[8, 'desc']],
         columnDefs: [
+            { targets: 2, width: '350px' },
+            // { targets: 4, width: '100px' },
             { searchable: false, orderable: false, targets: [0, 7] }
         ]
     });

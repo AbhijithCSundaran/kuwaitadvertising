@@ -43,12 +43,26 @@ public function save()
     $quantity = $this->request->getPost('quantity');
     $total = $this->request->getPost('total');
 
-    if (empty($customerId) || empty($address) || empty($description) || empty($price) || empty($quantity) || empty($total)) {
+    if (empty($customerId) || empty($address)) {
         return $this->response->setJSON([
             'status' => 'error',
-            'message' => 'Please Fill All Mandatory Fields.'
+            'message' => 'Please fill customer name and address.'
         ]);
     }
+
+    $validItems = 0;
+    foreach ($description as $key => $desc) {
+        if (!empty(trim($desc))) {
+            $validItems++;
+        }
+    }
+    if ($validItems === 0) {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Please fill at least one item with description.'
+        ]);
+    }
+
 
     $subtotal = 0;
     foreach ($total as $t) {
@@ -65,12 +79,24 @@ public function save()
         'date' => date('Y-m-d')
     ];
 
-    $items = [];
+
+$items = [];
     foreach ($description as $key => $desc) {
+        $desc = trim($desc);
+        $unitPrice = trim($price[$key]);
+        $qty = trim($quantity[$key]);
+
+        if ($desc === '' || $unitPrice === '' || $qty === '') {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Each item must have Description, Unit Price, and Quantity filled.'
+            ]);
+        }
+
         $items[] = [
             'description' => $desc,
-            'price' => (float)$price[$key],
-            'quantity' => (float)$quantity[$key],
+            'price' => (float)$unitPrice,
+            'quantity' => (float)$qty,
             'total' => (float)$total[$key]
         ];
     }
@@ -126,7 +152,7 @@ public function save()
 
         return $this->response->setJSON([
             'status' => 'success',
-            'message' => 'Estimate Saved Successfully.',
+            'message' => 'Generating Estimate.',
             'estimate_id' => $estimateId
         ]);
     }
