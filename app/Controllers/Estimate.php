@@ -186,16 +186,17 @@ $items = [];
             }
 
             $data[] = [
-                'slno'              => $slno++,
-                'estimate_id'       => $row['estimate_id'],
-                'customer_name'     => $row['customer_name'],
-                'customer_address'  => $row['customer_address'],
-                'subtotal'          => number_format($subtotal, 2),
-                'discount'          => $row['discount'],
-                'total_amount'      => number_format($row['total_amount'], 2),
-                'date'              => $row['date'],
-                'description'       => implode(', ', $descList),
-            ];
+    'slno'              => $slno++,
+    'estimate_id'       => $row['estimate_id'],
+    'customer_name'     => $row['customer_name'],
+    'customer_address'  => $row['customer_address'],
+    'subtotal'          => round($subtotal, 2),
+    'discount'          => $row['discount'],
+    'total_amount'      => round($row['total_amount'], 2),
+    'date'              => $row['date'],
+    'description'       => implode(', ', $descList),
+];
+
         }
 
         return $this->response->setJSON([

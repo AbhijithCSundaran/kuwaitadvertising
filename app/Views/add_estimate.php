@@ -233,20 +233,26 @@
             }
 
             $('#add-item').click(function () {
-                $('#item-container').append(`
-                <tr class="item-row">
-                    <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
-                    <td><input type="number" name="price[]" class="form-control price"></td>
-                    <td><input type="number" name="quantity[]" class="form-control quantity"></td>
-                    <td><input type="number" name="total[]" class="form-control total" readonly></td>
-                    <td class="text-center">
-                        <span class="remove-item-btn" title="Remove">
-                            <i class="fas fa-trash text-danger"></i>
-                        </span>
-                    </td>
-                </tr>
+                const newRow = $(`
+                    <tr class="item-row">
+                        <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
+                        <td><input type="number" name="price[]" class="form-control price"></td>
+                        <td><input type="number" name="quantity[]" class="form-control quantity"></td>
+                        <td><input type="number" name="total[]" class="form-control total" readonly></td>
+                        <td class="text-center">
+                            <span class="remove-item-btn" title="Remove">
+                                <i class="fas fa-trash text-danger"></i>
+                            </span>
+                        </td>
+                    </tr>
                 `);
+
+                $('#item-container').append(newRow);
+
+                // Autofocus on the description input of the newly added row
+                newRow.find('input[name="description[]"]').focus();
             });
+
 
             $(document).on('click', '.remove-item-btn', function () {
                 $(this).closest('tr').remove();
