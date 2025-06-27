@@ -37,6 +37,7 @@ class Expense extends BaseController
         $particular   = $this->request->getPost('particular');
         $amount       = $this->request->getPost('amount');
         $payment_mode = $this->request->getPost('payment_mode');
+        $reference    = $this->request->getPost('reference');
 
         if (empty($date) || empty($particular) || empty($amount) || empty($payment_mode)) {
             return $this->response->setJSON([
@@ -49,7 +50,8 @@ class Expense extends BaseController
             'date' => $convertedDate,
             'particular'   => $particular,
             'amount'       => $amount,
-            'payment_mode' => $payment_mode
+            'payment_mode' => $payment_mode,
+            'reference'    => $reference
         ];
 
         if (!empty($id)) {
@@ -65,7 +67,8 @@ class Expense extends BaseController
                 $existing['date'] !== $data['date'] ||
                 $existing['particular'] !== $data['particular'] ||
                 $existing['amount'] != $data['amount'] ||
-                $existing['payment_mode'] !== $data['payment_mode']
+                $existing['payment_mode'] !== $data['payment_mode'] ||
+                $existing['reference'] !== $data['reference']
             );
 
             if ($hasChanges) {
@@ -159,38 +162,41 @@ class Expense extends BaseController
     }
 
    public function getExpenseReportAjax()
-    {
-        $model = new \App\Models\Expense_Model();
+{
+    $model = new \App\Models\Expense_Model();
 
-        $date      = $this->request->getPost('date');       
-        $month     = $this->request->getPost('month');
-        $year      = $this->request->getPost('year');
-        $fromDate  = $this->request->getPost('fromDate');
-        $toDate    = $this->request->getPost('toDate');
+    $date     = $this->request->getPost('date');       
+    $month    = $this->request->getPost('month');
+    $year     = $this->request->getPost('year');
+    $fromDate = $this->request->getPost('fromDate');
+    $toDate   = $this->request->getPost('toDate');
 
-        $builder = $model->builder()->orderBy('id', 'DESC');
+    $builder = $model->builder();
 
-        
-        if (!empty($fromDate) && !empty($toDate)) {
-            $builder->where('date >=', $fromDate)->where('date <=', $toDate);
-        }
-        
-        elseif (!empty($date)) {
-            $builder->where('DATE(date)', $date);
-        }
-       
-        elseif (!empty($month) && !empty($year)) {
-            $builder->where('MONTH(date)', $month);
-            $builder->where('YEAR(date)', $year);
-        }
-        
-        elseif (!empty($year)) {
-            $builder->where('YEAR(date)', $year);
-        }
+    
+    if (!empty($fromDate) && !empty($toDate)) {
+        $builder->where('date >=', $fromDate)->where('date <=', $toDate);
+    }
+    
+    elseif (!empty($date)) {
+        $builder->where('DATE(date)', $date);
+    }
+    
+    elseif (!empty($month) && !empty($year)) {
+        $builder->where('MONTH(date)', $month);
+        $builder->where('YEAR(date)', $year);
+    }
+   
+    elseif (!empty($year)) {
+        $builder->where('YEAR(date)', $year);
+    }
 
-        $data = $builder->get()->getResult();
+    $builder->orderBy('date', 'DESC')->orderBy('id', 'DESC');
 
-        return $this->response->setJSON($data);
-    }   
+    $data = $builder->get()->getResult();
+
+    return $this->response->setJSON($data);
+
+}
 
     }

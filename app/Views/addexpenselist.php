@@ -26,28 +26,21 @@
 </div>
 </div>
 
-<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-
-      <div class="modal-header">
-        <h5 class="modal-title" id="deleteModalLabel">Confirmation</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeDeleteModalBtn">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-
-      <div class="modal-body">
-        Are you sure you want to delete this expense?
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
-         <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancelDeleteBtn">Cancel</button>
-      </div>
-
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">Are you sure you want to delete this company?</div>
+            <div class="modal-footer">
+                <button type="button" id="confirm-delete-btn" class="btn btn-danger">Delete</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 <?php include "common/footer.php"; ?>
 
@@ -125,14 +118,11 @@ $(document).ready(function () {
 
 $(document).on('click', '.delete-btn', function () {
     expenseIdToDelete = $(this).data('id');
-    $('#deleteModal .modal-body').text('Are you sure you want to delete this expense?');
-    $('#deleteModal').modal('show');
-});
-$('#cancelDeleteBtn, #closeDeleteModalBtn').on('click', function () {
-    $('#deleteModal').modal('hide');
+    $('#confirmDeleteModal .modal-body').text('Are you sure you want to delete this expense?');
+    $('#confirmDeleteModal').modal('show');
 });
 
-$('#confirmDeleteBtn').on('click', function () {
+$('#confirm-delete-btn').on('click', function () {
     if (!expenseIdToDelete) return;
 
     $.ajax({
@@ -141,7 +131,7 @@ $('#confirmDeleteBtn').on('click', function () {
         data: { expense_id: expenseIdToDelete },
         dataType: "json",
         success: function (res) {
-            $('#deleteModal').modal('hide');
+            $('#confirmDeleteModal').modal('hide');
             const alertBox = $('.alert');
 
             if (res.status === 'success') {
@@ -171,7 +161,7 @@ $('#confirmDeleteBtn').on('click', function () {
             }
         },
         error: function () {
-            $('#deleteModal').modal('hide');
+            $('#confirmDeleteModal').modal('hide');
             const alertBox = $('.alert');
 
             alertBox.removeClass('d-none alert-success alert-warning')

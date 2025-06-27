@@ -32,6 +32,7 @@
     .filter_item {
         width: 50%;
     }
+    
 </style>
 
 <div class="form-control mb-3 right_container">
@@ -79,16 +80,15 @@
                 <th><strong>SI No</strong></th>
                 <th><strong>Date</strong></th>
                 <th><strong>Particular</strong></th>
-                <th><strong>Amount</strong></th>
                 <th><strong>Payment Mode</strong></th>
+                <th><strong>Amount</strong></th> 
             </tr>
         </thead>
         <tbody></tbody>
         <tfoot>
             <tr>
-                <th colspan="3" class="text-end">Total:</th>
+                <th colspan="4" class="text-end">Total:</th>
                 <th id="totalAmount">₹0.00</th>
-                <th></th>
             </tr>
         </tfoot>
     </table>
@@ -104,7 +104,32 @@
     }
 
     $(document).ready(function () {
-        let filterApplied = false; 
+        let filterApplied = false;
+
+      
+        $.ajax({
+            url: "<?= base_url('expense/getExpenseReportAjax') ?>",
+            type: "POST",
+            dataType: "json",
+            success: function (data) {
+                const years = new Set();
+
+                data.forEach(item => {
+                    const year = new Date(item.date).getFullYear();
+                    years.add(year);
+                });
+
+                if (years.size > 0) {
+                    const minYear = Math.min(...years);
+                    const maxYear = new Date().getFullYear() + 1;
+                    let options = '<option value="">Filter by Year</option>';
+                    for (let y = maxYear; y >= minYear; y--) {
+                        options += `<option value="${y}">${y}</option>`;
+                    }
+                    $('#filterYear').html(options);
+                }
+            }
+        });
 
         function loadExpenses() {
             $.ajax({
@@ -129,8 +154,8 @@
                                     <td>${index + 1}</td>
                                     <td>${item.date}</td>
                                     <td>${capitalizeFirst(item.particular)}</td>
-                                    <td>₹${parseFloat(item.amount).toFixed(2)}</td>
                                     <td>${capitalizeFirst(item.payment_mode)}</td>
+                                    <td>₹${parseFloat(item.amount).toFixed(2)}</td>
                                 </tr>
                             `;
                         });
@@ -144,7 +169,6 @@
             });
         }
 
-        
         $('#filterMonth, #filterYear').on('change', function () {
             if (filterApplied) {
                 $('#fromDate').val('');
@@ -152,7 +176,6 @@
             }
         });
 
-        
         $('#fromDate, #toDate').on('change', function () {
             const dateValue = $(this).val();
             if (dateValue) {
@@ -164,7 +187,6 @@
             }
         });
 
-      
         $('#filterBtn').click(function () {
             const month = $('#filterMonth').val();
             const year = $('#filterYear').val();
@@ -195,11 +217,9 @@
             }
 
             filterApplied = true;
-
             loadExpenses();
         });
 
-     
         $('#resetBtn').click(function () {
             $('#fromDate').val('');
             $('#toDate').val('');
@@ -209,7 +229,6 @@
             loadExpenses();
         });
 
-       
         loadExpenses();
     });
 </script>

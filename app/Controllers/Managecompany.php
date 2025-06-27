@@ -104,7 +104,7 @@ class Managecompany extends BaseController
 				]);
 			}
 			
-			if (!preg_match('/^[0-9]{7,15}$/', $newData['phone'])) {
+			if (!preg_match('/^[0-9+\-\s]{7,20}$/', $newData['phone'])) {
 				return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid Phone Number']);
 			}
 
