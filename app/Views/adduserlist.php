@@ -27,28 +27,21 @@
 </div>
 </div>
 
-<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-    
-      <div class="modal-header">
-        <h5 class="modal-title" id="deleteModalLabel">Confirmation</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeDeleteModalBtn">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      
-      <div class="modal-body">
-        Are you sure you want to delete this user?
-      </div>
-      
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cancelDeleteBtn">Cancel</button>
-      </div>
-      
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">Are you sure you want to delete this User?</div>
+            <div class="modal-footer">
+                <button type="button" id="confirm-delete-btn" class="btn btn-danger">Delete</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 <?php include "common/footer.php"; ?>
@@ -128,13 +121,11 @@ $(document).ready(function () {
 
 $(document).on('click', '.delete-btn', function () {
     userIdToDelete = $(this).data('id');
-    $('#deleteModal .modal-body').text('Are you sure you want to delete this user?');
-    $('#deleteModal').modal('show');
+    $('#confirmDeleteModal .modal-body').text('Are you sure you want to delete this User?');
+    $('#confirmDeleteModal').modal('show');
 });
- $('#cancelDeleteBtn, #closeDeleteModalBtn').on('click', function () {
-    $('#deleteModal').modal('hide');
-});
-$('#confirmDeleteBtn').on('click', function () {
+
+$('#confirm-delete-btn').on('click', function () {
     if (!userIdToDelete) return;
 
     $.ajax({
@@ -143,7 +134,7 @@ $('#confirmDeleteBtn').on('click', function () {
         data: { user_id: userIdToDelete },
         dataType: "json",
         success: function (res) {
-            $('#deleteModal').modal('hide');
+            $('#confirmDeleteModal').modal('hide');
             const alertBox = $('.alert');
 
             if (res.status === 'success') {
@@ -173,7 +164,7 @@ $('#confirmDeleteBtn').on('click', function () {
             }
         },
         error: function () {
-            $('#deleteModal').modal('hide');
+            $('#confirmDeleteModal').modal('hide');
             const alertBox = $('.alert');
 
             alertBox.removeClass('d-none alert-success alert-warning')
@@ -189,6 +180,8 @@ $('#confirmDeleteBtn').on('click', function () {
         }
     });
 });
+
 });
+
 </script>
 

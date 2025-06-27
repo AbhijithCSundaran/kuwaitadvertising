@@ -38,7 +38,7 @@
                                 <span>Billing Address</span>
                                 <div class="form-check end-0 position-absolute pe-2">
                                     <input type="checkbox" class="form-check-input" id="sameAddressCheck" <?= $isSame ? 'checked' : '' ?>>
-                                    <label class="form-check-label small m-0" for="sameAddressCheck">Use This Same as Company Address</label>
+                                    <label class="form-check-label small m-0" for="sameAddressCheck">Use Same as Company Address</label>
                                 </div>
                             </label>
                             <textarea name="billing_address" id="billing_address" class="form-control capitalize" maxlength="150"
@@ -48,10 +48,10 @@
 
                         <div class="col-6 mb-3 px-2">
                             <label for="phone" class="form-label">Phone <span class="text-danger">*</span></label>
-                            <input type="text" name="phone" id="phone" class="form-control" maxlength="15"
-                                pattern="^[0-9]{7,150}$"
-                                title="Please enter a valid phone number (7 to 150 digits)"
-                                value="<?= isset($company['phone']) ? esc($company['phone']) : '' ?>" required>
+                            <input type="text" name="phone" id="phone" class="form-control" maxlength="20"
+                            pattern="^[0-9+\-\s]{7,20}$"
+                            title="Please enter a valid phone number (digits, +, -, spaces allowed, 7–20 characters)"
+                            value="<?= isset($company['phone']) ? esc($company['phone']) : '' ?>" required>
                         </div>
                         <div class="col-6 mb-3 px-2">
                             <label for="tax_number" class="form-label">Tax Number</label>

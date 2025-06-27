@@ -26,22 +26,30 @@ class Rolemanagement extends Controller
 
     public function store()
     {
-        $role_name = $this->request->getPost('role_name');
+        $role_name_raw = $this->request->getPost('role_name');
         $access_data = $this->request->getPost('access');
 
-        if ($this->roleModel->where('role_name', $role_name)->first()) {
+        
+        $normalized_role_name = trim(preg_replace('/\s+/', ' ', strtolower($role_name_raw)));
+
+        
+        $duplicate = $this->roleModel
+            ->where('REPLACE(LOWER(TRIM(role_name)), " ", "") =', str_replace(' ', '', $normalized_role_name))
+            ->first();
+
+        if ($duplicate) {
             if ($this->request->isAJAX()) {
                 return $this->response->setJSON(['status' => 'error', 'message' => 'Role Already Exists.']);
             }
             return redirect()->back()->with('error', 'Role Already Exists.');
         }
 
-       $this->roleModel->insert([
-            'role_name'  => $role_name,
+       
+        $this->roleModel->insert([
+            'role_name'  => ucwords($normalized_role_name), 
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s'),
         ]);
-        
 
         $role_id = $this->roleModel->getInsertID();
 
@@ -103,7 +111,7 @@ class Rolemanagement extends Controller
             ];
 			$slno++;	
         }
-		//response-
+		
 		$rowResult = $roleModel->getAllRoleCount();
 		$totRoleCount = $rowResult->totroles;
 		$filterRowResult = $roleModel->getFilterRoleCount($condition,$fromstart,$tolimit);
@@ -152,60 +160,78 @@ class Rolemanagement extends Controller
     }
 
     public function update($id)
-    {
-        $role_name = $this->request->getPost('role_name');
-        $access_data = $this->request->getPost('access') ?? [];
+{
+    $role_name_raw = $this->request->getPost('role_name');
 
-        $normalizedAccess = [];
-        foreach ($this->menus as $menu) {
-            $normalizedAccess[$menu] = isset($access_data[$menu]) ? 1 : 0;
-        }
+    
+    $normalized_role_name = trim(preg_replace('/\s+/', ' ', strtolower($role_name_raw)));
 
-        $existingRole = $this->roleModel->find($id);
-        $existingPermissions = $this->roleMenuModel->where('role_id', $id)->findAll();
+    $access_data = $this->request->getPost('access') ?? [];
 
-        $oldAccess = [];
-        foreach ($this->menus as $menu) {
-            $oldAccess[$menu] = 0;
-        }
-        foreach ($existingPermissions as $perm) {
-            $oldAccess[$perm['menu_name']] = (int) $perm['access'];
-        }
-
-
-        $isNameChanged = $existingRole['role_name'] !== $role_name;
-        $isAccessChanged = $normalizedAccess !== $oldAccess;
-
-        if (!$isNameChanged && !$isAccessChanged) {
-            return redirect()->back()->with('info', 'No Changes Detected To Update.');
-        }
-
-
-        $this->roleModel->update($id, [
-            'role_name' => $role_name,
-            'updated_at' => date('Y-m-d H:i:s'),
-        ]);
-
-
-        $this->roleMenuModel->where('role_id', $id)->delete();
-        foreach ($normalizedAccess as $menu => $value) {
-            if ($value == 1) {
-                $this->roleMenuModel->insert([
-                    'role_id' => $id,
-                    'menu_name' => $menu,
-                    'access' => 1
-                ]);
-            }
-        }
-
-        if ($this->request->isAJAX()) {
-            return $this->response->setJSON(['status' => 'success', 'message' => 'Role Updated Successfully.']);
-        }
-
-        session()->setFlashdata('success', 'Role Updated Successfully.');
-        return redirect()->to(base_url('rolemanagement/edit/' . $id));
-
-
+    
+    $normalizedAccess = [];
+    foreach ($this->menus as $menu) {
+        $normalizedAccess[$menu] = isset($access_data[$menu]) ? 1 : 0;
     }
+
+    $existingRole = $this->roleModel->find($id);
+    $existingPermissions = $this->roleMenuModel->where('role_id', $id)->findAll();
+
+    $oldAccess = [];
+    foreach ($this->menus as $menu) {
+        $oldAccess[$menu] = 0;
+    }
+    foreach ($existingPermissions as $perm) {
+        $oldAccess[$perm['menu_name']] = (int) $perm['access'];
+    }
+
+   
+    $duplicate = $this->roleModel
+        ->where('REPLACE(LOWER(TRIM(role_name)), " ", "") =', str_replace(' ', '', $normalized_role_name))
+        ->where('role_id !=', $id)
+        ->first();
+
+    if ($duplicate) {
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Role Name Already Exists.']);
+        }
+        return redirect()->back()->with('error', 'Role Name Already Exists.');
+    }
+
+    
+    $currentRoleNameNormalized = strtolower(trim(preg_replace('/\s+/', ' ', $existingRole['role_name'])));
+    $isNameChanged = $currentRoleNameNormalized !== $normalized_role_name;
+    $isAccessChanged = $normalizedAccess !== $oldAccess;
+
+    if (!$isNameChanged && !$isAccessChanged) {
+        return redirect()->back()->with('info', 'No Changes Detected To Update.');
+    }
+
+    
+    $this->roleModel->update($id, [
+        'role_name' => ucwords($normalized_role_name), 
+        'updated_at' => date('Y-m-d H:i:s'),
+    ]);
+
+    
+    $this->roleMenuModel->where('role_id', $id)->delete();
+    foreach ($normalizedAccess as $menu => $value) {
+        if ($value == 1) {
+            $this->roleMenuModel->insert([
+                'role_id' => $id,
+                'menu_name' => $menu,
+                'access' => 1
+            ]);
+        }
+    }
+
+    if ($this->request->isAJAX()) {
+        return $this->response->setJSON(['status' => 'success', 'message' => 'Role Updated Successfully.']);
+    }
+
+    session()->setFlashdata('success', 'Role Updated Successfully.');
+    return redirect()->to(base_url('rolemanagement/edit/' . $id));
+}
+
 
 }
