@@ -66,7 +66,7 @@ input[type=number].no-spinner {
                     </div>
                     <div class="form-group col-md-6">
                             <label>Reference</label>
-                            <input type="text" name="reference" class="form-control" />
+                            <input type="text" name="reference" class="form-control" value="<?= isset($expense['reference']) ? esc($expense['reference']) : '' ?>">
                         </div>
                 
                     <div class="form-group col-md-6">

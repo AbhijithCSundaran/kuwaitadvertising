@@ -1,22 +1,24 @@
-<?php include "common/header.php";?>
-      <!-- partial -->
-      <div class="main-panel right_container">
-        <div class="content-wrapper">
-          <div class="row">
-            <div class="col-md-12 grid-margin">
-              <div class="d-flex justify-content-between flex-wrap">
-                <div class="d-flex align-items-end flex-wrap">
-                  <div class="me-md-3 me-xl-5">
-                    <h2>Welcome back,</h2>
-                    <p class="mb-md-0">Your analytics dashboard template.</p>
-                  </div>
-                  <div class="d-flex">
-                    <i class="mdi mdi-home text-muted hover-cursor"></i>
-                    <p class="text-muted mb-0 hover-cursor">&nbsp;/&nbsp;Dashboard&nbsp;/&nbsp;</p>
-                    <p class="text-primary mb-0 hover-cursor">Analytics</p>
-                  </div>
-                </div>
-                <div class="d-flex justify-content-between align-items-end flex-wrap">
+<?php include "common/header.php"; ?>
+<!-- partial -->
+<div class="right_container">
+  <div class="content-wrapper">
+    <div class="row">
+      <div class="col-md-12 grid-margin">
+        <div class="d-flex justify-content-between flex-wrap">
+          <div class="d-flex align-items-end flex-wrap">
+            <div class="me-md-3 me-xl-5">
+              <h2>Welcome back</h2>
+              <!-- <p class="mb-md-0">Your analytics dashboard template.</p> -->
+            </div>
+          </div>
+          <div class="d-flex align-items-center flex-wrap">
+            <i class="mdi mdi-home text-muted hover-cursor"></i>
+            <span class="text-muted hover-cursor mx-1">/ Dashboard /</span>
+            <span class="text-primary hover-cursor">Analytics</span>
+          </div>
+
+
+          <!-- <div class="d-flex justify-content-between align-items-end flex-wrap">
                   <button type="button" class="btn btn-light bg-white btn-icon me-3 d-none d-md-block ">
                     <i class="mdi mdi-download text-muted"></i>
                   </button>
@@ -27,15 +29,15 @@
                     <i class="mdi mdi-plus text-muted"></i>
                   </button>
                   <button class="btn btn-primary mt-2 mt-xl-0">Download report</button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-12 grid-margin stretch-card">
-              <div class="card">
-                <div class="card-body dashboard-tabs p-0">
-                  <ul class="nav nav-tabs px-4 border-left-0 border-top-0 border-right-0" role="tablist">
+                </div> -->
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body dashboard-tabs p-0">
+            <!-- <ul class="nav nav-tabs px-4 border-left-0 border-top-0 border-right-0" role="tablist">
                     <li class="nav-item">
                       <a class="nav-link active" id="overview-tab" data-bs-toggle="tab" href="#overview" role="tab" aria-controls="overview" aria-selected="true">Overview</a>
                     </li>
@@ -45,190 +47,205 @@
                     <li class="nav-item">
                       <a class="nav-link" id="purchases-tab" data-bs-toggle="tab" href="#purchases" role="tab" aria-controls="purchases" aria-selected="false">Purchases</a>
                     </li>
-                  </ul>
-                  <div class="tab-content py-0 px-0 border-left-0 border-bottom-0 border-right-0">
-                    <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
-                      <div class="d-flex flex-wrap justify-content-xl-between">
-                        <?php
-                        use App\Models\Manageuser_Model;
-                        $userModel = new Manageuser_Model();
-                        $userCount = $userModel->getAllUserCount()->totuser ?? 0;
-                        ?>
+                  </ul> -->
+            <div class="tab-content py-0 px-0 border-left-0 border-bottom-0 border-right-0">
+              <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+                <div class="d-flex flex-wrap justify-content-xl-between">
+                  <?php
+                  use App\Models\Manageuser_Model;
+                  $userModel = new Manageuser_Model();
+                  $userCount = $userModel->getAllUserCount()->totuser ?? 0;
+                  ?>
 
-                        <div class="d-flex flex-wrap justify-content-xl-between">
-                          <a href="<?= base_url('adduserlist') ?>" class="text-decoration-none text-dark">
-                            <div class="d-none d-xl-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item" style="cursor: pointer;">
-                              <div class="icon-box-secondary me-3">
-                                <i class="mdi mdi-account-group"></i>
-                              </div>
-                              <div class="d-flex flex-column justify-content-around p-2 rounded">
-                                <small class="mb-1 text-muted">Total Customers</small>
-                                <h5 class="mb-0"><?= $userCount ?></h5>
-                              </div>
-                            </div>
-                          </a>
+                  <div class="d-flex flex-wrap justify-content-xl-between">
+                    <a href="<?= base_url('adduserlist') ?>" class="text-decoration-none text-dark">
+                      <!-- <div class=" d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item bg-primary text-white"
+                        style="cursor: pointer;">
+                        <div class="icon-box me-3">
+                          <i class="mdi mdi-account-group"></i>
                         </div>
-                        <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
-                          <div class="icon-box-secondary me-3">
-                            <i class="mdi mdi-currency-usd"></i>
-                          </div>
-                          <div class="d-flex flex-column justify-content-around">
-                            <small class="mb-1 text-muted">Total Revenue Of The Day</small>
-                            <h5 class="me-2 mb-0">$577545</h5>
-                          </div>
+                        <div class="d-flex flex-column justify-content-around p-2 rounded ">
+                          <small class="mb-1 text-white">Total Customers</small>
+                          <h5 class="mb-0 text-center"><?= $userCount ?></h5>
                         </div>
-                        <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
-                          <div class="icon-box-secondary me-3">
-                            <i class="mdi mdi-eye"></i>
-                          </div>
-                             <div class="d-flex flex-column justify-content-around">
-                              <small class="mb-1 text-muted">Total Expenses Of The Day</small>
-                              <h5 class="me-2 mb-0" id="dailyExpense">0</h5>
-                          </div>
-                        </div>
-                        <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
-                          <div class="icon-box-secondary me-3">
-                            <i class="mdi mdi-download"></i>
-                          </div>
-                          <div class="d-flex flex-column justify-content-around">
-                            <small class="mb-1 text-muted">Total Income Of The Month</small>
-                            <h5 class="me-2 mb-0">0000</h5>
-                          </div>
-                        </div>
-                        <div class="d-flex py-3 border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
-                          <div class="icon-box-secondary me-3">
-                            <i class="mdi mdi-flag"></i>
-                          </div>
-                          <div class="d-flex flex-column justify-content-around">
-                              <small class="mb-1 text-muted">Total Expenses Of The Month</small>
-                              <h5 class="me-2 mb-0" id="monthlyExpense">0</h5>
-                          </div>
+                      </div> -->
+                    </a>
+                  </div>
+                  <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item bg-primary text-white" style="height: 150px;">
+                    <div class="icon-box me-4">
+                      <i class="mdi mdi-currency-usd"></i>
+                    </div>
+                    <div class="d-flex flex-column justify-content-around">
+                      <small class="mb-3 text-white"><b>Total Revenue Of The Day</b></small>
+                      <h5 class="me-2 mb-0 text-center">KWD 577545</h5>
+                    </div>
+                  </div>
+                  <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item bg-success text-white">
+                    <div class="icon-box me-4">
+                      <i class="mdi mdi-eye"></i>
+                    </div>
+                    <div class="d-flex flex-column justify-content-around">
+                      <small class="mb-3 text-white"><b>Total Expenses Of The Day</b></small>
+                      <h5 class="me-2 mb-0 text-center" id="dailyExpense">0</h5>
+                    </div>
+                  </div>
+                  <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item bg-info text-white">
+                    <div class="icon-box me-4">
+                      <i class="mdi mdi-download"></i>
+                    </div>
+                    <div class="d-flex flex-column justify-content-around">
+                      <small class="mb-3 text-white"><b>Total Income Of The Month</b></small>
+                      <h5 class="me-2 mb-0 text-center">0000</h5>
+                    </div>
+                  </div>
+                  <div  class="d-flex py-3 border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item bg-warning text-white">
+                    <div class="icon-box me-4">
+                      <i class="mdi mdi-flag"></i>
+                    </div>
+                    <div class="d-flex flex-column justify-content-around">
+                      <small class="mb-3 text-white"><b>Total Expenses Of The Month</b></small>
+                      <h5 class="me-2 mb-0 text-center" id="monthlyExpense">0</h5>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="sales" role="tabpanel" aria-labelledby="sales-tab">
+                <div class="d-flex flex-wrap justify-content-xl-between">
+                  <div
+                    class="d-none d-xl-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
+                    <div class="icon-box-secondary me-3">
+                      <i class="mdi mdi-calendar-heart"></i>
+                    </div>
+                    <div class="d-flex flex-column justify-content-around">
+                      <small class="mb-1 text-muted">Start date</small>
+                      <div class="dropdown">
+                        <a class="btn btn-secondary dropdown-toggle p-0 bg-transparent border-0 text-dark shadow-none font-weight-medium"
+                          href="#" role="button" id="dropdownMenuLinkB" data-bs-toggle="dropdown" aria-haspopup="true"
+                          aria-expanded="false">
+                          <h5 class="mb-0 d-inline-block">26 Jul 2018</h5>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLinkB">
+                          <a class="dropdown-item" href="#">12 Aug 2018</a>
+                          <a class="dropdown-item" href="#">22 Sep 2018</a>
+                          <a class="dropdown-item" href="#">21 Oct 2018</a>
                         </div>
                       </div>
                     </div>
-                    <div class="tab-pane fade" id="sales" role="tabpanel" aria-labelledby="sales-tab">
-                      <div class="d-flex flex-wrap justify-content-xl-between">
-                        <div class="d-none d-xl-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
-                          <div class="icon-box-secondary me-3">
-                            <i class="mdi mdi-calendar-heart"></i>
-                          </div>
-                          <div class="d-flex flex-column justify-content-around">
-                            <small class="mb-1 text-muted">Start date</small>  
-                              <div class="dropdown">
-                                <a class="btn btn-secondary dropdown-toggle p-0 bg-transparent border-0 text-dark shadow-none font-weight-medium" href="#" role="button" id="dropdownMenuLinkB" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                  <h5 class="mb-0 d-inline-block">26 Jul 2018</h5>
-                                </a>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLinkB">
-                                  <a class="dropdown-item" href="#">12 Aug 2018</a>
-                                  <a class="dropdown-item" href="#">22 Sep 2018</a>
-                                  <a class="dropdown-item" href="#">21 Oct 2018</a>
-                                </div>
-                              </div>
-                          </div>
-                        </div>
-                        <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
-                          <div class="icon-box-secondary me-3">
-                            <i class="mdi mdi-currency-usd"></i>
-                          </div>
-                          <div class="d-flex flex-column justify-content-around">
-                            <small class="mb-1 text-muted">Revenue</small>
-                            <h5 class="me-2 mb-0">$577545</h5>
-                          </div>
-                        </div>
-                        <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
-                          <div class="icon-box-secondary me-3">
-                            <i class="mdi mdi-eye"></i>
-                          </div>
-                          <div class="d-flex flex-column justify-content-around">
-                            <small class="mb-1 text-muted">Total views</small>
-                            <h5 class="me-2 mb-0">9833550</h5>
-                          </div>
-                        </div>
-                        <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
-                          <div class="icon-box-secondary me-3">
-                            <i class="mdi mdi-download"></i>
-                          </div>
-                          <div class="d-flex flex-column justify-content-around">
-                            <small class="mb-1 text-muted">Downloads</small>
-                            <h5 class="me-2 mb-0">2233783</h5>
-                          </div>
-                        </div>
-                        <div class="d-flex py-3 border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
-                          <div class="icon-box-secondary me-3">
-                            <i class="mdi mdi-flag"></i>
-                          </div>
-                          <div class="d-flex flex-column justify-content-around">
-                            <small class="mb-1 text-muted">Flagged</small>
-                            <h5 class="me-2 mb-0">3497843</h5>
-                          </div>
+                  </div>
+                  <div
+                    class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
+                    <div class="icon-box-secondary me-3">
+                      <i class="mdi mdi-currency-usd"></i>
+                    </div>
+                    <div class="d-flex flex-column justify-content-around">
+                      <small class="mb-1 text-muted">Revenue</small>
+                      <h5 class="me-2 mb-0">$577545</h5>
+                    </div>
+                  </div>
+                  <div
+                    class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
+                    <div class="icon-box-secondary me-3">
+                      <i class="mdi mdi-eye"></i>
+                    </div>
+                    <div class="d-flex flex-column justify-content-around">
+                      <small class="mb-1 text-muted">Total views</small>
+                      <h5 class="me-2 mb-0">9833550</h5>
+                    </div>
+                  </div>
+                  <div
+                    class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
+                    <div class="icon-box-secondary me-3">
+                      <i class="mdi mdi-download"></i>
+                    </div>
+                    <div class="d-flex flex-column justify-content-around">
+                      <small class="mb-1 text-muted">Downloads</small>
+                      <h5 class="me-2 mb-0">2233783</h5>
+                    </div>
+                  </div>
+                  <div
+                    class="d-flex py-3 border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
+                    <div class="icon-box-secondary me-3">
+                      <i class="mdi mdi-flag"></i>
+                    </div>
+                    <div class="d-flex flex-column justify-content-around">
+                      <small class="mb-1 text-muted">Flagged</small>
+                      <h5 class="me-2 mb-0">3497843</h5>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="purchases" role="tabpanel" aria-labelledby="purchases-tab">
+                <div class="d-flex flex-wrap justify-content-xl-between">
+                  <div
+                    class="d-none d-xl-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
+                    <div class="icon-box-secondary me-3">
+                      <i class="mdi mdi-calendar-heart"></i>
+                    </div>
+                    <div class="d-flex flex-column justify-content-around">
+                      <small class="mb-1 text-muted">Start date</small>
+                      <div class="dropdown">
+                        <a class="btn btn-secondary dropdown-toggle p-0 bg-transparent border-0 text-dark shadow-none font-weight-medium"
+                          href="#" role="button" id="dropdownMenuLinkC" data-bs-toggle="dropdown" aria-haspopup="true"
+                          aria-expanded="false">
+                          <h5 class="mb-0 d-inline-block">26 Jul 2018</h5>
+                        </a>
+
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLinkC">
+                          <a class="dropdown-item" href="#">12 Aug 2018</a>
+                          <a class="dropdown-item" href="#">22 Sep 2018</a>
+                          <a class="dropdown-item" href="#">21 Oct 2018</a>
                         </div>
                       </div>
                     </div>
-                    <div class="tab-pane fade" id="purchases" role="tabpanel" aria-labelledby="purchases-tab">
-                      <div class="d-flex flex-wrap justify-content-xl-between">
-                        <div class="d-none d-xl-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
-                          <div class="icon-box-secondary me-3">
-                            <i class="mdi mdi-calendar-heart"></i>
-                          </div>
-                          <div class="d-flex flex-column justify-content-around">
-                            <small class="mb-1 text-muted">Start date</small>
-                            <div class="dropdown">
-                              <a class="btn btn-secondary dropdown-toggle p-0 bg-transparent border-0 text-dark shadow-none font-weight-medium" href="#" role="button" id="dropdownMenuLinkC" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <h5 class="mb-0 d-inline-block">26 Jul 2018</h5>
-                              </a>
-                            
-                              <div class="dropdown-menu" aria-labelledby="dropdownMenuLinkC">
-                                <a class="dropdown-item" href="#">12 Aug 2018</a>
-                                <a class="dropdown-item" href="#">22 Sep 2018</a>
-                                <a class="dropdown-item" href="#">21 Oct 2018</a>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
-                          <div class="icon-box-secondary me-3">
-                            <i class="mdi mdi-currency-usd"></i>
-                          </div>
-                          <div class="d-flex flex-column justify-content-around">
-                            <small class="mb-1 text-muted">Revenue</small>
-                            <h5 class="me-2 mb-0">$577545</h5>
-                          </div>
-                        </div>
-                        <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
-                          <div class="icon-box-secondary me-3">
-                            <i class="mdi mdi-eye"></i>
-                          </div>
-                          <div class="d-flex flex-column justify-content-around">
-                            <small class="mb-1 text-muted">Total views</small>
-                            <h5 class="me-2 mb-0">9833550</h5>
-                          </div>
-                        </div>
-                        <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
-                          <div class="icon-box-secondary me-3">
-                            <i class="mdi mdi-download"></i>
-                          </div>
-                          <div class="d-flex flex-column justify-content-around">
-                            <small class="mb-1 text-muted">Downloads</small>
-                            <h5 class="me-2 mb-0">2233783</h5>
-                          </div>
-                        </div>
-                        <div class="d-flex py-3 border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
-                          <div class="icon-box-secondary me-3">
-                            <i class="mdi mdi-flag"></i>
-                          </div>
-                          <div class="d-flex flex-column justify-content-around">
-                            <small class="mb-1 text-muted">Flagged</small>
-                            <h5 class="me-2 mb-0">3497843</h5>
-                          </div>
-                        </div>
-                      </div>
+                  </div>
+                  <div
+                    class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
+                    <div class="icon-box-secondary me-3">
+                      <i class="mdi mdi-currency-usd"></i>
+                    </div>
+                    <div class="d-flex flex-column justify-content-around">
+                      <small class="mb-1 text-muted">Revenue</small>
+                      <h5 class="me-2 mb-0">$577545</h5>
+                    </div>
+                  </div>
+                  <div
+                    class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
+                    <div class="icon-box-secondary me-3">
+                      <i class="mdi mdi-eye"></i>
+                    </div>
+                    <div class="d-flex flex-column justify-content-around">
+                      <small class="mb-1 text-muted">Total views</small>
+                      <h5 class="me-2 mb-0">9833550</h5>
+                    </div>
+                  </div>
+                  <div
+                    class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
+                    <div class="icon-box-secondary me-3">
+                      <i class="mdi mdi-download"></i>
+                    </div>
+                    <div class="d-flex flex-column justify-content-around">
+                      <small class="mb-1 text-muted">Downloads</small>
+                      <h5 class="me-2 mb-0">2233783</h5>
+                    </div>
+                  </div>
+                  <div
+                    class="d-flex py-3 border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item">
+                    <div class="icon-box-secondary me-3">
+                      <i class="mdi mdi-flag"></i>
+                    </div>
+                    <div class="d-flex flex-column justify-content-around">
+                      <small class="mb-1 text-muted">Flagged</small>
+                      <h5 class="me-2 mb-0">3497843</h5>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <!-- <div class="row">
+        </div>
+      </div>
+    </div>
+    <!-- <div class="row">
             <div class="col-md-6 col-xl-3 grid-margin stretch-card">
               <div class="card">
                 <div id="cashSalesCarousel" class="carousel slide card-carousel" data-ride="carousel">
@@ -566,7 +583,7 @@
               </div>
             </div>
           </div> -->
-          <!-- <div class="row">
+    <!-- <div class="row">
             <div class="col-md-7 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
@@ -590,34 +607,34 @@
               </div>
             </div>
           </div> -->
-          <div class="row">
-            <div class="col-md-12 grid-margin stretch-card">
-              <div class="card">
-                <div class="card-body">
-                  <p class="card-title">Recent Estimates</p>
-                  <div class="table-responsive">
-                     <table class="table">
-                      <thead>
-                        <tr>
-                            <th style="width: 20%;"><strong>Customer</strong></th>
-                            <th style="width: 20%;"><strong>Status</strong></th>
-                            <th style="width: 20%;"><strong>Office</strong></th>
-                            <th style="width: 20%;"><strong>Description</strong></th>
-                            <th style="width: 10%;"><strong>Subtotal</strong></th>
-                            <th style="width: 20%;"><strong>Date</strong></th>
-                            <th style="width: 20%;"><strong>Gross Amount</strong></th>
-                        </tr>
-                      </thead>
-                      <tbody id="recentEstimatesBody">
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
+    <div class="row">
+      <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <p class="card-title">Recent Estimates</p>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;"><strong>Customer</strong></th>
+                    <th style="width: 20%;"><strong>Status</strong></th>
+                    <th style="width: 20%;"><strong>Office</strong></th>
+                    <th style="width: 20%;"><strong>Description</strong></th>
+                    <th style="width: 10%;"><strong>Subtotal</strong></th>
+                    <th style="width: 20%;"><strong>Date</strong></th>
+                    <th style="width: 20%;"><strong>Gross Amount</strong></th>
+                  </tr>
+                </thead>
+                <tbody id="recentEstimatesBody">
+                </tbody>
+              </table>
             </div>
           </div>
-          <!-- <div class="row"> -->
-            <!-- <div class="col-md-4 grid-margin grid-margin-md-0 stretch-card">
+        </div>
+      </div>
+    </div>
+    <!-- <div class="row">
+        <div class="col-md-4 grid-margin grid-margin-md-0 stretch-card"> 
               <div class="card border-0 bg-primary text-white">
                 <div id="downloads-carousel" class="carousel slide card-carousel" data-ride="carousel">
                   <div class="carousel-inner">
@@ -646,8 +663,8 @@
                   </a>
                 </div>  
               </div>
-            </div> -->
-            <!-- <div class="col-md-4 grid-margin grid-margin-md-0 stretch-card">
+            </div> 
+    <div class="col-md-4 grid-margin grid-margin-md-0 stretch-card">
               <div class="card border-0 bg-warning text-white">
                 <div id="feedbacks-carousel" class="carousel slide card-carousel" data-ride="carousel">
                   <div class="carousel-inner">
@@ -676,8 +693,8 @@
                   </a>
                 </div>  
               </div>
-            </div> -->
-            <!-- <div class="col-md-4 grid-margin grid-margin-md-0 stretch-card">
+            </div> 
+   <div class="col-md-4 grid-margin grid-margin-md-0 stretch-card">
               <div class="card border-0 bg-success text-white">
                 <div id="customers-carousel" class="carousel slide card-carousel" data-ride="carousel">
                   <div class="carousel-inner">
@@ -706,10 +723,12 @@
                   </a>
                 </div>  
               </div>
-            </div> -->
-          <!-- </div> -->
-        </div>
-     <?php include "common/footer.php";?> 
+            </div> 
+    </div> -->
+  </div>
+</div>
+</div>
+<?php include "common/footer.php"; ?>
 <script>
   function fetchTodayExpense() {
     $.ajax({
@@ -784,8 +803,3 @@
     }, 10000);
   });
 </script>
-
-
-
-
-        

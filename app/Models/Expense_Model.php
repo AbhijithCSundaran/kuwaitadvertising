@@ -6,9 +6,9 @@ use CodeIgniter\Model;
 
 class Expense_Model extends Model
 {
-    protected $table = 'expenses'; // table name in DB
+    protected $table = 'expenses';
     protected $primaryKey = 'id';
-    protected $allowedFields = ['date', 'particular', 'amount', 'payment_mode']; 
+    protected $allowedFields = ['date', 'particular', 'amount', 'payment_mode', 'reference']; 
 
     public function getAllExpenseCount() {
         return $this->db->query("select count(*) as totexpense from expenses")->getRow();
