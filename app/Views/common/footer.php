@@ -1,8 +1,8 @@
 <footer class="footer">
   <div class="row">
-  <div class="d-sm-flex justify-content-center justify-content-sm-between">
-    <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2025  All rights reserved.</span>
-    <span class="float-none float-sm-end d-block mt-3 mt-sm-4 text-center">Powered by 
+  <div class="d-sm-flex justify-content-between align-items-center">
+    <span class="text-muted ">Copyright © 2025  All rights reserved.</span>
+    <span class="text-center">Powered by 
       <a href="https://www.smartlounge.online/" target="_blank">Smartlounge.online</a>
     </span>
   </div>

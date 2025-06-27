@@ -5,7 +5,7 @@
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Majestic Admin Pro</title>
+  <title>Alrai Printing Press</title>
   <!-- plugins:css -->
   <link rel="stylesheet" href="<?php echo ASSET_PATH; ?>assets/vendors/mdi/css/materialdesignicons.min.css">
   <link rel="stylesheet" href="<?php echo ASSET_PATH; ?>assets/vendors/css/vendor.bundle.base.css">
@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="<?php echo ASSET_PATH; ?>assets/css/style.css">
   <link rel="stylesheet" href="<?php echo ASSET_PATH; ?>assets/css/custom.css">
   <!-- endinject -->
-  <link rel="shortcut icon" href="<?php echo ASSET_PATH; ?>assets/images/adminlogo.jpeg" />
+  <link rel="shortcut icon" href="<?php echo ASSET_PATH; ?>assets/images/adminlogo.jpg" />
   <!-- Add in your header or before closing body tag -->
    <!-- Add this to your common/header.php if not already present -->
 	<!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">-->
@@ -68,12 +68,12 @@
   <div class="navbar-brand-wrapper d-flex justify-content-center">
     <div class="navbar-brand-inner-wrapper d-flex justify-content-between align-items-center w-100">
       <a class="navbar-brand brand-logo" href="#">
-    <img src="<?= ASSET_PATH; ?>assets/images/adminlogo.jpeg" alt="Logo" style="height: 40px;">
+    <img src="<?= ASSET_PATH; ?>assets/images/adminlogo.jpg" alt="Logo" style="height: 50px;">
 </a>
 
-      <a class="navbar-brand brand-logo-white" href="index.html"><img src="<?= ASSET_PATH; ?>assets/images/adminlogo.jpeg"
+      <a class="navbar-brand brand-logo-white" href="index.html"><img src="<?= ASSET_PATH; ?>assets/images/adminlogo.jpg"
           alt="logo" /></a>
-      <a class="navbar-brand brand-logo-mini" href="index.html"><img src="<?= ASSET_PATH; ?>assets/images/adminlogo.jpeg"
+      <a class="navbar-brand brand-logo-mini" href="index.html"><img src="<?= ASSET_PATH; ?>assets/images/adminlogo.jpg"
           alt="logo" /></a>
       <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
        
@@ -110,7 +110,7 @@
     </li>       
     <li class="nav-item">
       <a class="nav-link <?= $uri->getSegment(1) == 'adduserlist' ? 'active' : '' ?>" href="<?= base_url('adduserlist') ?>">
-        <i class="mdi mdi-circle-outline menu-icon"></i>
+        <i class="mdi mdi-bi bi-person menu-icon"></i>
         <span class="menu-title">Manage User</span>
         
       </a>
@@ -140,7 +140,6 @@
       <a class="nav-link" data-bs-toggle="collapse" href="#icons" aria-expanded="false" aria-controls="icons">
         <i class="mdi mdi-emoticon menu-icon"></i>
         <span class="menu-title">Invoice Generation</span>
-        <!-- <i class="menu-arrow"></i> -->
       </a>
       <div class="collapse" id="icons">
         <ul class="nav flex-column sub-menu">          
@@ -216,8 +215,8 @@
       </div>
       
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" id="cancelLogoutBtn">Cancel</button>
         <button type="button" class="btn btn-primary" id="confirmlogout">Logout</button>
+        <button type="button" class="btn btn-secondary" id="cancelLogoutBtn">Cancel</button> 
       </div>
       
     </div>
