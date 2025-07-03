@@ -18,11 +18,17 @@
 	padding: 25px;
     transform:scale(0.5);
 }
+ .background-box {	
+    background-image: url("../images/estimate-6-bg.jpg");
+	background-size: 100%;     
+	background-position: top;
+	background-repeat: no-repeat; 	
+}
 
 }
 </style>
     <div class="text-right  text-end print-btn" >
-        <button onclick="printEstimate()" class="btn btn-primary no print">🖨️ Print Estimate</button>
+        <button onclick="printEstimate()" class="btn btn-primary no print">🖨️ Print</button>
     </div>
     <div class="right_container" >
         <div class="m-auto background-box" id="printArea"> 
@@ -43,8 +49,12 @@
                         <p><?= esc($estimate['customer_name'] ?? '') ?></p>
                         <p><?= esc($estimate['customer_address'] ?? '') ?></p>
                     </div>
+                    <div class="col-md-6 text-end">
+                        <p><strong>From:</strong></p>
+                        <p><?= esc($user_name ?? '') ?></p>
+                    </div>
                 </div>
-                <table class="generate-table ">
+                <table class="generate-table " >
                     <thead class="thead-dark">
                         <tr>
                             <th>Sl No</th>
@@ -117,7 +127,7 @@ function printEstimate() {
 
     document.body.innerHTML = printContents;
     window.print();
-    document.body.innerHTML = originalContents;
+    // document.body.innerHTML = originalContents;
     location.reload(); 
 }
 

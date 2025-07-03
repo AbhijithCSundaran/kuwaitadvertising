@@ -90,7 +90,8 @@
       var url = '<?= base_url("login/authenticate") ?>';
 
       $.post(url, body, function (response) {
-        if (response == 1) {
+        if (response.status === 1) {
+          
           $('#loginalert').removeClass('alert-danger').addClass('alert-success');
           $('#loginalert').html('Login Successful');
           $('#loginalert').fadeIn();
@@ -98,6 +99,7 @@
           setTimeout(function () {
             $('#loginalert').fadeOut();
             window.location.href = "<?= base_url('dashboard') ?>";
+            // alert(response.user_Id);
           }, 2000); 
         } else {
           $('#loginalert').removeClass('alert-success').addClass('alert-danger');

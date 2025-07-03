@@ -19,15 +19,22 @@ class Login extends BaseController{
 			$result=$this->Login_Model->authenticateNow($email,$password);
 			$loginModel = new Login_Model();
             $result = $loginModel->authenticateNow($email, $password);
-			if($result){
-				echo json_encode(1);
-			}
-			else{
-				echo json_encode(0);
+			if ($result) {
+				$this->session->set([
+					'user_Id'=> $result->user_id,
+					'user_Name'=> $result->name,
+					'status'=> 1,
+				]);
+				echo json_encode(['status' => 1 ,
+				'user_Id' => $result->user_id
+ 
+			]);
+			} else {
+				echo json_encode(['status' => 0]);
 			}
 		}
 		else{
-			echo json_encode(0);
+			echo json_encode(['status' => 0]);
 		}
 	}
 }
