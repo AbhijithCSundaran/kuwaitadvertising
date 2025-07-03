@@ -47,8 +47,6 @@ class Rolemanagement extends Controller
        
         $this->roleModel->insert([
             'role_name'  => ucwords($normalized_role_name), 
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s'),
         ]);
 
         $role_id = $this->roleModel->getInsertID();
@@ -207,11 +205,11 @@ class Rolemanagement extends Controller
         return redirect()->back()->with('info', 'No Changes Detected To Update.');
     }
 
-    
-    $this->roleModel->update($id, [
-        'role_name' => ucwords($normalized_role_name), 
-        'updated_at' => date('Y-m-d H:i:s'),
-    ]);
+        
+        $this->roleModel->update($id, [
+            'role_name' => ucwords($normalized_role_name), 
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
 
     
     $this->roleMenuModel->where('role_id', $id)->delete();

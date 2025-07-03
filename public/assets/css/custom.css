@@ -306,7 +306,7 @@ th.no-sort::after {
     position:absolute;
     top:49%;
     right:4%;
-    z-index:10;
+    z-index:1;
 }
 .from-date{
     background-color: white !important;
@@ -384,4 +384,19 @@ td.logo-col {
     font-size: 14px;
     text-align: left;
     width: auto !important;
+}
+.bg-revenue {
+  background-color: #53d6cb !important;
+  color: #ffffff !important;
+}
+.bg-success {
+	background-color: #3dcd86 !important;
+  color: #ffffff !important;
+}
+.bg-info{
+	background-color: #9bc33a !important;
+  color: #ffffff !important;
+}
+#sameAddressCheck{
+	margin-left: -1.1rem !important;
 }

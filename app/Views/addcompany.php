@@ -38,7 +38,7 @@
                                 <span>Billing Address</span>
                                 <div class="form-check end-0 position-absolute pe-2">
                                     <input type="checkbox" class="form-check-input" id="sameAddressCheck" <?= $isSame ? 'checked' : '' ?>>
-                                    <label class="form-check-label small m-0" for="sameAddressCheck">Use Same as Company Address</label>
+                                    <label class="form-check-label small m-0" for="sameAddressCheck">Same as company address</label>
                                 </div>
                             </label>
                             <textarea name="billing_address" id="billing_address" class="form-control capitalize" maxlength="150"
