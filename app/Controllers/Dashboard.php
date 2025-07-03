@@ -7,8 +7,12 @@ class Dashboard extends BaseController
 {
     public function index()
     {
-         return view('dashboard');
+        $estimateModel = new \App\Models\EstimateModel();
+        $recentEstimates = $estimateModel->getRecentEstimatesWithCustomer();
+
+        return view('dashboard', ['estimates' => $recentEstimates]);
     }
+
     public function getTodayExpenseTotal()
     {
         $expenseModel = new \App\Models\Expense_Model();

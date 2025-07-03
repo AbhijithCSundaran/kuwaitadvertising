@@ -102,6 +102,15 @@
             ? str.charAt(0).toUpperCase() + str.slice(1)
             : '';
     }
+    function formatDate(dateStr) {
+        const dateObj = new Date(dateStr);
+        if (isNaN(dateObj.getTime())) return dateStr; // Fallback for invalid date
+
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const year = dateObj.getFullYear();
+        return `${day}-${month}-${year}`;
+    }
 
     $(document).ready(function () {
         let filterApplied = false;
@@ -152,7 +161,7 @@
                             rows += `
                                 <tr>
                                     <td>${index + 1}</td>
-                                    <td>${item.date}</td>
+                                    <td>${formatDate(item.date)}</td>
                                     <td>${capitalizeFirst(item.particular)}</td>
                                     <td>${capitalizeFirst(item.payment_mode)}</td>
                                     <td>₹${parseFloat(item.amount).toFixed(2)}</td>

@@ -1,4 +1,28 @@
 <?php include "common/header.php"; ?>
+<style>
+  /* Make the table header smaller and brown */
+  table thead th {
+    padding: 6px 12px !important;
+    font-size: 13px !important;
+    background-color: #a1263a !important; /* Brown */
+    color: #ffffff !important;
+    vertical-align: middle;
+    text-align: center;
+  }
+
+  /* Optional: Make table body font consistent */
+  table tbody td {
+    font-size: 14px;
+    padding: 8px 12px;
+    vertical-align: middle;
+  }
+
+  /* Optional: Add border for better visibility */
+  table th, table td {
+    border: 1px solid #dee2e6;
+  }
+</style>
+
 <!-- partial -->
 <div class="right_container">
   <div class="content-wrapper">
@@ -8,7 +32,7 @@
           <div class="d-flex align-items-end flex-wrap">
             <div class="me-md-3 me-xl-5">
               <h2>Welcome back</h2>
-              <!-- <p class="mb-md-0">Your analytics dashboard template.</p> -->
+              <!-- <p class="mb-md-0">Alrai Printing Press</p> -->
             </div>
           </div>
           <div class="d-flex align-items-center flex-wrap">
@@ -71,7 +95,8 @@
                       </div> -->
                     </a>
                   </div>
-                  <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item bg-primary text-white" style="height: 150px;">
+                  <!-- <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item bg-primary text-white" style="height: 150px;"> -->
+                    <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item bg-revenue"style="height: 150px;" >
                     <div class="icon-box me-4">
                       <i class="mdi mdi-currency-usd"></i>
                     </div>
@@ -616,16 +641,15 @@
               <table class="table">
                 <thead>
                   <tr>
-                    <th style="width: 20%;"><strong>Customer</strong></th>
-                    <th style="width: 20%;"><strong>Status</strong></th>
-                    <th style="width: 20%;"><strong>Office</strong></th>
-                    <th style="width: 20%;"><strong>Description</strong></th>
-                    <th style="width: 10%;"><strong>Subtotal</strong></th>
-                    <th style="width: 20%;"><strong>Date</strong></th>
-                    <th style="width: 20%;"><strong>Gross Amount</strong></th>
+                    <th><strong>Sl No</strong></th>
+                    <th><strong>Date</strong></th>
+                    <th><strong>Customer Name</strong></th>
+                    <th><strong>Customer Address</strong></th>
+                    <th><strong>Subtotal</strong></th>
+                    <th><strong>Gross Amount</strong></th>
                   </tr>
                 </thead>
-                <tbody id="recentEstimatesBody">
+                <tbody id="recentEstimatesBody"></tbody>
                 </tbody>
               </table>
             </div>
@@ -633,98 +657,6 @@
         </div>
       </div>
     </div>
-    <!-- <div class="row">
-        <div class="col-md-4 grid-margin grid-margin-md-0 stretch-card"> 
-              <div class="card border-0 bg-primary text-white">
-                <div id="downloads-carousel" class="carousel slide card-carousel" data-ride="carousel">
-                  <div class="carousel-inner">
-                    <div class="carousel-item active">
-                      <div class="card-body pb-0">
-                        <p class="card-title text-white">Downloads</p>
-                        <h1>8543</h1>
-                        <h4>Growth 58%</h4>
-                      </div>
-                      <canvas height="110" id="downloads-chart-a"></canvas>
-                    </div>
-                    <div class="carousel-item">
-                      <div class="card-body pb-0">
-                        <p class="card-title text-white">Uploads</p>
-                        <h1>4533</h1>
-                        <h4>Growth 32%</h4>
-                      </div>
-                      <canvas height="110" id="downloads-chart-b"></canvas>
-                    </div>
-                  </div>
-                  <a class="carousel-control-prev control-light" href="#downloads-carousel" role="button" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                  </a>
-                  <a class="carousel-control-next control-light" href="#downloads-carousel" role="button" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                  </a>
-                </div>  
-              </div>
-            </div> 
-    <div class="col-md-4 grid-margin grid-margin-md-0 stretch-card">
-              <div class="card border-0 bg-warning text-white">
-                <div id="feedbacks-carousel" class="carousel slide card-carousel" data-ride="carousel">
-                  <div class="carousel-inner">
-                    <div class="carousel-item active">
-                      <div class="card-body pb-0">
-                        <p class="card-title text-white">feedbacks</p>
-                        <h1>3568</h1>
-                        <h4>Growth 12%</h4>
-                      </div>
-                      <canvas height="110" id="feedbacks-chart-a"></canvas>
-                    </div>
-                    <div class="carousel-item">
-                      <div class="card-body pb-0">
-                        <p class="card-title text-white">feedbacks</p>
-                        <h1>8290</h1>
-                        <h4>Growth 11%</h4>
-                      </div>
-                      <canvas height="110" id="feedbacks-chart-b"></canvas>
-                    </div>
-                  </div>
-                  <a class="carousel-control-prev control-light" href="#feedbacks-carousel" role="button" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                  </a>
-                  <a class="carousel-control-next control-light" href="#feedbacks-carousel" role="button" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                  </a>
-                </div>  
-              </div>
-            </div> 
-   <div class="col-md-4 grid-margin grid-margin-md-0 stretch-card">
-              <div class="card border-0 bg-success text-white">
-                <div id="customers-carousel" class="carousel slide card-carousel" data-ride="carousel">
-                  <div class="carousel-inner">
-                    <div class="carousel-item active">
-                      <div class="card-body pb-0">
-                        <p class="card-title text-white">customers</p>
-                        <h1>4567</h1>
-                        <h4>Growth 31%</h4>
-                      </div>
-                      <canvas height="110" id="customers-chart-a"></canvas>
-                    </div>
-                    <div class="carousel-item">
-                      <div class="card-body pb-0">
-                        <p class="card-title text-white">Users</p>
-                        <h1>1782</h1>
-                        <h4>Growth 62%</h4>
-                      </div>
-                      <canvas height="110" id="customers-chart-b"></canvas>
-                    </div>
-                  </div>
-                  <a class="carousel-control-prev control-light" href="#customers-carousel" role="button" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                  </a>
-                  <a class="carousel-control-next control-light" href="#customers-carousel" role="button" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                  </a>
-                </div>  
-              </div>
-            </div> 
-    </div> -->
   </div>
 </div>
 </div>
@@ -766,16 +698,15 @@
       success: function (data) {
         let rows = '';
         if (data.length > 0) {
-          data.forEach(est => {
+          data.forEach((est, index) => {
             rows += `
               <tr>
+                <td>${index + 1}</td>
+                <td>${formatDate(est.date)}</td>
                 <td>${est.customer_name ?? '-'}</td>
-                <td>Estimate</td>
-                <td>--</td>
-                <td>${est.description || '-'}</td> <!-- Item Description -->
-                <td>${parseFloat(est.sub_total || 0).toFixed(2)} KWD</td> <!-- Subtotal -->
-                <td>${new Date(est.date).toLocaleDateString('en-GB')}</td>
-                <td>${parseFloat(est.total_amount || 0).toFixed(2)} KWD</td> <!-- Gross Amount -->
+                <td>${est.customer_address ?? '-'}</td>
+                <td>${parseFloat(est.sub_total || 0).toFixed(2)} KWD</td>
+                <td>${parseFloat(est.total_amount || 0).toFixed(2)} KWD</td>
               </tr>
             `;
           });
@@ -789,13 +720,20 @@
       }
     });
   }
+  function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
 
   $(document).ready(function () {
     fetchTodayExpense();
     fetchMonthlyExpense();
     loadRecentEstimates();
 
-    // Auto-refresh all every 10 seconds
+    // Auto-refresh every 10 seconds
     setInterval(function () {
       fetchTodayExpense();
       fetchMonthlyExpense();
