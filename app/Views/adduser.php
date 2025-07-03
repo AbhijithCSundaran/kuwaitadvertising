@@ -43,7 +43,7 @@
             </div>
             <div class="col-md-6 mb-2">
               <label>Phone Number</label>
-              <input type="text" name="phonenumber" id="phonenumber" class="form-control" value="<?= $userData['phonenumber'] ?? '' ?>" minlength="7" maxlength="15"  />
+              <input type="text" name="phonenumber" id="phonenumber" class="form-control" value="<?= $userData['phonenumber'] ?? '' ?>" minlength="7" maxlength="15"  pattern="^\+?[0-9]{7,15}$" title="Phone number must be 7 to 15 digits and can start with +" />
             </div>
             <div class="col-md-6 mb-2">
               <label for="role_id">Role <span class="text-danger">*</span></label>
@@ -115,9 +115,16 @@ $(document).ready(function () {
   $('#user-login-form input , #user-login-form select').on('input change', function () {
     $('#saveUserBtn').prop('disabled', $('#user-login-form').serialize() === initialFormData);
   });
-  document.getElementById('phonenumber').addEventListener('input', function () {
-    this.value = this.value.replace(/[^0-9]/g, '');
-  });
+ document.getElementById('phonenumber').addEventListener('input', function () {
+  let val = this.value;
+  // Allow + only at the beginning and remove all other non-digit characters
+  if (val.charAt(0) === '+') {
+    this.value = '+' + val.slice(1).replace(/[^0-9]/g, '');
+  } else {
+    this.value = val.replace(/[^0-9]/g, '');
+  }
+});
+
 $(document).on('click', '.toggle-password', function () {
   const input = $($(this).attr('toggle'));
   const icon = $(this).find('i');
@@ -143,18 +150,19 @@ $(document).on('click', '.toggle-password', function () {
     const isNew = uid === '';
     const name = $('#name').val().trim();
     const email = $('#email').val().trim();
-    const phone = $('#phonenumber').val().trim();
+    const phone = document.getElementById('phonenumber').value.trim();
     const pw = $('#password').val()?.trim() || '';
     const newPw = $('#new_password').val()?.trim() || '';
     const confPw = $('#confirm_new_password').val()?.trim() || '';
-    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (phone !== '') {
-          if (phone.length < 7 || phone.length > 15) {
-              showAlert('Phone Number must be between 7 to 15 digits');
-              return btn.prop('disabled', false);
-          }
-      }
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;  
+    const phonePattern = /^\+?[0-9]{7,15}$/;
 
+    if (phone !== '') {
+      if (!phonePattern.test(phone)) {
+        showAlert('Phone Number must be between 7 to 15 digits and can start with +');
+        return btn.prop('disabled', false);
+      }
+    }
     if (!name || !email || (isNew && !pw)) {
       showAlert('Please Fill All Mandatory Fields <span class="text-danger">*</span>.', 'danger');
       return btn.prop('disabled', false);

@@ -6,12 +6,17 @@ use App\Controllers\BaseController;
 use App\Models\EstimateModel;
 use App\Models\EstimateItemModel;
 use App\Models\customerModel;
+use App\Models\Manageuser_Model;
 
 class Estimate extends BaseController
 {
     public function estimatelist()
     {
         return view('estimatelist');
+    }
+    public function __construct(){
+       // $this->session = \Session::get('');
+       $this->session = \Config\Services::session();
     }
 
     public function add_estimate($id = null)
@@ -233,11 +238,12 @@ $items = [];
        
         $data['items'] = $estimateItemModel->where('estimate_id', $id)->findAll();
         $data['customers'] = $customerModel->findAll();
-        $data['estimate'] = $estimateModel
-            ->select('estimates.*, customers.name AS customer_name, customers.address AS customer_address')
-            ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
-            ->where('estimate_id', $id)
-            ->first();
+       $data['estimate'] = $estimateModel
+        ->select('estimates.*,customers.address AS customer_address, customers.name AS customer_name')
+        ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
+        ->where('estimate_id', $id)
+        ->first();
+
 
 
         if (!$data['estimate']) {
@@ -246,55 +252,48 @@ $items = [];
 
         return view('add_estimate', $data);
     }
-
     public function generateEstimate($id)
     {
         $estimateModel = new EstimateModel();
         $itemModel = new EstimateItemModel();
-
+        $userModel = new Manageuser_Model();
         $estimate = $estimateModel
-            ->select('estimates.*, customers.name AS customer_name')
+            ->select('estimates.*, customers.name AS customer_name,customers.address AS customer_address')
             ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
             ->where('estimate_id', $id)
             ->first();
-
+ 
         $items = $itemModel->where('estimate_id', $id)->findAll();
-
+		$userName = session()->get('user_Name');
+        $userId = session()->get('user_id'); 
+         $user = $userModel->find($userId);
         return view('generateestimate', [
             'estimate' => $estimate,
-            'items' => $items
+            'items' => $items,
+            'user_id' => $userId,
+			'user_name'=>$userName
         ]);
     }
     // dashboardlisting
-    public function recentEstimates()
+   public function recentEstimates()
     {
         $estimateModel = new \App\Models\EstimateModel();
         $itemModel = new \App\Models\EstimateItemModel();
-
-        $estimates = $estimateModel
-            ->select('estimates.*, customers.name AS customer_name')
-            ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
-            ->orderBy('estimates.estimate_id', 'DESC')
-            ->limit(10)
-            ->findAll();
-
+ 
+        $estimates = $estimateModel->getRecentEstimatesWithCustomer(10); // Includes name & address
+ 
         foreach ($estimates as &$est) {
             $items = $itemModel->where('estimate_id', $est['estimate_id'])->findAll();
+ 
             $subtotal = 0;
-            $descriptions = [];
-
             foreach ($items as $item) {
                 $subtotal += (float)$item['total'];
-                $descriptions[] = $item['description'];
             }
-
-            $est['sub_total'] = $subtotal;
-            $est['description'] = implode(', ', $descriptions);
+ 
+            $est['sub_total'] = round($subtotal, 2);
         }
-
+ 
         return $this->response->setJSON($estimates);
     }
-
-
  
 }
