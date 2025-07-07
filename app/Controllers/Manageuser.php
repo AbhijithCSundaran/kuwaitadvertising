@@ -94,10 +94,11 @@ public function save()
         'company_id'  => $companyId
     ];
     if (!$isEdit && $pw !== '') {
-        $data['password'] = password_hash($pw, PASSWORD_DEFAULT);
+        $data['password'] = md5($pw);
     } elseif ($isEdit && $newPw !== '') {
-        $data['password'] = password_hash($newPw, PASSWORD_DEFAULT);
+        $data['password'] = md5($newPw);
     }
+
     if (!$isEdit) {
         $model->insert($data);
         return $this->response->setJSON([
