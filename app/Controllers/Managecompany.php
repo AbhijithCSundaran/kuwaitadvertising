@@ -214,48 +214,65 @@ class Managecompany extends BaseController
 	}
 
 	public function companylistjson()
-	{
-		$draw = $_POST['draw'];
-		$fromstart = $_POST['start'];
-		$tolimit = $_POST['length'];
-		$order = $_POST['order'][0]['dir'];
-		$search = $_POST['search']['value'];
-		$slno = $fromstart + 1;
+{
+    $draw = $_POST['draw'] ?? 1;
+    $fromstart = $_POST['start'] ?? 0;
+    $tolimit = $_POST['length'] ?? 10;
 
-		$condition = "1=1";
-		if (!empty($search)) {
-			$condition .= " AND (company_name LIKE '%" . trim($search) . "%' OR email LIKE '%" . trim($search) . "%' OR phone LIKE '%" . trim($search) . "%')";
-		}
+    // Fix: Handle missing 'order' gracefully
+    $order = $_POST['order'][0]['dir'] ?? 'desc';
+    $columnIndex = $_POST['order'][0]['column'] ?? 1; // default column index
+    $search = $_POST['search']['value'] ?? '';
 
-		$companyModel = new \App\Models\Managecompany_Model();
-		$companies = $companyModel->getAllFilteredRecords($condition, $fromstart, $tolimit, $order);
+    $slno = $fromstart + 1;
 
-		$result = [];
-		foreach ($companies as $company) {
-			$tax = trim($company['tax_number']);
-			$company['tax_number'] = ($tax === '0' || $tax === '') ? '-N/A-' : $tax;
+    $columnMap = [
+        0 => 'company_id',
+        1 => 'company_name',
+        2 => 'address',
+        3 => 'tax_number',
+        4 => 'email',
+        5 => 'phone',
+        6 => 'company_logo',
+        7 => 'company_id'
+    ];
+    $orderColumn = $columnMap[$columnIndex] ?? 'company_id';
 
-			$result[] = [
-				'slno' => $slno++,
-				'company_id' => $company['company_id'],
-				'company_name' => $company['company_name'],
-				'address' => $company['address'],
-				'tax_number' => $company['tax_number'],
-				'email' => $company['email'],
-				'phone' => $company['phone'],
-				'company_logo' => $company['company_logo']
-			];
-		}
+    $condition = "1=1";
+    if (!empty($search)) {
+        $condition .= " AND (company_name LIKE '%" . trim($search) . "%' OR email LIKE '%" . trim($search) . "%' OR phone LIKE '%" . trim($search) . "%')";
+    }
 
-		$total = $companyModel->getAllCompanyCount()->totcompanies;
-		$filteredTotal = $companyModel->getFilteredCompanyCount($condition)->filCompanies;
+    $companyModel = new \App\Models\Managecompany_Model();
+    $companies = $companyModel->getAllFilteredRecords($condition, $fromstart, $tolimit, $orderColumn, $order);
 
-		return $this->response->setJSON([
-			'draw' => intval($draw),
-			'iTotalRecords' => $total,
-			'iTotalDisplayRecords' => $filteredTotal,
-			'data' => $result
-		]);
-	}
+    $result = [];
+    foreach ($companies as $company) {
+        $tax = trim($company['tax_number']);
+        $company['tax_number'] = ($tax === '0' || $tax === '') ? '-N/A-' : $tax;
+
+        $result[] = [
+            'slno' => $slno++,
+            'company_id' => $company['company_id'],
+            'company_name' => $company['company_name'],
+            'address' => $company['address'],
+            'tax_number' => $company['tax_number'],
+            'email' => $company['email'],
+            'phone' => $company['phone'],
+            'company_logo' => $company['company_logo']
+        ];
+    }
+
+    $total = $companyModel->getAllCompanyCount()->totcompanies;
+    $filteredTotal = $companyModel->getFilteredCompanyCount($condition)->filCompanies;
+
+    return $this->response->setJSON([
+        'draw' => intval($draw),
+        'recordsTotal' => $total,
+        'recordsFiltered' => $filteredTotal,
+        'data' => $result
+    ]);
+}
+
 
 }

@@ -50,21 +50,26 @@ class EstimateModel extends Model
         return $builder->countAllResults();
     }
 
-    public function getFilteredEstimates($search = '', $start = 0, $length = 10)
-    {
-        $builder = $this->db->table('estimates')
-            ->select('estimates.*, customers.name AS customer_name, customers.address AS customer_address')
-            ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
-            ->orderBy('estimate_id', 'DESC')
+    public function getFilteredEstimates($search = '', $start = 0, $length = 10, $orderColumn = 'estimate_id', $orderDir = 'desc')
+{
+    $builder = $this->db->table('estimates')
+        ->select('estimates.*, customers.name AS customer_name, customers.address AS customer_address')
+        ->join('customers', 'customers.customer_id = estimates.customer_id', 'left');
+
+    if ($search) {
+        $builder->groupStart()
+            ->like('customers.name', $search)
+            ->orLike('customers.address', $search)
+            ->groupEnd();
+    }
+
+    $builder->orderBy($orderColumn, $orderDir)
             ->limit($length, $start);
 
-        if ($search) {
-            $builder->like('customers.name', $search)
-                    ->orLike('customers.address', $search);
-        }
+    return $builder->get()->getResultArray();
+}
 
-        return $builder->get()->getResultArray();
-    }
+
     public function getRecentEstimatesWithCustomer($limit = 5)
     {
         return $this->db->table('estimates')

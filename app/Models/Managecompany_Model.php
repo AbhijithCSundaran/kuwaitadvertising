@@ -23,10 +23,20 @@ class Managecompany_Model extends Model
     }
 
    
-    public function getAllFilteredRecords($condition, $fromstart, $tolimit, $order = 'DESC')
-    {
-        return $this->db
-            ->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY company_id $order LIMIT $fromstart, $tolimit")
-            ->getResultArray();
+    public function getAllFilteredRecords($condition, $fromstart, $tolimit, $orderColumn = 'company_id', $orderDir = 'DESC')
+{
+    $allowedColumns = ['company_id', 'company_name', 'address', 'tax_number', 'email', 'phone', 'company_logo'];
+    
+    if (!in_array($orderColumn, $allowedColumns)) {
+        $orderColumn = 'company_id';
     }
+
+    $orderDir = strtoupper($orderDir) === 'ASC' ? 'ASC' : 'DESC';
+
+    return $this->db
+        ->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $orderColumn $orderDir LIMIT $fromstart, $tolimit")
+        ->getResultArray();
+}
+
+
 }

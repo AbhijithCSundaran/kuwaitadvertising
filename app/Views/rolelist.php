@@ -62,7 +62,7 @@
             ajax: {
                 url: "<?= base_url('rolemanagement/rolelistajax') ?>",
                 type: "POST",
-                dataSrc: "roles"
+                dataSrc: "data"
             },
 			sort:true,
 			searching:true,

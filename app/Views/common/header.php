@@ -136,7 +136,7 @@
         </ul>
       </div>
     </li>    
-    <li class="nav-item">
+    <!-- <li class="nav-item">
       <a class="nav-link" data-bs-toggle="collapse" href="#icons" aria-expanded="false" aria-controls="icons">
         <i class="mdi mdi-emoticon menu-icon"></i>
         <span class="menu-title">Invoice Generation</span>
@@ -146,7 +146,7 @@
           <li class="nav-item"> <a class="nav-link" href="pages/icons/font-awesome.html">Font Awesome</a></li>                              
         </ul>
       </div>
-    </li>  
+    </li>   -->
     <?php
     $isExpenseActive = $uri->getSegment(1) == 'expense' && $uri->getSegment(2) == '';
     ?>
@@ -177,14 +177,14 @@
                 <li class="nav-item">
                     <a class="nav-link <?= "$segment1/$segment2" == 'expense/report' ? 'active' : '' ?>" href="<?= base_url('expense/report') ?>">Expense Report</a>
                 </li>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-link <?= ($segment1 === 'companyledger') ? 'active' : '' ?>" href="<?= base_url('companyledger') ?>">
                         Company Ledger
                     </a>
-                </li>
-                <li class="nav-item">
+                </li> -->
+                <!-- <li class="nav-item">
                     <a class="nav-link <?= "$segment1/$segment2" == 'sales/report' ? 'active' : '' ?>" href="<?= base_url('sales/report') ?>">Sales Report</a>
-                </li>
+                </li> -->
             </ul>
         </div>
     </li>

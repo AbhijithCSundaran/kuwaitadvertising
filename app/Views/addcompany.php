@@ -16,7 +16,7 @@
                         </div>
                         
                         <div class="col-6 mb-3 px-2">
-                            <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                            <label for="email" class="form-label">Email</label>
                             <input type="email" name="email" id="email" class="form-control"
                             value="<?= isset($company['email']) ? esc($company['email']) : '' ?>" />
                         </div>
@@ -221,18 +221,15 @@
                 return;
             }
 
-            if (!email) {
-                showMessage('Please Enter a Valid Email Address To Continue.', 'danger');
-                $saveBtn.prop('disabled', false).css('opacity', 1);
-                return;
+            if (email) {
+                let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    showMessage('Please Enter a Valid Email Address.', 'danger');
+                    $saveBtn.prop('disabled', false).css('opacity', 1);
+                    return;
+                }
             }
 
-            let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                showMessage('Please Enter a Valid Email Address.', 'danger');
-                $saveBtn.prop('disabled', false).css('opacity', 1);
-                return;
-            }
 
             if (!phone) {
                 showMessage('Please Enter a Valid Phone Number.', 'danger');
@@ -301,8 +298,13 @@
         $('#sameAddressCheck').on('change', function () {
             if ($(this).is(':checked')) {
                 $('#billing_address').val($('#address').val());
+                $('#billing_address').prop('readonly', true);
+            } else {
+                $('#billing_address').val('');
+                $('#billing_address').prop('readonly', false);
             }
         });
+
         $('#address').on('input', function () {
             if ($('#sameAddressCheck').is(':checked')) {
                 $('#billing_address').val($(this).val());

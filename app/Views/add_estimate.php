@@ -67,7 +67,7 @@
                 <div class="col-md-6">
                     <label><strong> Customer</strong><span class="text-danger">*</span></label>
                     <div class="input-group mb-2 d-flex">
-                        <select name="customer_id" id="customer_id" class="form-control select2" required>
+                        <select name="customer_id" id="customer_id" class="form-control select2">
                             <option value="" disabled <?= !isset($estimate['customer_id']) ? 'selected' : '' ?>>Select Customer</option>
                             <?php foreach ($customers as $customer): ?>
                                 <option value="<?= $customer['customer_id'] ?>"
@@ -81,8 +81,9 @@
                         </div>
                     </div>
                     <label class="mt-3"><strong>Customer Address</strong><span class="text-danger">*</span></label>
-                    <textarea name="customer_address" id="customer_address" class="form-control" rows="3"
-                        required><?= isset($estimate['customer_address']) ? $estimate['customer_address'] : '' ?></textarea>
+                    <textarea name="customer_address" id="customer_address" class="form-control" rows="3">
+                        <?= isset($estimate['customer_address']) ? $estimate['customer_address'] : '' ?>
+                    </textarea>
                 </div>
                 <div class="col-md-6">
                     <div class="estimate-title">ESTIMATE</div>
@@ -203,15 +204,14 @@
     <?php include "common/footer.php"; ?>
     <!-- <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script> -->
     <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
-  <script>
-    $(document).ready(function () {
+<script>
+   $(document).ready(function () {
         $('#customer_id').select2({
             placeholder: "Select Customer",
             width: 'calc(100% - 40px)',
             minimumResultsForSearch: 0
         });
 
-        // Capitalize first letter of each word in Customer Name
         $('#popup_name').on('input', function () {
             let value = $(this).val();
             let capitalized = value.replace(/\b\w/g, function (char) {
@@ -220,7 +220,6 @@
             $(this).val(capitalized);
         });
 
-        // Capitalize first letter of each sentence in Customer Address
         $('#popup_address').on('input', function () {
             let value = $(this).val();
             let capitalized = value.replace(/(^\s*\w|[.!?]\s*\w)/g, function (char) {
@@ -229,7 +228,6 @@
             $(this).val(capitalized);
         });
 
-        // Capitalize first letter of each word in Description inputs (even newly added ones)
         $(document).on('input', 'input[name="description[]"]', function () {
             let value = $(this).val();
             let capitalized = value.replace(/\b\w/g, function (char) {
@@ -238,7 +236,6 @@
             $(this).val(capitalized);
         });
 
-        // Open modal
         $('#addCustomerBtn').on('click', function () {
             $('#customerModal').modal('show');
         });
@@ -260,7 +257,7 @@
         }
 
         $('#add-item').click(function () {
-            const newRow = $(`
+            const newRow = $(` 
                 <tr class="item-row">
                     <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
                     <td><input type="number" name="price[]" class="form-control price"></td>
@@ -368,6 +365,31 @@
         $('#estimate-form').submit(function (e) {
             e.preventDefault();
 
+            const customerId = $('#customer_id').val();
+            const customerAddress = $('#customer_address').val().trim();
+
+            if (!customerId) {
+                $('.alert')
+                    .removeClass('d-none alert-success alert-warning')
+                    .addClass('alert-danger')
+                    .text('Please select a customer.')
+                    .fadeIn()
+                    .delay(3000)
+                    .fadeOut();
+                return;
+            }
+
+            if (!customerAddress) {
+                $('.alert')
+                    .removeClass('d-none alert-success alert-warning')
+                    .addClass('alert-danger')
+                    .text('Please enter the customer address.')
+                    .fadeIn()
+                    .delay(3000)
+                    .fadeOut();
+                return;
+            }
+
             let validItemExists = false;
 
             $('.item-row').each(function () {
@@ -385,7 +407,7 @@
                 $('.alert')
                     .removeClass('d-none alert-success alert-warning')
                     .addClass('alert-danger')
-                    .text('Please enter at least one valid item with Description, Price, and Quantity.')
+                    .text('Please Enter At Least One Valid Item With Description, Price, and Quantity.')
                     .fadeIn()
                     .delay(3000)
                     .fadeOut();
@@ -401,6 +423,9 @@
                     $(this).remove();
                 }
             });
+
+            // Disable the button
+            $('#generate-btn').prop('disabled', true).text('Generating...');
 
             $.ajax({
                 url: "<?= site_url('estimate/save') ?>",
@@ -425,6 +450,7 @@
                             .fadeIn()
                             .delay(3000)
                             .fadeOut();
+                        $('#generate-btn').prop('disabled', false).text('Generate Estimate');
                     } else {
                         $('.alert')
                             .removeClass('d-none alert-success alert-warning')
@@ -433,6 +459,7 @@
                             .fadeIn()
                             .delay(3000)
                             .fadeOut();
+                        $('#generate-btn').prop('disabled', false).text('Generate Estimate');
                     }
                 },
                 error: function () {
@@ -443,22 +470,23 @@
                         .fadeIn()
                         .delay(3000)
                         .fadeOut();
+                    $('#generate-btn').prop('disabled', false).text('Generate Estimate');
                 }
             });
         });
     });
 
     $(window).on('keydown', function (e) {
-        // Ctrl + Enter to generate
         if (e.ctrlKey && e.key === 'Enter') {
             e.preventDefault();
             $('#generate-btn').trigger('click');
         }
 
-        // Ctrl + F to add row
         if (e.ctrlKey && e.key.toLowerCase() === 'f') {
             e.preventDefault();
             $('#add-item').trigger('click');
         }
     });
 </script>
+
+
