@@ -64,24 +64,23 @@
 let table = "";
 $(document).ready(function () {
     const alertBox = $('.alert');
+
     table = $('#estimateTable').DataTable({
         ajax: {
             url: "<?= base_url('estimate/estimatelistajax') ?>",
             type: "POST",
             dataSrc: "data"
         },
-        sort:true,
-		searching:true,
-        paging: true,
         processing: true,
         serverSide: true,
+        paging: true,
         searching: true,
+        order: [[8, 'desc']], // Sort by hidden estimate_id
         dom: "<'row mb-3'<'col-sm-6'l><'col-sm-6'f>>" +
              "<'row'<'col-sm-12'tr>>" +
              "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
         columns: [
             { data: "slno" },
-
             {
                 data: "customer_name",
                 render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''
@@ -90,28 +89,17 @@ $(document).ready(function () {
                 data: "customer_address",
                 render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''
             },
-            
             {
                 data: "subtotal",
-                render: function (data) {
-                    return parseFloat(data).toFixed(2) + " KWD";
-                }
+                render: data => parseFloat(data).toFixed(2) + " KWD"
             },
             {
                 data: "discount",
-                render: function (data) {
-                    if (data === null || data === '' || parseFloat(data) === 0) {
-                        return '-N/A-';
-                    }
-                    return parseFloat(data).toFixed(2) + '%';
-                }
+                render: data => (!data || parseFloat(data) === 0) ? '-N/A-' : parseFloat(data).toFixed(2) + '%'
             },
-
             {
                 data: "total_amount",
-                render: function (data) {
-                    return parseFloat(data).toFixed(2) + " KWD";
-                }
+                render: data => parseFloat(data).toFixed(2) + " KWD"
             },
             {
                 data: "date",
@@ -139,17 +127,15 @@ $(document).ready(function () {
                     `;
                 }
             },
-            { data: "estimate_id", visible: false }
+            { data: "estimate_id", visible: false } // index 8
         ],
-
-        order: [[8, 'desc']],
         columnDefs: [
             { targets: 2, width: '350px' },
-            // { targets: 4, width: '100px' },
-            { searchable: false, orderable: false, targets: [0, 7] }
+            { searchable: false, orderable: false, targets: [0, 7] } // DO NOT block column 8!
         ]
     });
 
+    // Dynamic SL No. after sorting or filtering
     table.on('order.dt search.dt draw.dt', function () {
         table.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
             var pageInfo = table.page.info();
@@ -157,6 +143,7 @@ $(document).ready(function () {
         });
     });
 
+    // Handle Delete Modal
     let deleteId = null;
     const deleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
 
@@ -197,3 +184,4 @@ $(document).ready(function () {
     });
 });
 </script>
+

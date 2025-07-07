@@ -163,54 +163,71 @@ $items = [];
     }
 }
 
-    public function estimatelistajax()
-    {
-        $request = service('request');
-        $draw = $request->getPost('draw');
-        $start = $request->getPost('start');
-        $length = $request->getPost('length');
-        $searchValue = $request->getPost('search')['value'];
+ public function estimatelistajax()
+{
+    $request = service('request');
+    $draw = $request->getPost('draw');
+    $start = $request->getPost('start');
+    $length = $request->getPost('length');
+    $searchValue = $request->getPost('search')['value'];
 
-        $estimateModel = new EstimateModel();
-        $itemModel = new EstimateItemModel();
+    $orderColumnIndex = $request->getPost('order')[0]['column'] ?? 8; // fallback to estimate_id
+    $orderDir = $request->getPost('order')[0]['dir'] ?? 'desc';
 
-        $totalRecords = $estimateModel->getEstimateCount();
-        $filteredRecords = $estimateModel->getFilteredCount($searchValue);
-        $records = $estimateModel->getFilteredEstimates($searchValue, $start, $length);
+    // Match DataTable column index to DB field names
+    $columns = [
+        0 => 'estimate_id',          // slno
+        1 => 'customers.name',
+        2 => 'customers.address',
+        3 => 'estimates.total_amount', // subtotal (not in DB directly)
+        4 => 'estimates.discount',
+        5 => 'estimates.total_amount',
+        6 => 'estimates.date',
+        7 => 'estimates.estimate_id',
+        8 => 'estimates.estimate_id'
+    ];
+    $orderByColumn = $columns[$orderColumnIndex] ?? 'estimates.estimate_id';
 
-        $data = [];
-        $slno = $start + 1;
+    $estimateModel = new EstimateModel();
+    $itemModel = new EstimateItemModel();
 
-        foreach ($records as $row) {
-            $items = $itemModel->where('estimate_id', $row['estimate_id'])->findAll();
-            $descList = array_column($items, 'description');
+    $totalRecords = $estimateModel->getEstimateCount();
+    $filteredRecords = $estimateModel->getFilteredCount($searchValue);
+    $records = $estimateModel->getFilteredEstimates($searchValue, $start, $length, $orderByColumn, $orderDir);
 
-            $subtotal = 0;
-            foreach ($items as $item) {
-                $subtotal += (float)$item['total'];
-            }
+    $data = [];
+    $slno = $start + 1;
 
-            $data[] = [
-    'slno'              => $slno++,
-    'estimate_id'       => $row['estimate_id'],
-    'customer_name'     => $row['customer_name'],
-    'customer_address'  => $row['customer_address'],
-    'subtotal'          => round($subtotal, 2),
-    'discount'          => $row['discount'],
-    'total_amount'      => round($row['total_amount'], 2),
-    'date'              => $row['date'],
-    'description'       => implode(', ', $descList),
-];
+    foreach ($records as $row) {
+        $items = $itemModel->where('estimate_id', $row['estimate_id'])->findAll();
+        $descList = array_column($items, 'description');
 
+        $subtotal = 0;
+        foreach ($items as $item) {
+            $subtotal += (float)$item['total'];
         }
 
-        return $this->response->setJSON([
-            'draw' => intval($draw),
-            'recordsTotal' => $totalRecords,
-            'recordsFiltered' => $filteredRecords,
-            'data' => $data,
-        ]);
+        $data[] = [
+            'slno'              => $slno++,
+            'estimate_id'       => $row['estimate_id'],
+            'customer_name'     => $row['customer_name'],
+            'customer_address'  => $row['customer_address'],
+            'subtotal'          => round($subtotal, 2),
+            'discount'          => $row['discount'],
+            'total_amount'      => round($row['total_amount'], 2),
+            'date'              => $row['date'],
+            'description'       => implode(', ', $descList),
+        ];
     }
+
+    return $this->response->setJSON([
+        'draw' => intval($draw),
+        'recordsTotal' => $totalRecords,
+        'recordsFiltered' => $filteredRecords,
+        'data' => $data,
+    ]);
+}
+
 
 
     public function delete()

@@ -14,6 +14,12 @@
         font-size: 14px;
         vertical-align: middle;
     }
+  
+    /* Hide sort icons for non-sortable columns */
+    th:not(.sorting):not(.sorting_asc):not(.sorting_desc)::after,
+th:not(.sorting):not(.sorting_asc):not(.sorting_desc)::before {
+  display: none !important;
+}
 </style>
 
 
@@ -56,7 +62,7 @@
                 <h5 class="modal-title">Confirmation</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">Are you sure you want to delete this company?</div>
+            <div class="modal-body">Are You Sure You Want To Delete This Company?</div>
             <div class="modal-footer">
                 <button type="button" id="confirm-delete-btn" class="btn btn-danger">Delete</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -85,13 +91,15 @@
 		    searching:true,
             processing: true,
             serverSide: true,
-            order: [[0, 'desc']],
+            order: [[1, 'desc']],
              columnDefs: [
-                { targets: 0, width: "50px" },         
-                { targets: 2, width: "350px" }, 
-                { targets: 6, width: "50px" },       
-                { targets: 7, width: "100px" }        
+                { targets: 0, orderable: false, width: "50px" },       // Sl No
+                { targets: 2, width: "350px" },                        // Address
+                { targets: 5, orderable: false },                      // Phone
+                { targets: 6, orderable: false, width: "50px" },       // Logo
+                { targets: 7, orderable: false, width: "100px" }       // Action
             ],
+
             columns: [
 
                 { data: "slno" },

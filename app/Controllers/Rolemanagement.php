@@ -16,8 +16,10 @@ class Rolemanagement extends Controller
     {
         $this->roleModel = new RoleModel();
         $this->roleMenuModel = new Rolemanagement_Model();
+        $this->db = \Config\Database::connect(); 
         helper(['form', 'url']);
     }
+
 
     public function create()
     {
@@ -75,53 +77,57 @@ class Rolemanagement extends Controller
     }
 
     public function rolelistajax()
-    {
-        $roleModel = new \App\Models\RoleModel();
-        $menuModel = new \App\Models\Rolemanagement_model();
-        
-        $draw = $_POST['draw'];
-        $fromstart = $_POST['start'];
-        $tolimit = $_POST['length'];
-        $order = $_POST['order'][0]['dir'];
-        $search = $_POST['search']['value'];
-		$slno = $fromstart + 1;
-		$condition = "1=1";
-		if($search) {
-			$condition .= " and role_name like '%".trim($search)."%'";
-		}
-		$totalRec = $roleModel->getAllFilteredRecords($condition,$fromstart,$tolimit);
-		$result = [];
+{
+    header('Content-Type: application/json'); // ensure correct JSON output
 
-        foreach ($totalRec as $role) {
-            $permissions = $menuModel->where('role_id', $role->role_id)
-                ->where('access', 1)
-                ->findAll();
+    $draw       = $_POST['draw'] ?? 1;
+    $fromstart  = $_POST['start'] ?? 0;
+    $tolimit    = $_POST['length'] ?? 10;
+    $search     = $_POST['search']['value'] ?? '';
 
-            $menuList = array_column($permissions, 'menu_name');
-
-            $result[] = [
-				'slno'=>$slno,
-                'role_id' => $role->role_id,
-                'role_name' => $role->role_name,
-                'created_at' => $role->created_at,
-                'updated_at' => $role->updated_at,
-                'permissions' => $menuList
-            ];
-			$slno++;	
-        }
-		
-		$rowResult = $roleModel->getAllRoleCount();
-		$totRoleCount = $rowResult->totroles;
-		$filterRowResult = $roleModel->getFilterRoleCount($condition,$fromstart,$tolimit);
-		$totFilterCounts = $filterRowResult->filRecords;
-		
-		$response = array("draw"=>intval($draw),
-						"iTotalRecords"=>$totRoleCount,
-						"iTotalDisplayRecords"=>$totFilterCounts,
-						"roles"=>$result);
-		
-		echo json_encode($response);
+    $condition = "1=1";
+    if (!empty($search)) {
+        $search = $this->db->escapeLikeString(trim($search));
+        $condition .= " AND role_name LIKE '%{$search}%'";
     }
+
+    $slno = $fromstart + 1;
+
+    $roleModel = new \App\Models\RoleModel();
+    $menuModel = new \App\Models\Rolemanagement_model();
+
+    $totalRec = $roleModel->getAllFilteredRecords($condition, $fromstart, $tolimit);
+    $result = [];
+
+    foreach ($totalRec as $role) {
+        $permissions = $menuModel->where('role_id', $role->role_id)
+            ->where('access', 1)
+            ->findAll();
+
+        $menuList = array_column($permissions, 'menu_name');
+
+        $result[] = [
+            'slno'        => $slno++,
+            'role_id'     => $role->role_id,
+            'role_name'   => $role->role_name,
+            'created_at'  => $role->created_at,
+            'updated_at'  => $role->updated_at,
+            'permissions' => $menuList
+        ];
+    }
+
+    $totalCount = $roleModel->getAllRoleCount()->totroles;
+    $filteredCount = $roleModel->getFilterRoleCount($condition, $fromstart, $tolimit)->filRecords;
+
+    $response = [
+        "draw" => intval($draw),
+        "recordsTotal" => $totalCount,
+        "recordsFiltered" => $filteredCount,
+        "data" => $result
+    ];
+
+    echo json_encode($response);
+}
 
 
     public function delete()
