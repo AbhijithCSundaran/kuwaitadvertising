@@ -101,15 +101,16 @@ class Expense extends BaseController
     $draw = $_POST['draw'];
     $fromstart = $_POST['start'];
     $tolimit = $_POST['length'];
-    $order = isset($_POST['order'][0]['dir']) ? $_POST['order'][0]['dir'] : 'desc';
+    $order = $_POST['order'][0]['dir'] ?? 'desc';
     $search = $_POST['search']['value'];
     $slno = $fromstart + 1;
 
     $condition = "1=1";
     if ($search) {
     $search = trim($search);
-    $condition .= " AND (DATE_FORMAT(date, '%d-%m-%Y') LIKE '%$search%' OR payment_mode LIKE '%$search%')";
+    $condition .= " AND (DATE_FORMAT(date, '%d-%m-%Y') LIKE '%$search%' OR payment_mode LIKE '%$search%' OR particular LIKE '%$search%' OR amount LIKE '%$search%')";
 }
+
 
 
     $totalRec = $model->getAllFilteredRecords($condition, $fromstart, $tolimit);
