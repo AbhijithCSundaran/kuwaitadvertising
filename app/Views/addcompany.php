@@ -22,9 +22,10 @@
                         </div>
                         <!-- address -->
                         <div class="col-6 mb-3 px-2">
-                            <label for="address" class="form-label">Company Address <span class="text-danger">*</span></label>
-                            <textarea name="address" id="address" class="form-control capitalize" maxlength="150"
-                                style="resize: vertical;" rows="3"><?= isset($company['address']) ? esc($company['address']) : '' ?></textarea>
+                            <label for="address" class="form-label">Company Address</label>
+<textarea name="address" id="address" class="form-control capitalize" maxlength="150"
+    style="resize: vertical;" rows="3"><?= isset($company['address']) ? esc($company['address']) : '' ?></textarea>
+
                         </div>
 
                         <?php
@@ -204,11 +205,12 @@
             let fileInput = $('#company_logo')[0];
             let file = fileInput ? fileInput.files[0] : null;
 
-            if (!name || !address) {
-                showMessage('Please Fill In All Required Fields.', 'danger');
+            if (!name) {
+                showMessage('Company Name is Required.', 'danger');
                 $saveBtn.prop('disabled', false).css('opacity', 1);
                 return;
             }
+
 
             if (!containsLetters(name)) {
                 showMessage('Company Name Must Contain At Least One Letter.', 'danger');
@@ -216,11 +218,6 @@
                 return;
             }
 
-            if (!containsLetters(address)) {
-                showMessage('Company Address Must Contain At Least One Letter.', 'danger');
-                $saveBtn.prop('disabled', false).css('opacity', 1);
-                return;
-            }
 
             if (email) {
                 let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

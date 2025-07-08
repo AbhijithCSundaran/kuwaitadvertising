@@ -1,13 +1,13 @@
 <?php
-
+ 
 namespace App\Controllers;
-
+ 
 use App\Controllers\BaseController;
 use App\Models\EstimateModel;
 use App\Models\EstimateItemModel;
 use App\Models\customerModel;
 use App\Models\Manageuser_Model;
-
+ 
 class Estimate extends BaseController
 {
     public function estimatelist()
@@ -15,32 +15,34 @@ class Estimate extends BaseController
         return view('estimatelist');
     }
     public function __construct(){
+       // $this->session = \Session::get('');
        $this->session = \Config\Services::session();
+ 
        $session = \Config\Services::session();
         if (!$session->get('logged_in')) {
             header('Location: ' . base_url('/'));
             exit;
         }
     }
-
+ 
     public function add_estimate($id = null)
     {
         $estimateModel = new EstimateModel();
         $estimateItemModel = new EstimateItemModel();
         $customerModel = new customerModel();
-
+ 
         $data['customers'] = $customerModel->findAll();
         $data['estimate'] = null;
         $data['items'] = [];
-
+ 
         if ($id) {
             $data['estimate'] = $estimateModel->find($id);
             $data['items'] = $estimateItemModel->where('estimate_id', $id)->findAll();
         }
-
+ 
         return view('add_estimate', $data);
     }
-
+ 
 public function save()
 {
     $estimateId = $this->request->getPost('estimate_id');
@@ -51,14 +53,14 @@ public function save()
     $price = $this->request->getPost('price');
     $quantity = $this->request->getPost('quantity');
     $total = $this->request->getPost('total');
-
+ 
     if (empty($customerId) || empty($address)) {
         return $this->response->setJSON([
             'status' => 'error',
             'message' => 'Please fill customer name and address.'
         ]);
     }
-
+ 
     $validItems = 0;
     foreach ($description as $key => $desc) {
         if (!empty(trim($desc))) {
@@ -71,15 +73,15 @@ public function save()
             'message' => 'Please fill at least one item with description.'
         ]);
     }
-
-
+ 
+ 
     $subtotal = 0;
     foreach ($total as $t) {
         $subtotal += (float)$t;
     }
     $discountAmount = ($subtotal * $discount) / 100;
     $grandTotal = $subtotal - $discountAmount;
-
+ 
     $estimateData = [
         'customer_id' => $customerId,
         'customer_address' => $address,
@@ -87,21 +89,21 @@ public function save()
         'total_amount' => $grandTotal,
         'date' => date('Y-m-d')
     ];
-
-
+ 
+ 
 $items = [];
     foreach ($description as $key => $desc) {
         $desc = trim($desc);
         $unitPrice = trim($price[$key]);
         $qty = trim($quantity[$key]);
-
+ 
         if ($desc === '' || $unitPrice === '' || $qty === '') {
             return $this->response->setJSON([
                 'status' => 'error',
                 'message' => 'Each item must have Description, Unit Price, and Quantity filled.'
             ]);
         }
-
+ 
         $items[] = [
             'description' => $desc,
             'price' => (float)$unitPrice,
@@ -109,10 +111,10 @@ $items = [];
             'total' => (float)$total[$key]
         ];
     }
-
+ 
     $estimateModel = new \App\Models\EstimateModel();
     $estimateItemModel = new \App\Models\EstimateItemModel();
-
+ 
     if (!empty($estimateId)) {
         // Update mode
         $existing = $estimateModel->find($estimateId);
@@ -122,14 +124,14 @@ $items = [];
                 'message' => 'Estimate Not Found.'
             ]);
         }
-
+ 
         $hasChanges = (
             $existing['customer_id'] != $customerId ||
             $existing['customer_address'] !== $address ||
             $existing['discount'] != $discount ||
             $existing['total_amount'] != $grandTotal
         );
-
+ 
         if ($hasChanges) {
             $estimateModel->update($estimateId, $estimateData);
             $estimateItemModel->where('estimate_id', $estimateId)->delete();
@@ -137,7 +139,7 @@ $items = [];
                 $item['estimate_id'] = $estimateId;
             }
             $estimateItemModel->insertBatch($items);
-
+ 
             return $this->response->setJSON([
                 'status' => 'success',
                 'message' => 'Estimate Updated Successfully.',
@@ -150,7 +152,7 @@ $items = [];
                 'estimate_id' => $estimateId
             ]);
         }
-
+ 
     } else {
         // Insert mode
         $estimateId = $estimateModel->insert($estimateData);
@@ -158,7 +160,7 @@ $items = [];
             $item['estimate_id'] = $estimateId;
         }
         $estimateItemModel->insertBatch($items);
-
+ 
         return $this->response->setJSON([
             'status' => 'success',
             'message' => 'Generating Estimate.',
@@ -166,7 +168,7 @@ $items = [];
         ]);
     }
 }
-
+ 
  public function estimatelistajax()
 {
     $request = service('request');
@@ -174,10 +176,10 @@ $items = [];
     $start = $request->getPost('start');
     $length = $request->getPost('length');
     $searchValue = $request->getPost('search')['value'];
-
+ 
     $orderColumnIndex = $request->getPost('order')[0]['column'] ?? 8; // fallback to estimate_id
     $orderDir = $request->getPost('order')[0]['dir'] ?? 'desc';
-
+ 
     // Match DataTable column index to DB field names
     $columns = [
         0 => 'estimate_id',          // slno
@@ -191,26 +193,26 @@ $items = [];
         8 => 'estimates.estimate_id'
     ];
     $orderByColumn = $columns[$orderColumnIndex] ?? 'estimates.estimate_id';
-
+ 
     $estimateModel = new EstimateModel();
     $itemModel = new EstimateItemModel();
-
+ 
     $totalRecords = $estimateModel->getEstimateCount();
     $filteredRecords = $estimateModel->getFilteredCount($searchValue);
     $records = $estimateModel->getFilteredEstimates($searchValue, $start, $length, $orderByColumn, $orderDir);
-
+ 
     $data = [];
     $slno = $start + 1;
-
+ 
     foreach ($records as $row) {
         $items = $itemModel->where('estimate_id', $row['estimate_id'])->findAll();
         $descList = array_column($items, 'description');
-
+ 
         $subtotal = 0;
         foreach ($items as $item) {
             $subtotal += (float)$item['total'];
         }
-
+ 
         $data[] = [
             'slno'              => $slno++,
             'estimate_id'       => $row['estimate_id'],
@@ -223,7 +225,7 @@ $items = [];
             'description'       => implode(', ', $descList),
         ];
     }
-
+ 
     return $this->response->setJSON([
         'draw' => intval($draw),
         'recordsTotal' => $totalRecords,
@@ -231,31 +233,29 @@ $items = [];
         'data' => $data,
     ]);
 }
-
-
-
+ 
     public function delete()
     {
         $estimate_id = $this->request->getPost('estimate_id');
         if (!$estimate_id) {
             return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid ID']);
         }
-
+ 
         $estimateModel = new EstimateModel();
         $itemModel = new EstimateItemModel();
-
+ 
         $itemModel->where('estimate_id', $estimate_id)->delete();
         $estimateModel->delete($estimate_id);
-
+ 
         return $this->response->setJSON(['status' => 'success']);
     }
-
+ 
     public function edit($id)
     {
         $estimateModel = new EstimateModel();
         $estimateItemModel = new EstimateItemModel();
         $customerModel = new customerModel();
-
+ 
        
         $data['items'] = $estimateItemModel->where('estimate_id', $id)->findAll();
         $data['customers'] = $customerModel->findAll();
@@ -264,13 +264,13 @@ $items = [];
         ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
         ->where('estimate_id', $id)
         ->first();
-
-
-
+ 
+ 
+ 
         if (!$data['estimate']) {
             return redirect()->to('estimatelist')->with('error', 'Estimate not found.');
         }
-
+ 
         return view('add_estimate', $data);
     }
     public function generateEstimate($id)
@@ -285,14 +285,14 @@ $items = [];
             ->first();
  
         $items = $itemModel->where('estimate_id', $id)->findAll();
-		$userName = session()->get('user_Name');
-        $userId = session()->get('user_id'); 
+        $userName = session()->get('user_Name');
+        $userId = session()->get('user_id');
          $user = $userModel->find($userId);
         return view('generateestimate', [
             'estimate' => $estimate,
             'items' => $items,
             'user_id' => $userId,
-			'user_name'=>$userName
+            'user_name'=>$userName
         ]);
     }
     // dashboardlisting

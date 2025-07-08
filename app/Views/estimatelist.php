@@ -9,7 +9,7 @@
   }
 
   #estimateTable.dataTable tbody td {
-      font-size: 14px;
+      font-size: 15px;
       vertical-align: middle;
       white-space: nowrap;
   }
@@ -72,7 +72,9 @@
 let table = "";
 $(document).ready(function () {
     const alertBox = $('.alert');
-
+        $('#estimateTable_filter input').on('input', function () {
+        this.value = this.value.trimStart(); // Prevents leading spaces
+    });
     table = $('#estimateTable').DataTable({
         ajax: {
             url: "<?= base_url('estimate/estimatelistajax') ?>",
