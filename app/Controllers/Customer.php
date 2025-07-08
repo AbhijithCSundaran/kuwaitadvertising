@@ -6,6 +6,14 @@ use CodeIgniter\Controller;
 
 class Customer extends BaseController
 {
+    public function __construct()
+    {
+       $session = \Config\Services::session();
+        if (!$session->get('logged_in')) {
+            header('Location: ' . base_url('/'));
+            exit;
+        }
+    }
     public function create()
     {
         $name = $this->request->getPost('name');

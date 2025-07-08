@@ -7,6 +7,14 @@ use App\Models\RoleModel;
 
 class Manageuser extends BaseController
 {
+    public function __construct()
+    {
+       $session = \Config\Services::session();
+        if (!$session->get('logged_in')) {
+            header('Location: ' . base_url('/'));
+            exit;
+        }
+    }
    public function index($uid = null){
         $isEdit = !empty($uid);
 

@@ -5,6 +5,14 @@ use App\Models\Login_Model;
 
 class Dashboard extends BaseController
 {
+    public function __construct()
+    {
+        $session = \Config\Services::session();
+        if (!$session->get('logged_in')) {
+            header('Location: ' . base_url('/'));
+            exit;
+        }
+    }
     public function index()
     {
         $estimateModel = new \App\Models\EstimateModel();
