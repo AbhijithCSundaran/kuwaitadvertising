@@ -88,7 +88,7 @@
                 <div class="col-md-6">
                     <div class="estimate-title">ESTIMATE</div>
                     <div class="estimate-details">
-                        <p <p class="mb-1" id="estimate-id-display">Estimate No :
+                        <p class="mb-1" id="estimate-id-display">Estimate No :
                             <?= isset($estimate['estimate_id']) ? $estimate['estimate_id'] : '' ?></p>
                         <p>Date : <?= date('d-m-Y') ?></p>
                     </div>
