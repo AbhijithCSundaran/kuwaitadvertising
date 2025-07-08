@@ -86,117 +86,94 @@
 </nav>
     <!-- partial -->
     <div class="container-fluid page-body-wrapper px-0">      
-      <!-- partial:partials/_sidebar.html -->
-      <nav class="sidebar sidebar-offcanvas" id="sidebar">
+      <?php
+$session = session();
+$allowedMenus = $session->get('allowed_menus') ?? [];
+$uri = service('uri');
+?>
+<nav class="sidebar sidebar-offcanvas" id="sidebar">
   <ul class="nav">
-    <?php $uri = service('uri'); ?>
+    <?php if (in_array('dashboard', $allowedMenus)): ?>
     <li class="nav-item">
       <a class="nav-link <?= $uri->getSegment(1) == 'dashboard' ? 'active' : '' ?>" href="<?= base_url('dashboard') ?>">
         <i class="mdi mdi-home menu-icon"></i>
         <span class="menu-title">Dashboard</span>
       </a>
-    </li> 
+    </li>
+    <?php endif; ?>
+
+    <?php if (in_array('companylist', $allowedMenus)): ?>
     <li class="nav-item">
       <a class="nav-link <?= $uri->getSegment(1) == 'companylist' ? 'active' : '' ?>" href="<?= base_url('companylist') ?>">
         <i class="mdi mdi-view-headline menu-icon"></i>
         <span class="menu-title">Company Management</span>
-        
       </a>
-      <div class="collapse" id="form-elements">
-        <ul class="nav flex-column sub-menu">
-          <li class="nav-item"><a class="nav-link" href="pages/forms/basic_elements.html">Basic Elements</a></li>          
-        </ul>
-      </div>
-    </li>       
+    </li>
+    <?php endif; ?>
+
+    <?php if (in_array('adduserlist', $allowedMenus)): ?>
     <li class="nav-item">
       <a class="nav-link <?= $uri->getSegment(1) == 'adduserlist' ? 'active' : '' ?>" href="<?= base_url('adduserlist') ?>">
         <i class="mdi mdi-bi bi-person menu-icon"></i>
         <span class="menu-title">Manage User</span>
-        
       </a>
-    </li>    
-    
-    <li class="nav-item">
-	  <a class="nav-link <?= $uri->getSegment(1) == 'rolemanagement' && $uri->getSegment(2) == 'rolelist' ? 'active' : '' ?>" href="<?= base_url('rolemanagement/rolelist') ?>">
-		<i class="mdi mdi-chart-pie menu-icon"></i>
-		<span class="menu-title">Role Management</span>
-	  </a>
-	</li>
+    </li>
+    <?php endif; ?>
 
+    <?php if (in_array('rolemanagement', $allowedMenus)): ?>
+    <li class="nav-item">
+      <a class="nav-link <?= $uri->getSegment(1) == 'rolemanagement' ? 'active' : '' ?>" href="<?= base_url('rolemanagement/rolelist') ?>">
+        <i class="mdi mdi-chart-pie menu-icon"></i>
+        <span class="menu-title">Role Management</span>
+      </a>
+    </li>
+    <?php endif; ?>
+
+    <?php if (in_array('estimatelist', $allowedMenus)): ?>
     <li class="nav-item">
       <a class="nav-link <?= $uri->getSegment(1) == 'estimatelist' ? 'active' : '' ?>" href="<?= base_url('estimatelist') ?>">
         <i class="mdi mdi-grid-large menu-icon"></i>
         <span class="menu-title">Estimate Generation</span>
-        
       </a>
-      <div class="collapse" id="tables">
-        <ul class="nav flex-column sub-menu">
-          <li class="nav-item"> <a class="nav-link" href="pages/tables/basic-table.html">Basic table</a></li>
-          </li>
-        </ul>
-      </div>
-    </li>    
-    <!-- <li class="nav-item">
-      <a class="nav-link" data-bs-toggle="collapse" href="#icons" aria-expanded="false" aria-controls="icons">
-        <i class="mdi mdi-emoticon menu-icon"></i>
-        <span class="menu-title">Invoice Generation</span>
-      </a>
-      <div class="collapse" id="icons">
-        <ul class="nav flex-column sub-menu">          
-          <li class="nav-item"> <a class="nav-link" href="pages/icons/font-awesome.html">Font Awesome</a></li>                              
-        </ul>
-      </div>
-    </li>   -->
-    <?php
-    $isExpenseActive = $uri->getSegment(1) == 'expense' && $uri->getSegment(2) == '';
-    ?>
+    </li>
+    <?php endif; ?>
+
+    <?php if (in_array('expense', $allowedMenus)): ?>
     <li class="nav-item">
-      <a class="nav-link <?= $isExpenseActive ? 'active' : '' ?>" href="<?= base_url('expense') ?>">
+      <a class="nav-link <?= $uri->getSegment(1) == 'expense' ? 'active' : '' ?>" href="<?= base_url('expense') ?>">
         <i class="mdi mdi-square-outline menu-icon"></i>
         <span class="menu-title">Expenses</span>
       </a>
-    </li>  
-    <?php
-    $segment1 = $uri->getSegment(1);
-    $segment2 = $uri->getSegment(2);
-    $isReportActive = in_array("$segment1/$segment2", [
-        'expense/report',
-    'ledger/company',
-    'report/sales',
-    'report/total-expense'
-]) || $segment1 === 'companyledger';
-    ?>
-
-    <li class="nav-item">
-        <a class="nav-link <?= $isReportActive ? 'active' : '' ?>" data-bs-toggle="collapse" href="#auth" aria-expanded="<?= $isReportActive ? 'true' : 'false' ?>" aria-controls="auth">
-            <i class="mdi mdi-clipboard menu-icon"></i>
-            <span class="menu-title">Reports</span>
-        </a>
-        <div class="collapse <?= $isReportActive ? 'show' : '' ?>" id="auth">
-            <ul class="nav flex-column sub-menu">
-                <li class="nav-item">
-                    <a class="nav-link <?= "$segment1/$segment2" == 'expense/report' ? 'active' : '' ?>" href="<?= base_url('expense/report') ?>">Expense Report</a>
-                </li>
-                <!-- <li class="nav-item">
-                    <a class="nav-link <?= ($segment1 === 'companyledger') ? 'active' : '' ?>" href="<?= base_url('companyledger') ?>">
-                        Company Ledger
-                    </a>
-                </li> -->
-                <!-- <li class="nav-item">
-                    <a class="nav-link <?= "$segment1/$segment2" == 'sales/report' ? 'active' : '' ?>" href="<?= base_url('sales/report') ?>">Sales Report</a>
-                </li> -->
-            </ul>
-        </div>
     </li>
+    <?php endif; ?>
+
+    <?php if (in_array('reports', $allowedMenus)): ?>
+    <li class="nav-item">
+  <a class="nav-link" data-bs-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
+    <i class="mdi mdi-clipboard menu-icon"></i>
+    <span class="menu-title">Reports</span>
+  </a>
+  <div class="collapse" id="auth">
+    <ul class="nav flex-column sub-menu">
+      <li class="nav-item"><a class="nav-link" href="<?= base_url('expense/report') ?>">Expense Report</a></li>
+      <li class="nav-item"><a class="nav-link" href="<?= base_url('sales/report') ?>">Sales Report</a></li>
+      <li class="nav-item"><a class="nav-link" href="<?= base_url('companyledger') ?>">Company Ledger</a></li>
+    </ul>
+  </div>
+</li>
+
+    <?php endif; ?>
+
     <li class="nav-item">
       <a href="#" id="logoutLink" class="nav-link">
-  <i class="mdi mdi-logout menu-icon"></i>
-  <span class="menu-title">Logout</span>
-</a>
+        <i class="mdi mdi-logout menu-icon"></i>
+        <span class="menu-title">Logout</span>
+      </a>
     </li>
-
   </ul>
 </nav>
+
+
 
 <!-- Logout Confirmation Modal -->
 <div class="modal fade" id="logoutModel" tabindex="-1" role="dialog" aria-labelledby="logoutModelLabel" aria-hidden="true">

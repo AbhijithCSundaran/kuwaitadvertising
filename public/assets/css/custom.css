@@ -242,19 +242,19 @@ table {
 	max-width: 100% !important;
 }
 
-table.dataTable th,
-table.dataTable td {
-	white-space: nowrap;
-	vertical-align: middle;
-}
+	table.dataTable th,
+	table.dataTable td {
+		white-space: nowrap;
+		vertical-align: middle;
+	}
 
-table.dataTable th {
-	min-width: 100px;
-}
+	table.dataTable th {
+		min-width: 100px;
+	}
 
-table.dataTable td {
-	word-break: break-word;
-}
+	table.dataTable td {
+		word-break: break-word;
+	}
 
 th.no-sort::after {
 	display: none !important;
@@ -399,4 +399,12 @@ td.logo-col {
 }
 #sameAddressCheck{
 	margin-left: -1.1rem !important;
+}
+#companiesTable.dataTable thead th {
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+    font-size: 16px !important;
+    line-height: 1.2 !important;
+    vertical-align: middle !important;
+    white-space: nowrap !important;
 }

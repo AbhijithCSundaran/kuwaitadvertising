@@ -34,16 +34,17 @@
                         ?>
 
                         <div class="col-6 mb-3 px-2 position-relative">
-                            <label for="billing_address" class="form-label d-flex justify-content-between align-items-center">
-                                <span>Billing Address</span>
-                                <div class="form-check end-0 position-absolute pe-2">
-                                    <input type="checkbox" class="form-check-input" id="sameAddressCheck" <?= $isSame ? 'checked' : '' ?>>
-                                    <label class="form-check-label small m-0" for="sameAddressCheck">Same as company address</label>
-                                </div>
-                            </label>
-                            <textarea name="billing_address" id="billing_address" class="form-control capitalize" maxlength="150"
-                                style="resize: vertical;" rows="3"><?= isset($company['billing_address']) ? esc($company['billing_address']) : '' ?></textarea>
-                        </div>
+    <label for="billing_address" class="form-label d-flex justify-content-between align-items-center">
+        <span>Billing Address</span>
+        <div class="form-check d-flex align-items-center position-absolute end-0 pe-2 m-0">
+            <input type="checkbox" class="form-check-input me-1" id="sameAddressCheck" <?= $isSame ? 'checked' : '' ?>>
+            <label class="form-check-label small m-0" for="sameAddressCheck">Same as company address</label>
+        </div>
+    </label>
+    <textarea name="billing_address" id="billing_address" class="form-control capitalize" maxlength="150"
+        style="resize: vertical;" rows="3"><?= isset($company['billing_address']) ? esc($company['billing_address']) : '' ?></textarea>
+</div>
+
                         <!-- address -->
 
                         <div class="col-6 mb-3 px-2">

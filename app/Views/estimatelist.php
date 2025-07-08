@@ -1,12 +1,20 @@
 <?php include "common/header.php"; ?>
 <style>
-    table.dataTable thead th {
-        padding-top: 10px !important;
-        padding-bottom: 10px !important;
-        font-size: 16px; /* Optional: smaller font */
-        vertical-align: middle !important;
-    }
+  /* Apply only to #estimateTable to avoid conflict */
+  #estimateTable.dataTable thead th {
+      padding: 10px 10px !important;
+      font-size: 14px !important;
+      vertical-align: middle !important;
+      white-space: nowrap !important;
+  }
+
+  #estimateTable.dataTable tbody td {
+      font-size: 14px;
+      vertical-align: middle;
+      white-space: nowrap;
+  }
 </style>
+
 
 <div class="form-control mb-3 right_container">
     <div class="alert d-none text-center position-fixed" role="alert"></div>

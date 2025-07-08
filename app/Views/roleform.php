@@ -21,17 +21,17 @@
                     <div class="card-body">
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="checkbox" id="select_all_permissions">
-                            <label class="form-check-label" for="select_all_permissions" style="font-weight: bold;">Select All</label>
+                            <label class="form-check-label fw-bold" for="select_all_permissions">Select All</label>
                         </div>
                         <div class="row">
-                            <?php foreach ($menus as $menu): ?>
+                            <?php foreach ($menus as $menuKey => $menuLabel): ?>
                                 <div class="col-md-4 mb-3">
                                     <div class="form-check">
                                         <input class="form-check-input permission-checkbox" type="checkbox"
-                                            name="access[<?= $menu ?>]" value="1" id="perm_<?= $menu ?>"
-                                            <?= isset($access[$menu]) && $access[$menu] == 1 ? 'checked' : '' ?>>
-                                        <label class="form-check-label" for="perm_<?= $menu ?>">
-                                            <?= esc(ucfirst($menu)) ?>
+                                            name="access[<?= $menuKey ?>]" value="1" id="perm_<?= $menuKey ?>"
+                                            <?= isset($access[$menuKey]) && $access[$menuKey] == 1 ? 'checked' : '' ?>>
+                                        <label class="form-check-label" for="perm_<?= $menuKey ?>">
+                                            <?= esc($menuLabel) ?>
                                         </label>
                                     </div>
                                 </div>
@@ -47,8 +47,9 @@
         </div>
     </div>
 </div>
-</div>
+                            </div>
 <?php include "common/footer.php"; ?>
+
 
 <script>
 $(document).ready(function () {
