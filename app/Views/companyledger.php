@@ -34,7 +34,7 @@ $(document).ready(function () {
 
     if (!companyId) {
         alertBox.removeClass().addClass('alert alert-danger text-center position-fixed')
-            .text('Please select a company.').fadeIn();
+            .text('Please Select A Company.').fadeIn();
         setTimeout(() => alertBox.fadeOut(), 2000);
         return;
     }

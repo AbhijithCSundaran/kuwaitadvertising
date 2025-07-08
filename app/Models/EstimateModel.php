@@ -37,37 +37,49 @@ class EstimateModel extends Model
         return $this->db->table('estimates')->countAllResults();
     }
 
-    public function getFilteredCount($search = '')
+   public function getFilteredCount($search = '')
     {
         $builder = $this->db->table('estimates')
             ->join('customers', 'customers.customer_id = estimates.customer_id', 'left');
 
         if ($search) {
-            $builder->like('customers.name', $search)
-                    ->orLike('customers.address', $search);
+            $search = trim(strtolower($search));
+
+            $builder->groupStart()
+                ->like('LOWER(customers.name)', $search)
+                ->orLike('LOWER(customers.address)', $search)
+                ->orLike('FORMAT(estimates.discount, 2)', $search)
+                ->orLike('DATE_FORMAT(estimates.date, "%d-%m-%Y")', $search)
+                ->groupEnd();
         }
 
         return $builder->countAllResults();
     }
 
+
+
     public function getFilteredEstimates($search = '', $start = 0, $length = 10, $orderColumn = 'estimate_id', $orderDir = 'desc')
-{
-    $builder = $this->db->table('estimates')
-        ->select('estimates.*, customers.name AS customer_name, customers.address AS customer_address')
-        ->join('customers', 'customers.customer_id = estimates.customer_id', 'left');
+    {
+        $builder = $this->db->table('estimates')
+            ->select('estimates.*, customers.name AS customer_name, customers.address AS customer_address')
+            ->join('customers', 'customers.customer_id = estimates.customer_id', 'left');
 
-    if ($search) {
-        $builder->groupStart()
-            ->like('customers.name', $search)
-            ->orLike('customers.address', $search)
-            ->groupEnd();
+        if ($search) {
+            $search = trim(strtolower($search));
+
+            $builder->groupStart()
+                ->like('LOWER(customers.name)', $search)
+                ->orLike('LOWER(customers.address)', $search)
+                ->orLike('FORMAT(estimates.discount, 2)', $search)
+                ->orLike('DATE_FORMAT(estimates.date, "%d-%m-%Y")', $search)
+                ->groupEnd();
+        }
+
+        $builder->orderBy($orderColumn, $orderDir)
+                ->limit($length, $start);
+
+        return $builder->get()->getResultArray();
     }
-
-    $builder->orderBy($orderColumn, $orderDir)
-            ->limit($length, $start);
-
-    return $builder->get()->getResultArray();
-}
 
 
     public function getRecentEstimatesWithCustomer($limit = 5)

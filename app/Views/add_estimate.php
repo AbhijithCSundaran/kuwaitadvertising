@@ -372,7 +372,7 @@
                 $('.alert')
                     .removeClass('d-none alert-success alert-warning')
                     .addClass('alert-danger')
-                    .text('Please select a customer.')
+                    .text('Please Select A Customer.')
                     .fadeIn()
                     .delay(3000)
                     .fadeOut();

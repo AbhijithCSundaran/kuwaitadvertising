@@ -50,7 +50,7 @@ class Managecompany extends BaseController
 
 		$rules = [
 			'company_name' => 'required',
-			'address' => 'required',
+			'address' => 'permit_empty',
 			'tax_number' => 'permit_empty',
 			'email' => 'permit_empty|valid_email',
 			'phone' => 'required',
@@ -77,15 +77,16 @@ class Managecompany extends BaseController
 			$logoFile->move(ROOTPATH . 'public/uploads', $logoName);
 		}
 
+		$rawAddress = trim($this->request->getPost('address'));
 		$newData = [
 			'company_name' => $this->request->getPost('company_name'),
-			'address' => $this->request->getPost('address'),
+			'address' => $rawAddress !== '-N/A-' ? $rawAddress : '', 
 			'billing_address' => $this->request->getPost('billing_address'),
 			'tax_number' => $this->request->getPost('tax_number'),
 			'email' => $this->request->getPost('email'),
 			'phone' => $this->request->getPost('phone'),
-			
 		];
+
 
 		if ($uid) {
 			$existing = $this->companyModel->find($uid);
@@ -220,13 +221,13 @@ class Managecompany extends BaseController
 
 	public function companylistjson()
 {
+    $db = \Config\Database::connect(); 
+
     $draw = $_POST['draw'] ?? 1;
     $fromstart = $_POST['start'] ?? 0;
     $tolimit = $_POST['length'] ?? 10;
-
-    // Fix: Handle missing 'order' gracefully
     $order = $_POST['order'][0]['dir'] ?? 'desc';
-    $columnIndex = $_POST['order'][0]['column'] ?? 1; // default column index
+    $columnIndex = $_POST['order'][0]['column'] ?? 1;
     $search = $_POST['search']['value'] ?? '';
 
     $slno = $fromstart + 1;
@@ -245,28 +246,42 @@ class Managecompany extends BaseController
 
     $condition = "1=1";
     if (!empty($search)) {
-        $condition .= " AND (company_name LIKE '%" . trim($search) . "%' OR email LIKE '%" . trim($search) . "%' OR phone LIKE '%" . trim($search) . "%')";
+        $search = trim($search);
+        $escapedSearch = $db->escapeLikeString($search); 
+
+        $condition .= " AND (
+            company_name LIKE '%$escapedSearch%' ESCAPE '!' OR
+            address LIKE '%$escapedSearch%' ESCAPE '!' OR
+            tax_number LIKE '%$escapedSearch%' ESCAPE '!' OR
+            email LIKE '%$escapedSearch%' ESCAPE '!' OR
+            phone LIKE '%$escapedSearch%' ESCAPE '!'
+        )";
     }
+
 
     $companyModel = new \App\Models\Managecompany_Model();
     $companies = $companyModel->getAllFilteredRecords($condition, $fromstart, $tolimit, $orderColumn, $order);
 
     $result = [];
     foreach ($companies as $company) {
-        $tax = trim($company['tax_number']);
-        $company['tax_number'] = ($tax === '0' || $tax === '') ? '-N/A-' : $tax;
+		$tax = trim($company['tax_number']);
+		$company['tax_number'] = ($tax === '0' || $tax === '') ? '-N/A-' : $tax;
 
-        $result[] = [
-            'slno' => $slno++,
-            'company_id' => $company['company_id'],
-            'company_name' => $company['company_name'],
-            'address' => $company['address'],
-            'tax_number' => $company['tax_number'],
-            'email' => $company['email'],
-            'phone' => $company['phone'],
-            'company_logo' => $company['company_logo']
-        ];
-    }
+		$address = trim($company['address']);
+		$company['address'] = $address === '' ? '-N/A-' : $address; 
+
+		$result[] = [
+			'slno' => $slno++,
+			'company_id' => $company['company_id'],
+			'company_name' => $company['company_name'],
+			'address' => $company['address'],
+			'tax_number' => $company['tax_number'],
+			'email' => $company['email'],
+			'phone' => $company['phone'],
+			'company_logo' => $company['company_logo']
+		];
+	}
+
 
     $total = $companyModel->getAllCompanyCount()->totcompanies;
     $filteredTotal = $companyModel->getFilteredCompanyCount($condition)->filCompanies;

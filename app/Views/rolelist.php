@@ -130,7 +130,7 @@
             ],
             order: [[6, 'desc']],
             columnDefs: [
-                { searchable: false, orderable: false, targets: [0, 4, 5] }
+                { searchable: false, orderable: false, targets: [0, 2, 5] } 
             ]
         });
 

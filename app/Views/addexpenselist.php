@@ -79,7 +79,9 @@ $(document).ready(function () {
                 }
             },
 
-            { data: "amount" },
+            { data: "amount" 
+                
+            },
             {
                 data: "payment_mode",
                 render: function (data) {
@@ -118,7 +120,7 @@ $(document).ready(function () {
 
 $(document).on('click', '.delete-btn', function () {
     expenseIdToDelete = $(this).data('id');
-    $('#confirmDeleteModal .modal-body').text('Are you sure you want to delete this expense?');
+    $('#confirmDeleteModal .modal-body').text('Are You Sure You Want To Delete This Expense?');
     $('#confirmDeleteModal').modal('show');
 });
 

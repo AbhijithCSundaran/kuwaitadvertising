@@ -17,6 +17,12 @@ class Estimate extends BaseController
     public function __construct(){
        // $this->session = \Session::get('');
        $this->session = \Config\Services::session();
+
+       $session = \Config\Services::session();
+        if (!$session->get('logged_in')) {
+            header('Location: ' . base_url('/'));
+            exit;
+        }
     }
 
     public function add_estimate($id = null)
@@ -227,8 +233,6 @@ $items = [];
         'data' => $data,
     ]);
 }
-
-
 
     public function delete()
     {

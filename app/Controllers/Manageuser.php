@@ -84,14 +84,14 @@ public function save()
     if (empty($roleId)) {
         return $this->response->setJSON([
             'status'  => 'error',
-            'message' => 'Please select a role.'
+            'message' => 'Please Select A Role.'
         ]);
     }
 
     if (empty($companyId)) {
         return $this->response->setJSON([
             'status'  => 'error',
-            'message' => 'Please select a company.'
+            'message' => 'Please Select A Company.'
         ]);
     }
     $data = [

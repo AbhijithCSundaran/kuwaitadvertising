@@ -19,13 +19,14 @@ class RoleModel extends Model
         return $this->db->query("SELECT COUNT(*) AS totroles FROM role_acces")->getRow();
     }
 
-    public function getAllFilteredRecords($condition, $fromstart, $tolimit)
+    public function getAllFilteredRecords($condition, $fromstart, $tolimit, $orderBy = 'role_id', $orderDir = 'desc')
     {
-        return $this->db->query("SELECT * FROM role_acces WHERE $condition ORDER BY role_id DESC LIMIT $fromstart, $tolimit")->getResult();
+        return $this->db->query("SELECT * FROM role_acces WHERE $condition ORDER BY $orderBy $orderDir LIMIT $fromstart, $tolimit")->getResult();
     }
 
-    public function getFilterRoleCount($condition, $fromstart, $tolimit)
+    public function getFilterRoleCount($condition)
     {
         return $this->db->query("SELECT COUNT(*) AS filRecords FROM role_acces WHERE $condition")->getRow();
     }
+
 }
