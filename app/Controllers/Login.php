@@ -2,6 +2,7 @@
 namespace App\Controllers;
 
 use App\Models\Login_Model;
+use App\Models\Rolemanagement_Model;
 use App\Controllers\BaseController;
 
 class Login extends BaseController
@@ -21,11 +22,23 @@ class Login extends BaseController
             $result = $loginModel->authenticateNow($email, $password);
 
             if ($result) {
+                // Load the role-based menu permissions
+                $roleMenuModel = new Rolemanagement_Model();
+                $permissions = $roleMenuModel
+                    ->where('role_id', $result->role_id)
+                    ->where('access', 1)
+                    ->findAll();
+
+                $allowedMenus = array_column($permissions, 'menu_name');
+
+                // Set session variables
                 $this->session->set([
-                    'user_Id'    => $result->user_id,
-                    'user_Name'  => $result->name,
-                    'status'     => 1,
-                    'logged_in'  => true
+                    'user_Id'       => $result->user_id,
+                    'user_Name'     => $result->name,
+                    'role_Id'       => $result->role_id,
+                    'allowed_menus' => $allowedMenus,
+                    'status'        => 1,
+                    'logged_in'     => true
                 ]);
 
                 return $this->response->setJSON([

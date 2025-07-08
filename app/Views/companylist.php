@@ -1,25 +1,9 @@
 <?php include "common/header.php"; ?>
 <style>
-    /* Reduce header height and padding */
-    table.dataTable thead th {
-        padding-top: 10px !important;
-        padding-bottom: 10px !important;
-        font-size: 16px;
-        line-height: 1.2 !important;
-        vertical-align: middle !important;
-    }
-
-    /* Optional: make body text consistent */
-    table.dataTable tbody td {
+    #companiesTable.dataTable tbody td {
         font-size: 14px;
         vertical-align: middle;
     }
-  
-    /* Hide sort icons for non-sortable columns */
-    th:not(.sorting):not(.sorting_asc):not(.sorting_desc)::after,
-th:not(.sorting):not(.sorting_asc):not(.sorting_desc)::before {
-  display: none !important;
-}
 </style>
 
 
@@ -40,7 +24,8 @@ th:not(.sorting):not(.sorting_asc):not(.sorting_desc)::before {
     <table class="table table-bordered" id="companiesTable" style="width:100%">
         <thead>
             <tr>
-                <th style="width: 50px;">Sl No</th>
+                <th class="d-none">ID</th> 
+                <th>Sl No</th>
                 <th>Name</th>
                 <th>Address</th>
                 <th>Tax Number</th>
@@ -48,6 +33,7 @@ th:not(.sorting):not(.sorting_asc):not(.sorting_desc)::before {
                 <th>Phone</th>
                 <th>Logo</th>
                 <th style="width: 100px;">Action</th>
+                
             </tr>
         </thead>
         <tbody></tbody>
@@ -91,50 +77,56 @@ th:not(.sorting):not(.sorting_asc):not(.sorting_desc)::before {
 		    searching:true,
             processing: true,
             serverSide: true,
-            order: [[1, 'desc']],
+            order: [[0, 'desc']],
              columnDefs: [
-                { targets: 0, orderable: false, width: "50px" },       // Sl No
-                { targets: 2, width: "350px" },                        // Address
-                { targets: 5, orderable: false },                      // Phone
-                { targets: 6, orderable: false, width: "50px" },       // Logo
-                { targets: 7, orderable: false, width: "100px" }       // Action
+                { targets: 1, orderable: false, width: "30px" },
+                { targets: 2, width: "150px" },       
+                { targets: 3, width: "300px" }, 
+                { targets: 5, orderable: false },                      
+                { targets: 6, orderable: false },                      
+                { targets: 7, orderable: false, width: "30px" },      
+                { targets: 8, orderable: false, width: "30px" }       
             ],
 
             columns: [
+    { data: "company_id", visible: false }, // index 0 - hidden but used for sorting
+    { data: "slno" },                        // index 1
+    {
+        data: "company_name",
+        render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''
+    },
+    {
+        data: "address",
+        render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''
+    },
+    {
+        data: "tax_number",
+        render: data => data && data.trim() !== "" ? data : '-N/A-'
+    },
+    {
+        data: "email",
+        render: data => data && data.trim() !== "" ? data : '-N/A-'
+    },
+    { data: "phone" },
+    {
+        data: "company_logo",
+        className: "logo-col",
+        render: data => data ? `<img src="<?= base_url('public/uploads/') ?>${data}" width="30">` : ''
+    },
+    {
+        data: "company_id",
+        render: data => `
+            <div class="d-flex gap-2">
+                <a href="<?= base_url('addcompany/') ?>${data}" title="Edit" style="color:rgb(13, 162, 199); margin-right: 10px;">
+                    <i class="bi bi-pencil-fill"></i>
+                </a>
+                <a href="javascript:void(0);" class="delete-company" data-id="${data}" title="Delete" style="color: #dc3545;">
+                    <i class="bi bi-trash-fill"></i>
+                </a>
+            </div>`
+    }
+]
 
-                { data: "slno" },
-                {
-                    data: "company_name",
-                    render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''
-                },
-                {
-                    data: "address",
-                    render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''
-                },
-                {
-                    data: "tax_number",
-                    render: data => data && data.trim() !== "" ? data : '-N/A-'
-                },
-                { data: "email" },
-                { data: "phone" },
-                {
-                    data: "company_logo",
-                    render: data => data ? `<img src="<?= base_url('public/uploads/') ?>${data}" width="30">` : ''
-                },
-                {
-                    data: "company_id",
-                    render: data => `
-                        <div class="d-flex gap-2">
-                            <a href="<?= base_url('addcompany/') ?>${data}" title="Edit" style="color:rgb(13, 162, 199); margin-right: 10px;">
-                                <i class="bi bi-pencil-fill"></i>
-                            </a>
-                            <a href="javascript:void(0);" class="delete-company" data-id="${data}" title="Delete" style="color: #dc3545;">
-                            
-                                <i class="bi bi-trash-fill"></i>
-                            </a>
-                        </div>`
-                }
-            ]
         });
 
         // Handle delete click

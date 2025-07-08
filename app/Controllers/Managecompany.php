@@ -13,6 +13,11 @@ class Managecompany extends BaseController
     public function __construct()
     {
         $this->companyModel = new Managecompany_Model();
+		$session = \Config\Services::session();
+        if (!$session->get('logged_in')) {
+            header('Location: ' . base_url('/'));
+            exit;
+        }
     }
 
     public function index()
@@ -47,7 +52,7 @@ class Managecompany extends BaseController
 			'company_name' => 'required',
 			'address' => 'required',
 			'tax_number' => 'permit_empty',
-			'email' => 'required|valid_email',
+			'email' => 'permit_empty|valid_email',
 			'phone' => 'required',
 		];
 
