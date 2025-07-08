@@ -7,6 +7,14 @@ use App\Models\Managecompany_Model;
 
 class CompanyLedger extends BaseController
 {
+    public function __construct()
+    {
+       $session = \Config\Services::session();
+        if (!$session->get('logged_in')) {
+            header('Location: ' . base_url('/'));
+            exit;
+        }
+    }
     public function index()
     {
         $companyModel = new Managecompany_Model();
