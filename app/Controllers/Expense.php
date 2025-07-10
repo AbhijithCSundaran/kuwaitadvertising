@@ -108,7 +108,11 @@ class Expense extends BaseController
     $draw = $_POST['draw'];
     $fromstart = $_POST['start'];
     $tolimit = $_POST['length'];
-    $order = $_POST['order'][0]['dir'] ?? 'desc';
+    $columns = ['id', 'date', 'particular', 'amount', 'payment_mode', 'id']; 
+    $orderColIndex = $_POST['order'][0]['column'] ?? 0;
+    $orderDir = $_POST['order'][0]['dir'] ?? 'desc';
+    $orderByCol = $columns[$orderColIndex] ?? 'id';
+
     $search = $_POST['search']['value'];
     $slno = $fromstart + 1;
 
@@ -120,7 +124,7 @@ class Expense extends BaseController
 
 
 
-    $totalRec = $model->getAllFilteredRecords($condition, $fromstart, $tolimit);
+    $totalRec = $model->getAllFilteredRecords($condition, $fromstart, $tolimit, $orderByCol, $orderDir);
 
     $result = [];
     foreach ($totalRec as $expense) {

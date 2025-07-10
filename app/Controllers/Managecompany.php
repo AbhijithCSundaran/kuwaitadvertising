@@ -221,14 +221,12 @@ class Managecompany extends BaseController
 
 	public function companylistjson()
 {
-    $db = \Config\Database::connect(); 
-
-    $draw = $_POST['draw'] ?? 1;
-    $fromstart = $_POST['start'] ?? 0;
-    $tolimit = $_POST['length'] ?? 10;
-    $order = $_POST['order'][0]['dir'] ?? 'desc';
-    $columnIndex = $_POST['order'][0]['column'] ?? 1;
-    $search = $_POST['search']['value'] ?? '';
+    $draw       = $this->request->getPost('draw') ?? 1;
+    $fromstart  = $this->request->getPost('start') ?? 0;
+    $tolimit    = $this->request->getPost('length') ?? 10;
+    $order      = $this->request->getPost('order')[0]['dir'] ?? 'desc';
+    $columnIndex= $this->request->getPost('order')[0]['column'] ?? 1;
+    $search     = $this->request->getPost('search')['value'] ?? '';
 
     $slno = $fromstart + 1;
 
@@ -244,53 +242,39 @@ class Managecompany extends BaseController
     ];
     $orderColumn = $columnMap[$columnIndex] ?? 'company_id';
 
-    $condition = "1=1";
-    if (!empty($search)) {
-        $search = trim($search);
-        $escapedSearch = $db->escapeLikeString($search); 
-
-        $condition .= " AND (
-            company_name LIKE '%$escapedSearch%' ESCAPE '!' OR
-            address LIKE '%$escapedSearch%' ESCAPE '!' OR
-            tax_number LIKE '%$escapedSearch%' ESCAPE '!' OR
-            email LIKE '%$escapedSearch%' ESCAPE '!' OR
-            phone LIKE '%$escapedSearch%' ESCAPE '!'
-        )";
-    }
-
-
     $companyModel = new \App\Models\Managecompany_Model();
-    $companies = $companyModel->getAllFilteredRecords($condition, $fromstart, $tolimit, $orderColumn, $order);
+
+    // Fetch filtered records based on updated search logic
+    $companies = $companyModel->getAllFilteredRecords($search, $fromstart, $tolimit, $orderColumn, $order);
 
     $result = [];
     foreach ($companies as $company) {
-		$tax = trim($company['tax_number']);
-		$company['tax_number'] = ($tax === '0' || $tax === '') ? '-N/A-' : $tax;
+        $tax = trim($company['tax_number']);
+        $company['tax_number'] = ($tax === '0' || $tax === '') ? '-N/A-' : $tax;
 
-		$address = trim($company['address']);
-		$company['address'] = $address === '' ? '-N/A-' : $address; 
+        $address = trim($company['address']);
+        $company['address'] = $address === '' ? '-N/A-' : $address;
 
-		$result[] = [
-			'slno' => $slno++,
-			'company_id' => $company['company_id'],
-			'company_name' => $company['company_name'],
-			'address' => $company['address'],
-			'tax_number' => $company['tax_number'],
-			'email' => $company['email'],
-			'phone' => $company['phone'],
-			'company_logo' => $company['company_logo']
-		];
-	}
+        $result[] = [
+            'slno'          => $slno++,
+            'company_id'    => $company['company_id'],
+            'company_name'  => $company['company_name'],
+            'address'       => $company['address'],
+            'tax_number'    => $company['tax_number'],
+            'email'         => $company['email'],
+            'phone'         => $company['phone'],
+            'company_logo'  => $company['company_logo']
+        ];
+    }
 
-
-    $total = $companyModel->getAllCompanyCount()->totcompanies;
-    $filteredTotal = $companyModel->getFilteredCompanyCount($condition)->filCompanies;
+    $total          = $companyModel->getAllCompanyCount()->totcompanies;
+    $filteredTotal  = $companyModel->getFilteredCompanyCount($search)->filCompanies;
 
     return $this->response->setJSON([
-        'draw' => intval($draw),
-        'recordsTotal' => $total,
+        'draw'            => intval($draw),
+        'recordsTotal'    => $total,
         'recordsFiltered' => $filteredTotal,
-        'data' => $result
+        'data'            => $result
     ]);
 }
 

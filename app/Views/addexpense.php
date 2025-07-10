@@ -71,7 +71,8 @@ input[type=number].no-spinner {
                 
                     <div class="form-group col-md-6">
                         <label>Amount <span class="text-danger">*</span></label>
-                        <input type="number" name="amount" step="0.01" class="form-control no-spinner" value="<?= isset($expense['amount']) ? $expense['amount'] : '' ?>" required>
+                        <input type="text" name="amount" id="amount" class="form-control no-spinner" inputmode="decimal" value="<?= isset($expense['amount']) ? $expense['amount'] : '' ?>" required>
+                        <small class="text-danger d-none" id="amountError">Please enter a valid amount </small>
                     </div>
 
                     <br><br>
@@ -100,15 +101,16 @@ input[type=number].no-spinner {
 </div>
 <?php include "common/footer.php"; ?>
 <script>
-    const dateInput = document.getElementById("date");
-    const calendar = flatpickr(dateInput, {
-        dateFormat: "d-m-Y",
-        defaultDate: "<?= $defaultDate ?>"
-    });
+const dateInput = document.getElementById("date");
+const calendar = flatpickr(dateInput, {
+    dateFormat: "d-m-Y",
+    defaultDate: "<?= $defaultDate ?>"
+});
 
-    document.getElementById("calendar-icon").addEventListener("click", function () {
-        calendar.open();
-    });
+document.getElementById("calendar-icon").addEventListener("click", function () {
+    calendar.open();
+});
+
 $(document).ready(function () {
     let originalData = $('#expense-form').serialize(); 
 
@@ -116,17 +118,45 @@ $(document).ready(function () {
         const currentData = $('#expense-form').serialize();
         $('#saveExpenseBtn').prop('disabled', currentData === originalData);
     });
+
+    // Restrict invalid characters in Amount field
+    $('#amount').on('keypress', function (e) {
+        const key = e.key;
+        const val = $(this).val();
+
+        // Allow: digits and one dot (.)
+        if (!/[0-9.]/.test(key) || (key === '.' && val.includes('.'))) {
+            e.preventDefault();
+        }
+    });
+
     $('#saveExpenseBtn').on('click', function () {
         const alertBox = $('.alert');
         const form = $('#expense-form')[0];
+        const amountInput = $('#amount');
+        const amountError = $('#amountError');
 
+        let amountVal = amountInput.val().trim();
+        if (amountVal === '.' || amountVal === '') {
+            amountVal = '0.';
+            amountInput.val(amountVal);
+        }
+        const validAmount = /^\d+(\.\d{0,2})?$/.test(amountVal);
         if (!form.checkValidity()) {
-            alertBox
-                .removeClass('d-none alert-success alert-warning')
-                .addClass('alert-danger')
-                .text('Please Fill All Mandatory Fields.');
+            alertBox.removeClass('d-none alert-success alert-warning')
+                    .addClass('alert-danger')
+                    .text('Please Fill All Mandatory Fields.');
             setTimeout(() => alertBox.addClass('d-none').text(''), 2000);
             return;
+        }
+
+        if (!validAmount) {
+            amountError.removeClass('d-none');
+            amountInput.addClass('is-invalid');
+            return;
+        } else {
+            amountError.addClass('d-none');
+            amountInput.removeClass('is-invalid');
         }
 
         const formData = new FormData(form);
@@ -141,10 +171,9 @@ $(document).ready(function () {
             dataType: 'json',
             success: function (res) {
                 if (res.status === 'success') {
-                    alertBox
-                        .removeClass('d-none alert-danger alert-warning')
-                        .addClass('alert-success')
-                        .text(res.message);
+                    alertBox.removeClass('d-none alert-danger alert-warning')
+                            .addClass('alert-success')
+                            .text(res.message);
                     setTimeout(() => {
                         if (res.redirect_to_list) {
                             window.location.href = "<?= base_url('expense') ?>";
@@ -153,31 +182,28 @@ $(document).ready(function () {
                         }
                     }, 1500);
                 } else if (res.status === 'nochange') {
-                    alertBox
-                        .removeClass('d-none alert-success alert-danger')
-                        .addClass('alert-warning')
-                        .text(res.message);
+                    alertBox.removeClass('d-none alert-success alert-danger')
+                            .addClass('alert-warning')
+                            .text(res.message);
                     setTimeout(() => {
                         window.location.href = "<?= base_url('expense') ?>";
                     }, 1500);
                 } else {
-                    alertBox
-                        .removeClass('d-none alert-success alert-warning')
-                        .addClass('alert-danger')
-                        .text(res.message || 'Failed to Save Expense.');
+                    alertBox.removeClass('d-none alert-success alert-warning')
+                            .addClass('alert-danger')
+                            .text(res.message || 'Failed to Save Expense.');
                     $('#saveExpenseBtn').prop('disabled', false);
                 }
             },
             error: function () {
-                alertBox
-                    .removeClass('d-none alert-success alert-warning')
-                    .addClass('alert-danger')
-                    .text('Error Occurred While Saving Expense.');
+                alertBox.removeClass('d-none alert-success alert-warning')
+                        .addClass('alert-danger')
+                        .text('Error Occurred While Saving Expense.');
                 $('#saveExpenseBtn').prop('disabled', false);
             }
         });
     });
 });
-
 </script>
+
 

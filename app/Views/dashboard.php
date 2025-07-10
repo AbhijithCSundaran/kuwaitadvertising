@@ -38,7 +38,7 @@
           <div class="d-flex align-items-center flex-wrap">
             <i class="mdi mdi-home text-muted hover-cursor"></i>
             <span class="text-muted hover-cursor mx-1">/ Dashboard /</span>
-            <span class="text-primary hover-cursor">Analytics</span>
+            <a href="<?= base_url('expense/report') ?>" class="breadcrumb-link">Analytics</a>
           </div>
 
 
@@ -105,15 +105,20 @@
                       <h5 class="me-2 mb-0 text-center">KWD 577545</h5>
                     </div>
                   </div>
-                  <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item bg-success text-white">
-                    <div class="icon-box me-4">
-                      <i class="mdi mdi-eye"></i>
-                    </div>
-                    <div class="d-flex flex-column justify-content-around">
-                      <small class="mb-3 text-white"><b>Total Expenses Of The Day</b></small>
-                      <h5 class="me-2 mb-0 text-center" id="dailyExpense">0</h5>
-                    </div>
+                  <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item bg-success text-white"
+                      style="cursor: pointer;"
+                      onclick="window.location.href='<?= base_url('expense/report') ?>'">
+                      
+                      <div class="icon-box me-4">
+                        <i class="mdi mdi-eye"></i>
+                      </div>
+                      
+                      <div class="d-flex flex-column justify-content-around">
+                        <small class="mb-3 text-white"><b>Total Expenses Of The Day</b></small>
+                        <h5 class="me-2 mb-0 text-center" id="dailyExpense">0</h5>
+                      </div>
                   </div>
+
                   <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item bg-info text-white">
                     <div class="icon-box me-4">
                       <i class="mdi mdi-download"></i>
@@ -123,14 +128,19 @@
                       <h5 class="me-2 mb-0 text-center">0000</h5>
                     </div>
                   </div>
-                  <div  class="d-flex py-3 border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item bg-warning text-white">
-                    <div class="icon-box me-4">
-                      <i class="mdi mdi-flag"></i>
-                    </div>
-                    <div class="d-flex flex-column justify-content-around">
-                      <small class="mb-3 text-white"><b>Total Expenses Of The Month</b></small>
-                      <h5 class="me-2 mb-0 text-center" id="monthlyExpense">0</h5>
-                    </div>
+                  <div class="d-flex py-3 border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item bg-warning text-white"
+                      style="cursor: pointer;"
+                      onclick="window.location.href='<?= base_url('expense/report') ?>'">
+                      
+                      <div class="icon-box me-4">
+                        <i class="mdi mdi-flag"></i>
+                      </div>
+                      
+                      <div class="d-flex flex-column justify-content-around">
+                        <small class="mb-3 text-white"><b>Total Expenses Of The Month</b></small>
+                        <h5 class="me-2 mb-0 text-center" id="monthlyExpense">0</h5>
+                      </div>
+                      
                   </div>
                 </div>
               </div>

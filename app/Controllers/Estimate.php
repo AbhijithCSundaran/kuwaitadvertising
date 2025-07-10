@@ -47,41 +47,44 @@ public function save()
 {
     $estimateId = $this->request->getPost('estimate_id');
     $customerId = $this->request->getPost('customer_id');
-    $address = $this->request->getPost('customer_address');
+    $address = trim($this->request->getPost('customer_address'));
     $discount = (float) $this->request->getPost('discount');
     $description = $this->request->getPost('description');
     $price = $this->request->getPost('price');
     $quantity = $this->request->getPost('quantity');
     $total = $this->request->getPost('total');
- 
+    $customerName = trim($this->request->getPost('customer_name')); // NEW
+
     if (empty($customerId) || empty($address)) {
         return $this->response->setJSON([
             'status' => 'error',
             'message' => 'Please fill customer name and address.'
         ]);
     }
- 
+
     $validItems = 0;
     foreach ($description as $key => $desc) {
         if (!empty(trim($desc))) {
             $validItems++;
         }
     }
+
     if ($validItems === 0) {
         return $this->response->setJSON([
             'status' => 'error',
             'message' => 'Please fill at least one item with description.'
         ]);
     }
- 
- 
+
+    // Recalculate totals
     $subtotal = 0;
     foreach ($total as $t) {
         $subtotal += (float)$t;
     }
+
     $discountAmount = ($subtotal * $discount) / 100;
     $grandTotal = $subtotal - $discountAmount;
- 
+
     $estimateData = [
         'customer_id' => $customerId,
         'customer_address' => $address,
@@ -89,21 +92,21 @@ public function save()
         'total_amount' => $grandTotal,
         'date' => date('Y-m-d')
     ];
- 
- 
-$items = [];
+
+    // Build items array
+    $items = [];
     foreach ($description as $key => $desc) {
         $desc = trim($desc);
         $unitPrice = trim($price[$key]);
         $qty = trim($quantity[$key]);
- 
+
         if ($desc === '' || $unitPrice === '' || $qty === '') {
             return $this->response->setJSON([
                 'status' => 'error',
                 'message' => 'Each item must have Description, Unit Price, and Quantity filled.'
             ]);
         }
- 
+
         $items[] = [
             'description' => $desc,
             'price' => (float)$unitPrice,
@@ -111,10 +114,25 @@ $items = [];
             'total' => (float)$total[$key]
         ];
     }
- 
+
     $estimateModel = new \App\Models\EstimateModel();
     $estimateItemModel = new \App\Models\EstimateItemModel();
- 
+    $customerModel = new \App\Models\customerModel();
+
+    // ✅ Check and update customer name or address if needed
+    $customer = $customerModel->find($customerId);
+    if ($customer) {
+        if (
+            $customer['name'] !== $customerName ||
+            $customer['address'] !== $address
+        ) {
+            $customerModel->update($customerId, [
+                'name' => $customerName,
+                'address' => $address
+            ]);
+        }
+    }
+
     if (!empty($estimateId)) {
         // Update mode
         $existing = $estimateModel->find($estimateId);
@@ -124,14 +142,14 @@ $items = [];
                 'message' => 'Estimate Not Found.'
             ]);
         }
- 
+
         $hasChanges = (
             $existing['customer_id'] != $customerId ||
             $existing['customer_address'] !== $address ||
             $existing['discount'] != $discount ||
             $existing['total_amount'] != $grandTotal
         );
- 
+
         if ($hasChanges) {
             $estimateModel->update($estimateId, $estimateData);
             $estimateItemModel->where('estimate_id', $estimateId)->delete();
@@ -139,7 +157,7 @@ $items = [];
                 $item['estimate_id'] = $estimateId;
             }
             $estimateItemModel->insertBatch($items);
- 
+
             return $this->response->setJSON([
                 'status' => 'success',
                 'message' => 'Estimate Updated Successfully.',
@@ -152,7 +170,7 @@ $items = [];
                 'estimate_id' => $estimateId
             ]);
         }
- 
+
     } else {
         // Insert mode
         $estimateId = $estimateModel->insert($estimateData);
@@ -160,7 +178,7 @@ $items = [];
             $item['estimate_id'] = $estimateId;
         }
         $estimateItemModel->insertBatch($items);
- 
+
         return $this->response->setJSON([
             'status' => 'success',
             'message' => 'Generating Estimate.',
@@ -168,6 +186,7 @@ $items = [];
         ]);
     }
 }
+
  
  public function estimatelistajax()
 {

@@ -13,10 +13,13 @@ class Expense_Model extends Model
     public function getAllExpenseCount() {
         return $this->db->query("select count(*) as totexpense from expenses")->getRow();
     }
-	public function getAllFilteredRecords($condition,$fromstart,$tolimit) {
-		
-		 return $this->db->query("SELECT * FROM expenses WHERE $condition ORDER BY id DESC LIMIT $fromstart, $tolimit")->getResult();
-	}
+	public function getAllFilteredRecords($condition, $fromstart, $tolimit, $orderBy = 'id', $orderDir = 'desc') {
+        $orderBy = in_array($orderBy, ['id', 'date', 'particular', 'amount', 'payment_mode']) ? $orderBy : 'id';
+        $orderDir = strtolower($orderDir) === 'asc' ? 'ASC' : 'DESC';
+
+        return $this->db->query("SELECT * FROM expenses WHERE $condition ORDER BY $orderBy $orderDir LIMIT $fromstart, $tolimit")->getResult();
+    }
+
 	public function getFilterExpenseCount($condition,$fromstart,$tolimit) {
 		
 		return $this->db->query("select count(*) as filRecords from expenses where ".$condition)->getRow();

@@ -27,9 +27,11 @@
 
 }
 </style>
-    <div class="text-right  text-end print-btn" >
-        <button onclick="printEstimate()" class="btn btn-primary no print">🖨️ Print</button>
+    <div class="text-right text-end print-btn">
+        <a href="<?= base_url('estimate/edit/' . $estimate['estimate_id']) ?>" class="btn btn-secondary no-print">Back to Form</a>
+        <button onclick="printEstimate()" class="btn btn-primary no-print">🖨️ Print</button>
     </div>
+
     <div class="right_container" >
         <div class="m-auto background-box" id="printArea"> 
             <div class="print_wrpr" >
