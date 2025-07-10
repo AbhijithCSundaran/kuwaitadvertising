@@ -144,50 +144,68 @@ public function save()
 }
 
 
-    public function userlistajax()
+public function userlistajax()
 {
-    $model = new \App\Models\Manageuser_Model();
-    $menuModel = new \App\Models\RoleModel();
+    $db = \Config\Database::connect();
 
-    $draw = $_POST['draw'];
-    $fromstart = $_POST['start'];
-    $tolimit = $_POST['length'];
-    $order = $_POST['order'][0]['dir'] ?? 'desc';
-    $search = $_POST['search']['value'];
+    $draw = $_POST['draw'] ?? 1;
+    $fromstart = $_POST['start'] ?? 0;
+    $tolimit = $_POST['length'] ?? 10;
+    $orderDir = $_POST['order'][0]['dir'] ?? 'desc';
+    $columnIndex = $_POST['order'][0]['column'] ?? 1;
+    $search = $_POST['search']['value'] ?? '';
+
     $slno = $fromstart + 1;
 
+    // Map DataTable column indexes to database column names
+    $columnMap = [
+        0 => 'user_id',
+        1 => 'name',
+        2 => 'role_name',
+        3 => 'email',
+        4 => 'phonenumber',
+        5 => 'user_id'
+    ];
+    $orderColumn = $columnMap[$columnIndex] ?? 'user_id';
+
+    // Build search condition
     $condition = "1=1";
-    if ($search) {
-        $condition .= " AND name LIKE '%" . trim($search) . "%' OR role_name like '%" . trim($search). "%' OR email LIKE '%" . trim($search) . "%' OR phonenumber LIKE '%" . trim($search) ."%'";
+    if (!empty($search)) {
+        $search = trim($search);
+        $escapedSearch = $db->escapeLikeString($search);
+
+        $condition .= " AND (
+            name LIKE '%$escapedSearch%' ESCAPE '!' OR
+            email LIKE '%$escapedSearch%' ESCAPE '!' OR
+            phonenumber LIKE '%$escapedSearch%' ESCAPE '!' OR
+            role_acces.role_name LIKE '%$escapedSearch%' ESCAPE '!'
+        )";
     }
 
-    $totalRec = $model->getAllFilteredRecords($condition, $fromstart, $tolimit);
-    $result = [];
+    $userModel = new \App\Models\Manageuser_Model();
+    $users = $userModel->getAllFilteredRecords($condition, $fromstart, $tolimit, $orderColumn, $orderDir);
 
-    foreach ($totalRec as $user) {
-        $permissions = $menuModel->where('role_id', $user->role_id)->findAll();
-        $menuList = array_column($permissions, 'menu_name');
+    $result = [];
+    foreach ($users as $user) {
         $result[] = [
-            'slno' => $slno++,
-            'user_id' => $user->user_id,
-            'name' => $user->name,
-            'role_name' => $user->role_name ?? '',
-            'email' => $user->email,
+            'slno'        => $slno++,
+            'user_id'     => $user->user_id,
+            'name'        => $user->name,
+            'role_name'   => $user->role_name ?? '',
+            'email'       => $user->email,
             'phonenumber' => $user->phonenumber
         ];
     }
 
-    $totUserCount = $model->getAllUserCount();
-    $totFilterCounts = $model->getFilterUserCount($condition, $fromstart, $tolimit);
+    $total = $userModel->getAllUserCount()->totuser ?? 0;
+    $filteredTotal = $userModel->getFilterUserCount($condition);
 
-    $response = [
-        "draw" => intval($draw),
-        "iTotalRecords" => $totUserCount->totuser ?? 0,
-        "iTotalDisplayRecords" => $totFilterCounts->filRecords ?? 0,
-        "data" => $result
-    ];
-
-    return $this->response->setJSON($response);
+    return $this->response->setJSON([
+    'draw' => intval($draw),
+    'recordsTotal' => $total,
+    'recordsFiltered' => $filteredTotal,
+    'data' => $result
+]);
 }
 
    public function delete()

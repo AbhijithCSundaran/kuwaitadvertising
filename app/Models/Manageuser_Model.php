@@ -9,24 +9,11 @@ class Manageuser_Model extends Model{
     protected $allowedFields = ['name', 'email', 'phonenumber', 'password','role_id','company_id'];
 
     public function getAllUserCount()
-{
-    $db = \Config\Database::connect();
-    return $db->query("SELECT COUNT(*) as totuser FROM user")->getRow();
-}
-	public function getAllFilteredRecords($condition, $start, $limit)
-	{
-		 $db = \Config\Database::connect();
-    		$sql = "SELECT user.*, role_acces.role_name 
-            FROM user 
-            LEFT JOIN role_acces ON role_acces.role_id = user.role_id 
-            WHERE $condition 
-            ORDER BY user.user_id DESC 
-            LIMIT $start, $limit";
-
-   		 return $db->query($sql)->getResult();
-	}
-
-	public function getFilterUserCount($condition,$fromstart,$tolimit) {
+    {
+        $db = \Config\Database::connect();
+        return $db->query("SELECT COUNT(*) as totuser FROM user")->getRow();
+    }
+    public function getFilterUserCount($condition) {
 		
 		$db = \Config\Database::connect();
     	$sql = "SELECT COUNT(*) as filRecords 
@@ -36,4 +23,29 @@ class Manageuser_Model extends Model{
 
     return $db->query($sql)->getRow();
 	}
+	public function getAllFilteredRecords($condition, $fromstart, $tolimit, $orderColumn = 'user_id', $orderDir = 'DESC')
+{
+    $allowedColumns = ['user_id', 'name', 'role_name', 'email', 'phonenumber'];
+
+    if (!in_array($orderColumn, $allowedColumns)) {
+        $orderColumn = 'user_id';
+    }
+
+    $orderDir = strtoupper($orderDir) === 'ASC' ? 'ASC' : 'DESC';
+
+    $db = \Config\Database::connect();
+    $builder = $db->query("
+        SELECT user.*, role_acces.role_name 
+        FROM user 
+        LEFT JOIN role_acces ON role_acces.role_id = user.role_id 
+        WHERE $condition 
+        ORDER BY $orderColumn $orderDir 
+        LIMIT $fromstart, $tolimit
+    ");
+
+    return $builder->getResult();
+}
+
+
+	
 }
