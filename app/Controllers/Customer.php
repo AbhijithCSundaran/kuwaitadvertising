@@ -14,30 +14,52 @@ class Customer extends BaseController
             exit;
         }
     }
-    public function create()
-    {
-        $name = $this->request->getPost('name');
-        $address = $this->request->getPost('address');
+   public function create()
+{
+    $name = $this->request->getPost('name');
+    $address = $this->request->getPost('address');
+    $customer_id = $this->request->getPost('customer_id'); // NEW LINE
 
-        if (empty($name) || empty($address)) {
+    if (empty($name) || empty($address)) {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Name and address are required'
+        ]);
+    }
+
+    $model = new customerModel();
+    $data = [
+        'name' => $name,
+        'address' => $address
+    ];
+
+    // ✅ Check if it's an update or create
+    if (!empty($customer_id)) {
+        $updated = $model->update($customer_id, $data);
+
+        if ($updated) {
+            $data['customer_id'] = $customer_id;
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Customer updated successfully',
+                'customer' => $data
+            ]);
+        } else {
             return $this->response->setJSON([
                 'status' => 'error',
-                'message' => 'Name and address are required'
+                'message' => 'Failed to update customer.'
             ]);
         }
 
-        $model = new customerModel();
-        $data = [
-            'name' => $name,
-            'address' => $address
-        ];
-
+    } else {
+        // Insert new customer
         $id = $model->insert($data);
 
         if ($id) {
             $data['customer_id'] = $id;
             return $this->response->setJSON([
                 'status' => 'success',
+                'message' => 'Customer created successfully',
                 'customer' => $data
             ]);
         } else {
@@ -47,6 +69,8 @@ class Customer extends BaseController
             ]);
         }
     }
+}
+
     public function get_address()
     {
         $customer_id = $this->request->getPost('customer_id');

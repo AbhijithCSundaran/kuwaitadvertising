@@ -367,9 +367,6 @@ td.logo-col {
     color: #fff;
     font-weight: bold;
 }
-.btn-primary no-print{
-
-}
 #addCustomerBtn{
 	border-color: #495057;
 }
@@ -407,4 +404,26 @@ td.logo-col {
     line-height: 1.2 !important;
     vertical-align: middle !important;
     white-space: nowrap !important;
+}
+.breadcrumb-link {
+    color: #212529BF;
+    text-decoration: none;
+    font-weight: normal;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease-in-out;
+}
+
+.breadcrumb-link:hover {
+    color: #0d6efd; /* Bootstrap primary blue */
+    border-bottom: 2px solid #0d6efd;
+}
+
+.breadcrumb-link.active {
+    color: black;
+    font-weight: bold;
+    border-bottom: 2px solid black;
+}
+.nav-link.active {
+    color: #0d6efd!important;
+    font-weight: bold;
 }

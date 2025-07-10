@@ -81,9 +81,8 @@
                         </div>
                     </div>
                     <label class="mt-3"><strong>Customer Address</strong><span class="text-danger">*</span></label>
-                    <textarea name="customer_address" id="customer_address" class="form-control" rows="3">
-                        <?= isset($estimate['customer_address']) ? $estimate['customer_address'] : '' ?>
-                    </textarea>
+                    <textarea name="customer_address" id="customer_address" class="form-control" rows="3"><?= isset($estimate['customer_address']) ? trim($estimate['customer_address']) : '' ?></textarea>
+
                 </div>
                 <div class="col-md-6">
                     <div class="estimate-title">ESTIMATE</div>
@@ -206,6 +205,15 @@
     <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
 <script>
    $(document).ready(function () {
+    // ✅ Detect browser back button and restore state
+window.onpageshow = function (event) {
+    if (event.persisted || window.performance.getEntriesByType("navigation")[0].type === "back_forward") {
+        $('#customer_id').select2();                // Reinitialize Select2
+        $('#customer_id').trigger('change');        // Trigger address load
+        $('.price, .quantity, #discount').trigger('input'); // Trigger recalculation
+    }
+};
+    
         $('#customer_id').select2({
             placeholder: "Select Customer",
             width: 'calc(100% - 40px)',
@@ -363,117 +371,95 @@
         });
 
         $('#estimate-form').submit(function (e) {
-            e.preventDefault();
+    e.preventDefault();
 
-            const customerId = $('#customer_id').val();
-            const customerAddress = $('#customer_address').val().trim();
+    const customerId = $('#customer_id').val();
+    const customerAddress = $('#customer_address').val().trim();
+    const customerName = $('#customer_id option:selected').text().trim(); // ✅ Get name from dropdown
 
-            if (!customerId) {
-                $('.alert')
-                    .removeClass('d-none alert-success alert-warning')
-                    .addClass('alert-danger')
-                    .text('Please Select A Customer.')
-                    .fadeIn()
-                    .delay(3000)
-                    .fadeOut();
-                return;
+    if (!customerId) {
+        showAlert('Please Select A Customer.', 'danger');
+        return;
+    }
+
+    if (!customerAddress) {
+        showAlert('Please enter the customer address.', 'danger');
+        return;
+    }
+
+    let validItemExists = false;
+    $('.item-row').each(function () {
+        const desc = $(this).find('input[name="description[]"]').val().trim();
+        const price = parseFloat($(this).find('input[name="price[]"]').val()) || 0;
+        const qty = parseFloat($(this).find('input[name="quantity[]"]').val()) || 0;
+
+        if (desc && price > 0 && qty > 0) {
+            validItemExists = true;
+            return false;
+        }
+    });
+
+    if (!validItemExists) {
+        showAlert('Please Enter At Least One Valid Item With Description, Price, and Quantity.', 'danger');
+        return;
+    }
+
+   
+    $('.item-row').each(function () {
+        const desc = $(this).find('input[name="description[]"]').val().trim();
+        const price = parseFloat($(this).find('input[name="price[]"]').val()) || 0;
+        const qty = parseFloat($(this).find('input[name="quantity[]"]').val()) || 0;
+
+        if (!desc && price === 0 && qty === 0) {
+            $(this).remove();
+        }
+    });
+
+    $('#generate-btn').prop('disabled', true).text('Generating...');
+
+  
+    const formData = new FormData(this);
+    formData.append('customer_name', customerName);
+
+    $.ajax({
+        url: "<?= site_url('estimate/save') ?>",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        dataType: "json",
+        success: function (res) {
+            if (res.status === 'success') {
+                showAlert(res.message, 'success');
+                setTimeout(function () {
+                    window.location.href = "<?= site_url('estimate/generateEstimate/') ?>" + res.estimate_id;
+                }, 1500);
+            } else if (res.status === 'nochange') {
+                showAlert(res.message, 'warning');
+                $('#generate-btn').prop('disabled', false).text('Generate Estimate');
+            } else {
+                showAlert(res.message || 'Failed To Save Estimate.', 'danger');
+                $('#generate-btn').prop('disabled', false).text('Generate Estimate');
             }
+        },
+        error: function () {
+            showAlert('Something Went Wrong While Saving The Estimate.', 'danger');
+            $('#generate-btn').prop('disabled', false).text('Generate Estimate');
+        }
+    });
+});
 
-            if (!customerAddress) {
-                $('.alert')
-                    .removeClass('d-none alert-success alert-warning')
-                    .addClass('alert-danger')
-                    .text('Please enter the customer address.')
-                    .fadeIn()
-                    .delay(3000)
-                    .fadeOut();
-                return;
-            }
 
-            let validItemExists = false;
+function showAlert(message, type = 'success') {
+    $('.alert')
+        .removeClass('d-none alert-success alert-danger alert-warning')
+        .addClass('alert-' + type)
+        .text(message)
+        .fadeIn()
+        .delay(3000)
+        .fadeOut();
+}
 
-            $('.item-row').each(function () {
-                const desc = $(this).find('input[name="description[]"]').val().trim();
-                const price = parseFloat($(this).find('input[name="price[]"]').val()) || 0;
-                const qty = parseFloat($(this).find('input[name="quantity[]"]').val()) || 0;
-
-                if (desc && price > 0 && qty > 0) {
-                    validItemExists = true;
-                    return false;
-                }
-            });
-
-            if (!validItemExists) {
-                $('.alert')
-                    .removeClass('d-none alert-success alert-warning')
-                    .addClass('alert-danger')
-                    .text('Please Enter At Least One Valid Item With Description, Price, and Quantity.')
-                    .fadeIn()
-                    .delay(3000)
-                    .fadeOut();
-                return;
-            }
-
-            $('.item-row').each(function () {
-                const desc = $(this).find('input[name="description[]"]').val().trim();
-                const price = parseFloat($(this).find('input[name="price[]"]').val()) || 0;
-                const qty = parseFloat($(this).find('input[name="quantity[]"]').val()) || 0;
-
-                if (!desc && price === 0 && qty === 0) {
-                    $(this).remove();
-                }
-            });
-
-            // Disable the button
-            $('#generate-btn').prop('disabled', true).text('Generating...');
-
-            $.ajax({
-                url: "<?= site_url('estimate/save') ?>",
-                type: "POST",
-                data: $(this).serialize(),
-                dataType: "json",
-                success: function (res) {
-                    if (res.status === 'success') {
-                        $('.alert')
-                            .removeClass('d-none alert-danger alert-warning')
-                            .addClass('alert-success')
-                            .text(res.message)
-                            .fadeIn();
-                        setTimeout(function () {
-                            window.location.href = "<?= site_url('estimate/generateEstimate/') ?>" + res.estimate_id;
-                        }, 1500);
-                    } else if (res.status === 'nochange') {
-                        $('.alert')
-                            .removeClass('d-none alert-success alert-danger')
-                            .addClass('alert-warning')
-                            .text(res.message)
-                            .fadeIn()
-                            .delay(3000)
-                            .fadeOut();
-                        $('#generate-btn').prop('disabled', false).text('Generate Estimate');
-                    } else {
-                        $('.alert')
-                            .removeClass('d-none alert-success alert-warning')
-                            .addClass('alert-danger')
-                            .text(res.message || 'Failed To Save Estimate.')
-                            .fadeIn()
-                            .delay(3000)
-                            .fadeOut();
-                        $('#generate-btn').prop('disabled', false).text('Generate Estimate');
-                    }
-                },
-                error: function () {
-                    $('.alert')
-                        .removeClass('d-none alert-success alert-warning')
-                        .addClass('alert-danger')
-                        .text('Something Went Wrong While Saving The Estimate.')
-                        .fadeIn()
-                        .delay(3000)
-                        .fadeOut();
-                    $('#generate-btn').prop('disabled', false).text('Generate Estimate');
-                }
-            });
-        });
     });
 
     $(window).on('keydown', function (e) {

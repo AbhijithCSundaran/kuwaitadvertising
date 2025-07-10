@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <style>
@@ -11,7 +12,7 @@
 	<!-- Required meta tags -->
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>Kuwait Advertising</title>
+	<title>Alrai Printing Press</title>
 	<!-- plugins:css -->
 	<link rel="stylesheet" href="<?php echo ASSET_PATH; ?>assets/vendors/mdi/css/materialdesignicons.min.css">
 	<link rel="stylesheet" href="<?php echo ASSET_PATH; ?>assets/vendors/css/vendor.bundle.base.css">

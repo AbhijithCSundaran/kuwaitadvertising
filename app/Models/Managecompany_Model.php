@@ -17,26 +17,58 @@ class Managecompany_Model extends Model
     }
 
     
-    public function getFilteredCompanyCount($condition)
-    {
-        return $this->db->query("SELECT COUNT(*) AS filCompanies FROM {$this->table} WHERE $condition")->getRow();
-    }
-
-   
-    public function getAllFilteredRecords($condition, $fromstart, $tolimit, $orderColumn = 'company_id', $orderDir = 'DESC')
+   public function getFilteredCompanyCount($search = '')
 {
-    $allowedColumns = ['company_id', 'company_name', 'address', 'tax_number', 'email', 'phone', 'company_logo'];
-    
-    if (!in_array($orderColumn, $allowedColumns)) {
-        $orderColumn = 'company_id';
+    $builder = $this->db->table($this->table);
+
+    if ($search) {
+        $search = strtolower(trim($search));
+        $search = str_replace(' ', '', $search);
+
+        $builder->groupStart()
+            ->like("REPLACE(LOWER(company_name), ' ', '')", $search)
+            ->orLike("REPLACE(LOWER(address), ' ', '')", $search)
+            ->orLike("REPLACE(LOWER(tax_number), ' ', '')", $search)
+            ->orLike("REPLACE(LOWER(email), ' ', '')", $search)
+            ->orLike("REPLACE(LOWER(phone), ' ', '')", $search)
+            ->groupEnd();
     }
 
-    $orderDir = strtoupper($orderDir) === 'ASC' ? 'ASC' : 'DESC';
+    $count = $builder->countAllResults();
 
-    return $this->db
-        ->query("SELECT * FROM {$this->table} WHERE $condition ORDER BY $orderColumn $orderDir LIMIT $fromstart, $tolimit")
-        ->getResultArray();
+    return (object)['filCompanies' => $count];
 }
+
+    public function getAllFilteredRecords($search = '', $fromstart = 0, $tolimit = 10, $orderColumn = 'company_id', $orderDir = 'DESC')
+    {
+        $allowedColumns = ['company_id', 'company_name', 'address', 'tax_number', 'email', 'phone', 'company_logo'];
+        if (!in_array($orderColumn, $allowedColumns)) {
+            $orderColumn = 'company_id';
+        }
+
+        $orderDir = strtoupper($orderDir) === 'ASC' ? 'ASC' : 'DESC';
+
+        $builder = $this->db->table($this->table);
+
+        if ($search) {
+            $search = strtolower(trim($search));
+            $search = str_replace(' ', '', $search);
+
+            $builder->groupStart()
+                ->like("REPLACE(LOWER(company_name), ' ', '')", $search)
+                ->orLike("REPLACE(LOWER(address), ' ', '')", $search)
+                ->orLike("REPLACE(LOWER(tax_number), ' ', '')", $search)
+                ->orLike("REPLACE(LOWER(email), ' ', '')", $search)
+                ->orLike("REPLACE(LOWER(phone), ' ', '')", $search)
+                ->groupEnd();
+        }
+
+        $builder->orderBy($orderColumn, $orderDir)
+                ->limit($tolimit, $fromstart);
+
+        return $builder->get()->getResultArray();
+    }
+
 
 
 }

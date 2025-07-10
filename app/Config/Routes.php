@@ -60,6 +60,8 @@ $routes->post('save', 'Estimate::saveEstimate');
 
 
 
+
+
 // $routes->get('invoicelist', 'Invoice::invoicelist');
 
 $routes->post('customer/create', 'Customer::create');
@@ -75,6 +77,8 @@ $routes->post('expense/list', 'Expense::expenselistajax');
 $routes->post('expense/delete/(:num)', 'Expense::delete/$1');
 $routes->post('expense/delete', 'Expense::delete'); 
 $routes->post('expense/getExpensesAjax', 'Expense::getExpensesAjax');
+$routes->get('expense/report', 'Expense::report');
+
 
 
 // dashboard
