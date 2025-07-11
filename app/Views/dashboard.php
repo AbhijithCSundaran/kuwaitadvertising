@@ -1,23 +1,18 @@
 <?php include "common/header.php"; ?>
 <style>
-  /* Make the table header smaller and brown */
   table thead th {
     padding: 6px 12px !important;
     font-size: 13px !important;
-    background-color: #a1263a !important; /* Brown */
+    background-color: #a1263a !important; 
     color: #ffffff !important;
     vertical-align: middle;
     text-align: center;
   }
-
-  /* Optional: Make table body font consistent */
   table tbody td {
     font-size: 14px;
     padding: 8px 12px;
     vertical-align: middle;
   }
-
-  /* Optional: Add border for better visibility */
   table th, table td {
     border: 1px solid #dee2e6;
   }
@@ -31,7 +26,7 @@
         <div class="d-flex justify-content-between flex-wrap">
           <div class="d-flex align-items-end flex-wrap">
             <div class="me-md-3 me-xl-5">
-              <h2>Welcome back</h2>
+              <h2>Welcome Back</h2>
               <!-- <p class="mb-md-0">Alrai Printing Press</p> -->
             </div>
           </div>
@@ -40,20 +35,6 @@
             <span class="text-muted hover-cursor mx-1">/ Dashboard /</span>
             <a href="<?= base_url('expense/report') ?>" class="breadcrumb-link">Analytics</a>
           </div>
-
-
-          <!-- <div class="d-flex justify-content-between align-items-end flex-wrap">
-                  <button type="button" class="btn btn-light bg-white btn-icon me-3 d-none d-md-block ">
-                    <i class="mdi mdi-download text-muted"></i>
-                  </button>
-                  <button type="button" class="btn btn-light bg-white btn-icon me-3 mt-2 mt-xl-0">
-                    <i class="mdi mdi-clock-outline text-muted"></i>
-                  </button>
-                  <button type="button" class="btn btn-light bg-white btn-icon me-3 mt-2 mt-xl-0">
-                    <i class="mdi mdi-plus text-muted"></i>
-                  </button>
-                  <button class="btn btn-primary mt-2 mt-xl-0">Download report</button>
-                </div> -->
         </div>
       </div>
     </div>
@@ -61,17 +42,6 @@
       <div class="col-md-12 grid-margin stretch-card">
         <div class="card">
           <div class="card-body dashboard-tabs p-0">
-            <!-- <ul class="nav nav-tabs px-4 border-left-0 border-top-0 border-right-0" role="tablist">
-                    <li class="nav-item">
-                      <a class="nav-link active" id="overview-tab" data-bs-toggle="tab" href="#overview" role="tab" aria-controls="overview" aria-selected="true">Overview</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" id="sales-tab" data-bs-toggle="tab" href="#sales" role="tab" aria-controls="sales" aria-selected="false">Sales</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" id="purchases-tab" data-bs-toggle="tab" href="#purchases" role="tab" aria-controls="purchases" aria-selected="false">Purchases</a>
-                    </li>
-                  </ul> -->
             <div class="tab-content py-0 px-0 border-left-0 border-bottom-0 border-right-0">
               <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
                 <div class="d-flex flex-wrap justify-content-xl-between">
@@ -82,18 +52,7 @@
                   ?>
 
                   <div class="d-flex flex-wrap justify-content-xl-between">
-                    <a href="<?= base_url('adduserlist') ?>" class="text-decoration-none text-dark">
-                      <!-- <div class=" d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item bg-primary text-white"
-                        style="cursor: pointer;">
-                        <div class="icon-box me-3">
-                          <i class="mdi mdi-account-group"></i>
-                        </div>
-                        <div class="d-flex flex-column justify-content-around p-2 rounded ">
-                          <small class="mb-1 text-white">Total Customers</small>
-                          <h5 class="mb-0 text-center"><?= $userCount ?></h5>
-                        </div>
-                      </div> -->
-                    </a>
+                    <a href="<?= base_url('adduserlist') ?>" class="text-decoration-none text-dark"></a>
                   </div>
                   <!-- <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item bg-primary text-white" style="height: 150px;"> -->
                     <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item bg-revenue"style="height: 150px;" >
@@ -701,35 +660,40 @@
   }
 
   function loadRecentEstimates() {
-    $.ajax({
-      url: "<?= base_url('estimate/recentEstimates') ?>",
-      method: "GET",
-      dataType: "json",
-      success: function (data) {
-        let rows = '';
-        if (data.length > 0) {
-          data.forEach((est, index) => {
-            rows += `
-              <tr>
-                <td>${index + 1}</td>
-                <td>${formatDate(est.date)}</td>
-                <td>${est.customer_name ?? '-'}</td>
-                <td>${est.customer_address ?? '-'}</td>
-                <td>${parseFloat(est.sub_total || 0).toFixed(2)} KWD</td>
-                <td>${parseFloat(est.total_amount || 0).toFixed(2)} KWD</td>
-              </tr>
-            `;
-          });
-        } else {
-          rows = '<tr><td colspan="6" class="text-center">No recent estimates found.</td></tr>';
-        }
-        $('#recentEstimatesBody').html(rows);
-      },
-      error: function () {
-        $('#recentEstimatesBody').html('<tr><td colspan="6" class="text-center text-danger">Error loading estimates.</td></tr>');
+  $.ajax({
+    url: "<?= base_url('estimate/recentEstimates') ?>",
+    method: "GET",
+    dataType: "json",
+    success: function (data) {
+      let rows = '';
+      if (data.length > 0) {
+        data.forEach((est, index) => {
+          rows += `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${formatDate(est.date)}</td>
+              <td>${capitalizeWords(est.customer_name ?? '-')}</td>
+              <td>${capitalizeWords(est.customer_address ?? '-')}</td>
+              <td>${parseFloat(est.sub_total || 0).toFixed(2)} KWD</td>
+              <td>${parseFloat(est.total_amount || 0).toFixed(2)} KWD</td>
+            </tr>
+          `;
+        });
+      } else {
+        rows = '<tr><td colspan="6" class="text-center">No recent estimates found.</td></tr>';
       }
-    });
-  }
+      $('#recentEstimatesBody').html(rows);
+    },
+    error: function () {
+      $('#recentEstimatesBody').html('<tr><td colspan="6" class="text-center text-danger">Error loading estimates.</td></tr>');
+    }
+  });
+}
+function capitalizeWords(str) {
+  return str
+    .toLowerCase()
+    .replace(/\b\w/g, char => char.toUpperCase());
+}
   function formatDate(dateStr) {
     const date = new Date(dateStr);
     const day = String(date.getDate()).padStart(2, '0');

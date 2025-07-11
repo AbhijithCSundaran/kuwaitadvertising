@@ -89,8 +89,8 @@
             ],
 
             columns: [
-    { data: "company_id", visible: false }, // index 0 - hidden but used for sorting
-    { data: "slno" },                        // index 1
+    { data: "company_id", visible: false }, 
+    { data: "slno" },                       
     {
         data: "company_name",
         render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''
@@ -129,13 +129,11 @@
 
         });
 
-        // Handle delete click
         $(document).on('click', '.delete-company', function () {
             deleteId = $(this).data('id');
             deleteModal.show();
         });
 
-        // Confirm deletion
         $('#confirm-delete-btn').click(function () {
             if (!deleteId) return;
 

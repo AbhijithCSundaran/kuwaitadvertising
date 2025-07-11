@@ -73,7 +73,7 @@ let table = "";
 $(document).ready(function () {
     const alertBox = $('.alert');
         $('#estimateTable_filter input').on('input', function () {
-        this.value = this.value.trimStart(); // Prevents leading spaces
+        this.value = this.value.trimStart(); 
     });
     table = $('#estimateTable').DataTable({
         ajax: {
@@ -85,7 +85,7 @@ $(document).ready(function () {
         serverSide: true,
         paging: true,
         searching: true,
-        order: [[8, 'desc']], // Sort by hidden estimate_id
+        order: [[8, 'desc']],
         dom: "<'row mb-3'<'col-sm-6'l><'col-sm-6'f>>" +
              "<'row'<'col-sm-12'tr>>" +
              "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
@@ -145,7 +145,6 @@ $(document).ready(function () {
         ]
     });
 
-    // Dynamic SL No. after sorting or filtering
     table.on('order.dt search.dt draw.dt', function () {
         table.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
             var pageInfo = table.page.info();
@@ -153,7 +152,7 @@ $(document).ready(function () {
         });
     });
 
-    // Handle Delete Modal
+  
     let deleteId = null;
     const deleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
 
@@ -175,7 +174,7 @@ $(document).ready(function () {
             dataType: "json",
             success: function (res) {
                 if (res.status === 'success') {
-                    alertBox.removeClass().addClass('alert alert-danger text-center position-fixed').text('Estimate Deleted Successfully.').fadeIn();
+                    alertBox.removeClass().addClass('alert alert-success text-center position-fixed').text('Estimate Deleted Successfully.').fadeIn();
                     setTimeout(() => alertBox.fadeOut(), 2000);
                     table.ajax.reload(null, false);
                 } else {
