@@ -4,6 +4,7 @@
     .no-print,
     .navbar,
     .footer,
+    
     .sidebar {
         display: none !important;
     }
@@ -28,7 +29,7 @@
 }
 </style>
     <div class="text-right text-end print-btn">
-        <a href="<?= base_url('estimate/edit/' . $estimate['estimate_id']) ?>" class="btn btn-secondary no-print">Back to Form</a>
+        <a href="<?= base_url('estimate/edit/' . $estimate['estimate_id']) ?>" class="btn btn-primary no-print">Back to Form</a>
         <button onclick="printEstimate()" class="btn btn-primary no-print">🖨️ Print</button>
     </div>
 

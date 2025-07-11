@@ -108,23 +108,30 @@ class Expense extends BaseController
     $draw = $_POST['draw'];
     $fromstart = $_POST['start'];
     $tolimit = $_POST['length'];
-    $columns = ['id', 'date', 'particular', 'amount', 'payment_mode', 'id']; 
-    $orderColIndex = $_POST['order'][0]['column'] ?? 0;
+    $orderColumnIndex = $_POST['order'][0]['column'] ?? 1; // Default to first sortable column
     $orderDir = $_POST['order'][0]['dir'] ?? 'desc';
-    $orderByCol = $columns[$orderColIndex] ?? 'id';
-
     $search = $_POST['search']['value'];
     $slno = $fromstart + 1;
 
+    // Columns must match order in DataTable (excluding SLNO if not DB column)
+    $columns = ['date', 'particular', 'amount', 'payment_mode'];
+    $orderBy = $columns[$orderColumnIndex - 1] ?? 'date'; // -1 if SLNO is first (non-db)
+
     $condition = "1=1";
-    if ($search) {
-    $search = trim($search);
-    $condition .= " AND (DATE_FORMAT(date, '%d-%m-%Y') LIKE '%$search%' OR payment_mode LIKE '%$search%' OR particular LIKE '%$search%' OR amount LIKE '%$search%')";
-}
+    $search = trim(preg_replace('/\s+/', ' ', $search)); // normalize spaces
 
+    if (!empty($search)) {
+        $noSpaceSearch = str_replace(' ', '', strtolower($search));
 
+        $condition .= " AND (
+            REPLACE(LOWER(payment_mode), ' ', '') LIKE '%{$noSpaceSearch}%' 
+            OR REPLACE(LOWER(particular), ' ', '') LIKE '%{$noSpaceSearch}%' 
+            OR REPLACE(LOWER(amount), ' ', '') LIKE '%{$noSpaceSearch}%' 
+            OR DATE_FORMAT(date, '%d-%m-%Y') LIKE '%$search%'
+        )";
+    }
 
-    $totalRec = $model->getAllFilteredRecords($condition, $fromstart, $tolimit, $orderByCol, $orderDir);
+    $totalRec = $model->getAllFilteredRecords($condition, $fromstart, $tolimit, $orderBy, $orderDir);
 
     $result = [];
     foreach ($totalRec as $expense) {
@@ -134,13 +141,13 @@ class Expense extends BaseController
             'id'           => $expense->id,
             'date'         => $formattedDate, 
             'particular'   => $expense->particular,
-            'amount'       => $expense->amount,
+            'amount'       => (float) $expense->amount,
             'payment_mode' => $expense->payment_mode 
         ];
     }
 
     $totExpenseCount = $model->getAllExpenseCount();
-    $totFilterCounts = $model->getFilterExpenseCount($condition, $fromstart, $tolimit);
+    $totFilterCounts = $model->getFilterExpenseCount($condition);
 
     $response = [
         "draw" => intval($draw),

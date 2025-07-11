@@ -20,7 +20,7 @@ class Expense_Model extends Model
         return $this->db->query("SELECT * FROM expenses WHERE $condition ORDER BY $orderBy $orderDir LIMIT $fromstart, $tolimit")->getResult();
     }
 
-	public function getFilterExpenseCount($condition,$fromstart,$tolimit) {
+	public function getFilterExpenseCount($condition) {
 		
 		return $this->db->query("select count(*) as filRecords from expenses where ".$condition)->getRow();
 	}

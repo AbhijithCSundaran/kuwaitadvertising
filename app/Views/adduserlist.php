@@ -103,7 +103,7 @@ $(document).ready(function () {
             },
             { data: "user_id", visible: false }
         ],
-       order: [[0, 'desc']],
+       order: [[6, 'desc']],
             columnDefs: [
                 { searchable: false, orderable: false, targets: [0, 4, 5] }
             ]
