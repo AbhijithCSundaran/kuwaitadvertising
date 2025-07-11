@@ -170,17 +170,20 @@ public function userlistajax()
 
     // Build search condition
     $condition = "1=1";
-    if (!empty($search)) {
-        $search = trim($search);
-        $escapedSearch = $db->escapeLikeString($search);
+   $search = trim(preg_replace('/\s+/', ' ', $search)); // Normalize whitespace
 
-        $condition .= " AND (
-            name LIKE '%$escapedSearch%' ESCAPE '!' OR
-            email LIKE '%$escapedSearch%' ESCAPE '!' OR
-            phonenumber LIKE '%$escapedSearch%' ESCAPE '!' OR
-            role_acces.role_name LIKE '%$escapedSearch%' ESCAPE '!'
-        )";
-    }
+if (!empty($search)) {
+    // Create a version with all spaces removed for flexible matching
+    $normalizedSearch = str_replace(' ', '', strtolower($search));
+
+    $condition .= " AND (
+        REPLACE(LOWER(user.name), ' ', '') LIKE '%$normalizedSearch%' OR
+        REPLACE(LOWER(user.email), ' ', '') LIKE '%$normalizedSearch%' OR
+        REPLACE(LOWER(user.phonenumber), ' ', '') LIKE '%$normalizedSearch%' OR
+        REPLACE(LOWER(role_acces.role_name), ' ', '') LIKE '%$normalizedSearch%'
+    )";
+}
+
 
     $userModel = new \App\Models\Manageuser_Model();
     $users = $userModel->getAllFilteredRecords($condition, $fromstart, $tolimit, $orderColumn, $orderDir);
@@ -198,7 +201,8 @@ public function userlistajax()
     }
 
     $total = $userModel->getAllUserCount()->totuser ?? 0;
-    $filteredTotal = $userModel->getFilterUserCount($condition);
+   $filteredTotal = $userModel->getFilterUserCount($condition, $fromstart, $tolimit);
+
 
     return $this->response->setJSON([
     'draw' => intval($draw),

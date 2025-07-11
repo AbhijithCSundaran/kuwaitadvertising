@@ -205,15 +205,6 @@
     <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
 <script>
    $(document).ready(function () {
-    // ✅ Detect browser back button and restore state
-window.onpageshow = function (event) {
-    if (event.persisted || window.performance.getEntriesByType("navigation")[0].type === "back_forward") {
-        $('#customer_id').select2();                // Reinitialize Select2
-        $('#customer_id').trigger('change');        // Trigger address load
-        $('.price, .quantity, #discount').trigger('input'); // Trigger recalculation
-    }
-};
-    
         $('#customer_id').select2({
             placeholder: "Select Customer",
             width: 'calc(100% - 40px)',
@@ -387,6 +378,7 @@ window.onpageshow = function (event) {
         return;
     }
 
+    // Ensure at least one valid item
     let validItemExists = false;
     $('.item-row').each(function () {
         const desc = $(this).find('input[name="description[]"]').val().trim();
@@ -404,7 +396,7 @@ window.onpageshow = function (event) {
         return;
     }
 
-   
+    // Remove empty rows
     $('.item-row').each(function () {
         const desc = $(this).find('input[name="description[]"]').val().trim();
         const price = parseFloat($(this).find('input[name="price[]"]').val()) || 0;
@@ -417,7 +409,7 @@ window.onpageshow = function (event) {
 
     $('#generate-btn').prop('disabled', true).text('Generating...');
 
-  
+    // ✅ Use FormData to include extra field
     const formData = new FormData(this);
     formData.append('customer_name', customerName);
 
@@ -449,7 +441,7 @@ window.onpageshow = function (event) {
     });
 });
 
-
+// ✅ Helper function to show alerts
 function showAlert(message, type = 'success') {
     $('.alert')
         .removeClass('d-none alert-success alert-danger alert-warning')

@@ -13,7 +13,7 @@ class Manageuser_Model extends Model{
         $db = \Config\Database::connect();
         return $db->query("SELECT COUNT(*) as totuser FROM user")->getRow();
     }
-    public function getFilterUserCount($condition) {
+    public function getFilterUserCount($condition, $fromstart, $tolimit) {
 		
 		$db = \Config\Database::connect();
     	$sql = "SELECT COUNT(*) as filRecords 

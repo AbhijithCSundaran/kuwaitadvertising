@@ -105,7 +105,7 @@
             ],
             order: [[6, 'desc']],
                 columnDefs: [
-                    { searchable: false, orderable: false, targets: [0, 4, 5] },
+                    { searchable: false, orderable: false, targets: [0,3,5] },
                     { targets: 2, width: '450px' }
                 ]
         });
