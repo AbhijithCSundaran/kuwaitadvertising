@@ -129,6 +129,15 @@ $uri = service('uri');
     </li>
     <?php endif; ?>
 
+    <?php if (in_array('customer', $allowedMenus)): ?>
+      <li class="nav-item">
+        <a class="nav-link <?= $uri->getSegment(1) == 'customer' ? 'active' : '' ?>" href="<?= base_url('customer/list') ?>">
+          <i class="mdi mdi-account-multiple menu-icon"></i>
+          <span class="menu-title">Customer List</span>
+        </a>
+      </li>
+      <?php endif; ?>
+
     <?php if (in_array('estimatelist', $allowedMenus)): ?>
     <li class="nav-item">
       <a class="nav-link <?= $uri->getSegment(1) == 'estimatelist' ? 'active' : '' ?>" href="<?= base_url('estimatelist') ?>">

@@ -31,7 +31,7 @@ class Estimate extends BaseController
         $estimateItemModel = new EstimateItemModel();
         $customerModel = new customerModel();
  
-        $data['customers'] = $customerModel->findAll();
+        $data['customers'] = $customerModel->where('is_deleted', 0)->orderBy('customer_id', 'DESC')->findAll();
         $data['estimate'] = null;
         $data['items'] = [];
  
@@ -277,7 +277,7 @@ public function save()
  
        
         $data['items'] = $estimateItemModel->where('estimate_id', $id)->findAll();
-        $data['customers'] = $customerModel->findAll();
+        $data['customers'] = $customerModel->where('is_deleted', 0)->orderBy('customer_id', 'DESC')->findAll();
        $data['estimate'] = $estimateModel
         ->select('estimates.*,customers.address AS customer_address, customers.name AS customer_name')
         ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
@@ -336,4 +336,34 @@ public function save()
         return $this->response->setJSON($estimates);
     }
  
+    public function viewByCustomer($customerId)
+{
+    $estimateModel = new \App\Models\EstimateModel();
+    $itemModel = new \App\Models\EstimateItemModel();
+    $customerModel = new \App\Models\customerModel();
+
+    $estimates = $estimateModel
+        ->where('customer_id', $customerId)
+        ->orderBy('date', 'desc')
+        ->findAll();
+
+    foreach ($estimates as &$est) {
+        $items = $itemModel->where('estimate_id', $est['estimate_id'])->findAll();
+        $subtotal = 0;
+        foreach ($items as $item) {
+            $subtotal += (float)$item['total'];
+        }
+        $est['items'] = $items;
+        $est['subtotal'] = round($subtotal, 2);
+    }
+
+    $customer = $customerModel->find($customerId);
+
+    return view('customer_estimates', [
+        'estimates' => $estimates,
+        'customer' => $customer
+    ]);
+
+}
+
 }
