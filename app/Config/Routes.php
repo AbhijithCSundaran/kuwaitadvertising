@@ -100,3 +100,16 @@ $routes->get('sales/report', 'Sales::report');
 
 $routes->get('companyledger', 'CompanyLedger::index');
 $routes->post('companyledger/save', 'CompanyLedger::save');
+
+$routes->get('customer/list', 'Customer::list');
+$routes->post('customer/fetch', 'Customer::fetch');
+$routes->post('customer/create', 'Customer::create');
+$routes->post('customer/delete', 'Customer::delete');
+$routes->post('customer/get_address', 'Customer::get_address');
+$routes->get('customer/edit/(:num)', 'Customer::edit/$1'); // If you support edit page
+$routes->get('customer/getCustomer/(:num)', 'Customer::getCustomer/$1');
+$routes->get('estimate/customer/(:num)', 'Estimate::viewByCustomer/$1');
+$routes->get('customer', 'Customer::index'); // Or whatever your controller is
+
+
+

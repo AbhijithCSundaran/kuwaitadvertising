@@ -19,7 +19,8 @@ class Rolemanagement extends Controller
     'expense'           => 'Expense',
     'ledger'            => 'Ledger',
     'reports'           => 'Reports',
-    'rolemanagement'    => 'Role Management'
+    'rolemanagement'    => 'Role Management',
+    'customer'          => 'Customer List'
 ];
     
     public function __construct()
