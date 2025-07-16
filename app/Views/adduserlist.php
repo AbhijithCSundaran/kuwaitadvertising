@@ -35,7 +35,7 @@
                 <h5 class="modal-title">Confirmation</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">Are you sure you want to delete this User?</div>
+            <div class="modal-body">Are You Sure You Want To Delete This User?</div>
             <div class="modal-footer">
                 <button type="button" id="confirm-delete-btn" class="btn btn-danger">Delete</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -121,7 +121,7 @@ $(document).ready(function () {
 
 $(document).on('click', '.delete-btn', function () {
     userIdToDelete = $(this).data('id');
-    $('#confirmDeleteModal .modal-body').text('Are you sure you want to delete this User?');
+    $('#confirmDeleteModal .modal-body').text('Are You Sure You Want To Delete This User?');
     $('#confirmDeleteModal').modal('show');
 });
 
