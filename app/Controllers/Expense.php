@@ -114,8 +114,13 @@ class Expense extends BaseController
     $slno = $fromstart + 1;
 
     // Columns must match order in DataTable (excluding SLNO if not DB column)
-    $columns = ['date', 'particular', 'amount', 'payment_mode'];
-    $orderBy = $columns[$orderColumnIndex - 1] ?? 'date'; // -1 if SLNO is first (non-db)
+    $columns = ['slno', 'date', 'particular', 'amount', 'payment_mode', 'id'];
+    $orderBy = $columns[$orderColumnIndex] ?? 'date';
+
+    // Ignore ordering on virtual columns
+    if ($orderBy === 'slno' || $orderBy === 'id') {
+        $orderBy = 'date'; // fallback to a sortable DB column
+    }
 
     $condition = "1=1";
     $search = trim(preg_replace('/\s+/', ' ', $search)); // normalize spaces

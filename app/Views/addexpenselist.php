@@ -103,11 +103,12 @@
                     }
                 }
             ],
-            order: [[6, 'desc']],
-                columnDefs: [
-                    { searchable: false, orderable: false, targets: [0,3,5] },
-                    { targets: 2, width: '450px' }
-                ]
+           columnDefs: [
+                { searchable: false, orderable: false, targets: [0, 5] }, 
+                { targets: 2, width: '450px' }
+            ],
+            order: [[1, 'desc']], 
+
         });
         table.on('order.dt search.dt draw.dt', function () {
             table.column(0, { search: 'applied', order: 'applied' })
