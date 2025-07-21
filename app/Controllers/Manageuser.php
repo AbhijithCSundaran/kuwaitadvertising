@@ -185,7 +185,7 @@ if (!empty($search)) {
 }
 
 
-    $userModel = new \App\Models\Manageuser_Model();
+    $userModel = new Manageuser_Model();
     $users = $userModel->getAllFilteredRecords($condition, $fromstart, $tolimit, $orderColumn, $orderDir);
 
     $result = [];

@@ -107,7 +107,7 @@
                 { searchable: false, orderable: false, targets: [0, 5] }, 
                 { targets: 2, width: '450px' }
             ],
-            order: [[1, 'desc']], 
+            order: [[1, 'asc']], 
 
         });
         table.on('order.dt search.dt draw.dt', function () {
