@@ -28,7 +28,7 @@
 
 }
 </style>
-    <div class="text-right text-end print-btn">
+    <div class="text-right text-md-end print-btn">
         <a href="<?= base_url('estimate/edit/' . $estimate['estimate_id']) ?>" class="btn btn-primary no-print">Back to Form</a>
         <button onclick="printEstimate()" class="btn btn-primary no-print">🖨️ Print</button>
     </div>
@@ -38,25 +38,26 @@
             <div class="print_wrpr" >
                 <div class="row">
                     
-                    <div class="col-md-6">
+                    <div class="col-12 col-md-6">
                         <h3><strong>Quotation</strong></h3>
                     </div>
                    
-                    <div class="col-md-6 text-end">
+                    <div class="col-12 col-md-6 text-end">
                         <p><strong>Date:</strong> <?= date('d-m-Y', strtotime($estimate['date'])) ?></p>
                     </div>
                 </div>
                 <div class="row mt-3">
-                    <div class="col-md-6">
+                    <div class="col-12 col-md-6">
                         <p><strong>To:</strong></p>
                         <p><?= esc($estimate['customer_name'] ?? '') ?></p>
                         <p><?= esc($estimate['customer_address'] ?? '') ?></p>
                     </div>
-                    <div class="col-md-6 text-end">
+                    <div class="col-12 col-md-6 text-end">
                         <p><strong>From:</strong></p>
                         <p><?= esc($user_name ?? '') ?></p>
                     </div>
                 </div>
+            <div class="table-responsive">
                 <table class="generate-table " >
                     <thead class="thead-dark">
                         <tr>
@@ -83,7 +84,8 @@
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
-                </table>  
+                </table> 
+            </div> 
                 <div class="d-flex" >
                     <div class="col-8 terms mt-5">
                         <strong>TERMS & CONDITIONS</strong><br>
@@ -92,8 +94,9 @@
                         3. Full payment is required to process the order.<br>
                         4. Cancellation of processed order will not be accepted.
                     </div>
-                    <div class="col-4 text-end">
-                       <table class="summary-table">
+
+                    <div class="col-12 col-md-4 mt-2 mt-md-1">
+                       <table class="summary-table text-end">
                             <tr>
                                 <td class="label">SUBTOTAL</td>
                                 <td><?= number_format($grandTotal, 2) ?> KWD</td>

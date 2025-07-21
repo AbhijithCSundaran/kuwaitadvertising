@@ -10,7 +10,7 @@
         </div>
     </div>
     <hr>
-
+<div class="table-responsive">
     <table class="table table-bordered" id="roleTable" style="width:100%">
         <thead>
             <tr>
@@ -25,6 +25,7 @@
         </thead>
         <tbody></tbody>
     </table>
+</div>
 </div>
 </div>
 

@@ -8,11 +8,9 @@
         <h3 class="mb-0"><?= isset($isEdit) && $isEdit ? 'Edit User' : 'Add New User' ?></h3>
       </div>
     </div>
-    <div class="col-md-12">
-      <hr/>
-    </div>
+      <hr class="d-none d-md-block">
 
-    <div class="card-body">
+    <div class="card-body p-3 px-md-4">
       <form id="user-login-form" autocomplete="off" >
         <div class="form-group">
           <div class="row">

@@ -201,7 +201,8 @@ if (!empty($search)) {
     }
 
     $total = $userModel->getAllUserCount()->totuser ?? 0;
-   $filteredTotal = $userModel->getFilterUserCount($condition, $fromstart, $tolimit);
+    $filtered = $userModel->getFilterUserCount($condition);
+    $filteredTotal = isset($filtered->totuser) ? (int) $filtered->totuser : 0;
 
 
     return $this->response->setJSON([
@@ -210,6 +211,7 @@ if (!empty($search)) {
     'recordsFiltered' => $filteredTotal,
     'data' => $result
 ]);
+
 }
 
    public function delete()

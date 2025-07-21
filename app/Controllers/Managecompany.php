@@ -242,7 +242,7 @@ class Managecompany extends BaseController
     ];
     $orderColumn = $columnMap[$columnIndex] ?? 'company_id';
 
-    $companyModel = new \App\Models\Managecompany_Model();
+    $companyModel = new Managecompany_Model();
 
     // Fetch filtered records based on updated search logic
     $companies = $companyModel->getAllFilteredRecords($search, $fromstart, $tolimit, $orderColumn, $order);

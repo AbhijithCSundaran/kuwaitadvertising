@@ -20,24 +20,25 @@
     </div>
 
     <hr>
+    <div class="table-responsive">
+        <table class="table table-bordered" id="companiesTable" style="width:100%">
+            <thead>
+                <tr>
+                    <th class="d-none">ID</th>
+                    <th>Sl No</th>
+                    <th>Name</th>
+                    <th>Address</th>
+                    <th>Tax Number</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Logo</th>
+                    <th style="width: 100px;">Action</th>
 
-    <table class="table table-bordered" id="companiesTable" style="width:100%">
-        <thead>
-            <tr>
-                <th class="d-none">ID</th> 
-                <th>Sl No</th>
-                <th>Name</th>
-                <th>Address</th>
-                <th>Tax Number</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Logo</th>
-                <th style="width: 100px;">Action</th>
-                
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
 </div>
 
 <!-- Delete Confirmation Modal -->
@@ -73,49 +74,53 @@
                 type: "POST",
                 dataSrc: "data"
             },
-            sort:true,
-		    searching:true,
+            sort: true,
+            searching: true,
+            paging: true,
             processing: true,
             serverSide: true,
             order: [[0, 'desc']],
-             columnDefs: [
+            columnDefs: [
                 { targets: 1, orderable: false, width: "30px" },
-                { targets: 2, width: "150px" },       
-                { targets: 3, width: "300px" }, 
-                { targets: 5, orderable: false },                      
-                { targets: 6, orderable: false },                      
-                { targets: 7, orderable: false, width: "30px" },      
-                { targets: 8, orderable: false, width: "30px" }       
+                { targets: 2, width: "150px" },
+                { targets: 3, width: "300px" },
+                { targets: 5, orderable: false },
+                { targets: 6, orderable: false },
+                { targets: 7, orderable: false, width: "30px" },
+                { targets: 8, orderable: false, width: "30px" }
             ],
+            dom: "<'row mb-3'<'col-sm-6'l><'col-sm-6'f>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
 
             columns: [
-    { data: "company_id", visible: false }, 
-    { data: "slno" },                       
-    {
-        data: "company_name",
-        render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''
-    },
-    {
-        data: "address",
-        render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''
-    },
-    {
-        data: "tax_number",
-        render: data => data && data.trim() !== "" ? data : '-N/A-'
-    },
-    {
-        data: "email",
-        render: data => data && data.trim() !== "" ? data : '-N/A-'
-    },
-    { data: "phone" },
-    {
-        data: "company_logo",
-        className: "logo-col",
-        render: data => data ? `<img src="<?= base_url('public/uploads/') ?>${data}" width="30">` : ''
-    },
-    {
-        data: "company_id",
-        render: data => `
+                { data: "company_id", visible: false },
+                { data: "slno" },
+                {
+                    data: "company_name",
+                    render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''
+                },
+                {
+                    data: "address",
+                    render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''
+                },
+                {
+                    data: "tax_number",
+                    render: data => data && data.trim() !== "" ? data : '-N/A-'
+                },
+                {
+                    data: "email",
+                    render: data => data && data.trim() !== "" ? data : '-N/A-'
+                },
+                { data: "phone" },
+                {
+                    data: "company_logo",
+                    className: "logo-col",
+                    render: data => data ? `<img src="<?= base_url('public/uploads/') ?>${data}" width="30">` : ''
+                },
+                {
+                    data: "company_id",
+                    render: data => `
             <div class="d-flex gap-2">
                 <a href="<?= base_url('addcompany/') ?>${data}" title="Edit" style="color:rgb(13, 162, 199); margin-right: 10px;">
                     <i class="bi bi-pencil-fill"></i>
@@ -124,8 +129,8 @@
                     <i class="bi bi-trash-fill"></i>
                 </a>
             </div>`
-    }
-]
+                }
+            ]
 
         });
 
