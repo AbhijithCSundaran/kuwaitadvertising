@@ -121,6 +121,7 @@ public function save()
     public function edit($id)
 {
     $invoiceModel = new InvoiceModel();
+    $itemModel = new \App\Models\InvoiceItemModel();
     $customerModel = new CustomerModel();
 
     $invoice = $invoiceModel->find($id);
@@ -128,14 +129,18 @@ public function save()
         return redirect()->to(base_url('invoicelist'))->with('error', 'Invoice not found.');
     }
 
+    // ✅ Load invoice items
+    $items = $itemModel->where('invoice_id', $id)->findAll();
+
     $data = [
         'invoice' => $invoice,
+        'items' => $items, // ✅ Pass items to the view
         'customers' => $customerModel->where('is_deleted', 0)->findAll()
     ];
 
-    return view('invoice_form', $data); // if it's directly inside Views/
-
+    return view('invoice_form', $data);
 }
+
 
 public function delete($id = null)
 {
@@ -151,7 +156,25 @@ public function delete($id = null)
         'message' => $deleted ? 'Invoice deleted successfully.' : 'Failed to delete invoice.'
     ]);
 }
+public function printInvoice($id)
+{
+    $model = new InvoiceModel();
+    $invoice = $model->find($id);
 
+    $itemModel = new InvoiceItemModel();
+    $items = $itemModel->where('invoice_id', $id)->findAll(); // ✅ GET ITEMS
+
+    $user_id = $invoice['user_id'];
+    $userModel = new UserModel();
+    $user = $userModel->find($user_id);
+    $user_name = $user['name'] ?? 'N/A';
+
+    return view('invoice/invoice_print', [
+        'invoice' => $invoice,
+        'items' => $items,          // ✅ PASS TO VIEW
+        'user_name' => $user_name,  // ✅ PASS TO VIEW
+    ]);
+}
 
 
 }

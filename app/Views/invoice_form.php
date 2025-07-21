@@ -108,7 +108,7 @@
                 <?php if (!empty($items)): ?>
     <?php foreach ($items as $index => $item): ?>
         <tr class="item-row">
-            <td><input type="text" name="description[]" class="form-control" value="<?= esc($item['description']) ?>"></td>
+            <td><input type="text" name="description[]" class="form-control" value="<?= esc($item['item_name']) ?>"></td>
             <td><input type="number" name="price[]" class="form-control price" value="<?= esc($item['price']) ?>"></td>
             <td><input type="number" name="quantity[]" class="form-control quantity" value="<?= esc($item['quantity']) ?>"></td>
             <td><input type="number" name="total[]" class="form-control total" value="<?= esc($item['price'] * $item['quantity']) ?>" readonly></td>
@@ -155,7 +155,7 @@
 
         <div class="text-end">
             <a href="<?= base_url('invoicelist') ?>" class="btn btn-secondary">Discard</a>
-            <button type="submit" id="save-invoice-btn" class="btn btn-primary">Save</button>
+            <button type="submit" id="save-invoice-btn" class="btn btn-primary">Generate Invoice</button>
         </div>
     </form>
 </div>
