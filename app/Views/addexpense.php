@@ -17,8 +17,8 @@ input[type=number].no-spinner {
                 <h3 class="mb-0"><?= isset($isEdit) && $isEdit ? 'Edit Expense' : 'Add New Expense' ?></h3>
             </div>    
         </div>
-        <hr>
-        <div class="card-body">
+        <hr class="d-none d-md-block">
+        <div class="card-body p-3 px-md-4">
             <form id="expense-form">
                 <div class ="row"> 
                     <?php
@@ -46,7 +46,7 @@ input[type=number].no-spinner {
                         }
 
                         .calendar-input-wrapper input {
-                            padding-right: 35px; /* Make room for the icon */
+                            padding-right: 35px; 
                         }
                     </style>
 
