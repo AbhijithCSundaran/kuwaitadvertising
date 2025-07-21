@@ -111,5 +111,17 @@ $routes->get('customer/getCustomer/(:num)', 'Customer::getCustomer/$1');
 $routes->get('estimate/customer/(:num)', 'Estimate::viewByCustomer/$1');
 $routes->get('customer', 'Customer::index'); // Or whatever your controller is
 
+$routes->get('invoicelist', 'Invoice::list');
+$routes->get('invoice/add', 'Invoice::add');
+$routes->post('invoice/save', 'Invoice::save');
+$routes->get('invoice/print/(:segment)', 'Invoice::print/$1');
+$routes->get('invoice/fetch', 'Invoice::fetchInvoices');
+$routes->get('invoice/edit/(:segment)', 'Invoice::edit/$1');        // Edit page
+$routes->post('invoice/delete/(:segment)', 'Invoice::delete/$1');
+$routes->get('invoice/edit/(:num)', 'Invoice::edit/$1');
+$routes->post('invoice/save', 'Invoice::save'); // if you handle saving here
+
+
+
 
 

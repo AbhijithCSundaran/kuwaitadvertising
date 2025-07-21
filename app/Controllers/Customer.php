@@ -16,9 +16,9 @@ class Customer extends BaseController
     }
    public function create()
 {
-    $name = $this->request->getPost('name');
-    $address = $this->request->getPost('address');
-    $customer_id = $this->request->getPost('customer_id'); // NEW LINE
+    $name = ucwords(strtolower(trim($this->request->getPost('name'))));
+    $address = ucfirst(strtolower(trim($this->request->getPost('address'))));
+    $customer_id = $this->request->getPost('customer_id'); 
 
     if (empty($name) || empty($address)) {
         return $this->response->setJSON([
