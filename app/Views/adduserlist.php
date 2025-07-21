@@ -66,6 +66,11 @@
             paging: true,
             processing: true,
             serverSide: true,
+            
+            order: [[6, 'desc']],
+            columnDefs: [
+                { searchable: false, orderable: false, targets: [0, 4, 5] }
+            ],
             dom: "<'row mb-3'<'col-sm-6'l><'col-sm-6'f>>" +
                 "<'row'<'col-sm-12'tr>>" +
                 "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
@@ -108,18 +113,6 @@
                 },
                 { data: "user_id", visible: false }
             ],
-            order: [[6, 'desc']],
-            columnDefs: [
-                { searchable: false, orderable: false, targets: [0, 4, 5] }
-            ]
-        });
-        table.on('order.dt search.dt draw.dt', function () {
-            table.column(0, { search: 'applied', order: 'applied' })
-                .nodes()
-                .each(function (cell, i) {
-                    var pageInfo = table.page.info();
-                    cell.innerHTML = pageInfo.start + i + 1;
-                });
         });
 
         let userIdToDelete = null;

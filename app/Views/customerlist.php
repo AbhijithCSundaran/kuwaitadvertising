@@ -19,7 +19,7 @@
         </div>
     </div>
     <hr>
-
+<div class="table-responsive">
     <table class="table table-bordered" id="customersTable" style="width:100%">
         <thead>
             <tr>
@@ -32,6 +32,7 @@
         </thead>
         <tbody></tbody>
     </table>
+</div>
 </div>
 
 <!-- Modal: Add/Edit Customer -->
@@ -110,6 +111,9 @@ $(document).ready(function () {
             { targets: 3, width: "300px" },
             { targets: 4, orderable: false, width: "50px" }
         ],
+        dom: "<'row mb-3'<'col-sm-6'l><'col-sm-6'f>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
         columns: [
             { data: "customer_id" },
             { data: "slno" },

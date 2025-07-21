@@ -93,51 +93,52 @@
                     </div>
                 </div>
             </div>
-
-            <table class="table table-bordered mt-4">
-                <thead>
-                    <tr>
-                        <th>Description Of Goods</th>
-                        <th>Unit Price</th>
-                        <th>Quantity</th>
-                        <th>Amount</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="item-container">
-                    <?php if (isset($items) && count($items) > 0): ?>
-                        <?php foreach ($items as $item): ?>
+            <div class="table-responsive">
+                <table class="table table-bordered mt-4">
+                    <thead>
+                        <tr>
+                            <th>Description Of Goods</th>
+                            <th>Unit Price</th>
+                            <th>Quantity</th>
+                            <th>Amount</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="item-container">
+                        <?php if (isset($items) && count($items) > 0): ?>
+                            <?php foreach ($items as $item): ?>
+                                <tr class="item-row">
+                                    <td><input type="text" name="description[]" class="form-control"
+                                            value="<?= $item['description'] ?>"></td>
+                                    <td><input type="number" name="price[]" class="form-control price"
+                                            value="<?= $item['price'] ?>"></td>
+                                    <td><input type="number" name="quantity[]" class="form-control quantity"
+                                            value="<?= $item['quantity'] ?>"></td>
+                                    <td><input type="number" name="total[]" class="form-control total" value="<?= $item['total'] ?>"
+                                            readonly></td>
+                                    <td class="text-center">
+                                        <span class="remove-item-btn" title="Remove">
+                                            <i class="fas fa-trash text-danger"></i>
+                                        </span>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
                             <tr class="item-row">
-                                <td><input type="text" name="description[]" class="form-control"
-                                        value="<?= $item['description'] ?>"></td>
-                                <td><input type="number" name="price[]" class="form-control price"
-                                        value="<?= $item['price'] ?>"></td>
-                                <td><input type="number" name="quantity[]" class="form-control quantity"
-                                        value="<?= $item['quantity'] ?>"></td>
-                                <td><input type="number" name="total[]" class="form-control total" value="<?= $item['total'] ?>"
-                                        readonly></td>
+                                <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
+                                <td><input type="number" name="price[]" class="form-control price"></td>
+                                <td><input type="number" name="quantity[]" class="form-control quantity"></td>
+                                <td><input type="number" name="total[]" class="form-control total" readonly></td>
                                 <td class="text-center">
                                     <span class="remove-item-btn" title="Remove">
                                         <i class="fas fa-trash text-danger"></i>
                                     </span>
                                 </td>
                             </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr class="item-row">
-                            <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
-                            <td><input type="number" name="price[]" class="form-control price"></td>
-                            <td><input type="number" name="quantity[]" class="form-control quantity"></td>
-                            <td><input type="number" name="total[]" class="form-control total" readonly></td>
-                            <td class="text-center">
-                                <span class="remove-item-btn" title="Remove">
-                                    <i class="fas fa-trash text-danger"></i>
-                                </span>
-                            </td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
             <button type="button" class="btn btn-outline-secondary mb-34" id="add-item">Add More Item</button>
             <table class="table totals">
                 <tr>

@@ -5,23 +5,23 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h3 class="mb-0"><?= isset($company['company_id']) ? 'Edit Company' : 'Add New Company' ?></h3>
             </div>
-            <hr/>
-            <div class="card-body">
+            <hr  class="d-none d-md-block">
+            <div class="card-body p-3 px-md-4">
                 <form id="company-form" enctype="multipart/form-data" method="post">
                     <div class="d-flex flex-wrap">
-                        <div class="col-6 mb-3 px-2">
+                        <div class="col-12 col-md-6 mb-3 px-2">
                             <label for="company_name" class="form-label">Name <span class="text-danger">*</span></label>
                             <input type="text" name="company_name" id="company_name" class="form-control capitalize" maxlength="50"
                             value="<?= isset($company['company_name']) ? esc($company['company_name']) : '' ?>" />
                         </div>
                         
-                        <div class="col-6 mb-3 px-2">
+                        <div class="col-12 col-md-6 mb-3 px-2">
                             <label for="email" class="form-label">Email</label>
                             <input type="email" name="email" id="email" class="form-control"
                             value="<?= isset($company['email']) ? esc($company['email']) : '' ?>" />
                         </div>
                         <!-- address -->
-                        <div class="col-6 mb-3 px-2">
+                        <div class="col-12 col-md-6 mb-3 px-2">
                             <label for="address" class="form-label">Company Address</label>
                             <textarea name="address" id="address" class="form-control capitalize" maxlength="150"
                             style="resize: vertical;" rows="3"><?= isset($company['address']) ? esc($company['address']) : '' ?></textarea>
@@ -33,10 +33,10 @@
                             $isSame = $addressVal !== '' && $addressVal === $billingVal;
                         ?>
 
-                        <div class="col-6 mb-3 px-2 position-relative">
-                            <label for="billing_address" class="form-label d-flex justify-content-between align-items-center">
+                        <div class="col-12 col-md-6 mb-3 px-2 position-relative">
+                            <label for="billing_address" class="form-label d-flex flex-column-reverse flex-md-row  justify-content-md-between align-items-md-center">
                                 <span>Billing Address</span>
-                                <div class="form-check d-flex align-items-center position-absolute end-0 pe-2 m-0">
+                                <div class="form-check d-flex align-items-center end-0  ps-3 ps-md-0 pb-2 pb-md-0 pe-2 m-0 sameas">
                                     <input type="checkbox" class="form-check-input me-1" id="sameAddressCheck" <?= $isSame ? 'checked' : '' ?>>
                                     <label class="form-check-label small m-0" for="sameAddressCheck">Same as company address</label>
                                 </div>
@@ -47,19 +47,19 @@
 
                         <!-- address -->
 
-                        <div class="col-6 mb-3 px-2">
+                        <div class="col-12 col-md-6 mb-3 px-2">
                             <label for="phone" class="form-label">Phone <span class="text-danger">*</span></label>
                             <input type="text" name="phone" id="phone" class="form-control" maxlength="20"
                             pattern="^[0-9+\-\s]{7,20}$"
                             title="Please enter a valid phone number (digits, +, -, spaces allowed, 7–20 characters)"
                             value="<?= isset($company['phone']) ? esc($company['phone']) : '' ?>" required>
                         </div>
-                        <div class="col-6 mb-3 px-2">
+                        <div class="col-12 col-md-6 mb-3 px-2">
                             <label for="tax_number" class="form-label">Tax Number</label>
                             <input type="text" name="tax_number" id="tax_number" class="form-control" maxlength="15"
                             value="<?= isset($company['tax_number']) ? esc($company['tax_number']) : '' ?>" />
                         </div>
-                        <div class="col-6 mb-3 px-2">
+                        <div class="col-12 col-md-6 mb-3 px-2">
                             <label class="form-label">Company Logo <span class="text-danger">*</span></label>
                            <?php if (!isset($company['company_id'])): ?>
                                 <input type="file" name="company_logo" id="company_logo" class="form-control" accept="image/*" />

@@ -10,6 +10,7 @@
             </div>
         </div>
         <hr>
+    <div class="table-responsive">
         <table class="table table-bordered" id="expenseTable">
             <thead>
                 <tr>
@@ -23,6 +24,7 @@
             </thead>
             <tbody></tbody>
         </table>
+    </div>
     </div>
     </div>
 

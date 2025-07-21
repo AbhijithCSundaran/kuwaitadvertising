@@ -13,15 +13,16 @@ class Manageuser_Model extends Model{
         $db = \Config\Database::connect();
         return $db->query("SELECT COUNT(*) as totuser FROM user")->getRow();
     }
-    public function getFilterUserCount($condition, $fromstart, $tolimit) {
+    public function getFilterUserCount($condition) {
 		
 		$db = \Config\Database::connect();
-    	$sql = "SELECT COUNT(*) as filRecords 
-            FROM user 
-            LEFT JOIN role_acces ON role_acces.role_id = user.role_id 
-            WHERE $condition";
+    	$builder = $db->table('user');
+        $builder->select('COUNT(*) as totuser');
+        $builder->join('role_acces', 'role_acces.role_id = user.role_id', 'left');
+        $builder->where($condition);
 
-    return $db->query($sql)->getRow();
+    return $builder->select("COUNT(*) as totuser")->get()->getRow();
+
 	}
 	public function getAllFilteredRecords($condition, $fromstart, $tolimit, $orderColumn = 'user_id', $orderDir = 'DESC')
 {

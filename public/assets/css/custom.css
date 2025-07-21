@@ -466,6 +466,10 @@ td.logo-col {
 	overflow: hidden;
 }
 
+.sameas {
+	position: absolute;
+}
+
 /* col-6 */
 /* col-xs-6 575px */
 /* col-sm-6 767px*/
@@ -491,7 +495,7 @@ td.logo-col {
 		margin-left: 0px;
 		width: 100vw;
 		overflow-x: auto;
-		padding:5px;
+		padding: 5px;
 		/* overflow-x: auto; */
 		/* white-space: nowrap; */
 	}
@@ -501,8 +505,9 @@ td.logo-col {
 		overflow-x: auto;
 	}
 
+	.table-responsive>table,
 	.table-responsive>div {
-		min-width: 750px;
+		min-width: 900px;
 		max-width: none;
 		overflow: hidden;
 	}
@@ -518,6 +523,22 @@ td.logo-col {
 		padding-right: 5px;
 	}
 
+	.modal {
+		margin: auto !important;
+	}
+	.form-control.w-50 {
+    	width: 100% !important;
+	}
+	.btn-primary:not(.btn-light) {
+		padding:5px;
+	}
+	
+}
+
+@media (max-width: 767px) {
+	.sameas {
+		position: relative;
+	}
 }
 
 /* @media (min-width:575px) {
