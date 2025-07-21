@@ -13,38 +13,39 @@
     <?php if (empty($estimates)) : ?>
         <p>No Estimates Found For This Customer.</p>
     <?php else : ?>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Estimate ID</th>
-                    <th>Date</th>
-                    <th>Subtotal</th>
-                    <th>Discount (%)</th>
-                    <th>Total</th>
-                    <th>Items</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($estimates as $est) : ?>
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle text-center">
+                <thead>
                     <tr>
-                        <td><?= $est['estimate_id'] ?></td>
-                        <td><?= $est['date'] ?></td>
-                        <td><?= number_format($est['subtotal'], 2) ?></td>
-                        <td><?= $est['discount'] ?></td>
-                        <td><?= number_format($est['total_amount'], 2) ?></td>
-                        <td>
-                            <ul class="mb-0">
-                                <?php foreach ($est['items'] as $item) : ?>
-                                    <li><?= $item['description'] ?> (<?= $item['quantity'] ?> x <?= $item['price'] ?>)</li>
-                                <?php endforeach ?>
-                            </ul>
-                        </td>
+                        <th>Estimate ID</th>
+                        <th>Estimate Date</th>
+                        <th>Items</th>
+                        <th>Subtotal</th>
+                        <th>Discount (%)</th>
+                        <th>Total</th>
                     </tr>
-                <?php endforeach ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php foreach ($estimates as $est) : ?>
+                        <tr>
+                            <td><?= $est['estimate_id'] ?></td>
+                            <td><?= date('d-m-Y', strtotime($est['date'])) ?></td>
+                            <td class="text-start">
+                                <ul class="mb-0 ps-3">
+                                    <?php foreach ($est['items'] as $item) : ?>
+                                        <li><?= $item['description'] ?> (<?= $item['quantity'] ?> x <?= number_format($item['price'], 2) ?>)</li>
+                                    <?php endforeach ?>
+                                </ul>
+                            </td>
+                            <td><?= number_format($est['subtotal'], 2) ?></td>
+                            <td><?= $est['discount'] ?></td>
+                            <td><?= number_format($est['total_amount'], 2) ?></td>
+                        </tr>
+                    <?php endforeach ?>
+                </tbody>
+            </table>
+        </div>
     <?php endif; ?>
 </div>
-                                </div>
-
+</div>
 <?php include "common/footer.php"; ?>

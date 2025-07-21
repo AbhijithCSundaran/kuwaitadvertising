@@ -204,6 +204,19 @@
             let fileInput = $('#company_logo')[0];
             let file = fileInput ? fileInput.files[0] : null;
 
+            let errors = [];
+
+            if (!name) errors.push('Company Name');
+            if (!phone) errors.push('Phone Number');
+            if (!file && !uid) errors.push('Company Logo');
+
+            if (errors.length === 3) {
+                showMessage('Please fill all mandatory fields.', 'danger');
+                $saveBtn.prop('disabled', false).css('opacity', 1);
+                return;
+            }
+
+
             if (!name) {
                 showMessage('Company Name is Required.', 'danger');
                 $saveBtn.prop('disabled', false).css('opacity', 1);

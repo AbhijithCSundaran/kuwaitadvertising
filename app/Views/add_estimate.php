@@ -312,8 +312,13 @@
 
         $('#customerForm').submit(function (e) {
             e.preventDefault();
-            const name = $('#popup_name').val().trim();
-            const address = $('#popup_address').val().trim();
+            let name = $('#popup_name').val().trim();
+            let address = $('#popup_address').val().trim();
+
+            
+            name = name.replace(/\b\w/g, char => char.toUpperCase());
+            address = address.replace(/(^\s*\w|[.!?]\s*\w)/g, char => char.toUpperCase());
+
 
             if (!name || !address) {
                 $('#customerError').removeClass('d-none').text('Please Enter Valid Name And Address');

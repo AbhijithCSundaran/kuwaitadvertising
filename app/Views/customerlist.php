@@ -1,4 +1,5 @@
 <?php include "common/header.php"; ?>
+
 <style>
     #customersTable.dataTable tbody td {
         font-size: 14px;
@@ -39,22 +40,22 @@
         <form id="customerForm">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add Customer</h5>
+                    <h5 class="modal-title" id="customerModalLabel">Add Customer</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="customer_id" id="customer_id">
                     <div class="mb-3">
                         <label>Name</label>
-                        <input type="text" name="name" id="name" class="form-control" required>
+                        <input type="text" name="name" id="name" class="form-control" required style="text-transform: capitalize;">
                     </div>
                     <div class="mb-3">
                         <label>Address</label>
-                        <textarea name="address" id="address" class="form-control" required></textarea>
+                        <textarea name="address" id="address" class="form-control" required style="text-transform: capitalize;"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="submit" id="saveCustomerBtn" class="btn btn-primary" disabled>Save</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 </div>
             </div>
@@ -82,131 +83,176 @@
 <?php include "common/footer.php"; ?>
 
 <script>
-    let table;
-    let deleteId = null;
-    const alertBox = $('.alert');
-    const customerModal = new bootstrap.Modal(document.getElementById('customerModal'));
-    const deleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+let table;
+let deleteId = null;
+const alertBox = $('.alert');
+const customerModal = new bootstrap.Modal(document.getElementById('customerModal'));
+const deleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
 
-    $(document).ready(function () {
-        // Load DataTable
-        table = $('#customersTable').DataTable({
-            ajax: {
-                url: "<?= base_url('customer/fetch') ?>",
-                type: "POST",
-                dataSrc: "data"
+let originalName = '';
+let originalAddress = '';
+
+$(document).ready(function () {
+    // Load DataTable
+    table = $('#customersTable').DataTable({
+        ajax: {
+            url: "<?= base_url('customer/fetch') ?>",
+            type: "POST",
+            dataSrc: "data"
+        },
+        processing: true,
+        serverSide: true,
+        order: [[0, 'desc']],
+        columnDefs: [
+            { targets: 0, visible: false },
+            { targets: 1, orderable: false, width: "30px" },
+            { targets: 2, width: "150px" },
+            { targets: 3, width: "300px" },
+            { targets: 4, orderable: false, width: "50px" }
+        ],
+        columns: [
+            { data: "customer_id" },
+            { data: "slno" },
+            {
+                data: "name",
+                render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''
             },
-            processing: true,
-            serverSide: true,
-            order: [[0, 'desc']],
-            columnDefs: [
-                { targets: 0, visible: false },
-                { targets: 1, orderable: false, width: "30px" },
-                { targets: 2, width: "150px" },
-                { targets: 3, width: "300px" },
-                { targets: 4, orderable: false, width: "50px" }
-            ],
-            columns: [
-                { data: "customer_id" },
-                { data: "slno" },
-                {
-                    data: "name",
-                    render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''
-                },
-                {
-                    data: "address",
-                    render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : '-N/A-'
-                },
-                {
-                    data: "customer_id",
-                    render: data => `
-                        <div class="d-flex gap-2">
-                            <a href="javascript:void(0);" class="view-estimate" data-id="${data}" title="View Estimates" style="color:green;">
-                                <i class="bi bi-eye-fill"></i>
-                            </a>
-                            <a href="javascript:void(0);" class="edit-customer" data-id="${data}" title="Edit" style="color:rgb(13, 162, 199);">
-                                <i class="bi bi-pencil-fill"></i>
-                            </a>
-                            <a href="javascript:void(0);" class="delete-customer" data-id="${data}" title="Delete" style="color: #dc3545;">
-                                <i class="bi bi-trash-fill"></i>
-                            </a>
-                        </div>`
-                }
-
-            ]
-        });
-
-        // Show add form
-        $('#addCustomerBtn').click(() => {
-            $('#customerForm')[0].reset();
-            $('#customer_id').val('');
-            customerModal.show();
-        });
-
-        // Handle form submit (Add/Edit)
-        $('#customerForm').submit(function (e) {
-            e.preventDefault();
-            $.post("<?= base_url('customer/create') ?>", $(this).serialize(), function (res) {
-                if (res.status === 'success') {
-                    showAlert('success', res.message);
-                    table.ajax.reload(null, false);
-                    customerModal.hide();
-                } else {
-                    showAlert('danger', res.message);
-                }
-            }, 'json');
-        });
-
-        // Edit click
-        $(document).on('click', '.edit-customer', function () {
-            const id = $(this).data('id');
-            $.get("<?= base_url('customer/getCustomer/') ?>" + id, function (data) {
-                if (data.status !== 'error') {
-                    $('#customer_id').val(data.customer_id);
-                    $('#name').val(data.name);
-                    $('#address').val(data.address);
-                    customerModal.show();
-                } else {
-                    showAlert('danger', data.message);
-                }
-            });
-        });
-
-        // View Estimate Click
-        $(document).on('click', '.view-estimate', function () {
-            const customerId = $(this).data('id');
-            window.location.href = "<?= base_url('estimate/customer/') ?>" + customerId;
-        });
-
-
-        // Delete click
-        $(document).on('click', '.delete-customer', function () {
-            deleteId = $(this).data('id');
-            deleteModal.show();
-        });
-
-        $('#confirm-delete-btn').click(function () {
-            if (!deleteId) return;
-
-            $.post("<?= base_url('customer/delete') ?>", {
-                id: deleteId,
-                '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
-            }, function (res) {
-                if (res.status === 'success') {
-                    showAlert('success', res.message);
-                    table.ajax.reload(null, false);
-                } else {
-                    showAlert('danger', res.message);
-                }
-                deleteModal.hide();
-                deleteId = null;
-            }, 'json');
-        });
-
-        function showAlert(type, message) {
-            alertBox.removeClass().addClass(`alert alert-${type} text-center position-fixed`)
-                .text(message).fadeIn();
-            setTimeout(() => alertBox.fadeOut(), 2000);
-        }
+            {
+                data: "address",
+                render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : '-N/A-'
+            },
+            {
+                data: "customer_id",
+                render: data => `
+                    <div class="d-flex gap-2">
+                        <a href="javascript:void(0);" class="view-estimate" data-id="${data}" title="View Estimates" style="color:green;">
+                            <i class="bi bi-eye-fill"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="edit-customer" data-id="${data}" title="Edit" style="color:rgb(13, 162, 199);">
+                            <i class="bi bi-pencil-fill"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="delete-customer" data-id="${data}" title="Delete" style="color: #dc3545;">
+                            <i class="bi bi-trash-fill"></i>
+                        </a>
+                    </div>`
+            }
+        ]
     });
+
+    // Add Customer
+    $('#addCustomerBtn').click(() => {
+        $('#customerForm')[0].reset();
+        $('#customer_id').val('');
+        $('#customerModalLabel').text('Add Customer');
+        $('#saveCustomerBtn').prop('disabled', false);
+        customerModal.show();
+
+        originalName = '';
+        originalAddress = '';
+    });
+
+    // Edit Customer
+    $(document).on('click', '.edit-customer', function () {
+        const id = $(this).data('id');
+        $.get("<?= base_url('customer/getCustomer/') ?>" + id, function (data) {
+            if (data.status !== 'error') {
+                $('#customer_id').val(data.customer_id);
+                $('#name').val(data.name);
+                $('#address').val(data.address);
+                $('#customerModalLabel').text('Edit Customer');
+
+                originalName = data.name.trim();
+                originalAddress = data.address.trim();
+
+                $('#saveCustomerBtn').prop('disabled', true);
+                customerModal.show();
+            } else {
+                showAlert('danger', data.message);
+            }
+        });
+    });
+
+    // Check if input values changed from original (only in Edit)
+    $('#name, #address').on('input', function () {
+        const isEdit = $('#customer_id').val() !== '';
+        if (!isEdit) return;
+
+        const currentName = $('#name').val().trim();
+        const currentAddress = $('#address').val().trim();
+
+        const hasChanged = currentName !== originalName || currentAddress !== originalAddress;
+        $('#saveCustomerBtn').prop('disabled', !hasChanged);
+    });
+
+    // Submit Form
+    $('#customerForm').submit(function (e) {
+        e.preventDefault();
+        const $btn = $('#saveCustomerBtn');
+        $btn.prop('disabled', true);
+
+        // Capitalize before sending
+        const name = $('#name').val().trim().replace(/\b\w/g, c => c.toUpperCase());
+        const address = $('#address').val().trim().replace(/\b\w/g, c => c.toUpperCase());
+        $('#name').val(name);
+        $('#address').val(address);
+
+        $.post("<?= base_url('customer/create') ?>", $(this).serialize(), function (res) {
+            if (res.status === 'success') {
+                showAlert('success', res.message);
+                table.ajax.reload(null, false);
+                customerModal.hide();
+            } else {
+                showAlert('danger', res.message);
+                $btn.prop('disabled', false);
+            }
+        }, 'json').fail(function () {
+            showAlert('danger', 'Something went wrong!');
+            $btn.prop('disabled', false);
+        });
+    });
+
+    // Reset button on modal close
+    $('#customerModal').on('hidden.bs.modal', function () {
+        $('#saveCustomerBtn').prop('disabled', true);
+        originalName = '';
+        originalAddress = '';
+    });
+
+    // View Estimate
+    $(document).on('click', '.view-estimate', function () {
+        const customerId = $(this).data('id');
+        window.location.href = "<?= base_url('estimate/customer/') ?>" + customerId;
+    });
+
+    // Delete
+    $(document).on('click', '.delete-customer', function () {
+        deleteId = $(this).data('id');
+        deleteModal.show();
+    });
+
+    $('#confirm-delete-btn').click(function () {
+        if (!deleteId) return;
+
+        $.post("<?= base_url('customer/delete') ?>", {
+            id: deleteId,
+            '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
+        }, function (res) {
+            if (res.status === 'success') {
+                showAlert('success', res.message);
+                table.ajax.reload(null, false);
+            } else {
+                showAlert('danger', res.message);
+            }
+            deleteModal.hide();
+            deleteId = null;
+        }, 'json');
+    });
+
+    function showAlert(type, message) {
+        alertBox.removeClass().addClass(`alert alert-${type} text-center position-fixed`)
+            .text(message).fadeIn();
+        setTimeout(() => alertBox.fadeOut(), 2000);
+    }
+});
 </script>
+

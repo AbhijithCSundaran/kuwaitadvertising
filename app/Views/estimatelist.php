@@ -28,7 +28,7 @@
     </div>
     <hr>
 
-    <table class="table table-bordered" id="estimateTable" style="width:100%">
+    <table class="table table-bordered" id="estimateTable"  style="width:100%" >
         <thead>
             <tr>
                 <th>Sl No</th>
