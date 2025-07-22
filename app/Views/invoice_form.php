@@ -106,29 +106,29 @@
             </thead>
             <tbody id="item-container">
                 <?php if (!empty($items)): ?>
-    <?php foreach ($items as $index => $item): ?>
-        <tr class="item-row">
-            <td><input type="text" name="description[]" class="form-control" value="<?= esc($item['item_name']) ?>"></td>
-            <td><input type="number" name="price[]" class="form-control price" value="<?= esc($item['price']) ?>"></td>
-            <td><input type="number" name="quantity[]" class="form-control quantity" value="<?= esc($item['quantity']) ?>"></td>
-            <td><input type="number" name="total[]" class="form-control total" value="<?= esc($item['price'] * $item['quantity']) ?>" readonly></td>
-            <td class="text-center">
-                <span class="remove-item-btn" title="Remove"><i class="fas fa-trash text-danger"></i></span>
-            </td>
-        </tr>
-    <?php endforeach; ?>
-<?php else: ?>
-    <tr class="item-row">
-        <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
-        <td><input type="number" name="price[]" class="form-control price"></td>
-        <td><input type="number" name="quantity[]" class="form-control quantity"></td>
-        <td><input type="number" name="total[]" class="form-control total" readonly></td>
-        <td class="text-center">
-            <span class="remove-item-btn" title="Remove"><i class="fas fa-trash text-danger"></i></span>
-        </td>
-    </tr>
-<?php endif; ?>
-    
+                <?php foreach ($items as $index => $item): ?>
+                    <tr class="item-row">
+                        <td><input type="text" name="description[]" class="form-control"  value="<?= esc($item['item_name']) ?>" ></td>
+                        <td><input type="number" name="price[]" class="form-control price" value="<?= esc($item['price']) ?>"></td>
+                        <td><input type="number" name="quantity[]" class="form-control quantity" value="<?= esc($item['quantity']) ?>"></td>
+                        <td><input type="number" name="total[]" class="form-control total" value="<?= esc($item['price'] * $item['quantity']) ?>" readonly></td>
+                        <td class="text-center">
+                            <span class="remove-item-btn" title="Remove"><i class="fas fa-trash text-danger"></i></span>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+                <?php else: ?>
+                    <tr class="item-row">
+                        <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
+                        <td><input type="number" name="price[]" class="form-control price"></td>
+                        <td><input type="number" name="quantity[]" class="form-control quantity"></td>
+                        <td><input type="number" name="total[]" class="form-control total" readonly></td>
+                        <td class="text-center">
+                            <span class="remove-item-btn" title="Remove"><i class="fas fa-trash text-danger"></i></span>
+                        </td>
+                    </tr>
+                <?php endif; ?>
+                    
             </tbody>
         </table>
 
@@ -190,6 +190,7 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
+    
 $(document).ready(function () {
     $('#customer_id').select2({
         placeholder: "Select Customer",
@@ -280,10 +281,10 @@ $(document).ready(function () {
 
     $('#invoice-form').submit(function (e) {
         e.preventDefault();
-
+ 
         const formData = new FormData(this);
         formData.append('customer_name', $('#customer_id option:selected').text().trim());
-
+ 
         $.ajax({
             url: "<?= site_url('invoice/save') ?>",
             type: "POST",
@@ -299,13 +300,13 @@ $(document).ready(function () {
         showAlert(res.message || 'Failed to save invoice.', 'danger');
     }
 },
-
+ 
             error: function () {
                 showAlert('Server error while saving.', 'danger');
             }
         });
     });
-
+ 
     function showAlert(message, type) {
         $('.alert')
             .removeClass('d-none alert-success alert-danger')
