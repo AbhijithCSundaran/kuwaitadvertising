@@ -87,7 +87,7 @@
       </div>
     </div>
     <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
-      <button id="menuToggle" class="btn  icon-align d-lg-none">
+      <button id="menuToggle" class="btn icon-align d-xl-none">
         <i class="fas fa-bars"></i>
       </button>
     </div>
@@ -169,14 +169,15 @@
             </a>
           </li>
         <?php endif; ?>
-          <?php if (in_array('invoices', $allowedMenus)): ?>
-<li class="nav-item">
-  <a class="nav-link <?= $uri->getSegment(1) == 'invoicelist' ? 'active' : '' ?>" href="<?= base_url('invoicelist') ?>">
-    <i class="mdi mdi-receipt menu-icon"></i>
-    <span class="menu-title">Invoice List</span>
-  </a>
-</li>
-<?php endif; ?>
+        <?php if (in_array('invoices', $allowedMenus)): ?>
+          <li class="nav-item">
+            <a class="nav-link <?= $uri->getSegment(1) == 'invoicelist' ? 'active' : '' ?>"
+              href="<?= base_url('invoicelist') ?>">
+              <i class="mdi mdi-receipt menu-icon"></i>
+              <span class="menu-title">Invoice List</span>
+            </a>
+          </li>
+        <?php endif; ?>
         <?php if (in_array('reports', $allowedMenus)): ?>
           <li class="nav-item">
             <a class="nav-link" data-bs-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">

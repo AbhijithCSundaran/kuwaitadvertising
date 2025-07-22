@@ -478,7 +478,15 @@ td.logo-col {
 /* col-xl-6 1200*/
 /* col-xxl-6 1366*/
 
-@media (max-width:1024px) {
+@media (max-width:1199px) {
+	.background-box {
+		padding: 271px 31px 52px 156px;
+	}
+
+	#printArea {
+		min-width: 1000px;
+	}
+
 	.sidebar {
 		transform: translateX(-100%);
 	}
@@ -500,6 +508,11 @@ td.logo-col {
 		/* white-space: nowrap; */
 	}
 
+}
+
+@media (max-width:1024px) {
+
+
 	.table-responsive {
 		max-width: 100vw;
 		overflow-x: auto;
@@ -511,7 +524,9 @@ td.logo-col {
 		max-width: none;
 		overflow: hidden;
 	}
-
+	.form-control.w-50 {
+    width: 75% !important;
+}
 	/* body {
 		overflow-x: auto;
 	} */
@@ -526,13 +541,13 @@ td.logo-col {
 	.modal {
 		margin: auto !important;
 	}
-	.form-control.w-50 {
-    	width: 100% !important;
+
+	.print-btn {
+		top: 12px;
+		right: 60px;
+		z-index: 10000;
 	}
-	.btn-primary:not(.btn-light) {
-		padding:5px;
-	}
-	
+
 }
 
 @media (max-width: 767px) {
@@ -540,6 +555,7 @@ td.logo-col {
 		position: relative;
 	}
 }
+
 
 /* @media (min-width:575px) {
 	.sidebar {
