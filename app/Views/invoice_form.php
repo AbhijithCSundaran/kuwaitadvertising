@@ -66,7 +66,7 @@
     <form id="invoice-form">
         <div class="row">
             <div class="col-md-6">
-                <label><strong>Customer</strong><span class="text-danger">*</span></label>
+                <label><strong>Person Name</strong><span class="text-danger">*</span></label>
                 <div class="input-group mb-2 d-flex">
                     <select name="customer_id" id="customer_id" class="form-control select2">
                         <option value="" disabled <?= !isset($invoice['customer_id']) ? 'selected' : '' ?>>Select Customer</option>
@@ -80,18 +80,37 @@
                         <button type="button" class="btn btn-outline-primary" id="addCustomerBtn">+</button>
                     </div>
                 </div>
-
-                <label class="mt-3"><strong>Customer Address</strong><span class="text-danger">*</span></label>
-                <textarea name="customer_address" id="customer_address" class="form-control" rows="3"><?= isset($invoice['customer_address']) ? trim($invoice['customer_address']) : '' ?></textarea>
             </div>
-
-            <div class="col-md-6 text-end">
+             <div class="col-md-6 text-end">
                 <div class="estimate-title">INVOICE</div>
                 <div class="estimate-details">
                     <p class="mb-1">Invoice No: <?= isset($invoice['invoice_id']) ? $invoice['invoice_id'] : 'Auto' ?></p>
                     <p>Date: <?= date('d-m-Y') ?></p>
                 </div>
             </div>
+            <div class="row">
+                <!-- Billing Address -->
+                <div class="col-md-6">
+                    <label class="mt-3"><strong>Billing Address</strong><span class="text-danger">*</span></label>
+                    <textarea name="customer_address" id="customer_address" class="form-control" rows="3"><?= isset($invoice['customer_address']) ? trim($invoice['customer_address']) : '' ?></textarea>
+                </div>
+
+                <!-- Shipping Address -->
+                <div class="col-md-6">
+                    <label class="mt-3"><strong>Shipping Address</strong><span class="text-danger">*</span></label>
+                    <textarea name="shipping_address" id="shipping_address" class="form-control" rows="3"><?= isset($invoice['shipping_address']) ? trim($invoice['shipping_address']) : '' ?></textarea>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="mt-3"><strong>LPO No</strong><span class="text-danger">*</span></label>
+                    <input type="text" name="lpo_no" id="lpo_no" class="form-control" value="<?= isset($invoice['lpo_no']) ? esc($invoice['lpo_no']) : '' ?>">
+                </div>
+                <div class="col-md-6">
+                    <label class="mt-3"><strong>Phone Number</strong><span class="text-danger">*</span></label>
+                    <input type="text" name="phone_number" id="phone_number" class="form-control" value="<?= isset($invoice['phone_number']) ? esc($invoice['phone_number']) : '' ?>" minlength="7" maxlength="15"  pattern="^\+?[0-9]{7,15}$" title="Phone number must be 7 to 15 digits and can start with +" />
+                </div>
+            </div> 
         </div>
 
         <table class="table table-bordered mt-4">
@@ -109,9 +128,9 @@
                 <?php foreach ($items as $index => $item): ?>
                     <tr class="item-row">
                         <td><input type="text" name="description[]" class="form-control"  value="<?= esc($item['item_name']) ?>" ></td>
-                        <td><input type="number" name="price[]" class="form-control price" value="<?= esc($item['price']) ?>"></td>
-                        <td><input type="number" name="quantity[]" class="form-control quantity" value="<?= esc($item['quantity']) ?>"></td>
-                        <td><input type="number" name="total[]" class="form-control total" value="<?= esc($item['price'] * $item['quantity']) ?>" readonly></td>
+                        <td><input type="number" class="form-control price" name="price[]" value="<?= $item['price'] ?>"></td>
+                        <td><input type="number" class="form-control quantity" name="quantity[]" value="<?= $item['quantity'] ?>"></td>
+                        <td><input type="number" class="form-control total" name="total[]" step="0.01" value="<?= $item['total'] ?>" readonly></td>
                         <td class="text-center">
                             <span class="remove-item-btn" title="Remove"><i class="fas fa-trash text-danger"></i></span>
                         </td>
@@ -120,7 +139,7 @@
                 <?php else: ?>
                     <tr class="item-row">
                         <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
-                        <td><input type="number" name="price[]" class="form-control price"></td>
+                        <td><input type="number" name="price[]" class="form-control price" step="0.01" min="0"></td>
                         <td><input type="number" name="quantity[]" class="form-control quantity"></td>
                         <td><input type="number" name="total[]" class="form-control total" readonly></td>
                         <td class="text-center">
@@ -216,14 +235,22 @@ $(document).ready(function () {
         const row = `
             <tr class="item-row">
                 <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
-                <td><input type="number" name="price[]" class="form-control price"></td>
-                <td><input type="number" name="quantity[]" class="form-control quantity"></td>
-                <td><input type="number" name="total[]" class="form-control total" readonly></td>
+                <td><input type="number" name="price[]" class="form-control price" step="0.01"></td>
+                <td><input type="number" name="quantity[]" class="form-control quantity" step="0.01"></td>
+                <td><input type="number" name="total[]" class="form-control total" step="0.01" readonly></td>
                 <td class="text-center"><span class="remove-item-btn" title="Remove"><i class="fas fa-trash text-danger"></i></span></td>
             </tr>`;
         $('#item-container').append(row);
     });
-
+     document.getElementById('phone_number').addEventListener('input', function () {
+        let val = this.value;
+        // Allow + only at the beginning and remove all other non-digit characters
+        if (val.charAt(0) === '+') {
+            this.value = '+' + val.slice(1).replace(/[^0-9]/g, '');
+        } else {
+            this.value = val.replace(/[^0-9]/g, '');
+        }
+        });
     $(document).on('click', '.remove-item-btn', function () {
         $(this).closest('tr').remove();
         calculateTotals();

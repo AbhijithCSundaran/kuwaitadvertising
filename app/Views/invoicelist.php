@@ -75,7 +75,7 @@ $(document).ready(function () {
         serverSide: true,
         paging: true,
         searching: true,
-        order: [[8, 'desc']], // Hidden ID column
+        order: [[1, 'desc']], // Hidden ID column
         dom: "<'row mb-3'<'col-sm-6'l><'col-sm-6'f>>" +
              "<'row'<'col-sm-12'tr>>" +
              "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
@@ -105,17 +105,7 @@ $(document).ready(function () {
                 data: "total_amount",
                 render: data => parseFloat(data).toFixed(2) + " KWD"
             },
-            {
-                data: "invoice_date",
-                render: function (data) {
-                    if (!data) return "-";
-                    const d = new Date(data);
-                    const day = String(d.getDate()).padStart(2, '0');
-                    const month = String(d.getMonth() + 1).padStart(2, '0');
-                    const year = d.getFullYear();
-                    return `${day}-${month}-${year}`;
-                }
-            },
+            { data: 'invoice_date' },
             {
                  data: 'status',
                 render: function (data) {
@@ -147,7 +137,7 @@ $(document).ready(function () {
         ],
         columnDefs: [
             { targets: 2, width: '350px' },
-            { searchable: false, orderable: false, targets: [0, 7] }
+            { searchable: false, orderable: false, targets: [0,8] }
         ]
     });
     table.on('order.dt search.dt draw.dt', function () {

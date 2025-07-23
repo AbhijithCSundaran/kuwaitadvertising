@@ -76,7 +76,7 @@ class Invoice extends BaseController
                 'discount' => $row['discount'],
                 'total_amount' => round($row['total_amount'], 2),
                 'status' => $row['status'] ?? 'unpaid',
-                'date' => !empty($row['invoice_date']) ? date('d-m-Y', strtotime($row['invoice_date'])) : '',
+                'invoice_date'  => date('d-m-Y', strtotime($row['invoice_date'])),
             ];
         }
 
@@ -123,24 +123,30 @@ class Invoice extends BaseController
             ]);
         }
 
-        $invoiceData = [
-            'customer_id' => $customerId,
-            'customer_address' => $request->getPost('customer_address'),
-            'total_amount' => $this->calculateTotal($request),
-            'discount' => $this->request->getPost('discount'),
-            'invoice_date' => date('Y-m-d'),
-            'status' => 'unpaid',
-            'user_id' => session()->get('user_id') ?? 1
+       $invoiceData = [
+            'customer_id'       => $customerId,
+            'billing_address'   => $customer['billing_address'] ?? $customer['customer_address'] ?? '',
+            'shipping_address'  => $customer['shipping_address'] ?? $request->getPost('shipping_address') ?? '',
+            'phone_number'             => $customer['phone_number'] ?? $request->getPost('phone_number') ?? '',
+            'lpo_no'            => $request->getPost('lpo_no'),
+            'total_amount'      => $this->calculateTotal($request),
+            'discount'          => $this->request->getPost('discount'),
+            'invoice_date'      => date('Y-m-d'),
+            'status'            => 'unpaid',
+            'user_id'           => session()->get('user_id') ?? 1
         ];
+
 
         $invoiceId = $request->getPost('invoice_id');
 
         if ($invoiceId) {
             $invoiceModel->update($invoiceId, $invoiceData);
             $itemModel->where('invoice_id', $invoiceId)->delete(); // Remove old items
+             $message = 'Invoice Updated Successfully';
         } else {
             $invoiceModel->insert($invoiceData);
             $invoiceId = $invoiceModel->getInsertID();
+            $message = 'Invoice Saved Successfully';
         }
 
         // Save items
@@ -161,10 +167,9 @@ class Invoice extends BaseController
             }
 
         }
-
         return $this->response->setJSON([
         'status'   => 'success',
-        'message'  => 'Invoice saved successfully',
+        'message'  => $message ,
         'redirect' => site_url('invoice/print/' . $invoiceId)
     ]);
     }
