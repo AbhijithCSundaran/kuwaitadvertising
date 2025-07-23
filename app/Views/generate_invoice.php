@@ -1,163 +1,219 @@
+
 <?php include "common/header.php"; ?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8">
-  <title>Cash Invoice</title>
+  <title>Invoice</title>
   <style>
-    .right_container {
-      width: 100%;
-      margin-left: auto;
-      padding: 25px;
-      transform: scale(0.5);
-    }
-
     body {
       font-family: Arial, sans-serif;
+      background: #fff;
+      color: #000;
       font-size: 14px;
-      margin: 0;
-      padding: 0;
-      background-color: #fff;
+      /* margin: 40px; */
     }
 
-    /* New outer brown container */
-    .outer-container {
-      width: fit-content;
+    .invoice-container {
+      width: 100%;
+      min-width: 900px;
       margin: auto;
-      padding: 15px;
-      background-color: #991b36;
-    }
-
-    .container {
-      width: 720px;
-      border: 5px solid #000;
-      border-radius: 23px;
-      padding: 20px;
-      position: relative;
-      background: url('/kuwaitadvertising/public/assets/images/invoice-bg.png.png') no-repeat;
-      background-size: 40%;
-      background-position: 52% 73%;
-      background-color: white;
-    }
-
-    .top-heading {
-      text-align: center;
-      margin-bottom: 5px;
-    }
-
-    .top-heading img {
-      width: 280px;
-    }
-
-    .invoice-type {
-      background-color: #991b36;
-      color: white;
-      font-weight: bold;
-      padding: 5px 20px;
-      display: inline-block;
-      border-radius: 4px;
-      margin: 5px auto;
-      font-size: 14px;
     }
 
     .invoice-header {
       display: flex;
-      flex-direction: column;
-      gap: 5px;
       justify-content: space-between;
-      margin-top: 15px;
+      align-items: flex-start;
     }
 
-    .invoice-header>div {
-      display: flex;
+    .address {
+      font-size: 16px;
+      line-height: 1.8;
+    }
+
+    .company-logo {
+      text-align: right;
+    }
+
+    .company-logo img {
+      height: 150px;
+
+    }
+
+    .company-name {
       font-weight: bold;
-      width: 100%;
+      font-size: 16px;
     }
 
-
-    .invoice-header .half {
-      width: 50%;
+    .company-arabic {
+      font-size: 13px;
     }
 
-    .invoice-header input {
-      border: 1px solid #000;
-      width: 100px;
-      height: 20px;
+    h2.invoice-title {
+      text-align: center;
+      text-decoration: underline;
+      margin: 20px 0 40px;
+      margin-top: -1px;
+      font-size: 1.75rem;
     }
 
-    .invoice-header span {
-      width: 90%;
-      /* text-decoration: underline; */
-      border-bottom: 1px solid black;
-      margin: 0 5px;
+    .info-table {
+      border-collapse: collapse;
+      font-size: 13px;
+      float: right;
+      margin-bottom: 20px;
     }
 
-    table {
+    .info-table td {
+      border: 2px solid black;
+      padding: 5px 10px;
+      font-weight: bold;
+    }
+
+    .bill-ship {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+
+    .bill-to,
+    .ship-to {
+      width: 48%;
+    }
+
+    .bill-to td,
+    .ship-to td {
+      padding: 2px 0;
+    }
+
+    .label {
+      font-weight: bold;
+      color: #da1c1c;
+    }
+
+    .items-table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
     }
 
-    table,
-    th,
-    td {
-      border: 1px solid black;
+    .items-table th {
+      background-color: #da1c1c;
+      color: #fff;
+      padding: 8px;
+      font-size: 13px;
+      border: 1px solid #ccc;
     }
 
-    tbody td {
-      border-top: 1px solid transparent;
-      border-bottom: 1px solid transparent;
-    }
-
-    tbody tr:last-child td {
-      border-bottom: 1px solid black;
-    }
-
-    th {
-      background-color: #cfc7c7ff;
-      text-align: center;
-      font-weight: bold;
-      padding: 4px;
-    }
-
-    td {
-      text-align: center;
+    .items-table td {
+      border: 1px solid #ccc;
+      padding: 6px;
       height: 30px;
-      padding: 4px;
     }
 
-    .table-footer {
+    .ship-bold {
+      text-decoration: underline solid #000;
+      font-weight: bold;
+      color: #da1c1c;
+    }
+
+    .totals {
+      width: 240px;
+      margin-top: 10px;
+      margin-left: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: end;
+    }
+
+    .totals .totals-row {
       display: flex;
       justify-content: space-between;
-      margin-top: 30px;
+      align-items: center;
+    }
+
+    .grand-total {
+      font-weight: bold;
+      color: #da1c1c;
+      font-size: 14px;
+      border-top: 2px solid #000;
+    }
+
+    .grand-total span {
+      background: #fba0a0;
+      color: black;
+      padding: 4px 10px;
+      border-bottom: 2px solid #000;
+    }
+
+    .invoice-footer-text {
+      margin-top: 20px;
+      font-size: 13px;
+      line-height: 1.2rem;
+    }
+
+    .invoice-footer-text .cheque {
+      color: #da1c1c;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+
+    /* .invoice-footer-text .thanks {
+      margin-top: 5px;
+    } */
+
+    .recipient-box {
+      width: 300px;
+      border: 1px solid #000;
+      margin-top: 20px;
+      float: right;
+    }
+
+    .recipient-box table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .recipient-box td {
+      border: 1px solid #000;
+      padding: 6px;
+      font-size: 13px;
+    }
+
+    .compname {
+      font-size: 16px;
+      text-decoration: underline 1px solid #000;
+    }
+
+    .bill-to strong,
+    .ship-to strong {
+      color: black;
+      /* Ensure strong tags are black */
+    }
+
+    /* .totals {
+  margin-top: 20px;
+  max-width: 300px;
+  font-size: 14px;
+} */
+
+    /* .totals-row {
+  display: right;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px solid #ccc;
+} */
+
+    .tot {
       font-weight: bold;
     }
 
-    .amount-words {
-      margin-top: 20px;
-      margin-bottom: 20px;
-      font-weight: bold;
+    .value {
+      text-align: right;
+      min-width: 80px;
     }
-
-    .table-footer div {
-      width: 48%;
-    }
-
-    .bottom-bar {
-      text-align: center;
-      font-size: 12px;
-      color: white;
-      background-color: #991b36;
-      padding: 10px;
-      margin-top: 20px;
-
-    }
-
-    .tfoot {
-      background-color: #cfc7c7ff;
-    }
-
     @media print {
       * {
         -webkit-print-color-adjust: exact !important;
@@ -172,230 +228,221 @@
       .sidebar {
         display: none !important;
       }
-    }
   </style>
-
-
 </head>
 
 <body>
 
-  <!-- ✅ Outer brown container starts here -->
-  <div class="outer-container">
-    <!-- Buttons: Print & Discard -->
+  <div class="right_container">
     <div class="no-print" style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
       <button onclick="window.print()"
-        style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px;">
-        🖨️ Print
+         style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px;">
+          🖨️ Print
       </button>
       <button onclick="window.location.href='<?= base_url('invoice/edit/' . $invoice['invoice_id']) ?>'"
-  style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
-  Discard
-</button>
+        style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
+        Discard
+      </button>
+      <!-- Paid/Unpaid Toggle Button -->
+      <button id="paymentStatusBtn"
+        style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
+        Unpaid
+      </button>
 
     </div>
-    <div class="container">
+  <div class="invoice-container">
 
-      <!-- Top Logo and Title -->
-      <div class="top-heading">
-        <img src="<?php echo ASSET_PATH; ?>assets/images/invoice-heading.png" alt="Invoice Heading">
-        <!-- <img src="<?php echo ASSET_PATH; ?>assets/images/adminlogo.jpg" alt="logo" style="width: 100px; height: 100;"> -->
-        <hr>
-        <!-- ____________________________________________________________________________________________ -->
-        <div
-          style="background-color: #991b36;color: white;font-weight: bold;padding: 5px 20px;display: inline-block;border-radius: 4px;margin: 5px auto;font-size: 14px;">
-          فاتورة / نقداً / بالحساب<br>Cash / Credit Invoice</div>
-      </div>
-
-      <!-- Header Info -->
+      <!-- Header -->
       <div class="invoice-header">
-        <div class="row">
-          <div class="half">
-            No.: <input type="text" readonly value="<?= esc($invoice['invoice_id']) ?>">
-          </div>
-          <div class="half" style="text-align: right;">
-            Date: <input type="text" value="<?= esc($invoice['invoice_date']) ?>"><br><br>
-          </div>
+        <div class="address">
+          <em>Al-Shuwaikh Area, 3</em><br>
+          <em>Behind Sultan Center - 4th Ring Road</em><br>
+          <em>Tel: +965 600 60 102</em>
         </div>
-        <div class="col-12">
-          Mr./Mrs: <span><?= esc($invoice['customer_name'] ?? '') ?></span>:السيد
+        <div class="company-logo">
+          <img src="<?php echo ASSET_PATH; ?>assets/images/invoice-logo.png" alt="Invoicelogo">
+          <!-- <div class="company-name">Al Shaya International Printing Co</div>
+        <div class="company-arabic">شركة الشايع للطباعة الدولية</div> -->
         </div>
-        <div class="col-12">
-          Address: <span> <?= esc($invoice['customer_address'] ?? '') ?></span>:عنوان
-        </div>
-
       </div>
 
-      <!-- Invoice Table -->
-      <table>
+      <h2 class="invoice-title">INVOICE NO. 1009</h2>
+
+      <!-- Invoice Info -->
+      <table class="info-table">
+        <tr>
+          <td>Invoice Date:</td>
+          <td>1.5.2025</td>
+        </tr>
+        <tr>
+          <td>Delivery Date:</td>
+          <td>30.4.2025</td>
+        </tr>
+        <tr>
+          <td>Delivery Note No:</td>
+          <td>109</td>
+        </tr>
+        <tr>
+          <td>LPO No:</td>
+          <td>242501637</td>
+        </tr>
+      </table>
+
+      <!-- Billing & Shipping -->
+      <div class="bill-ship">
+        <div class="bill-to">
+          <div class="label">BILL TO: <strong>ALBATAIN AUTO (GULFEX)</strong></div>
+          <div>Person Name: <strong>Mr. Ajith Abraham</strong></div>
+          <div>Business Name:<strong> ALBATAIN AUTO (GULFEX)</strong></div>
+          <div>Address: <strong>Al-Rai</strong></div>
+          <div>Contact Number:<strong>97747515585</strong></div>
+        </div>
+
+        <div class="ship-to">
+          <div class="label">SHIP TO:<strong> ALBATAIN AUTO (GULFEX)</strong></div>
+          <div>Person Name:<strong> Mr. Ajith</strong></div>
+          <div>Business Name:<strong> M/S. Al-Babtain Auto - Al Rai</strong></div>
+          <div>Address:<strong>Al Rai Albatain Auto Al Shai Gulf Dubai China America, Al Rai Albatain Auto Al Shai Gulf
+              Dubai China America </strong></div>
+          <div>Contact Number:<strong>147852693</strong></div>
+        </div>
+      </div>
+
+
+      <!-- Items Table -->
+      <table class="items-table table-striped">
         <thead>
           <tr>
-            <th rowspan="2" style="width: 6%;">No.<br>رقم</th>
-            <th rowspan="2" style="width: 38%;">Description<br>التفاصيل</th>
-            <th rowspan="2" style="width: 8%;">Qty.<br>الكمية</th>
-            <th colspan="2" style="width: 24%;">Unit Price<br>سعر الوحدة</th>
-            <th colspan="2" style="width: 24%;">Total Amount<br>المبلغ الإجمالي</th>
-          </tr>
-          <tr>
-            <th style="width: 12%;">K.D<br>دينار</th>
-            <th style="width: 12%;">Fils<br>فلس</th>
-            <th style="width: 12%;">K.D<br>دينار</th>
-            <th style="width: 12%;">Fils<br>فلس</th>
+            <th>SR. NO</th>
+            <th>DESCRIPTION</th>
+            <th>QTY</th>
+            <th>UNIT PRICE (KD)</th>
+            <th>TOTAL (KD)</th>
           </tr>
         </thead>
         <tbody>
-          <?php $totalAmount = 0; ?>
-          <?php foreach ($items as $index => $item):
-            $originalLineTotal = $item['quantity'] * $item['price'];
-            $discount = isset($item['discount']) ? $item['discount'] : 0;
-            $lineTotal = $originalLineTotal - ($originalLineTotal * $discount / 100);
-            $kd = floor($item['price']);
-            $fils = str_pad(number_format(($item['price'] - $kd) * 1000, 0, '', ''), 3, '0', STR_PAD_LEFT);
-            $lineKd = floor($lineTotal);
-            $lineFils = str_pad(number_format(($lineTotal - $lineKd) * 1000, 0, '', ''), 3, '0', STR_PAD_LEFT);
-            $totalAmount += $lineTotal;
-            ?>
-            <tr>
-              <td><?= $index + 1 ?></td>
-              <td><?= esc($item['item_name']) ?></td>
-              <td><?= $item['quantity'] ?></td>
-              <td><?= $kd ?></td>
-              <td><?= $fils ?></td>
-              <td><?= $lineKd ?></td>
-              <td><?= $lineFils ?></td>
-            </tr>
-          <?php endforeach; ?>
-
           <tr>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td>1</td>
+            <td>ABA Spring Offer Roll up changing</td>
+            <td>10</td>
+            <td>7.000</td>
+            <td>70.000</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>ABA Spring Offer new Roll up supply</td>
+            <td>2</td>
+            <td>10.000</td>
+            <td>20.000</td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td>
             <td></td>
             <td></td>
             <td></td>
             <td></td>
           </tr>
           <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td>&nbsp;</td>
             <td></td>
             <td></td>
             <td></td>
             <td></td>
           </tr>
         </tbody>
-        <tfoot class="tfoot">
-          <tr>
-            <td colspan="5"><strong>Total Amount</strong></td>
-            <td colspan="2" id="total-amount">KD <?= number_format($totalAmount, 3) ?></td>
-          </tr>
-        </tfoot>
       </table>
 
-      <!-- Amount in words -->
-      <div class="amount-words">
-        Amount Chargeable (in words): <span id="amount-words"></span>
+      <!-- Totals -->
+      <div class="totals">
+        <div class="totals-row">
+          <div class="tot">SUBTOTAL</div>
+          <div class="value">90.000</div>
+        </div>
+        <div class="totals-row">
+          <div class="tot">DISCOUNT</div>
+          <div class="value">0.000</div>
+        </div>
       </div>
 
 
+
+      <div class="totals grand-total">
+        <div class="totals-row">
+          <strong>Grand Total</strong>
+          <span>KD90.000</span>
+        </div>
+      </div>
+      <div class="words"><strong>In Words: Kuwaiti Dinars Ninety Only</strong></div>
       <!-- Footer -->
-      <div class="table-footer">
-        <div>Received by. المستلم</div>
-        <div style="text-align: right;">Salesman Signature. توقيع البائع</div>
+      <div class="invoice-footer-text">
+        <div class="thanks">Thank you for your business!</div>
+        <div class="cheque">Please issue the cheque in the favor of:</div>
+        <div class="compname"><strong>Al Shaya International Printing Co</strong></div>
       </div>
 
+      <!-- Recipient -->
+      <div class="recipient-box">
+        <table>
+          <tr>
+            <td colspan="2">Received the above in good order</td>
+          </tr>
+          <tr>
+            <td>Recipient Name:</td>
+            <td>Accountant:</td>
+          </tr>
+          <tr>
+            <td colspan="2">Signature:</td>
+          </tr>
+        </table>
+      </div>
+<!-- Delivery Note Popup -->
+<div id="deliveryNoteModal" class="modal" style="display:none; position: fixed; z-index: 9999; left: 0; top: 0;
+  width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
+  <div style="background-color: #fff; margin: 15% auto; padding: 20px; border-radius: 10px; width: 300px; text-align: center;">
+    <p>Do you want to download the delivery note?</p>
+    <button onclick="downloadDeliveryNote()" style="background-color: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 5px; margin: 5px;">
+      Download
+    </button>
+    <button onclick="closeModal()" style="background-color: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 5px; margin: 5px;">
+      Cancel
+    </button>
+  </div>
+</div>
 
-    </div> <!-- /.container -->
-    <!-- Bottom Bar -->
-    <div class="bottom-bar">
-      الراي ، قطعة ٣ ، شارع ٣٢ ، مبنى رقم ٤٣٧ ، محل رقم ٤ ، بالقرب من زجاج الروان ، الشويخ - الكويت<br>
-      Al-Rai, Block 3, Street 32, Build No. 437, Shop No. 4, Near Al Rawan Glass, Shuwaik - Kuwait<br>
-      📞 +965 6006 0102 &nbsp;&nbsp; | &nbsp;&nbsp;
-      📧 <a href="mailto:alraiprintpress@gmail.com" style="color: white; text-decoration: none;">
-        alraiprintpress@gmail.com
-      </a>
     </div>
+  </div>
 
 </body>
 
 </html>
 </div>
-</div>
 <?php include "common/footer.php"; ?>
-
-<!-- JS to convert number to words -->
 <script>
-  function numberToWords(num) {
-    const a = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven',
-      'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
-    const b = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+  const paymentStatusBtn = document.getElementById('paymentStatusBtn');
+  const deliveryNoteModal = document.getElementById('deliveryNoteModal');
 
-    if ((num = num.toString()).length > 9) return 'overflow';
+  paymentStatusBtn.addEventListener('click', function () {
+    if (paymentStatusBtn.textContent === 'Unpaid') {
+      paymentStatusBtn.textContent = 'Paid';
+      paymentStatusBtn.style.backgroundColor = '#28a745'; // green for paid
+      showModal();
+    } else {
+      paymentStatusBtn.textContent = 'Unpaid';
+      paymentStatusBtn.style.backgroundColor = '#991b36'; // back to original
+    }
+  });
 
-    let [dinars, fils] = num.split('.');
-    dinars = parseInt(dinars);
-    fils = parseInt(fils || '0');
-
-    const convert = (n) => {
-      if (n < 20) return a[n];
-      if (n < 100) return b[Math.floor(n / 10)] + (n % 10 ? '-' + a[n % 10] : '');
-      if (n < 1000) return a[Math.floor(n / 100)] + ' hundred ' + (n % 100 ? convert(n % 100) : '');
-      if (n < 1000000) return convert(Math.floor(n / 1000)) + ' thousand ' + convert(n % 1000);
-      return '';
-    };
-
-    let words = '';
-    if (dinars > 0) words += convert(dinars) + ' Kuwaiti Dinar';
-    if (fils > 0) words += (words ? ' and ' : '') + convert(fils) + ' Fils';
-    return words || 'Zero';
+  function showModal() {
+    deliveryNoteModal.style.display = 'block';
   }
 
-  document.getElementById("amount-words").innerText = numberToWords(<?= number_format($totalAmount, 3) ?>);
+  function closeModal() {
+    deliveryNoteModal.style.display = 'none';
+  }
 
+  function downloadDeliveryNote() {
+    deliveryNoteModal.style.display = 'none';
+    // Replace with actual download logic
+    window.open('<?= base_url("invoice/delivery_note/" . $invoice["invoice_id"]) ?>', '_blank');
+  }
 </script>

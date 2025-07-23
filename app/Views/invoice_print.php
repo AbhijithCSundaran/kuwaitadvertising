@@ -1,4 +1,3 @@
-
 <?php include "common/header.php"; ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,9 +15,11 @@
     }
 
     .invoice-container {
-      width: 100%;
-      min-width: 900px;
+      /* width: 100%; */
+      width: 700px;
       margin: auto;
+      border: 1px solid #ddd;
+      padding: 30px;
     }
 
     .invoice-header {
@@ -168,10 +169,10 @@
       width: 300px;
       border: 1px solid #000;
       margin-top: 20px;
-      float: right;
+      /* float: right; */
     }
 
-    .recipient-box table {
+    .recipient-box.table {
       width: 100%;
       border-collapse: collapse;
     }
@@ -214,6 +215,7 @@
       text-align: right;
       min-width: 80px;
     }
+
     @media print {
       * {
         -webkit-print-color-adjust: exact !important;
@@ -236,8 +238,8 @@
   <div class="right_container">
     <div class="no-print" style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
       <button onclick="window.print()"
-         style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px;">
-          🖨️ Print
+        style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px;">
+        🖨️ Print
       </button>
       <button onclick="window.location.href='<?= base_url('invoice/edit/' . $invoice['invoice_id']) ?>'"
         style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
@@ -250,7 +252,7 @@
       </button>
 
     </div>
-  <div class="invoice-container">
+    <div class="invoice-container">
 
       <!-- Header -->
       <div class="invoice-header">
@@ -374,40 +376,46 @@
       </div>
       <div class="words"><strong>In Words: Kuwaiti Dinars Ninety Only</strong></div>
       <!-- Footer -->
-      <div class="invoice-footer-text">
-        <div class="thanks">Thank you for your business!</div>
-        <div class="cheque">Please issue the cheque in the favor of:</div>
-        <div class="compname"><strong>Al Shaya International Printing Co</strong></div>
+      <div class="d-flex col-12">
+        <div class="invoice-footer-text col-6">
+          <div class="thanks">Thank you for your business!</div>
+          <div class="cheque">Please issue the cheque in the favor of:</div>
+          <div class="compname"><strong>Al Shaya International Printing Co</strong></div>
+        </div>
+        <!-- Recipient -->
+        <div class="col-6 d-flex justify-content-end">
+          <table class="recipient-box">
+            <tr>
+              <td colspan="2">Received the above in good order</td>
+            </tr>
+            <tr>
+              <td>Recipient Name:</td>
+              <td>Accountant:</td>
+            </tr>
+            <tr>
+              <td colspan="2">Signature:</td>
+            </tr>
+          </table>
+        </div>
       </div>
 
-      <!-- Recipient -->
-      <div class="recipient-box">
-        <table>
-          <tr>
-            <td colspan="2">Received the above in good order</td>
-          </tr>
-          <tr>
-            <td>Recipient Name:</td>
-            <td>Accountant:</td>
-          </tr>
-          <tr>
-            <td colspan="2">Signature:</td>
-          </tr>
-        </table>
-      </div>
-<!-- Delivery Note Popup -->
-<div id="deliveryNoteModal" class="modal" style="display:none; position: fixed; z-index: 9999; left: 0; top: 0;
+
+      <!-- Delivery Note Popup -->
+      <div id="deliveryNoteModal" class="modal" style="display:none; position: fixed; z-index: 9999; left: 0; top: 0;
   width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
-  <div style="background-color: #fff; margin: 15% auto; padding: 20px; border-radius: 10px; width: 300px; text-align: center;">
-    <p>Do you want to download the delivery note?</p>
-    <button onclick="downloadDeliveryNote()" style="background-color: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 5px; margin: 5px;">
-      Download
-    </button>
-    <button onclick="closeModal()" style="background-color: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 5px; margin: 5px;">
-      Cancel
-    </button>
-  </div>
-</div>
+        <div
+          style="background-color: #fff; margin: 15% auto; padding: 20px; border-radius: 10px; width: 300px; text-align: center;">
+          <p>Do you want to download the delivery note?</p>
+          <button onclick="downloadDeliveryNote()"
+            style="background-color: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 5px; margin: 5px;">
+            Download
+          </button>
+          <button onclick="closeModal()"
+            style="background-color: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 5px; margin: 5px;">
+            Cancel
+          </button>
+        </div>
+      </div>
 
     </div>
   </div>
