@@ -66,7 +66,7 @@
     <form id="invoice-form">
         <div class="row">
             <div class="col-md-6">
-                <label><strong>Person Name</strong><span class="text-danger">*</span></label>
+                <label><strong>Customer Name</strong><span class="text-danger">*</span></label>
                 <div class="input-group mb-2 d-flex">
                     <select name="customer_id" id="customer_id" class="form-control select2">
                         <option value="" disabled <?= !isset($invoice['customer_id']) ? 'selected' : '' ?>>Select Customer</option>
@@ -103,7 +103,7 @@
             </div>
             <div class="row">
                 <div class="col-md-6">
-                    <label class="mt-3"><strong>LPO No</strong><span class="text-danger">*</span></label>
+                    <label class="mt-3"><strong>LPO No</strong></label>
                     <input type="text" name="lpo_no" id="lpo_no" class="form-control" value="<?= isset($invoice['lpo_no']) ? esc($invoice['lpo_no']) : '' ?>">
                 </div>
                 <div class="col-md-6">
@@ -209,13 +209,19 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
-    
+   let initialFormData; 
 $(document).ready(function () {
     $('#customer_id').select2({
         placeholder: "Select Customer",
         width: 'resolve'
     });
-
+    initialFormData = $('#invoice-form').serialize();
+      $('#save-invoice-btn').prop('disabled', true);
+     $('#invoice-form input, #invoice-form select, #invoice-form textarea').on('input change', function () {
+        const currentFormData = $('#invoice-form').serialize();
+        const hasChanged = currentFormData !== initialFormData;
+        $('#save-invoice-btn').prop('disabled', !hasChanged);
+    });
     function calculateTotals() {
         let subtotal = 0;
         $('.item-row').each(function () {
@@ -255,7 +261,7 @@ $(document).ready(function () {
         $(this).closest('tr').remove();
         calculateTotals();
     });
-
+    
     $(document).on('input', '.price, .quantity, #discount', calculateTotals);
     calculateTotals();
 
@@ -308,10 +314,56 @@ $(document).ready(function () {
 
     $('#invoice-form').submit(function (e) {
         e.preventDefault();
- 
-        const formData = new FormData(this);
-        formData.append('customer_name', $('#customer_id option:selected').text().trim());
- 
+         const currentFormData = $('#invoice-form').serialize();
+        if (currentFormData === initialFormData) {
+            showAlert('No changes made.', 'info');
+            return;
+        }
+        const $submitBtn = $('#save-invoice-btn');
+        $submitBtn.prop('disabled', true).text('Generating...');
+        const customerId = $('#customer_id').val();
+        const customerName = $('#customer_id option:selected').text().trim();
+        const billingAddress = $('#customer_address').val()?.trim();
+        const shippingAddress = $('#shipping_address').val()?.trim();
+        const phoneNumber = $('#phone_number').val()?.trim(); 
+
+        if (!customerId || !billingAddress || !shippingAddress || !phoneNumber) {
+            showAlert('Please fill all mandatory fields.', 'danger');
+            $submitBtn.prop('disabled', false).text('Generate Invoice'); 
+            return;
+        }
+
+        // Ensure at least one valid item
+        let validItemExists = false;
+        $('.item-row').each(function () {
+            const desc = $(this).find('input[name="description[]"]').val().trim();
+            const price = parseFloat($(this).find('input[name="price[]"]').val()) || 0;
+            const qty = parseFloat($(this).find('input[name="quantity[]"]').val()) || 0;
+
+            if (desc && price > 0 && qty > 0) {
+                validItemExists = true;
+                return false;
+            }
+        });
+
+        if (!validItemExists) {
+            showAlert('Please Enter At Least One Valid Item With Description, Price, and Quantity.', 'danger');
+             $submitBtn.prop('disabled', false).text('Generate Invoice');
+            return;
+        }
+
+        // Remove empty rows
+        $('.item-row').each(function () {
+            const desc = $(this).find('input[name="description[]"]').val().trim();
+            const price = parseFloat($(this).find('input[name="price[]"]').val()) || 0;
+            const qty = parseFloat($(this).find('input[name="quantity[]"]').val()) || 0;
+
+            if (!desc && price === 0 && qty === 0) {
+                $(this).remove();
+            }
+        });
+        
+    const formData = new FormData(this);
         $.ajax({
             url: "<?= site_url('invoice/save') ?>",
             type: "POST",
@@ -322,14 +374,16 @@ $(document).ready(function () {
             success: function (res) {
     if (res.status === 'success') {
         showAlert(res.message, 'success');
-        setTimeout(() => window.location.href = res.redirect, 1000); // Redirect to print page
+        setTimeout(() => window.location.href = res.redirect, 1000);
     } else {
         showAlert(res.message || 'Failed to save invoice.', 'danger');
+        $submitBtn.prop('disabled', false).text('Generate Invoice'); 
     }
 },
  
             error: function () {
                 showAlert('Server error while saving.', 'danger');
+                $submitBtn.prop('disabled', false).text('Generate Invoice');
             }
         });
     });

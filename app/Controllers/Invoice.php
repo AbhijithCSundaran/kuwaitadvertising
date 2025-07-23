@@ -146,11 +146,9 @@ class Invoice extends BaseController
         } else {
             $invoiceModel->insert($invoiceData);
             $invoiceId = $invoiceModel->getInsertID();
-            $message = 'Invoice Saved Successfully';
+            $message = 'Generating Invoice';
         }
 
-        // Save items
-        // $descriptions = $request->getPost('item_name');
         $descriptions = $request->getPost('description');
         $quantities = $request->getPost('quantity');
         $prices = $request->getPost('price');
