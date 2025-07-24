@@ -6,7 +6,7 @@ class EstimateModel extends Model
 {
     protected $table = 'estimates';
     protected $primaryKey = 'estimate_id';
-    protected $allowedFields = ['customer_id','discount', 'total_amount', 'sub_total','date'];
+    protected $allowedFields = ['customer_id','discount', 'total_amount', 'sub_total','date','phone_number'];
 
     public function insertEstimateWithItems($estimateData, $items)
     {

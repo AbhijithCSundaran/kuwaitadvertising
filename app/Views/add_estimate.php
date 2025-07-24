@@ -82,7 +82,13 @@
                     </div>
                     <label class="mt-3"><strong>Customer Address</strong><span class="text-danger">*</span></label>
                     <textarea name="customer_address" id="customer_address" class="form-control" rows="3"><?= isset($estimate['customer_address']) ? trim($estimate['customer_address']) : '' ?></textarea>
-
+                    <div class="phone pt-3">
+                        <label class="mt-md-0 mt-3"><strong>Contact Number</strong><span class="text-danger">*</span></label>
+                        <input type="text" name="phone_number" id="phone_number" class="form-control"
+                        value="<?= isset($estimate['phone_number']) ? esc($estimate['phone_number']) : '' ?>"
+                        minlength="7" maxlength="15" pattern="^\+?[0-9]{7,15}$"
+                        title="Phone number must be 7 to 15 digits and can start with +" />
+                    </div>
                 </div>
                 <div class="col-md-6">
                     <div class="estimate-title">ESTIMATE</div>
@@ -229,13 +235,22 @@
             $(this).val(capitalized);
         });
 
+         document.getElementById('phone_number').addEventListener('input', function () {
+            let val = this.value;
+            // Allow + only at the beginning and remove all other non-digit characters
+            if (val.charAt(0) === '+') {
+                this.value = '+' + val.slice(1).replace(/[^0-9]/g, '');
+            } else {
+                this.value = val.replace(/[^0-9]/g, '');
+            }
+        });
 
         $('#convert-invoice-btn').on('click', function () {
             const estimateId = $('#estimate_id').val().trim(); // Ensure this hidden field is present
             const alertBox = $('.alert');
 
             if (estimateId) {
-                window.open(`<?= base_url('invoice/printInvoice/') ?>${estimateId}`, '_blank');
+                window.open(`<?= base_url('invoice/print/') ?>${estimateId}`, '_blank');
             } else {
                 alertBox
                     .removeClass('d-none alert-success')
@@ -332,13 +347,10 @@
                 }
             });
         });
-
         $('#customerForm').submit(function (e) {
             e.preventDefault();
             let name = $('#popup_name').val().trim();
             let address = $('#popup_address').val().trim();
-
-            
             name = name.replace(/\b\w/g, char => char.toUpperCase());
             address = address.replace(/(^\s*\w|[.!?]\s*\w)/g, char => char.toUpperCase());
 
@@ -388,6 +400,25 @@
                 }
             });
         });
+        // Track original state of the form
+let initialEstimateData = $('#estimate-form').serialize();
+
+// Disable button initially if it's an existing estimate (edit mode)
+$('#generate-btn').prop('disabled', true);
+
+// Listen for changes in form fields
+$('#estimate-form').on('input change', 'input, select, textarea', function () {
+    const currentData = $('#estimate-form').serialize();
+    const hasChanged = currentData !== initialEstimateData;
+    $('#generate-btn').prop('disabled', !hasChanged); // Enable only if form changed
+});
+
+// After successful save, update the reference state
+function updateInitialFormState() {
+    initialEstimateData = $('#estimate-form').serialize();
+    $('#generate-btn').prop('disabled', true); // Re-disable after saving
+}
+
 
         $('#estimate-form').submit(function (e) {
     e.preventDefault();
@@ -449,19 +480,23 @@
         contentType: false,
         dataType: "json",
         success: function (res) {
-            if (res.status === 'success') {
-                showAlert(res.message, 'success');
-                setTimeout(function () {
-                    window.location.href = "<?= site_url('estimate/generateEstimate/') ?>" + res.estimate_id;
-                }, 1500);
-            } else if (res.status === 'nochange') {
-                showAlert(res.message, 'warning');
-                $('#generate-btn').prop('disabled', false).text('Generate Estimate');
-            } else {
-                showAlert(res.message || 'Failed To Save Estimate.', 'danger');
-                $('#generate-btn').prop('disabled', false).text('Generate Estimate');
-            }
-        },
+    if (res.status === 'success') {
+        showAlert(res.message, 'success');
+
+        updateInitialFormState(); // ✅ Reset change tracker after save
+
+        setTimeout(function () {
+            window.location.href = "<?= site_url('estimate/generateEstimate/') ?>" + res.estimate_id;
+        }, 1500);
+    } else if (res.status === 'nochange') {
+        showAlert(res.message, 'warning');
+        $('#generate-btn').prop('disabled', true).text('Generate Estimate');
+    } else {
+        showAlert(res.message || 'Failed To Save Estimate.', 'danger');
+        $('#generate-btn').prop('disabled', false).text('Generate Estimate');
+    }
+},
+
         error: function () {
             showAlert('Something Went Wrong While Saving The Estimate.', 'danger');
             $('#generate-btn').prop('disabled', false).text('Generate Estimate');

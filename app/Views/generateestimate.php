@@ -1,7 +1,12 @@
 <?php include "common/header.php"; ?>
 <style>
     @media print {
-        .no-print,
+       *{
+         -webkit-print-color-adjust: exact !important;
+        /* Safari/Chrome */
+        print-color-adjust: exact !important;
+        /* Firefox */
+       } .no-print,
         .navbar,
         .footer,
 
@@ -12,7 +17,7 @@
         body {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
-        }
+        } */
 
         .right_container {
             width: 100%;
@@ -27,16 +32,22 @@
             background-position: top;
             background-repeat: no-repeat;
         }
-
     }
 </style>
-<div class="text-right text-md-end print-btn">
-    <a href="<?= base_url('estimate/edit/' . $estimate['estimate_id']) ?>" class="btn btn-primary no-print">Back to
-        Form</a>
-    <button onclick="printEstimate()" class="btn btn-primary no-print">🖨️ Print</button>
-</div>
-
 <div class="right_container">
+    <div class="no-print" style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+        <button onclick="window.print()"
+            style="background-color: #a1263a; color: white; padding: 8px 16px; border: none; border-radius: 5px;">
+            🖨️ Print
+        </button>
+        <button onclick="window.location.href='<?= base_url('estimate/edit/' . $estimate['estimate_id']) ?>'"
+            style="background-color: #a1263a; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
+            Discard
+        </button>
+
+        </div>
+
+
     <div class="m-auto background-box" id="printArea">
         <div class="print_wrpr">
             <div class="row">

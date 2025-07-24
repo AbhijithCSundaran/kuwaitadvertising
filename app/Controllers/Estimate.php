@@ -7,7 +7,7 @@ use App\Models\EstimateModel;
 use App\Models\EstimateItemModel;
 use App\Models\customerModel;
 use App\Models\Manageuser_Model;
- 
+ use App\Models\Managecompany_Model;
 class Estimate extends BaseController
 {
     public function estimatelist()
@@ -53,7 +53,9 @@ public function save()
     $price = $this->request->getPost('price');
     $quantity = $this->request->getPost('quantity');
     $total = $this->request->getPost('total');
-    $customerName = trim($this->request->getPost('customer_name')); // NEW
+    $customerName = trim($this->request->getPost('customer_name'));
+    $phoneNumber = trim($this->request->getPost('phone_number'));
+
 
     if (empty($customerId) || empty($address)) {
         return $this->response->setJSON([
@@ -90,7 +92,8 @@ public function save()
         'customer_address' => $address,
         'discount' => $discount,
         'total_amount' => $grandTotal,
-        'date' => date('Y-m-d')
+        'date' => date('Y-m-d'),
+        'phone_number' => $phoneNumber, 
     ];
 
     // Build items array
@@ -242,6 +245,7 @@ public function save()
             'total_amount'      => round($row['total_amount'], 2),
             'date'              => $row['date'],
             'description'       => implode(', ', $descList),
+        
         ];
     }
  
@@ -292,35 +296,62 @@ public function save()
  
         return view('add_estimate', $data);
     }
-    public function generateEstimate($id)
+  public function generateEstimate($id)
     {
         $estimateModel = new EstimateModel();
         $itemModel = new EstimateItemModel();
         $userModel = new Manageuser_Model();
+        $companyModel = new \App\Models\Managecompany_Model();
+
+        // Fetch estimate with customer info
         $estimate = $estimateModel
-            ->select('estimates.*, customers.name AS customer_name,customers.address AS customer_address')
+            ->select('estimates.*, customers.name AS customer_name, customers.address AS customer_address')
             ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
             ->where('estimate_id', $id)
             ->first();
- 
+
+        if (!$estimate) {
+            return redirect()->to('/estimatelist')->with('error', 'Estimate not found.');
+        }
+
+        // Fetch related data
         $items = $itemModel->where('estimate_id', $id)->findAll();
-        $userName = session()->get('user_Name');
         $userId = session()->get('user_id');
-         $user = $userModel->find($userId);
-        return view('generatequotation', [
+        $userName = session()->get('user_Name');
+        $companyId = session()->get('company_id');
+
+        // Fetch company details from DB
+        $company = $companyModel->find($companyId);
+
+        // Prepare data for the view
+        $data = [
             'estimate' => $estimate,
             'items' => $items,
             'user_id' => $userId,
-            'user_name'=>$userName
-        ]);
+            'user_name' => $userName,
+            'company_name' => $company['company_name'] ?? ''
+        ];
+
+        // Return company-specific view
+        if ($companyId == 69) {
+            // Alrai company
+            return view('generateestimate', $data);
+        } elseif ($companyId == 70) {
+            // Alshay company
+            return view('generatequotation', $data);
+        } else {
+            // Fallback
+            return view('generateestimate', $data);
+        }
     }
-    // dashboardlisting
-   public function recentEstimates()
-    {
-        $estimateModel = new \App\Models\EstimateModel();
-        $itemModel = new \App\Models\EstimateItemModel();
- 
-        $estimates = $estimateModel->getRecentEstimatesWithCustomer(10); // Includes name & address
+
+        // dashboardlisting
+    public function recentEstimates()
+        {
+            $estimateModel = new \App\Models\EstimateModel();
+            $itemModel = new \App\Models\EstimateItemModel();
+    
+            $estimates = $estimateModel->getRecentEstimatesWithCustomer(10); // Includes name & address
  
         foreach ($estimates as &$est) {
             $items = $itemModel->where('estimate_id', $est['estimate_id'])->findAll();
@@ -337,52 +368,50 @@ public function save()
     }
  
     public function viewByCustomer($customerId)
-{
-    $estimateModel = new \App\Models\EstimateModel();
-    $itemModel = new \App\Models\EstimateItemModel();
-    $customerModel = new \App\Models\customerModel();
+    {
+        $estimateModel = new \App\Models\EstimateModel();
+        $itemModel = new \App\Models\EstimateItemModel();
+        $customerModel = new \App\Models\customerModel();
 
-    $estimates = $estimateModel
-        ->where('customer_id', $customerId)
-        ->orderBy('date', 'desc')
-        ->findAll();
+        $estimates = $estimateModel
+            ->where('customer_id', $customerId)
+            ->orderBy('date', 'desc')
+            ->findAll();
 
-    foreach ($estimates as &$est) {
-        $items = $itemModel->where('estimate_id', $est['estimate_id'])->findAll();
-        $subtotal = 0;
-        foreach ($items as $item) {
-            $subtotal += (float)$item['total'];
+        foreach ($estimates as &$est) {
+            $items = $itemModel->where('estimate_id', $est['estimate_id'])->findAll();
+            $subtotal = 0;
+            foreach ($items as $item) {
+                $subtotal += (float)$item['total'];
+            }
+            $est['items'] = $items;
+            $est['subtotal'] = round($subtotal, 2);
         }
-        $est['items'] = $items;
-        $est['subtotal'] = round($subtotal, 2);
+
+        $customer = $customerModel->find($customerId);
+
+        return view('customer_estimates', [
+            'estimates' => $estimates,
+            'customer' => $customer
+        ]);
+
     }
+    public function fromEstimate($estimateId)
+    {
+        $estimateModel = new \App\Models\EstimateModel();
+        $estimateItemModel = new \App\Models\EstimateitemModel();
 
-    $customer = $customerModel->find($customerId);
+        $estimate = $estimateModel->find($estimateId);
+        if (!$estimate) {
+            throw new \CodeIgniter\Exceptions\PageNotFoundException("Estimate not found.");
+        }
 
-    return view('customer_estimates', [
-        'estimates' => $estimates,
-        'customer' => $customer
-    ]);
+        $items = $estimateItemModel->where('estimate_id', $estimateId)->findAll();
 
-}
-public function fromEstimate($estimateId)
-{
-    $estimateModel = new \App\Models\EstimateModel();
-    $estimateItemModel = new \App\Models\EstimateitemModel();
-
-    $estimate = $estimateModel->find($estimateId);
-    if (!$estimate) {
-        throw new \CodeIgniter\Exceptions\PageNotFoundException("Estimate not found.");
+        // Load your invoice design view and pass data
+        return view('invoice/add_invoice', [
+            'estimate' => $estimate,
+            'items' => $items
+        ]);
     }
-
-    $items = $estimateItemModel->where('estimate_id', $estimateId)->findAll();
-
-    // Load your invoice design view and pass data
-    return view('invoice/add_invoice', [
-        'estimate' => $estimate,
-        'items' => $items
-    ]);
-}
-
-
 }
