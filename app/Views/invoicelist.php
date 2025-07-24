@@ -161,10 +161,10 @@ $(document).ready(function () {
         $.post("<?= base_url('invoice/delete/') ?>" + deleteId, {
             '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
         }, function () {
-            showAlert('success', 'Invoice deleted successfully.');
+            showAlert('success', 'Invoice Deleted Successfully.');
             table.ajax.reload(null, false);
         }).fail(function () {
-            showAlert('danger', 'Failed to delete invoice.');
+            showAlert('danger', 'Failed To Delete Invoice.');
         }).always(function () {
             deleteModal.hide();
             deleteId = null;

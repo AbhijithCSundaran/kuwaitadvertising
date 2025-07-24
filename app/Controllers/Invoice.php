@@ -3,13 +3,13 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use App\Models\InvoiceModel;
-use App\Models\CustomerModel;
+use App\Models\customerModel;
 
 class Invoice extends BaseController
 {
     public function add()
     {
-        $customerModel = new CustomerModel();
+        $customerModel = new customerModel();
         $data['customers'] = $customerModel->where('is_deleted', 0)->findAll();
         return view('invoice_form', $data);
     }
@@ -111,7 +111,7 @@ class Invoice extends BaseController
         $request = $this->request;
         $invoiceModel = new InvoiceModel();
         $itemModel = new \App\Models\InvoiceItemModel(); // Make sure this model exists
-        $customerModel = new CustomerModel();
+        $customerModel = new customerModel();
         $discount = $this->request->getPost('discount');
         $customerId = $request->getPost('customer_id');
         $customer = $customerModel->find($customerId);
@@ -193,7 +193,7 @@ class Invoice extends BaseController
     {
         $invoiceModel = new InvoiceModel();
         $itemModel = new \App\Models\InvoiceItemModel();
-        $customerModel = new CustomerModel();
+        $customerModel = new customerModel();
 
         // Fetch invoice
         $invoice = $invoiceModel->find($id);
@@ -258,6 +258,5 @@ class Invoice extends BaseController
             'user_name' => $user_name,  // ✅ PASS TO VIEW
         ]);
     }
-
 
 }
