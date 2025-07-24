@@ -216,7 +216,7 @@
       min-width: 80px;
     }
 
-    @media print 
+    @media print {
       * {
         -webkit-print-color-adjust: exact !important;
         /* Safari/Chrome */
@@ -230,9 +230,9 @@
       .sidebar {
         display: none !important;
       }
+    }
   </style>
 </head>
-
 <body>
 
   <div class="right_container">
@@ -273,28 +273,28 @@
         </div>
       </div>
 
-      <h2 class="invoice-title">INVOICE NO. 1009</h2>
+      <h2 class="invoice-title">INVOICE NO. <?= esc($invoice['invoice_id']) ?></h2>
+
 
 
       <!-- Billing & Shipping -->
       <div class="d-flex col-12 mb-3">
         <!-- Bill To -->
         <div class="bill-to col-4 pr-3">
-          <div class="label">BILL TO: <strong>ALBATAIN AUTO (GULFEX)</strong></div>
-          <div>Person Name: <strong>Mr. Ajith Abraham</strong></div>
-          <div>Business Name:<strong> ALBATAIN AUTO (GULFEX)</strong></div>
-          <div>Address: <strong>Al-Rai</strong></div>
-          <div>Contact Number:<strong>97747515585</strong></div>
+          <div class="label">BILL TO: <strong><?= esc($customer['name'] ?? '-') ?></strong></div>
+          <div>Person Name: <strong><?= esc($customer['name'] ?? '-') ?></strong></div>
+          <div>Business Name:<strong><?= esc($invoice['company_name'] ?? '-') ?></strong></div>
+          <div>Address: <strong><?= esc($invoice['customer_address'] ?? '-') ?></strong></div>
+          <div>Contact Number:<strong><?= esc($invoice['phone_number'] ?? '-') ?></strong></div>
         </div>
 
         <!-- Ship To -->
         <div class="ship-to col-4">
-          <div class="label">SHIP TO:<strong> ALBATAIN AUTO (GULFEX)</strong></div>
-          <div>Person Name:<strong> Mr. Ajith</strong></div>
-          <div>Business Name:<strong> M/S. Al-Babtain Auto - Al Rai</strong></div>
-          <div>Address:<strong>Al Rai Albatain Auto Al Shai Gulf Dubai China America, Al Rai Albatain Auto Al Shai
-              Gulf Dubai China America</strong></div>
-          <div>Contact Number:<strong>147852693</strong></div>
+          <div class="label">SHIP TO:<strong><?= esc($customer['name'] ?? '-') ?></strong></div>
+          <div>Person Name:<strong><?= esc($customer['name'] ?? '-') ?></strong></div>
+          <div>Business Name:<strong><?= esc($invoice['company_name'] ?? '-') ?></strong></div>
+          <div>Address:<strong><?= esc($invoice['shipping_address'] ?? '-') ?></strong></div>
+          <div>Contact Number:<strong><?= esc($invoice['phone_number'] ?? '-') ?></strong></div>
         </div>
 
         <!-- Invoice Info -->
@@ -302,7 +302,7 @@
           <table class="info-table table-sm  justify-content-end">
             <tr>
               <td>Invoice Date:</td>
-              <td>1.5.2025</td>
+              <td><?= date('d.m.Y', strtotime($invoice['invoice_date'])) ?></td>
             </tr>
             <tr>
               <td>Delivery Date:</td>
@@ -314,7 +314,7 @@
             </tr>
             <tr>
               <td>LPO No:</td>
-              <td>242501637</td>
+              <td><?= esc($invoice['lpo_no']) ?></td>
             </tr>
           </table>
         </div>
@@ -322,43 +322,37 @@
       <!-- Items Table -->
       <table class="items-table table-striped">
         <thead>
-          <tr>
-            <th>SR. NO</th>
-            <th>DESCRIPTION</th>
-            <th>QTY</th>
-            <th>UNIT PRICE (KD)</th>
-            <th>TOTAL (KD)</th>
-          </tr>
+        <tr>
+          <th>SR. NO</th>
+          <th>DESCRIPTION</th>
+          <th>QTY</th>
+          <th>UNIT PRICE (KD)</th>
+          <th>TOTAL (KD)</th>
+        </tr>
+                  <?php
+        $i = 1;
+        $subtotal = 0;
+        $totalDiscountAmount = 0;
+        $discountPercent = isset($invoice['discount']) ? floatval($invoice['discount']) : 0;
+        foreach ($items as $item):
+        $price = $item['price'];
+        $qty = $item['quantity'];
+        $lineTotal = $price * $qty;
+        $discountAmount = ($lineTotal * $discountPercent) / 100;
+        $finalTotal = $lineTotal - $discountAmount;
+        $subtotal += $lineTotal;
+        $totalDiscountAmount += $discountAmount;
+     ?>
         </thead>
         <tbody>
           <tr>
-            <td>1</td>
-            <td>ABA Spring Offer Roll up changing</td>
-            <td>10</td>
-            <td>7.000</td>
-            <td>70.000</td>
+            <td><?= $i++ ?></td>
+            <td><?= esc($item['item_name'] ?? '-') ?></td>
+            <td><?= esc($item['quantity']) ?></td>
+            <td><?= number_format($item['price'], 3) ?></td>
+            <td><?= number_format($finalTotal, 3) ?></td>
           </tr>
-          <tr>
-            <td>2</td>
-            <td>ABA Spring Offer new Roll up supply</td>
-            <td>2</td>
-            <td>10.000</td>
-            <td>20.000</td>
-          </tr>
-          <tr>
-            <td>&nbsp;</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>&nbsp;</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
+           <?php endforeach; ?>
         </tbody>
       </table>
 
@@ -366,11 +360,11 @@
       <div class="totals">
         <div class="totals-row">
           <div class="tot">SUBTOTAL</div>
-          <div class="value">90.000</div>
+          <div class="value"><?= number_format($subtotal, 3) ?></div>
         </div>
         <div class="totals-row">
           <div class="tot">DISCOUNT</div>
-          <div class="value">0.000</div>
+          <div class="value"><?= number_format($totalDiscountAmount, 3) ?></div>
         </div>
       </div>
 
@@ -379,10 +373,15 @@
       <div class="totals grand-total">
         <div class="totals-row">
           <strong>Grand Total</strong>
-          <span>KD90.000</span>
+          <span><?= number_format($subtotal - $totalDiscountAmount, 3) ?></span>
         </div>
       </div>
-      <div class="words"><strong>In Words: Kuwaiti Dinars Ninety Only</strong></div>
+     <?php $grandTotal = $subtotal - $totalDiscountAmount; ?>
+      <div class="amount-words">
+       In Words:: <span id="amount-words"></span>
+      </div>
+
+
       <!-- Footer -->
       <div class="d-flex col-12">
         <div class="invoice-footer-text col-6">
@@ -436,6 +435,112 @@
 </div>
 <?php include "common/footer.php"; ?>
 <script>
+  function numberToWords(num) {
+    const a = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven',
+      'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+    const b = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+    num = num.toString().replace(/,/g, '');
+    
+    let [dinars, fils] = num.split('.');
+    
+    if (dinars.length > 9) return 'overflow';
+    dinars = parseInt(dinars, 10);
+    fils = parseInt((fils || '0').padEnd(3, '0').slice(0, 2)); // Handle fils up to 2 decimal places
+
+      const convert = (n) => {
+        if (n < 20) return a[n];
+        if (n < 100) return b[Math.floor(n / 10)] + (n % 10 ? '-' + a[n % 10] : '');
+        if (n < 1000) return a[Math.floor(n / 100)] + ' hundred' + (n % 100 ? ' ' + convert(n % 100) : '');
+        if (n < 1000000) return convert(Math.floor(n / 1000)) + ' thousand' + (n % 1000 ? ' ' + convert(n % 1000) : '');
+        if (n < 1000000000) return convert(Math.floor(n / 1000000)) + ' million' + (n % 1000000 ? ' ' + convert(n % 1000000) : '');
+        return '';
+    };
+
+    let words = '';
+    if (dinars > 0) words += convert(dinars) + ' Kuwaiti Dinar';
+    if (fils > 0) words += (words ? ' and ' : '') + convert(fils) + ' Fils';
+    return words || 'Zero';
+  }
+
+
+  function numberToArabicWords(num) {
+  const ones = ['', 'واحد', 'اثنان', 'ثلاثة', 'أربعة', 'خمسة', 'ستة', 'سبعة', 'ثمانية', 'تسعة'];
+  const tens = ['', 'عشرة', 'عشرون', 'ثلاثون', 'أربعون', 'خمسون', 'ستون', 'سبعون', 'ثمانون', 'تسعون'];
+  const teens = ['أحد عشر', 'اثنا عشر', 'ثلاثة عشر', 'أربعة عشر', 'خمسة عشر', 'ستة عشر', 'سبعة عشر', 'ثمانية عشر', 'تسعة عشر'];
+
+  function convert_hundreds(n) {
+    let result = '';
+    const hundred = Math.floor(n / 100);
+    const remainder = n % 100;
+
+    if (hundred > 0) {
+      if (hundred === 1) result += 'مائة';
+      else if (hundred === 2) result += 'مائتان';
+      else result += ones[hundred] + 'مائة';
+    }
+
+    if (remainder > 0) {
+      if (result) result += ' و ';
+      result += convert_tens(remainder);
+    }
+
+    return result;
+  }
+
+  function convert_tens(n) {
+    if (n < 10) return ones[n];
+    if (n >= 11 && n <= 19) return teens[n - 11];
+    const ten = Math.floor(n / 10);
+    const one = n % 10;
+
+    if (one === 0) return tens[ten];
+    return ones[one] + ' و ' + tens[ten];
+  }
+
+  function convert_group(n, groupName, dualName, pluralName) {
+    if (n === 0) return '';
+    if (n === 1) return groupName;
+    if (n === 2) return dualName;
+    if (n >= 3 && n <= 10) return convert_hundreds(n) + ' ' + pluralName;
+    return convert_hundreds(n) + ' ' + groupName;
+  }
+
+  function convertNumber(n) {
+    if (n === 0) return 'صفر';
+
+    const million = Math.floor(n / 1000000);
+    const thousand = Math.floor((n % 1000000) / 1000);
+    const rest = n % 1000;
+
+    let parts = [];
+    if (million > 0) parts.push(convert_group(million, 'مليون', 'مليونان', 'ملايين'));
+    if (thousand > 0) parts.push(convert_group(thousand, 'ألف', 'ألفان', 'آلاف'));
+    if (rest > 0) parts.push(convert_hundreds(rest));
+
+    return parts.join(' و ');
+  }
+
+  num = num.toString().replace(/,/g, '');
+  let [dinars, fils] = num.split('.');
+  dinars = parseInt(dinars || '0', 10);
+  fils = parseInt((fils || '0').padEnd(3, '0').slice(0, 2));
+
+  let words = '';
+  if (dinars > 0) words += convertNumber(dinars) + ' دينار';
+  if (fils > 0) words += (words ? ' و ' : '') + convertNumber(fils) + ' فلس';
+  return words || 'صفر';
+}
+
+  const grandTotal = <?= json_encode(number_format($grandTotal, 3, '.', '')) ?>;
+
+  const englishWords = numberToWords(grandTotal);
+  const arabicWords = numberToArabicWords(grandTotal);
+
+  document.getElementById("amount-words").innerHTML = `
+    ${englishWords}<br><span style="font-family: 'Amiri', serif;">${arabicWords}</span>
+  `;
+
+
   const paymentStatusBtn = document.getElementById('paymentStatusBtn');
   const deliveryNoteModal = document.getElementById('deliveryNoteModal');
 

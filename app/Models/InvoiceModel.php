@@ -67,19 +67,28 @@ class InvoiceModel extends Model
         return $builder->get()->getResultArray( );
     }
 
-    // Get single invoice with its items
-     public function getInvoiceWithItems($id)
-    {
-        $invoice = $this->select('invoices.*, customers.name AS customer_name, customers.address AS customer_address')
-            ->join('customers', 'customers.customer_id = invoices.customer_id', 'left')
-            ->where('invoices.invoice_id', $id)
-            ->first();
-    
-        if ($invoice) {
-            $itemModel = new \App\Models\InvoiceItemModel();
-            $invoice['items'] = $itemModel->where('invoice_id', $id)->findAll();
-        }
-    
-        return $invoice;
+    public function getInvoiceWithItems($id)
+{
+    $invoice = $this->select(
+            'invoices.*, 
+             customers.name AS customer_name, 
+             customers.address AS customer_address, 
+             invoices.phone_number, 
+             invoices.billing_address, 
+             invoices.shipping_address,
+             company.company_name AS company_name'
+        )
+        ->join('customers', 'customers.customer_id = invoices.customer_id', 'left')
+        ->join('company', 'company.company_id = company.company_id', 'left')
+        ->where('invoices.invoice_id', $id)
+        ->first();
+
+    if ($invoice) {
+        $itemModel = new \App\Models\InvoiceItemModel();
+        $invoice['items'] = $itemModel->where('invoice_id', $id)->findAll();
     }
+
+    return $invoice;
+}
+
 }
