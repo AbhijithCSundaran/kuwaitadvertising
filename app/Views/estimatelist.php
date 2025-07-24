@@ -128,6 +128,9 @@ $(document).ready(function () {
                 render: function (id) {
                     return `
                         <div class="d-flex align-items-center gap-3">
+                            <a href="<?= base_url('estimate/generateEstimate/') ?>${id}" title="Print" style="color:green;">
+                                <i class="bi bi-printer-fill"></i>
+                            </a>
                             <a href="<?= base_url('estimate/edit/') ?>${id}" title="Edit" style="color:rgb(13, 162, 199); margin-right: 10px;">
                                 <i class="bi bi-pencil-fill"></i>
                             </a>
