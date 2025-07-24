@@ -57,6 +57,7 @@ $routes->get('estimatelist', 'Estimate::estimatelist');
 $routes->get('estimate/edit/(:num)', 'Estimate::edit/$1');
 $routes->get('estimate/generateEstimate/(:num)', 'Estimate::generateEstimate/$1');
 $routes->post('save', 'Estimate::saveEstimate');
+$routes->get('estimate/generateEstimate/(:segment)', 'Estimate::generateEstimate/$1');
 
 
 

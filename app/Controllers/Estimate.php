@@ -307,7 +307,7 @@ public function save()
         $userName = session()->get('user_Name');
         $userId = session()->get('user_id');
          $user = $userModel->find($userId);
-        return view('generateestimate', [
+        return view('generatequotation', [
             'estimate' => $estimate,
             'items' => $items,
             'user_id' => $userId,

@@ -216,7 +216,7 @@
       min-width: 80px;
     }
 
-    @media print {
+    @media print 
       * {
         -webkit-print-color-adjust: exact !important;
         /* Safari/Chrome */
