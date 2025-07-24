@@ -121,7 +121,7 @@ $(document).ready(function () {
                 render: function (id) {
                     return `
                         <div class="d-flex gap-2">
-                            <a href="<?= base_url('invoice/print/') ?>${id}" target="_blank" title="Print" style="color:green;">
+                            <a href="<?= base_url('invoice/print/') ?>${id}" title="Print" style="color:green;">
                                 <i class="bi bi-printer-fill"></i>
                             </a>
                             <a href="<?= base_url('invoice/edit/') ?>${id}" title="Edit" style="color:rgb(13, 162, 199);">

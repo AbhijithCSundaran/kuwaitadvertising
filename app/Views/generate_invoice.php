@@ -16,7 +16,7 @@
 
     .invoice-container {
       /* width: 100%; */
-      width: 730px;
+      /* width: 730px; */
       margin: auto;
       border: 1px solid #ddd;
       padding: 30px; 
@@ -167,7 +167,7 @@
 
     .recipient-box {
       width: 300px;
-      border: 1px solid #000;
+      border: 2px solid #000;
       margin-top: 20px;
       /* float: right; */
     }
@@ -178,7 +178,7 @@
     }
 
     .recipient-box td {
-      border: 1px solid #000;
+      border: 2px solid #000;
       padding: 6px;
       font-size: 13px;
     }
@@ -392,19 +392,21 @@
         </div>
         <!-- Recipient -->
         <div class="col-6 d-flex justify-content-end">
-          <table class="recipient-box">
-            <tr>
-              <td colspan="2">Received the above in good order</td>
-            </tr>
-            <tr>
-              <td>Recipient Name:</td>
-              <td>Accountant:</td>
-            </tr>
-            <tr>
-              <td colspan="2">Signature:</td>
-            </tr>
-          </table>
-        </div>
+  <table class="recipient-box">
+    <tr>
+      <td><strong><div class="rec-label">Received the above in good order</div></strong></td>
+      <td><strong><div class="rec-label">Accountant:</div></strong></td>
+    </tr>
+    <tr>
+      <td><strong><div class="rec-label">Recipient Name:</div></strong></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td><strong><div class="rec-label">Signature:</div></strong></td>
+      <td></td>
+    </tr>
+  </table>
+</div>
       </div>
 
 

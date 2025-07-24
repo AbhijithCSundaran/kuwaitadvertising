@@ -38,7 +38,8 @@ class Login extends BaseController
                     'role_Id'       => $result->role_id,
                     'allowed_menus' => $allowedMenus,
                     'status'        => 1,
-                    'logged_in'     => true
+                    'logged_in'     => true,
+                    'company_id'    => $result->company_id 
                 ]);
 
                 return $this->response->setJSON([
