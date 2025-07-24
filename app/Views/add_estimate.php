@@ -158,11 +158,12 @@
                     <td><strong><span id="total_display">0.00</span> KWD</strong></td>
                 </tr>
             </table>
-            <input type="hidden" name="estimate_id"
-                value="<?= isset($estimate['estimate_id']) ? $estimate['estimate_id'] : '' ?>">
+            <input type="hidden" id="estimate_id" value="<?= $estimate['estimate_id'] ?? '' ?>">
+
             <div class="text-right">
                 <a href="<?= base_url('estimatelist') ?>" class="btn btn-secondary">Discard</a>
                 <button type="submit" id="generate-btn" class="btn btn-primary">Generate Estimate</button>
+                <button type="button" id="convert-invoice-btn" class="btn btn-primary">Convert Invoice</button>
             </div>
         </form>
     </div>
@@ -228,6 +229,26 @@
             $(this).val(capitalized);
         });
 
+
+        $('#convert-invoice-btn').on('click', function () {
+            const estimateId = $('#estimate_id').val().trim(); // Ensure this hidden field is present
+            const alertBox = $('.alert');
+
+            if (estimateId) {
+                window.open(`<?= base_url('invoice/printInvoice/') ?>${estimateId}`, '_blank');
+            } else {
+                alertBox
+                    .removeClass('d-none alert-success')
+                    .addClass('alert-danger')
+                    .text('Please generate the estimate first before converting to invoice.');
+
+                // Auto-hide after 3 seconds
+                setTimeout(() => {
+                    alertBox.addClass('d-none').removeClass('alert-danger').text('');
+                }, 3000);
+            }
+        });
+
         $(document).on('input', 'input[name="description[]"]', function () {
             let value = $(this).val();
             let capitalized = value.replace(/\b\w/g, function (char) {
@@ -273,6 +294,7 @@
             $('#item-container').append(newRow);
             newRow.find('input[name="description[]"]').focus();
         });
+
 
         $(document).on('click', '.remove-item-btn', function () {
             $(this).closest('tr').remove();
@@ -372,7 +394,7 @@
 
     const customerId = $('#customer_id').val();
     const customerAddress = $('#customer_address').val().trim();
-    const customerName = $('#customer_id option:selected').text().trim(); // ✅ Get name from dropdown
+    const customerName = $('#customer_id option:selected').text().trim();
 
     if (!customerId) {
         showAlert('Please Select A Customer.', 'danger');

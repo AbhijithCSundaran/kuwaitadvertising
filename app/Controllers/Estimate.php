@@ -365,5 +365,24 @@ public function save()
     ]);
 
 }
+public function fromEstimate($estimateId)
+{
+    $estimateModel = new \App\Models\EstimateModel();
+    $estimateItemModel = new \App\Models\EstimateitemModel();
+
+    $estimate = $estimateModel->find($estimateId);
+    if (!$estimate) {
+        throw new \CodeIgniter\Exceptions\PageNotFoundException("Estimate not found.");
+    }
+
+    $items = $estimateItemModel->where('estimate_id', $estimateId)->findAll();
+
+    // Load your invoice design view and pass data
+    return view('invoice/add_invoice', [
+        'estimate' => $estimate,
+        'items' => $items
+    ]);
+}
+
 
 }

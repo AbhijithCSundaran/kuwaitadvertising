@@ -60,8 +60,6 @@ $routes->post('save', 'Estimate::saveEstimate');
 
 
 
-
-
 // $routes->get('invoicelist', 'Invoice::invoicelist');
 
 $routes->post('customer/create', 'Customer::create');
@@ -121,6 +119,9 @@ $routes->get('invoice/edit/(:segment)', 'Invoice::edit/$1');        // Edit page
 $routes->post('invoice/delete/(:segment)', 'Invoice::delete/$1');
 $routes->get('invoice/edit/(:num)', 'Invoice::edit/$1');
 $routes->post('invoice/save', 'Invoice::save'); // if you handle saving here
+$routes->get('invoice/from_estimate/(:num)', 'Invoice::fromEstimate/$1');
+
+
 
 
 
