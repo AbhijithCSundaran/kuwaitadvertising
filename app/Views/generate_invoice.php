@@ -1,4 +1,3 @@
-
 <?php include "common/header.php"; ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,9 +15,11 @@
     }
 
     .invoice-container {
-      width: 100%;
-      min-width: 900px;
+      /* width: 100%; */
+      width: 730px;
       margin: auto;
+      border: 1px solid #ddd;
+      padding: 30px; 
     }
 
     .invoice-header {
@@ -28,8 +29,8 @@
     }
 
     .address {
-      font-size: 16px;
-      line-height: 1.8;
+      font-size: 14px;
+      line-height: 1.25rem;
     }
 
     .company-logo {
@@ -37,7 +38,7 @@
     }
 
     .company-logo img {
-      height: 150px;
+      height: 100px;
 
     }
 
@@ -55,7 +56,7 @@
       text-decoration: underline;
       margin: 20px 0 40px;
       margin-top: -1px;
-      font-size: 1.75rem;
+      font-size: 1.45rem;
     }
 
     .info-table {
@@ -78,10 +79,10 @@
       margin-bottom: 10px;
     }
 
-    .bill-to,
+    /* .bill-to,
     .ship-to {
       width: 48%;
-    }
+    } */
 
     .bill-to td,
     .ship-to td {
@@ -168,10 +169,10 @@
       width: 300px;
       border: 1px solid #000;
       margin-top: 20px;
-      float: right;
+      /* float: right; */
     }
 
-    .recipient-box table {
+    .recipient-box.table {
       width: 100%;
       border-collapse: collapse;
     }
@@ -214,6 +215,7 @@
       text-align: right;
       min-width: 80px;
     }
+
     @media print {
       * {
         -webkit-print-color-adjust: exact !important;
@@ -236,8 +238,8 @@
   <div class="right_container">
     <div class="no-print" style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
       <button onclick="window.print()"
-         style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px;">
-          🖨️ Print
+        style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px;">
+        🖨️ Print
       </button>
       <button onclick="window.location.href='<?= base_url('invoice/edit/' . $invoice['invoice_id']) ?>'"
         style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
@@ -248,49 +250,36 @@
         style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
         Unpaid
       </button>
-
     </div>
-  <div class="invoice-container">
+    <div class="invoice-container">
 
       <!-- Header -->
-      <div class="invoice-header">
-        <div class="address">
-          <em>Al-Shuwaikh Area, 3</em><br>
-          <em>Behind Sultan Center - 4th Ring Road</em><br>
-          <em>Tel: +965 600 60 102</em>
+      <div class="d-flex col-12 mb-3">
+        <div class="col-6">
+          <div class="address">
+            <em>Al-Shuwaikh Area, 3</em><br>
+            <em>Behind Sultan Center - 4th Ring Road</em><br>
+            <em>Tel: +965 600 60 102</em>
+          </div>
         </div>
-        <div class="company-logo">
-          <img src="<?php echo ASSET_PATH; ?>assets/images/invoice-logo.png" alt="Invoicelogo">
-          <!-- <div class="company-name">Al Shaya International Printing Co</div>
-        <div class="company-arabic">شركة الشايع للطباعة الدولية</div> -->
+
+        <!-- Company Logo-->
+        <div class="col-6 d-flex justify-content-end ">
+          <div class="company-logo">
+            <img src="<?php echo ASSET_PATH; ?>assets/images/invoice-logo.png" alt="Invoicelogo">
+            <!-- <div class="company-name">Al Shaya International Printing Co</div>
+            <div class="company-arabic">شركة الشايع للطباعة الدولية</div> -->
+          </div>
         </div>
       </div>
 
       <h2 class="invoice-title">INVOICE NO. 1009</h2>
 
-      <!-- Invoice Info -->
-      <table class="info-table">
-        <tr>
-          <td>Invoice Date:</td>
-          <td>1.5.2025</td>
-        </tr>
-        <tr>
-          <td>Delivery Date:</td>
-          <td>30.4.2025</td>
-        </tr>
-        <tr>
-          <td>Delivery Note No:</td>
-          <td>109</td>
-        </tr>
-        <tr>
-          <td>LPO No:</td>
-          <td>242501637</td>
-        </tr>
-      </table>
 
       <!-- Billing & Shipping -->
-      <div class="bill-ship">
-        <div class="bill-to">
+      <div class="d-flex col-12 mb-3">
+        <!-- Bill To -->
+        <div class="bill-to col-4 pr-3">
           <div class="label">BILL TO: <strong>ALBATAIN AUTO (GULFEX)</strong></div>
           <div>Person Name: <strong>Mr. Ajith Abraham</strong></div>
           <div>Business Name:<strong> ALBATAIN AUTO (GULFEX)</strong></div>
@@ -298,17 +287,38 @@
           <div>Contact Number:<strong>97747515585</strong></div>
         </div>
 
-        <div class="ship-to">
+        <!-- Ship To -->
+        <div class="ship-to col-4">
           <div class="label">SHIP TO:<strong> ALBATAIN AUTO (GULFEX)</strong></div>
           <div>Person Name:<strong> Mr. Ajith</strong></div>
           <div>Business Name:<strong> M/S. Al-Babtain Auto - Al Rai</strong></div>
-          <div>Address:<strong>Al Rai Albatain Auto Al Shai Gulf Dubai China America, Al Rai Albatain Auto Al Shai Gulf
-              Dubai China America </strong></div>
+          <div>Address:<strong>Al Rai Albatain Auto Al Shai Gulf Dubai China America, Al Rai Albatain Auto Al Shai
+              Gulf Dubai China America</strong></div>
           <div>Contact Number:<strong>147852693</strong></div>
         </div>
+
+        <!-- Invoice Info -->
+        <div class="col-4 pl-3 ml-auto">
+          <table class="info-table table-sm  justify-content-end">
+            <tr>
+              <td>Invoice Date:</td>
+              <td>1.5.2025</td>
+            </tr>
+            <tr>
+              <td>Delivery Date:</td>
+              <td>30.4.2025</td>
+            </tr>
+            <tr>
+              <td>Delivery Note No:</td>
+              <td>109</td>
+            </tr>
+            <tr>
+              <td>LPO No:</td>
+              <td>242501637</td>
+            </tr>
+          </table>
+        </div>
       </div>
-
-
       <!-- Items Table -->
       <table class="items-table table-striped">
         <thead>
@@ -374,40 +384,46 @@
       </div>
       <div class="words"><strong>In Words: Kuwaiti Dinars Ninety Only</strong></div>
       <!-- Footer -->
-      <div class="invoice-footer-text">
-        <div class="thanks">Thank you for your business!</div>
-        <div class="cheque">Please issue the cheque in the favor of:</div>
-        <div class="compname"><strong>Al Shaya International Printing Co</strong></div>
+      <div class="d-flex col-12">
+        <div class="invoice-footer-text col-6">
+          <div class="thanks">Thank you for your business!</div>
+          <div class="cheque">Please issue the cheque in the favor of:</div>
+          <div class="compname"><strong>Al Shaya International Printing Co</strong></div>
+        </div>
+        <!-- Recipient -->
+        <div class="col-6 d-flex justify-content-end">
+          <table class="recipient-box">
+            <tr>
+              <td colspan="2">Received the above in good order</td>
+            </tr>
+            <tr>
+              <td>Recipient Name:</td>
+              <td>Accountant:</td>
+            </tr>
+            <tr>
+              <td colspan="2">Signature:</td>
+            </tr>
+          </table>
+        </div>
       </div>
 
-      <!-- Recipient -->
-      <div class="recipient-box">
-        <table>
-          <tr>
-            <td colspan="2">Received the above in good order</td>
-          </tr>
-          <tr>
-            <td>Recipient Name:</td>
-            <td>Accountant:</td>
-          </tr>
-          <tr>
-            <td colspan="2">Signature:</td>
-          </tr>
-        </table>
-      </div>
-<!-- Delivery Note Popup -->
-<div id="deliveryNoteModal" class="modal" style="display:none; position: fixed; z-index: 9999; left: 0; top: 0;
+
+      <!-- Delivery Note Popup -->
+      <div id="deliveryNoteModal" class="modal" style="display:none; position: fixed; z-index: 9999; left: 0; top: 0;
   width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
-  <div style="background-color: #fff; margin: 15% auto; padding: 20px; border-radius: 10px; width: 300px; text-align: center;">
-    <p>Do you want to download the delivery note?</p>
-    <button onclick="downloadDeliveryNote()" style="background-color: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 5px; margin: 5px;">
-      Download
-    </button>
-    <button onclick="closeModal()" style="background-color: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 5px; margin: 5px;">
-      Cancel
-    </button>
-  </div>
-</div>
+        <div
+          style="background-color: #fff; margin: 15% auto; padding: 20px; border-radius: 10px; width: 300px; text-align: center;">
+          <p>Do you want to download the delivery note?</p>
+          <button onclick="downloadDeliveryNote()"
+            style="background-color: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 5px; margin: 5px;">
+            Download
+          </button>
+          <button onclick="closeModal()"
+            style="background-color: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 5px; margin: 5px;">
+            Cancel
+          </button>
+        </div>
+      </div>
 
     </div>
   </div>

@@ -105,6 +105,15 @@
       border: 1px solid black;
     }
 
+    table.min_height {
+      min-height: 350px;
+    }
+
+    table.min_height tbody td {
+      vertical-align: top;
+      padding: 5px 0;
+    }
+
     tbody td {
       border-top: 1px solid transparent;
       border-bottom: 1px solid transparent;
@@ -125,6 +134,9 @@
       text-align: center;
       height: 30px;
       padding: 4px;
+      word-wrap: break-word;
+      word-break: break-word;
+      white-space: normal;
     }
 
     .table-footer {
@@ -172,6 +184,17 @@
       .sidebar {
         display: none !important;
       }
+
+      table td {
+        font-size: 10px;
+      }
+
+      td:nth-child(2) {
+        max-width: 250px;
+        word-wrap: break-word;
+        word-break: break-word;
+        white-space: normal;
+      }
     }
   </style>
 
@@ -189,9 +212,9 @@
         🖨️ Print
       </button>
       <button onclick="window.location.href='<?= base_url('invoice/edit/' . $invoice['invoice_id']) ?>'"
-  style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
-  Discard
-</button>
+        style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
+        Discard
+      </button>
 
     </div>
     <div class="container">
@@ -204,7 +227,7 @@
         <!-- ____________________________________________________________________________________________ -->
         <div
           style="background-color: #991b36;color: white;font-weight: bold;padding: 5px 20px;display: inline-block;border-radius: 4px;margin: 5px auto;font-size: 14px;">
-          فاتورة / نقداً / بالحساب<br>Cash / Credit Invoice</div>
+          فاتورة / نقداً / بالحساب<br>CASH / CREDIT INVOICE</div>
       </div>
 
       <!-- Header Info -->
@@ -214,8 +237,8 @@
             No.: <input type="text" readonly value="<?= esc($invoice['invoice_id']) ?>">
           </div>
           <div class="half" style="text-align: right;">
-  Date: <input type="text" value="<?= date('d-m-Y', strtotime($invoice['invoice_date'])) ?>"><br><br>
-</div>
+            Date: <input type="text" value="<?= date('d-m-Y', strtotime($invoice['invoice_date'])) ?>"><br><br>
+          </div>
 
         </div>
         <div class="col-12">
@@ -228,7 +251,7 @@
       </div>
 
       <!-- Invoice Table -->
-      <table>
+      <table class="min_height">
         <thead>
           <tr>
             <th rowspan="2" style="width: 6%;">No.<br>رقم</th>
@@ -246,100 +269,61 @@
         </thead>
         <tbody>
           <?php $totalAmount = 0; ?>
-          <?php foreach ($items as $index => $item):
-            $originalLineTotal = $item['quantity'] * $item['price'];
-            $discount = isset($item['discount']) ? $item['discount'] : 0;
-            $lineTotal = $originalLineTotal - ($originalLineTotal * $discount / 100);
-            $kd = floor($item['price']);
-            $fils = str_pad(number_format(($item['price'] - $kd) * 1000, 0, '', ''), 3, '0', STR_PAD_LEFT);
-            $lineKd = floor($lineTotal);
-            $lineFils = str_pad(number_format(($lineTotal - $lineKd) * 1000, 0, '', ''), 3, '0', STR_PAD_LEFT);
-            $totalAmount += $lineTotal;
-            ?>
-            <tr>
-              <td><?= $index + 1 ?></td>
-              <td><?= esc($item['item_name']) ?></td>
-              <td><?= $item['quantity'] ?></td>
-              <td><?= $kd ?></td>
-              <td><?= $fils ?></td>
-              <td><?= $lineKd ?></td>
-              <td><?= $lineFils ?></td>
-            </tr>
-          <?php endforeach; ?>
+            <?php foreach ($items as $index => $item):
+              $originalLineTotal = $item['quantity'] * $item['price'];
+              $discount = isset($item['discount']) ? $item['discount'] : 0;
+              $lineTotal = $originalLineTotal - ($originalLineTotal * $discount / 100);
+              $kd = floor($item['price']);
+              $fils = str_pad(number_format(($item['price'] - $kd) * 1000, 0, '', ''), 3, '0', STR_PAD_LEFT);
+              $lineKd = floor($lineTotal);
+              $lineFils = str_pad(number_format(($lineTotal - $lineKd) * 1000, 0, '', ''), 3, '0', STR_PAD_LEFT);
+              $totalAmount += $lineTotal;
+              ?>
+              <tr>
+                <td><?= $index + 1 ?></td>
+                <td><?= esc($item['item_name']) ?></td>
+                <td><?= $item['quantity'] ?></td>
+                <td><?= $kd ?></td>
+                <td><?= $fils ?></td>
+                <td><?= $lineKd ?></td>
+                <td><?= $lineFils ?></td>
+              </tr>
+            <?php endforeach; ?>
           <?php $grandTotal = $totalAmount; ?>
+          <?php 
+            $subtotal = 0;
+            foreach ($items as $item) {
+              $lineTotal = $item['quantity'] * $item['price'];
+              $subtotal += $lineTotal;
+            }
+            $discountPercent = isset($invoice['discount']) ? floatval($invoice['discount']) : 0;
+            $totalDiscount = ($subtotal * $discountPercent) / 100;
+            $grandTotal = $subtotal - $totalDiscount;
+          ?>
+          <tfoot class="tfoot">
+            <?php if ($discountPercent > 0): ?>
+              <tr>
+                <td colspan="5" style="text-align: right; font-weight: bold;">Subtotal</td>
+                <td colspan="2" style="text-align: right;">KD <?= number_format($subtotal, 3) ?></td>
+              </tr>
+              <tr>
+                <td colspan="5" style="text-align: right; font-weight: bold;">
+                  Discount (<?= $discountPercent ?>%)
+                </td>
+                <td colspan="2" style="text-align: right;">
+                  KD <?= number_format($totalDiscount, 3) ?>
+                </td>
+              </tr>
+            <?php endif; ?>
 
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-        </tbody>
-        <tfoot class="tfoot">
-          <tr>
-            <td colspan="5"><strong>Total Amount</strong></td>
-            <td colspan="2" id="total-amount">KD <?= number_format($totalAmount, 3) ?></td>
-          </tr>
-        </tfoot>
+            <tr>
+              <td colspan="5" style="text-align: right; font-weight: bold;">Total Amount</td>
+              <td colspan="2" style="text-align: right;" id="total-amount">
+                KD <?= number_format($grandTotal, 3) ?>
+              </td>
+            </tr>
+          </tfoot>
       </table>
-
       <!-- Amount in words -->
       <div class="amount-words">
         Amount Chargeable (in words): <span id="amount-words"></span>
