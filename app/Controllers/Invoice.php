@@ -90,21 +90,40 @@ class Invoice extends BaseController
 
 
 
-    public function print($id)
-    {
-        $invoiceModel = new InvoiceModel();
-        $invoice = $invoiceModel->getInvoiceWithItems($id);
+  public function print($id)
+{
+    $invoiceModel = new InvoiceModel();
+    $invoice = $invoiceModel->getInvoiceWithItems($id);
 
-        if (!$invoice) {
-            return redirect()->to('/invoicelist')->with('error', 'Invoice not found.');
-        }
+    if (!$invoice) {
+        return redirect()->to('/invoicelist')->with('error', 'Invoice not found.');
+    }
 
+    $companyId = session()->get('company_id');
+
+    if ($companyId == 69) {
         return view('invoice_print', [
             'invoice' => $invoice,
             'items' => $invoice['items'],
             'user_name' => session()->get('user_name') ?? 'Salesman'
         ]);
+    } elseif ($companyId == 70) {
+        return view('generate_invoice', [
+            'invoice' => $invoice,
+            'items' => $invoice['items'],
+            'user_name' => session()->get('user_name') ?? 'Salesman'
+        ]);
+    } else {
+        return view('invoice_print', [ // default fallback
+            'invoice' => $invoice,
+            'items' => $invoice['items'],
+            'user_name' => session()->get('user_name') ?? 'Salesman'
+        ]);
     }
+}
+
+
+
 
     public function save()
     {

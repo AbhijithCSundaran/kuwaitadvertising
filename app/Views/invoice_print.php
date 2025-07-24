@@ -35,9 +35,9 @@
       border-radius: 23px;
       padding: 20px;
       position: relative;
-      background: url('/kuwaitadvertising/public/assets/images/invoice-bg.png.png') no-repeat;
-      background-size: 36%;
-      background-position: 52% 70%;
+      background: url('<?= ASSET_PATH ?>assets/images/invoice-bg.png') no-repeat;
+      background-size: 33%;
+      background-position: 52% 64%;
       background-color: white;
     }
 
@@ -106,7 +106,7 @@
     }
 
     table.min_height {
-      min-height: 350px;
+      min-height: 380px;
     }
 
     table.min_height tbody td {
@@ -200,12 +200,8 @@
 
 
 </head>
-
 <body>
-
-  <!-- ✅ Outer brown container starts here -->
   <div class="outer-container">
-    <!-- Buttons: Print & Discard -->
     <div class="no-print" style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
       <button onclick="window.print()"
         style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px;">
@@ -215,31 +211,24 @@
         style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
         Discard
       </button>
-
     </div>
     <div class="container">
-
-      <!-- Top Logo and Title -->
       <div class="top-heading">
         <img src="<?php echo ASSET_PATH; ?>assets/images/invoice-heading.png" alt="Invoice Heading">
-        <!-- <img src="<?php echo ASSET_PATH; ?>assets/images/adminlogo.jpg" alt="logo" style="width: 100px; height: 100;"> -->
         <hr>
-        <!-- ____________________________________________________________________________________________ -->
-        <div
-          style="background-color: #991b36;color: white;font-weight: bold;padding: 5px 20px;display: inline-block;border-radius: 4px;margin: 5px auto;font-size: 14px;">
-          فاتورة / نقداً / بالحساب<br>CASH / CREDIT INVOICE</div>
+          <div
+            style="background-color: #991b36;color: white;font-weight: bold;padding: 5px 20px;display: inline-block;border-radius: 4px;margin: 5px auto;font-size: 14px;">
+            فاتورة / نقداً / بالحساب<br>CASH / CREDIT INVOICE
+          </div>
       </div>
-
-      <!-- Header Info -->
       <div class="invoice-header">
         <div class="row">
           <div class="half">
             No.: <input type="text" readonly value="<?= esc($invoice['invoice_id']) ?>">
           </div>
           <div class="half" style="text-align: right;">
-            Date: <input type="text" value="<?= date('d-m-Y', strtotime($invoice['invoice_date'])) ?>"><br><br>
+            Date: <input type="text" value="<?= date('d-m-Y', strtotime($invoice['invoice_date'])) ?>" readonly><br><br>
           </div>
-
         </div>
         <div class="col-12">
           Mr./Mrs: <span><?= esc($invoice['customer_name'] ?? '') ?></span>:السيد
@@ -247,7 +236,6 @@
         <div class="col-12">
           Address: <span> <?= esc($invoice['customer_address'] ?? '') ?></span>:عنوان
         </div>
-
       </div>
 
       <!-- Invoice Table -->
@@ -268,69 +256,69 @@
           </tr>
         </thead>
         <tbody>
-          <?php $totalAmount = 0; ?>
-            <?php foreach ($items as $index => $item):
-              $originalLineTotal = $item['quantity'] * $item['price'];
-              $discount = isset($item['discount']) ? $item['discount'] : 0;
-              $lineTotal = $originalLineTotal - ($originalLineTotal * $discount / 100);
-              $kd = floor($item['price']);
-              $fils = str_pad(number_format(($item['price'] - $kd) * 1000, 0, '', ''), 3, '0', STR_PAD_LEFT);
-              $lineKd = floor($lineTotal);
-              $lineFils = str_pad(number_format(($lineTotal - $lineKd) * 1000, 0, '', ''), 3, '0', STR_PAD_LEFT);
-              $totalAmount += $lineTotal;
-              ?>
-              <tr>
-                <td><?= $index + 1 ?></td>
-                <td><?= esc($item['item_name']) ?></td>
-                <td><?= $item['quantity'] ?></td>
-                <td><?= $kd ?></td>
-                <td><?= $fils ?></td>
-                <td><?= $lineKd ?></td>
-                <td><?= $lineFils ?></td>
-              </tr>
-            <?php endforeach; ?>
+          <?php
+            $totalAmount = 0;
+            $discountPercent = isset($invoice['discount']) ? $invoice['discount'] : 0;
+            foreach ($items as $index => $item):
+            $originalLineTotal = $item['quantity'] * $item['price'];
+            $lineTotal = $originalLineTotal - ($originalLineTotal * $discountPercent / 100);
+            $kd = floor($item['price']);
+            $fils = str_pad(number_format(($item['price'] - $kd) * 100, 0), 3, '0', STR_PAD_LEFT);
+            $lineKd = floor($lineTotal);
+            $lineFils = str_pad(number_format(($lineTotal - $lineKd) * 100, 0), 3, '0', STR_PAD_LEFT);
+             $totalAmount += $lineTotal;
+        ?>
+          <tr>
+            <td><?= $index + 1 ?></td>
+            <td><?= esc($item['item_name']) ?></td>
+            <td><?= $item['quantity'] ?></td>
+            <td><?= $kd ?></td>
+            <td><?= $fils ?></td>
+            <td><?= $lineKd ?></td> <!-- discounted total -->
+            <td><?= $lineFils ?></td>
+          </tr>
+          <?php endforeach; ?>
           <?php $grandTotal = $totalAmount; ?>
-          <?php 
-            $subtotal = 0;
-            foreach ($items as $item) {
-              $lineTotal = $item['quantity'] * $item['price'];
-              $subtotal += $lineTotal;
-            }
-            $discountPercent = isset($invoice['discount']) ? floatval($invoice['discount']) : 0;
-            $totalDiscount = ($subtotal * $discountPercent) / 100;
-            $grandTotal = $subtotal - $totalDiscount;
-          ?>
+            <?php 
+              $subtotal = 0;
+              foreach ($items as $item) {
+                $lineTotal = $item['quantity'] * $item['price'];
+                $subtotal += $lineTotal;
+              }
+              $discountPercent = isset($invoice['discount']) ? floatval($invoice['discount']) : 0;
+              $totalDiscount = ($subtotal * $discountPercent) / 100;
+              $grandTotal = $subtotal - $totalDiscount;
+            ?>
           <tfoot class="tfoot">
             <?php if ($discountPercent > 0): ?>
               <tr>
                 <td colspan="5" style="text-align: right; font-weight: bold;">Subtotal</td>
-                <td colspan="2" style="text-align: right;">KD <?= number_format($subtotal, 3) ?></td>
+                <td colspan="2" style="text-align: right;"> <?= number_format($subtotal, 3) ?> KD</td>
               </tr>
               <tr>
                 <td colspan="5" style="text-align: right; font-weight: bold;">
                   Discount (<?= $discountPercent ?>%)
                 </td>
                 <td colspan="2" style="text-align: right;">
-                  KD <?= number_format($totalDiscount, 3) ?>
+                 <?= number_format($totalDiscount, 3) ?> KD 
                 </td>
               </tr>
             <?php endif; ?>
-
             <tr>
               <td colspan="5" style="text-align: right; font-weight: bold;">Total Amount</td>
               <td colspan="2" style="text-align: right;" id="total-amount">
-                KD <?= number_format($grandTotal, 3) ?>
+                <?= number_format($grandTotal, 3) ?> KD 
               </td>
             </tr>
           </tfoot>
       </table>
-      <!-- Amount in words -->
+     
       <div class="amount-words">
         Amount Chargeable (in words): <span id="amount-words"></span>
       </div>
 
 
-      <!-- Footer -->
+     
       <div class="table-footer">
         <div>Received by. المستلم</div>
         <div style="text-align: right;">Salesman Signature. توقيع البائع</div>
@@ -338,42 +326,40 @@
 
 
     </div> <!-- /.container -->
-    <!-- Bottom Bar -->
-    <div class="bottom-bar">
-      الراي ، قطعة ٣ ، شارع ٣٢ ، مبنى رقم ٤٣٧ ، محل رقم ٤ ، بالقرب من زجاج الروان ، الشويخ - الكويت<br>
-      Al-Rai, Block 3, Street 32, Build No. 437, Shop No. 4, Near Al Rawan Glass, Shuwaik - Kuwait<br>
-      📞 +965 6006 0102 &nbsp;&nbsp; | &nbsp;&nbsp;
-      📧 <a href="mailto:alraiprintpress@gmail.com" style="color: white; text-decoration: none;">
-        alraiprintpress@gmail.com
-      </a>
-    </div>
-
+      <!-- Bottom Bar -->
+      <div class="bottom-bar">
+        الراي ، قطعة ٣ ، شارع ٣٢ ، مبنى رقم ٤٣٧ ، محل رقم ٤ ، بالقرب من زجاج الروان ، الشويخ - الكويت<br>
+        Al-Rai, Block 3, Street 32, Build No. 437, Shop No. 4, Near Al Rawan Glass, Shuwaik - Kuwait<br>
+        📞 +965 6006 0102 &nbsp;&nbsp; | &nbsp;&nbsp;
+        📧 <a href="mailto:alraiprintpress@gmail.com" style="color: white; text-decoration: none;">
+          alraiprintpress@gmail.com
+        </a>
+      </div>
 </body>
-
 </html>
 </div>
 </div>
-<?php include "common/footer.php"; ?>
-
-<!-- JS to convert number to words -->
+<?php include "common/footer.php"; ?> 
 <script>
   function numberToWords(num) {
     const a = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven',
       'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
     const b = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
-
-    if ((num = num.toString()).length > 9) return 'overflow';
-
+    num = num.toString().replace(/,/g, '');
+    
     let [dinars, fils] = num.split('.');
-    dinars = parseInt(dinars);
-    fils = parseInt(fils || '0');
+    
+    if (dinars.length > 9) return 'overflow';
+    dinars = parseInt(dinars, 10);
+    fils = parseInt((fils || '0').padEnd(3, '0').slice(0, 2)); // Handle fils up to 2 decimal places
 
-    const convert = (n) => {
-      if (n < 20) return a[n];
-      if (n < 100) return b[Math.floor(n / 10)] + (n % 10 ? '-' + a[n % 10] : '');
-      if (n < 1000) return a[Math.floor(n / 100)] + ' hundred ' + (n % 100 ? convert(n % 100) : '');
-      if (n < 1000000) return convert(Math.floor(n / 1000)) + ' thousand ' + convert(n % 1000);
-      return '';
+      const convert = (n) => {
+        if (n < 20) return a[n];
+        if (n < 100) return b[Math.floor(n / 10)] + (n % 10 ? '-' + a[n % 10] : '');
+        if (n < 1000) return a[Math.floor(n / 100)] + ' hundred' + (n % 100 ? ' ' + convert(n % 100) : '');
+        if (n < 1000000) return convert(Math.floor(n / 1000)) + ' thousand' + (n % 1000 ? ' ' + convert(n % 1000) : '');
+        if (n < 1000000000) return convert(Math.floor(n / 1000000)) + ' million' + (n % 1000000 ? ' ' + convert(n % 1000000) : '');
+        return '';
     };
 
     let words = '';
@@ -382,31 +368,74 @@
     return words || 'Zero';
   }
 
+
   function numberToArabicWords(num) {
-    // Basic static map, for demo purposes — you can replace with more complex logic or API if needed
-    const a = ['', 'واحد', 'اثنان', 'ثلاثة', 'أربعة', 'خمسة', 'ستة', 'سبعة', 'ثمانية', 'تسعة', 'عشرة', 'أحد عشر',
-      'اثنا عشر', 'ثلاثة عشر', 'أربعة عشر', 'خمسة عشر', 'ستة عشر', 'سبعة عشر', 'ثمانية عشر', 'تسعة عشر'];
-    const b = ['', '', 'عشرون', 'ثلاثون', 'أربعون', 'خمسون', 'ستون', 'سبعون', 'ثمانون', 'تسعون'];
+  const ones = ['', 'واحد', 'اثنان', 'ثلاثة', 'أربعة', 'خمسة', 'ستة', 'سبعة', 'ثمانية', 'تسعة'];
+  const tens = ['', 'عشرة', 'عشرون', 'ثلاثون', 'أربعون', 'خمسون', 'ستون', 'سبعون', 'ثمانون', 'تسعون'];
+  const teens = ['أحد عشر', 'اثنا عشر', 'ثلاثة عشر', 'أربعة عشر', 'خمسة عشر', 'ستة عشر', 'سبعة عشر', 'ثمانية عشر', 'تسعة عشر'];
 
-    if ((num = num.toString()).length > 9) return 'عدد كبير';
+  function convert_hundreds(n) {
+    let result = '';
+    const hundred = Math.floor(n / 100);
+    const remainder = n % 100;
 
-    let [dinars, fils] = num.split('.');
-    dinars = parseInt(dinars);
-    fils = parseInt(fils || '0');
+    if (hundred > 0) {
+      if (hundred === 1) result += 'مائة';
+      else if (hundred === 2) result += 'مائتان';
+      else result += ones[hundred] + 'مائة';
+    }
 
-    const convert = (n) => {
-      if (n < 20) return a[n];
-      if (n < 100) return b[Math.floor(n / 10)] + (n % 10 ? ' و' + a[n % 10] : '');
-      if (n < 1000) return a[Math.floor(n / 100)] + ' مائة' + (n % 100 ? ' و' + convert(n % 100) : '');
-      if (n < 1000000) return convert(Math.floor(n / 1000)) + ' ألف' + (n % 1000 ? ' و' + convert(n % 1000) : '');
-      return '';
-    };
+    if (remainder > 0) {
+      if (result) result += ' و ';
+      result += convert_tens(remainder);
+    }
 
-    let words = '';
-    if (dinars > 0) words += convert(dinars) + ' دينار';
-    if (fils > 0) words += (words ? ' و' : '') + convert(fils) + ' فلس';
-    return words || 'صفر';
+    return result;
   }
+
+  function convert_tens(n) {
+    if (n < 10) return ones[n];
+    if (n >= 11 && n <= 19) return teens[n - 11];
+    const ten = Math.floor(n / 10);
+    const one = n % 10;
+
+    if (one === 0) return tens[ten];
+    return ones[one] + ' و ' + tens[ten];
+  }
+
+  function convert_group(n, groupName, dualName, pluralName) {
+    if (n === 0) return '';
+    if (n === 1) return groupName;
+    if (n === 2) return dualName;
+    if (n >= 3 && n <= 10) return convert_hundreds(n) + ' ' + pluralName;
+    return convert_hundreds(n) + ' ' + groupName;
+  }
+
+  function convertNumber(n) {
+    if (n === 0) return 'صفر';
+
+    const million = Math.floor(n / 1000000);
+    const thousand = Math.floor((n % 1000000) / 1000);
+    const rest = n % 1000;
+
+    let parts = [];
+    if (million > 0) parts.push(convert_group(million, 'مليون', 'مليونان', 'ملايين'));
+    if (thousand > 0) parts.push(convert_group(thousand, 'ألف', 'ألفان', 'آلاف'));
+    if (rest > 0) parts.push(convert_hundreds(rest));
+
+    return parts.join(' و ');
+  }
+
+  num = num.toString().replace(/,/g, '');
+  let [dinars, fils] = num.split('.');
+  dinars = parseInt(dinars || '0', 10);
+  fils = parseInt((fils || '0').padEnd(3, '0').slice(0, 2));
+
+  let words = '';
+  if (dinars > 0) words += convertNumber(dinars) + ' دينار';
+  if (fils > 0) words += (words ? ' و ' : '') + convertNumber(fils) + ' فلس';
+  return words || 'صفر';
+}
 
   const grandTotal = <?= json_encode(number_format($grandTotal, 3, '.', '')) ?>;
 
