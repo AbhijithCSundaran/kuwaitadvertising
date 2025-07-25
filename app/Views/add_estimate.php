@@ -116,8 +116,8 @@
                                 <tr class="item-row">
                                     <td><input type="text" name="description[]" class="form-control"
                                             value="<?= $item['description'] ?>"></td>
-                                    <td><input type="number" name="price[]" class="form-control price"
-                                            value="<?= $item['price'] ?>"></td>
+                                    <td><input type="number" class="form-control price" name="price[]" value="<?= $item['price'] ?>">
+                            </td>
                                     <td><input type="number" name="quantity[]" class="form-control quantity"
                                             value="<?= $item['quantity'] ?>"></td>
                                     <td><input type="number" name="total[]" class="form-control total" value="<?= $item['total'] ?>"
@@ -317,8 +317,27 @@
             calculateTotals();
         });
 
-        $(document).on('input change', '.price, .quantity, #discount', calculateTotals);
+        $(document).on('input', '.price', function () {
+            let input = this;
+            let val = input.value;
+            if (val === '' || val === '.') return;
+            let match = val.match(/^(\d{0,8})(\.(\d{0,2})?)?/);
+            if (match) {
+                let newVal = (match[1] || '') + (match[2] || '');
+                if (newVal !== val) {
+                    input.value = newVal;
+                    input.setSelectionRange(newVal.length, newVal.length);
+                }
+            } else {
+                val = val.slice(0, -1);
+                input.value = val;
+                input.setSelectionRange(val.length, val.length);
+            }
+        });
+
+        $(document).on('input', '.price, .quantity, #discount', calculateTotals);
         calculateTotals();
+        
 
         $('#cancelCustomerBtn, #closeCustomerModalBtn').on('click', function () {
             $('#customerModal').modal('hide');
@@ -401,23 +420,23 @@
                 }
             });
         });
-        // Track original state of the form
+       
 let initialEstimateData = $('#estimate-form').serialize();
 
-// Disable button initially if it's an existing estimate (edit mode)
+
 $('#generate-btn').prop('disabled', true);
 
-// Listen for changes in form fields
+
 $('#estimate-form').on('input change', 'input, select, textarea', function () {
     const currentData = $('#estimate-form').serialize();
     const hasChanged = currentData !== initialEstimateData;
-    $('#generate-btn').prop('disabled', !hasChanged); // Enable only if form changed
+    $('#generate-btn').prop('disabled', !hasChanged); 
 });
 
-// After successful save, update the reference state
+
 function updateInitialFormState() {
     initialEstimateData = $('#estimate-form').serialize();
-    $('#generate-btn').prop('disabled', true); // Re-disable after saving
+    $('#generate-btn').prop('disabled', true); 
 }
 
 
@@ -438,7 +457,7 @@ function updateInitialFormState() {
         return;
     }
 
-    // Ensure at least one valid item
+  
     let validItemExists = false;
     $('.item-row').each(function () {
         const desc = $(this).find('input[name="description[]"]').val().trim();
@@ -456,7 +475,7 @@ function updateInitialFormState() {
         return;
     }
 
-    // Remove empty rows
+   
     $('.item-row').each(function () {
         const desc = $(this).find('input[name="description[]"]').val().trim();
         const price = parseFloat($(this).find('input[name="price[]"]').val()) || 0;
@@ -469,7 +488,7 @@ function updateInitialFormState() {
 
     $('#generate-btn').prop('disabled', true).text('Generating...');
 
-    // ✅ Use FormData to include extra field
+   
     const formData = new FormData(this);
     formData.append('customer_name', customerName);
 
@@ -484,7 +503,7 @@ function updateInitialFormState() {
     if (res.status === 'success') {
         showAlert(res.message, 'success');
 
-        updateInitialFormState(); // ✅ Reset change tracker after save
+        updateInitialFormState(); 
 
         setTimeout(function () {
             window.location.href = "<?= site_url('estimate/generateEstimate/') ?>" + res.estimate_id;
@@ -505,7 +524,7 @@ function updateInitialFormState() {
     });
 });
 
-// ✅ Helper function to show alerts
+
 function showAlert(message, type = 'success') {
     $('.alert')
         .removeClass('d-none alert-success alert-danger alert-warning')
