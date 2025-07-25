@@ -297,11 +297,12 @@
               </tr>
               <tr>
                 <td colspan="5" style="text-align: right; font-weight: bold;">
-                  Discount (<?= $discountPercent ?>%)
+                  Discount
                 </td>
                 <td colspan="2" style="text-align: right;">
-                 <?= number_format($totalDiscount, 3) ?> KD 
+                  <?= $discountPercent ?>%
                 </td>
+
               </tr>
             <?php endif; ?>
             <tr>

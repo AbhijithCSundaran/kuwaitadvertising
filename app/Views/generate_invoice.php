@@ -290,11 +290,14 @@
 
         <!-- Ship To -->
         <div class="ship-to col-4">
-          <div class="label">SHIP TO:<strong><?= esc($customer['name'] ?? '-') ?></strong></div>
-          <div>Person Name:<strong><?= esc($customer['name'] ?? '-') ?></strong></div>
+         <div class="label">
+          <span>SHIPPING ADDRESS</span><br>
+          <strong><?= nl2br(esc($invoice['shipping_address'] ?? '-')) ?></strong>
+        </div>
+          <!-- <div>Address:<strong><?= esc($invoice['shipping_address'] ?? '-') ?></strong></div> -->
+          <!-- <div>Person Name:<strong><?= esc($customer['name'] ?? '-') ?></strong></div>
           <div>Business Name:<strong><?= esc($invoice['company_name'] ?? 'Company Name Not Found') ?></strong></div>
-          <div>Address:<strong><?= esc($invoice['shipping_address'] ?? '-') ?></strong></div>
-          <div>Contact Number:<strong><?= esc($invoice['phone_number'] ?? '-') ?></strong></div>
+          <div>Contact Number:<strong><?= esc($invoice['phone_number'] ?? '-') ?></strong></div> -->
         </div>
 
         <!-- Invoice Info -->
@@ -364,12 +367,9 @@
         </div>
         <div class="totals-row">
           <div class="tot">DISCOUNT</div>
-          <div class="value"><?= number_format($totalDiscountAmount, 3) ?></div>
+          <div class="value"><?= $discountPercent ?>%</div>
         </div>
       </div>
-
-
-
       <div class="totals grand-total">
         <div class="totals-row">
           <strong>Grand Total</strong>

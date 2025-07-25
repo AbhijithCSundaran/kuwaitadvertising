@@ -76,11 +76,11 @@ class InvoiceModel extends Model
              invoices.phone_number, 
              invoices.billing_address, 
              invoices.shipping_address,
-             company.company_name AS company_name' // ✅ this will give Business Name
+             company.company_name AS company_name'
         )
         ->join('customers', 'customers.customer_id = invoices.customer_id', 'left')
-        ->join('user', 'user.user_id = invoices.user_id', 'left') // ✅ joins invoice to user
-        ->join('company', 'company.company_id = user.company_id', 'left') // ✅ joins user to company
+        ->join('user', 'user.user_id = invoices.user_id', 'left')
+        ->join('company', 'company.company_id = user.company_id', 'left')
         ->where('invoices.invoice_id', $id)
         ->first();
 

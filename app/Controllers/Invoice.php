@@ -261,7 +261,7 @@ log_message('debug', 'Current user_id in session: ' . session()->get('user_id'))
         $invoice = $model->find($id);
 
         $itemModel = new InvoiceItemModel();
-        $items = $itemModel->where('invoice_id', $id)->findAll(); // ✅ GET ITEMS
+        $items = $itemModel->where('invoice_id', $id)->findAll(); 
 
         $user_id = $invoice['user_id'];
         $userModel = new UserModel();
@@ -270,9 +270,50 @@ log_message('debug', 'Current user_id in session: ' . session()->get('user_id'))
 
         return view('invoice/invoice_print', [
             'invoice' => $invoice,
-            'items' => $items,          // ✅ PASS TO VIEW
-            'user_name' => $user_name,  // ✅ PASS TO VIEW
+            'items' => $items,          
+            'user_name' => $user_name,  
         ]);
     }
+public function delivery_note($id)
+{
+    $invoiceModel = new \App\Models\InvoiceModel();
+    $itemModel = new \App\Models\InvoiceItemModel(); // Assuming you have this
+
+    $invoice = $invoiceModel->find($id);
+    $items = $itemModel->where('invoice_id', $id)->findAll();
+    $customerModel = new \App\Models\CustomerModel();
+    $customer = $customerModel->find($invoice['customer_id']);
+
+    return view('delivery_note', [
+    'invoice' => $invoice,
+    'items'   => $items,
+    'customer' => $customer
+]);
+
+}
+public function convertFromEstimate($estimateId)
+{
+    $estimateModel = new \App\Models\EstimateModel();
+    $itemModel = new \App\Models\EstimateItemModel();
+    $customerModel = new \App\Models\CustomerModel();
+ 
+    // Get estimate
+    $estimate = $estimateModel->find($estimateId);
+ 
+    // Get estimate items
+    $items = $itemModel->where('estimate_id', $estimateId)->findAll();
+ 
+    // Get all customers (for dropdown)
+    $customers = $customerModel->findAll();
+ 
+    $data = [
+        'invoice' => $estimate,
+        'items' => $items,
+        'customers' => $customers
+    ];
+ 
+    return view('invoice/invoice_form', $data);
+}
+ 
 
 }
