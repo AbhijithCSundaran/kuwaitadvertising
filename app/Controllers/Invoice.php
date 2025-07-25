@@ -138,7 +138,7 @@ class Invoice extends BaseController
                 'message' => 'Invalid customer selected.'
             ]);
         }
-
+log_message('debug', 'Current user_id in session: ' . session()->get('user_id'));
        $invoiceData = [
             'customer_id'       => $customerId,
             'billing_address'   => $customer['billing_address'] ?? $customer['customer_address'] ?? '',

@@ -283,7 +283,7 @@
         <div class="bill-to col-4 pr-3">
           <div class="label">BILL TO: <strong><?= esc($customer['name'] ?? '-') ?></strong></div>
           <div>Person Name: <strong><?= esc($customer['name'] ?? '-') ?></strong></div>
-          <div>Business Name:<strong><?= esc($invoice['company_name'] ?? '-') ?></strong></div>
+          <div>Business Name:<strong><?= esc($invoice['company_name'] ?? 'Company Name Not Found') ?></strong></div>
           <div>Address: <strong><?= esc($invoice['customer_address'] ?? '-') ?></strong></div>
           <div>Contact Number:<strong><?= esc($invoice['phone_number'] ?? '-') ?></strong></div>
         </div>
@@ -292,7 +292,7 @@
         <div class="ship-to col-4">
           <div class="label">SHIP TO:<strong><?= esc($customer['name'] ?? '-') ?></strong></div>
           <div>Person Name:<strong><?= esc($customer['name'] ?? '-') ?></strong></div>
-          <div>Business Name:<strong><?= esc($invoice['company_name'] ?? '-') ?></strong></div>
+          <div>Business Name:<strong><?= esc($invoice['company_name'] ?? 'Company Name Not Found') ?></strong></div>
           <div>Address:<strong><?= esc($invoice['shipping_address'] ?? '-') ?></strong></div>
           <div>Contact Number:<strong><?= esc($invoice['phone_number'] ?? '-') ?></strong></div>
         </div>
@@ -306,11 +306,11 @@
             </tr>
             <tr>
               <td>Delivery Date:</td>
-              <td>30.4.2025</td>
+              <td>--</td>
             </tr>
             <tr>
               <td>Delivery Note No:</td>
-              <td>109</td>
+              <td>--</td>
             </tr>
             <tr>
               <td>LPO No:</td>
@@ -322,38 +322,38 @@
       <!-- Items Table -->
       <table class="items-table table-striped">
         <thead>
-        <tr>
-          <th>SR. NO</th>
-          <th>DESCRIPTION</th>
-          <th>QTY</th>
-          <th>UNIT PRICE (KD)</th>
-          <th>TOTAL (KD)</th>
-        </tr>
-                  <?php
-        $i = 1;
-        $subtotal = 0;
-        $totalDiscountAmount = 0;
-        $discountPercent = isset($invoice['discount']) ? floatval($invoice['discount']) : 0;
-        foreach ($items as $item):
-        $price = $item['price'];
-        $qty = $item['quantity'];
-        $lineTotal = $price * $qty;
-        $discountAmount = ($lineTotal * $discountPercent) / 100;
-        $finalTotal = $lineTotal - $discountAmount;
-        $subtotal += $lineTotal;
-        $totalDiscountAmount += $discountAmount;
-     ?>
-        </thead>
-        <tbody>
           <tr>
-            <td><?= $i++ ?></td>
-            <td><?= esc($item['item_name'] ?? '-') ?></td>
-            <td><?= esc($item['quantity']) ?></td>
-            <td><?= number_format($item['price'], 3) ?></td>
-            <td><?= number_format($finalTotal, 3) ?></td>
+            <th>SR. NO</th>
+            <th style="width: 518px;">DESCRIPTION</th>
+            <th>QTY</th>
+            <th>UNIT PRICE (KD)</th>
+            <th>TOTAL (KD)</th>
           </tr>
-           <?php endforeach; ?>
-        </tbody>
+          <?php
+          $i = 1;
+          $subtotal = 0;
+          $totalDiscountAmount = 0;
+          $discountPercent = isset($invoice['discount']) ? floatval($invoice['discount']) : 0;
+          foreach ($items as $item):
+          $price = $item['price'];
+          $qty = $item['quantity'];
+          $lineTotal = $price * $qty;
+          $discountAmount = ($lineTotal * $discountPercent) / 100;
+          $finalTotal = $lineTotal - $discountAmount;
+          $subtotal += $lineTotal;
+          $totalDiscountAmount += $discountAmount;
+          ?>
+        </thead>
+          <tbody>
+            <tr>
+              <td><?= $i++ ?></td>
+              <td><?= esc($item['item_name'] ?? '-') ?></td>
+              <td><?= esc($item['quantity']) ?></td>
+              <td><?= number_format($item['price'], 3) ?></td>
+              <td><?= number_format($finalTotal, 3) ?></td>
+            </tr>
+            <?php endforeach; ?>
+          </tbody>
       </table>
 
       <!-- Totals -->
@@ -391,29 +391,27 @@
         </div>
         <!-- Recipient -->
         <div class="col-6 d-flex justify-content-end">
-  <table class="recipient-box">
-    <tr>
-      <td><strong><div class="rec-label">Received the above in good order</div></strong></td>
-      <td><strong><div class="rec-label">Accountant:</div></strong></td>
-    </tr>
-    <tr>
-      <td><strong><div class="rec-label">Recipient Name:</div></strong></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td><strong><div class="rec-label">Signature:</div></strong></td>
-      <td></td>
-    </tr>
-  </table>
-</div>
+          <table class="recipient-box">
+            <tr>
+              <td><strong><div class="rec-label">Received the above in good order</div></strong></td>
+              <td><strong><div class="rec-label">Accountant:</div></strong></td>
+            </tr>
+            <tr>
+              <td><strong><div class="rec-label">Recipient Name:</div></strong></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td><strong><div class="rec-label">Signature:</div></strong></td>
+              <td></td>
+            </tr>
+          </table>
+        </div>
       </div>
-
-
       <!-- Delivery Note Popup -->
       <div id="deliveryNoteModal" class="modal" style="display:none; position: fixed; z-index: 9999; left: 0; top: 0;
-  width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
-        <div
-          style="background-color: #fff; margin: 15% auto; padding: 20px; border-radius: 10px; width: 300px; text-align: center;">
+        width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
+      <div
+        style="background-color: #fff; margin: 15% auto; padding: 20px; border-radius: 10px; width: 300px; text-align: center;">
           <p>Do you want to download the delivery note?</p>
           <button onclick="downloadDeliveryNote()"
             style="background-color: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 5px; margin: 5px;">
@@ -425,12 +423,9 @@
           </button>
         </div>
       </div>
-
     </div>
   </div>
-
 </body>
-
 </html>
 </div>
 <?php include "common/footer.php"; ?>
