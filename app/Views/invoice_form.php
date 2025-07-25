@@ -140,7 +140,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <label class="mt-3"><strong>LPO No</strong></label>
-                    <input type="text" name="lpo_no" id="lpo_no" class="form-control"
+                    <input type="text" name="lpo_no" id="lpo_no" class="form-control" maxlength="10"
                         value="<?= isset($invoice['lpo_no']) ? esc($invoice['lpo_no']) : '' ?>">
                 </div>
                 <div class="col-md-6">
@@ -282,6 +282,14 @@
             let finalTotal = subtotal - (subtotal * discount / 100);
             $('#total_display').text(finalTotal.toFixed(2));
         }
+
+        // lpo no
+
+       $(document).on('input', '#lpo_no', function () {
+            let value = $(this).val();
+            value = value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().substr(0, 10);
+            $(this).val(value);
+        });
 
         $('#add-item').click(function () {
             const row = `
