@@ -176,8 +176,8 @@
         <div class="col-md-6 ">
         <div style="width: 100%; display: flex; justify-content: flex-end;">
                 <div style="text-align: right;">
-                    <div style="font-weight: bold; color: #2c3e50;">SUBTOTAL</div>
-                    <?= number_format($grandTotal, 2) ?> 
+                    <div style="font-weight: bold; color: #2c3e50; text-align: left;">SUBTOTAL
+                    <?= number_format($grandTotal, 2) ?> </div>
                     <div style="border-top: 2px solid black; margin: 2px 0 4px 0;"></div>
                     
                     <div style="display: flex; align-items: center; justify-content: flex-end;">

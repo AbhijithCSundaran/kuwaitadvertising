@@ -293,7 +293,33 @@
                 <td class="text-center"><span class="remove-item-btn" title="Remove"><i class="fas fa-trash text-danger"></i></span></td>
             </tr>`;
             $('#item-container').append(row);
+
+            // ✅ Recalculate totals
+            calculateTotals();
+
+            // ✅ Force trigger change tracking by binding again
+            const currentFormData = $('#invoice-form').serialize();
+            const hasChanged = currentFormData !== initialFormData;
+            $('#save-invoice-btn').prop('disabled', !hasChanged);
         });
+       $('#popup_name').on('input', function () {
+            let value = $(this).val();
+            let capitalized = value.replace(/\b\w/g, function (char) {
+                return char.toUpperCase();
+            });
+            $(this).val(capitalized);
+        });
+
+       $('#popup_address').on('input', function () {
+            let value = $(this).val();
+            let capitalized = value.replace(/\b\w/g, function (char) {
+                return char.toUpperCase();
+            });
+
+            $(this).val(capitalized);
+        });
+
+
         document.getElementById('phone_number').addEventListener('input', function () {
             let val = this.value;
             // Allow + only at the beginning and remove all other non-digit characters
@@ -303,13 +329,14 @@
                 this.value = val.replace(/[^0-9]/g, '');
             }
         });
-
-
         $(document).on('click', '.remove-item-btn', function () {
             $(this).closest('tr').remove();
             calculateTotals();
-        });
 
+            const currentFormData = $('#invoice-form').serialize();
+            const hasChanged = currentFormData !== initialFormData;
+            $('#save-invoice-btn').prop('disabled', !hasChanged);
+        });
         $(document).on('input', '.price, .quantity, #discount', calculateTotals);
         calculateTotals();
 

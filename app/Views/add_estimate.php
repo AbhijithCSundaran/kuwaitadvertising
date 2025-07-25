@@ -227,11 +227,12 @@
             $(this).val(capitalized);
         });
 
-        $('#popup_address').on('input', function () {
+       $('#popup_address').on('input', function () {
             let value = $(this).val();
-            let capitalized = value.replace(/(^\s*\w|[.!?]\s*\w)/g, function (char) {
+            let capitalized = value.replace(/\b\w/g, function (char) {
                 return char.toUpperCase();
             });
+
             $(this).val(capitalized);
         });
 
