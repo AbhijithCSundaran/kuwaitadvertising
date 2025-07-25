@@ -75,7 +75,7 @@ $(document).ready(function () {
         serverSide: true,
         paging: true,
         searching: true,
-        order: [[1, 'desc']], // Hidden ID column
+        order: [[9, 'desc']], // Hidden ID column
         dom: "<'row mb-3'<'col-sm-6'l><'col-sm-6'f>>" +
              "<'row'<'col-sm-12'tr>>" +
              "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
@@ -133,11 +133,11 @@ $(document).ready(function () {
                         </div>`;
                 }
             },
-            { data: "invoice_id", visible: false } // Hidden for ordering
+            { data: "invoice_id", visible: false } 
         ],
         columnDefs: [
             { targets: 2, width: '350px' },
-            { searchable: false, orderable: false, targets: [0,8] }
+            { searchable: false, orderable: false, targets: [0,4,8] }
         ]
     });
     table.on('order.dt search.dt draw.dt', function () {
