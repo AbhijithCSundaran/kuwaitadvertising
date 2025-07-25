@@ -87,7 +87,7 @@
           <div class="address">
             <em>Al-Shuwaikh Area, 3</em><br>
             <em>Behind Sultan Center - 4th Ring Road</em><br>
-            <em>Tel: +965 600 60 102</em>
+            <em>Tel: +965 60060102</em>
           </div>
         </div>
 
@@ -108,7 +108,7 @@
     <hr style="height: 2px; background-color: black; border: none;">
 
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-5">
             Person Name:
             <?= esc($estimate['customer_name'] ?? '') ?><br>
             Business Name:
@@ -118,18 +118,18 @@
             Contact Number:
              <?= esc($estimate['phone_number']) ?>
         </div>
-       <div class="col-md-6 d-flex justify-content-end " style="margin-top: -3px">
-    <table class="table table-bordered w-auto mb-0">
-        <tr>
-            <th>Quote Date</th>
-            <td><?= date('d-m-Y', strtotime($estimate['date'])) ?></td>
-        </tr>
-        <tr>
-            <th>Quote No.</th>
-            <td><?= $estimate['estimate_id'] ?></td>
-        </tr>
-    </table>
-</div>
+       <div class="col-md-7 d-flex justify-content-end " style="margin-top: -3px">
+          <table class="table table-bordered w-auto mb-0">
+              <tr>
+                  <th>Quote Date</th>
+                  <td><?= date('d-m-Y', strtotime($estimate['date'])) ?></td>
+              </tr>
+              <tr>
+                  <th>Quote No.</th>
+                  <td><?= $estimate['estimate_id'] ?></td>
+              </tr>
+          </table>
+        </div>
 
     </div>
 
@@ -150,6 +150,13 @@
             foreach ($items as $item):
                 $grandTotal += $item['total'];
             ?>
+            
+            <?php
+              $discount = $estimate['discount'] ?? 0;
+              $discountAmount = ($grandTotal * $discount) / 100;
+              $totalAfterDiscount = $grandTotal - $discountAmount;
+              ?>
+              
             <tr>
                 <td><?= $si++ ?></td>
                 <td><?= esc($item['description']) ?></td>
@@ -174,19 +181,19 @@
 
         <!-- Right: Totals and Signatures -->
         <div class="col-md-6 ">
-        <div style="width: 100%; display: flex; justify-content: flex-end;">
-                <div style="text-align: right;">
-                    <div style="font-weight: bold; color: #2c3e50; text-align: left;">SUBTOTAL
-                    <?= number_format($grandTotal, 2) ?> </div>
-                    <div style="border-top: 2px solid black; margin: 2px 0 4px 0;"></div>
-                    
-                    <div style="display: flex; align-items: center; justify-content: flex-end;">
-                        <div style="color: red; font-weight: bold; margin-right: 5px;">Grand total</div>
-                        <div style="background-color: #f08080; padding: 4px 10px; font-weight: bold;">
-                             <?= number_format($estimate['total_amount'] ?? 0, 2) ?> 
-                        </div>
-                    </div>
-                </div>
+          <div style="width: 100%; display: flex; justify-content: flex-end;">
+            <div style="text-align: right;">
+              <div style="font-weight: bold;  text-align: left;">SUBTOTAL
+              <?= number_format($grandTotal, 2) ?> </div>
+              <div style="font-weight: bold;  text-align: left;">DISCOUNT
+              <?= number_format($discount) ?>%</div>
+              <div style="border-top: 2px solid black; margin: 2px 0 4px 0;"></div>
+              <div style="display: flex; align-items: center; justify-content: flex-end;">
+                  <div style="color: red; font-weight: bold; margin-right: 5px;">Grand total</div>
+                  <div style="background-color: #f08080; padding: 4px 10px; font-weight: bold;">
+                      <?= number_format($totalAfterDiscount, 2) ?></div>
+            </div>
+          </div>
         </div>
          <div class="name-table col-md-12 d-flex justify-content-end">
             <table class="table table-bordered w-auto mb-0 pt-6">
@@ -308,7 +315,7 @@
   return words || 'صفر';
 }
 
-  const grandTotal = <?= json_encode(number_format($grandTotal, 3, '.', '')) ?>;
+  const grandTotal = <?= json_encode(number_format($estimate['total_amount'] ?? 0, 3, '.', '')) ?>;
 
  let englishWords = numberToWords(grandTotal);
     englishWords = englishWords.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());

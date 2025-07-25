@@ -90,15 +90,15 @@
             <div class="col-md-6">
                 <label><strong>Customer Name</strong><span class="text-danger">*</span></label>
                 <div class="input-group mb-2 d-flex">
-                    <select name="customer_id" id="customer_id" class="form-control select2">
-                        <option value="" disabled <?= !isset($invoice['customer_id']) ? 'selected' : '' ?>>Select
-                            Customer</option>
-                        <?php foreach ($customers as $customer): ?>
-                            <option value="<?= $customer['customer_id'] ?>" <?= (isset($invoice['customer_id']) && $invoice['customer_id'] == $customer['customer_id']) ? 'selected' : '' ?>>
+                   <select name="customer_id" class="form-control">
+                        <option value="">Select Customer</option>
+                        <?php foreach ($customers ?? []  as $customer): ?>
+                            <option value="<?= $customer['customer_id'] ?>" <?= ($customer['customer_id'] == ($customer_id ?? '')) ? 'selected' : '' ?>>
                                 <?= esc($customer['name']) ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
+
                     <div class="input-group-append">
                         <button type="button" class="btn btn-outline-primary" id="addCustomerBtn">+</button>
                     </div>
@@ -140,7 +140,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <label class="mt-3"><strong>LPO No</strong></label>
-                    <input type="text" name="lpo_no" id="lpo_no" class="form-control"
+                    <input type="text" name="lpo_no" id="lpo_no" class="form-control" maxlength="10"
                         value="<?= isset($invoice['lpo_no']) ? esc($invoice['lpo_no']) : '' ?>">
                 </div>
                 <div class="col-md-6">
@@ -163,36 +163,32 @@
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody id="item-container">
-                <?php if (!empty($items)): ?>
-                    <?php foreach ($items as $index => $item): ?>
-                        <tr class="item-row">
-                            <td><input type="text" name="description[]" class="form-control"
-                                    value="<?= esc($item['item_name']) ?>"></td>
-                            <td><input type="number" class="form-control price" name="price[]" value="<?= $item['price'] ?>">
-                            </td>
-                            <td><input type="number" class="form-control quantity" name="quantity[]"
-                                    value="<?= $item['quantity'] ?>"></td>
-                            <td><input type="number" class="form-control total" name="total[]" step="0.01"
-                                    value="<?= $item['total'] ?>" readonly></td>
-                            <td class="text-center">
-                                <span class="remove-item-btn" title="Remove"><i class="fas fa-trash text-danger"></i></span>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <tr class="item-row">
-                        <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
-                        <td><input type="number" name="price[]" class="form-control price" step="0.01" min="0"></td>
-                        <td><input type="number" name="quantity[]" class="form-control quantity"></td>
-                        <td><input type="number" name="total[]" class="form-control total" readonly></td>
-                        <td class="text-center">
-                            <span class="remove-item-btn" title="Remove"><i class="fas fa-trash text-danger"></i></span>
-                        </td>
-                    </tr>
-                <?php endif; ?>
+<tbody id="item-container">
+    <?php if (!empty($items)): ?>
+        <?php foreach ($items as $item): ?>
+            <tr class="item-row">
+                <td><input type="text" name="description[]" class="form-control" value="<?= esc($item['item_name'] ?? $item['desc']) ?>"></td>
+                <td><input type="number" class="form-control price" name="price[]" step="0.01" value="<?= esc($item['price']) ?>"></td>
+                <td><input type="number" class="form-control quantity" name="quantity[]" value="<?= esc($item['quantity'] ?? $item['qty']) ?>"></td>
+                <td><input type="number" class="form-control total" name="total[]" step="0.01" value="<?= esc($item['total'] ?? $item['amount']) ?>" readonly></td>
+                <td class="text-center">
+                    <span class="remove-item-btn" title="Remove"><i class="fas fa-trash text-danger"></i></span>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <tr class="item-row">
+            <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
+            <td><input type="number" name="price[]" class="form-control price" step="0.01" min="0"></td>
+            <td><input type="number" name="quantity[]" class="form-control quantity"></td>
+            <td><input type="number" name="total[]" class="form-control total" readonly></td>
+            <td class="text-center">
+                <span class="remove-item-btn" title="Remove"><i class="fas fa-trash text-danger"></i></span>
+            </td>
+        </tr>
+    <?php endif; ?>
+</tbody>
 
-            </tbody>
         </table>
 
         <button type="button" class="btn btn-outline-secondary mb-3" id="add-item">Add More Item</button>
@@ -268,20 +264,26 @@
             const hasChanged = currentFormData !== initialFormData;
             $('#save-invoice-btn').prop('disabled', !hasChanged);
         });
-        function calculateTotals() {
-            let subtotal = 0;
-            $('.item-row').each(function () {
-                let qty = parseFloat($(this).find('.quantity').val()) || 0;
-                let price = parseFloat($(this).find('.price').val()) || 0;
-                let total = qty * price;
-                $(this).find('.total').val(total.toFixed(2));
-                subtotal += total;
-            });
-            $('#sub_total_display').text(subtotal.toFixed(2));
-            let discount = parseFloat($('#discount').val()) || 0;
-            let finalTotal = subtotal - (subtotal * discount / 100);
-            $('#total_display').text(finalTotal.toFixed(2));
-        }
+       function updateTotals() {
+    $('.item-row').each(function () {
+        let price = parseFloat($(this).find('.price').val()) || 0;
+        let qty = parseFloat($(this).find('.quantity').val()) || 0;
+        let total = (price * qty).toFixed(2);
+        $(this).find('.total').val(total);
+    });
+    // Optionally: update subtotal, tax, grand total here
+}
+
+$(document).on('input', '.price, .quantity', updateTotals);
+
+
+        // lpo no
+
+       $(document).on('input', '#lpo_no', function () {
+            let value = $(this).val();
+            value = value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().substr(0, 10);
+            $(this).val(value);
+        });
 
         $('#add-item').click(function () {
             const row = `
@@ -337,24 +339,6 @@
             const hasChanged = currentFormData !== initialFormData;
             $('#save-invoice-btn').prop('disabled', !hasChanged);
         });
-        $(document).on('input', '.price', function () {
-            let input = this;
-            let val = input.value;
-            if (val === '' || val === '.') return;
-            let match = val.match(/^(\d{0,8})(\.(\d{0,2})?)?/);
-            if (match) {
-                let newVal = (match[1] || '') + (match[2] || '');
-                if (newVal !== val) {
-                    input.value = newVal;
-                    input.setSelectionRange(newVal.length, newVal.length);
-                }
-            } else {
-                val = val.slice(0, -1);
-                input.value = val;
-                input.setSelectionRange(val.length, val.length);
-            }
-        });
-
         $(document).on('input', '.price, .quantity, #discount', calculateTotals);
         calculateTotals();
 
