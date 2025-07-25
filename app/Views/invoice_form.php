@@ -140,7 +140,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <label class="mt-3"><strong>LPO No</strong></label>
-                    <input type="text" name="lpo_no" id="lpo_no" class="form-control" maxlength="10"
+                    <input type="text" name="lpo_no" id="lpo_no" class="form-control"
                         value="<?= isset($invoice['lpo_no']) ? esc($invoice['lpo_no']) : '' ?>">
                 </div>
                 <div class="col-md-6">
@@ -283,14 +283,6 @@
             $('#total_display').text(finalTotal.toFixed(2));
         }
 
-        // lpo no
-
-       $(document).on('input', '#lpo_no', function () {
-            let value = $(this).val();
-            value = value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().substr(0, 10);
-            $(this).val(value);
-        });
-
         $('#add-item').click(function () {
             const row = `
             <tr class="item-row">
@@ -345,6 +337,24 @@
             const hasChanged = currentFormData !== initialFormData;
             $('#save-invoice-btn').prop('disabled', !hasChanged);
         });
+        $(document).on('input', '.price', function () {
+            let input = this;
+            let val = input.value;
+            if (val === '' || val === '.') return;
+            let match = val.match(/^(\d{0,8})(\.(\d{0,2})?)?/);
+            if (match) {
+                let newVal = (match[1] || '') + (match[2] || '');
+                if (newVal !== val) {
+                    input.value = newVal;
+                    input.setSelectionRange(newVal.length, newVal.length);
+                }
+            } else {
+                val = val.slice(0, -1);
+                input.value = val;
+                input.setSelectionRange(val.length, val.length);
+            }
+        });
+
         $(document).on('input', '.price, .quantity, #discount', calculateTotals);
         calculateTotals();
 
