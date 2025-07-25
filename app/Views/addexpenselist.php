@@ -106,10 +106,10 @@
                 }
             ],
            columnDefs: [
-                { searchable: false, orderable: false, targets: [0, 5] }, 
+                { searchable: false, orderable: false, targets: [0, 3,5] }, 
                 { targets: 2, width: '450px' }
             ],
-            order: [[1, 'asc']], 
+            order: [[5, 'desc']], 
 
         });
         table.on('order.dt search.dt draw.dt', function () {
