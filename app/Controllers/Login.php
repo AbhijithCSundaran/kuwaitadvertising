@@ -33,7 +33,7 @@ class Login extends BaseController
 
                 // Set session variables
                 $this->session->set([
-                    'user_Id'       => $result->user_id,
+                    'user_id' => $result->user_id,
                     'user_Name'     => $result->name,
                     'role_Id'       => $result->role_id,
                     'allowed_menus' => $allowedMenus,

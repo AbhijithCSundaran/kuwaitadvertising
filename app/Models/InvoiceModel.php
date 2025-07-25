@@ -8,7 +8,7 @@ class InvoiceModel extends Model
     protected $table = 'invoices';
     protected $primaryKey = 'invoice_id';
 
-    protected $allowedFields = ['customer_id', 'billing_address','shipping_address','phone_number','lpo_no','discount', 'total_amount', 'sub_total','invoice_date','status'];
+    protected $allowedFields = ['customer_id', 'billing_address','shipping_address','phone_number','lpo_no','discount', 'total_amount', 'sub_total','invoice_date','status','user_id'];
     protected $returnType = 'array';
 
      public function getInvoiceCount()
@@ -76,10 +76,11 @@ class InvoiceModel extends Model
              invoices.phone_number, 
              invoices.billing_address, 
              invoices.shipping_address,
-             company.company_name AS company_name'
+             company.company_name AS company_name' // ✅ this will give Business Name
         )
         ->join('customers', 'customers.customer_id = invoices.customer_id', 'left')
-        ->join('company', 'company.company_id = company.company_id', 'left')
+        ->join('user', 'user.user_id = invoices.user_id', 'left') // ✅ joins invoice to user
+        ->join('company', 'company.company_id = user.company_id', 'left') // ✅ joins user to company
         ->where('invoices.invoice_id', $id)
         ->first();
 
@@ -90,5 +91,8 @@ class InvoiceModel extends Model
 
     return $invoice;
 }
+
+
+
 
 }
