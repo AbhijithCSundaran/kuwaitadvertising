@@ -93,36 +93,33 @@ class Invoice extends BaseController
   public function print($id)
 {
     $invoiceModel = new InvoiceModel();
+    $customerModel = new customerModel();
+
     $invoice = $invoiceModel->getInvoiceWithItems($id);
 
     if (!$invoice) {
         return redirect()->to('/invoicelist')->with('error', 'Invoice not found.');
     }
 
+    $customer = $customerModel->find($invoice['customer_id']);
+
     $companyId = session()->get('company_id');
 
+    $viewData = [
+        'invoice' => $invoice,
+        'items' => $invoice['items'],
+        'user_name' => session()->get('user_name') ?? 'Salesman',
+        'customer' => $customer ?? [] // ✅ Pass customer to view
+    ];
+
     if ($companyId == 69) {
-        return view('invoice_print', [
-            'invoice' => $invoice,
-            'items' => $invoice['items'],
-            'user_name' => session()->get('user_name') ?? 'Salesman'
-        ]);
+        return view('invoice_print', $viewData);
     } elseif ($companyId == 70) {
-        return view('generate_invoice', [
-            'invoice' => $invoice,
-            'items' => $invoice['items'],
-            'user_name' => session()->get('user_name') ?? 'Salesman'
-        ]);
+        return view('generate_invoice', $viewData);
     } else {
-        return view('invoice_print', [ // default fallback
-            'invoice' => $invoice,
-            'items' => $invoice['items'],
-            'user_name' => session()->get('user_name') ?? 'Salesman'
-        ]);
+        return view('invoice_print', $viewData);
     }
 }
-
-
 
 
     public function save()
