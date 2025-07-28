@@ -105,10 +105,10 @@
         <div class="col-md-6">
              <strong>TO: M/S. <?= esc($estimate['customer_name'] ?? 'Customer Name') ?></strong><br>
     </div>
-    <hr style="height: 2px; background-color: black; border: none;">
+    <div style="height: 2px; background-color: #ddd;"></div>
 
     <div class="row">
-        <div class="col-md-5">
+        <div class="col-8">
             Person Name:
             <?= esc($estimate['customer_name'] ?? '') ?><br>
             Business Name:
@@ -118,7 +118,7 @@
             Contact Number:
              <?= esc($estimate['phone_number']) ?>
         </div>
-       <div class="col-md-7 d-flex justify-content-end " style="margin-top: -3px">
+       <div class="col-4 d-flex justify-content-end ">
           <table class="table table-bordered w-auto mb-0">
               <tr>
                   <th>Quote Date</th>

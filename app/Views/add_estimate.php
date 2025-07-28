@@ -247,33 +247,33 @@
 
 
     $('#convert-to-invoice').on('click', function () {
-        let customer_id = $('#customer_id').val();
-        let customer_name = $("#customer_id option:selected").text();
-        let customer_address = $('#customer_address').val();
-        let phone = $('#customer_phone').val();
+    let customer_id = $('#customer_id').val();
+    let customer_name = $("#customer_id option:selected").text();
+    let customer_address = $('#customer_address').val();
+    let phone = $('#customer_phone').val();
 
-        let items = [];
-        $('.description').each(function (i) {
-            let desc = $(this).val();
-            let price = $('.unit_price').eq(i).val();
-            let qty = $('.quantity').eq(i).val();
-            let amount = $('.amount').eq(i).val();
-            if (desc !== '') {
-                items.push({ desc, price, qty, amount });
-            }
-        });
-
-        let estimateData = {
-            customer_id,
-            customer_name,
-            customer_address,
-            phone,
-            items: JSON.stringify(items)
-        };
-
-        let query = new URLSearchParams(estimateData).toString();
-        window.location.href = `<?= base_url('invoice/convertFromEstimate') ?>?${query}`;
+    let items = [];
+    $('.description').each(function (i) {
+        let desc = $(this).val();
+        let price = $('.unit_price').eq(i).val();
+        let qty = $('.quantity').eq(i).val();
+        let amount = $('.amount').eq(i).val();
+        if (desc !== '') {
+            items.push({ desc, price, qty, amount });
+        }
     });
+
+    let estimateData = {
+        customer_id,
+        customer_name,
+        customer_address,
+        phone,
+        items: JSON.stringify(items)
+    };
+
+    let query = new URLSearchParams(estimateData).toString();
+    window.location.href = `<?= base_url('invoice/convertFromEstimate') ?>?${query}`;
+});
 
         
         $(document).on('input', 'input[name="description[]"]', function () {
