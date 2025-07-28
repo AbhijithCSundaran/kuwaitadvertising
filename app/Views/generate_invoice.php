@@ -560,7 +560,6 @@
 
   function downloadDeliveryNote() {
     deliveryNoteModal.style.display = 'none';
-    // Replace with actual download logic
-    window.open('<?= base_url("invoice/delivery_note/" . $invoice["invoice_id"]) ?>', '_blank');
+    window.location.href = '<?= base_url("invoice/delivery_note/" . $invoice["invoice_id"]) ?>';
   }
 </script>
