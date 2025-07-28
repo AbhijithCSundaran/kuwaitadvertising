@@ -5,6 +5,7 @@ use App\Controllers\BaseController;
 use App\Models\InvoiceModel;
 use App\Models\customerModel;
 
+
 class Invoice extends BaseController
 {
     public function add()
@@ -291,6 +292,7 @@ public function delivery_note($id)
 ]);
 
 }
+
 public function convertFromEstimate($estimateId)
 {
     $estimateModel = new \App\Models\EstimateModel();
