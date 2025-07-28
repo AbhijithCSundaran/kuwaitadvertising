@@ -1,5 +1,12 @@
 <?php include "common/header.php"; ?>
 <style>
+    .bg-img{
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        z-index: -1;
+    }
     @media print {
        *{
          -webkit-print-color-adjust: exact !important;
@@ -18,20 +25,6 @@
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         } */
-
-        .right_container {
-            width: 100%;
-            margin-left: auto;
-            padding: 25px;
-            transform: scale(0.5);
-        }
-
-        .background-box {
-            background-image: url("../images/estimate-6-bg.jpg");
-            background-size: 100%;
-            background-position: top;
-            background-repeat: no-repeat;
-        }
     }
 </style>
 <div class="right_container">
@@ -48,25 +41,26 @@
         </div>
 
 
-    <div class="m-auto background-box" id="printArea">
+    <div class="background-image">
+        <img class="bg-img" src="<?php echo ASSET_PATH; ?>assets/images/estimate-6-bg.jpg" alt="estimateimage">
         <div class="print_wrpr">
             <div class="row">
 
-                <div class="col-12 col-md-6">
+                <div class=" col-6">
                     <h3><strong>Quotation</strong></h3>
                 </div>
 
-                <div class="col-12 col-md-6 text-end">
+                <div class=" col-6 text-end">
                     <p><strong>Date:</strong> <?= date('d-m-Y', strtotime($estimate['date'])) ?></p>
                 </div>
             </div>
             <div class="row mt-3">
-                <div class="col-12 col-md-6">
+                <div class=" col-6">
                     <p><strong>To:</strong></p>
                     <p><?= esc($estimate['customer_name'] ?? '') ?></p>
                     <p><?= esc($estimate['customer_address'] ?? '') ?></p>
                 </div>
-                <div class="col-12 col-md-6 text-end">
+                <div class=" col-6 text-end">
                     <p><strong>From:</strong></p>
                     <p><?= esc($user_name ?? '') ?></p>
                 </div>
@@ -144,7 +138,7 @@
 </div>
 </div>
 <?php include "common/footer.php"; ?>
-<script>
+<!-- <script>
     function printEstimate() {
         var printContents = document.getElementById('printArea').innerHTML;
         var originalContents = document.body.innerHTML;
@@ -155,4 +149,4 @@
         location.reload();
     }
 
-</script>
+</script> -->
