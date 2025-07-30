@@ -196,7 +196,7 @@ class Managecompany extends BaseController
 			]);
 		}
 
-		$companyModel = new \App\Models\Managecompany_Model();
+		$companyModel = new Managecompany_Model();
 		$company = $companyModel->find($id);
 
 		if (!$company) {

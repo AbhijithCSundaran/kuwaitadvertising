@@ -8,6 +8,8 @@ use App\Models\EstimateItemModel;
 use App\Models\customerModel;
 use App\Models\Manageuser_Model;
  use App\Models\Managecompany_Model;
+ use App\Models\RoleModel;
+
 class Estimate extends BaseController
 {
     public function estimatelist()
@@ -181,6 +183,7 @@ public function save()
             $item['estimate_id'] = $estimateId;
         }
         $estimateItemModel->insertBatch($items);
+        
 
         return $this->response->setJSON([
             'status' => 'success',
@@ -295,55 +298,64 @@ public function save()
         }
  
         return view('add_estimate', $data);
+        
     }
   public function generateEstimate($id)
-    {
-        $estimateModel = new EstimateModel();
-        $itemModel = new EstimateItemModel();
-        $userModel = new Manageuser_Model();
-        $companyModel = new \App\Models\Managecompany_Model();
+{
+    $estimateModel = new EstimateModel();
+    $itemModel = new EstimateItemModel();
+    $userModel = new Manageuser_Model();
+    $companyModel = new Managecompany_Model();
+    $roleModel = new RoleModel();
 
-        // Fetch estimate with customer info
-        $estimate = $estimateModel
-            ->select('estimates.*, customers.name AS customer_name, customers.address AS customer_address')
-            ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
-            ->where('estimate_id', $id)
-            ->first();
+    // Fetch estimate with customer info
+    $estimate = $estimateModel
+        ->select('estimates.*, customers.name AS customer_name, customers.address AS customer_address')
+        ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
+        ->where('estimate_id', $id)
+        ->first();
 
-        if (!$estimate) {
-            return redirect()->to('/estimatelist')->with('error', 'Estimate not found.');
-        }
-
-        // Fetch related data
-        $items = $itemModel->where('estimate_id', $id)->findAll();
-        $userId = session()->get('user_id');
-        $userName = session()->get('user_Name');
-        $companyId = session()->get('company_id');
-
-        // Fetch company details from DB
-        $company = $companyModel->find($companyId);
-
-        // Prepare data for the view
-        $data = [
-            'estimate' => $estimate,
-            'items' => $items,
-            'user_id' => $userId,
-            'user_name' => $userName,
-            'company_name' => $company['company_name'] ?? ''
-        ];
-
-        // Return company-specific view
-        if ($companyId == 69) {
-            // Alrai company
-            return view('generateestimate', $data);
-        } elseif ($companyId == 70) {
-            // Alshay company
-            return view('generatequotation', $data);
-        } else {
-            // Fallback
-            return view('generateestimate', $data);
-        }
+    if (!$estimate) {
+        return redirect()->to('/estimatelist')->with('error', 'Estimate not found.');
     }
+
+    // Fetch related data
+    $items = $itemModel->where('estimate_id', $id)->findAll();
+    $userId = session()->get('user_id');
+    $userName = session()->get('user_Name');
+    $roleId = session()->get('role_Id'); // ✅ Correct key from session
+    $companyId = session()->get('company_id');
+
+    // Get role name
+    $roleName = session()->get('role_Name'); // Try session first
+    if (!$roleName && $roleId) {
+        $role = $roleModel->find($roleId);
+        $roleName = $role['role_name'] ?? '';
+    }
+
+    // Fetch company details
+    $company = $companyModel->find($companyId);
+
+    // Prepare data
+    $data = [
+        'estimate'      => $estimate,
+        'items'         => $items,
+        'user_id'       => $userId,
+        'user_name'     => $userName,
+        'role_name'     => $roleName,
+        'company_name'  => $company['company_name'] ?? ''
+    ];
+
+    // Load view
+    if ($companyId == 69) {
+        return view('generateestimate', $data);
+    } elseif ($companyId == 70) {
+        return view('generatequotation', $data);
+    } else {
+        return view('generateestimate', $data);
+    }
+}
+
 
         // dashboardlisting
     public function recentEstimates()

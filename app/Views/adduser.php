@@ -43,7 +43,7 @@
             </div>
             <div class="col-md-6 mb-2">
               <label>Phone Number</label>
-              <input type="text" name="phonenumber" id="phonenumber" class="form-control" value="<?= $userData['phonenumber'] ?? '' ?>" minlength="7" maxlength="15"  pattern="^\+?[0-9]{7,15}$" title="Phone number must be 7 to 15 digits and can start with +" />
+              <input type="text" name="phonenumber" id="phonenumber" class="form-control" value="<?= $userData['phonenumber'] ?? '' ?>" minlength="7" maxlength="20"  pattern="^[\+0-9\s\-\(\)]{7,25}$" title="Phone number must be 7 to 15 digits and can start with +" />
             </div>
             <div class="col-md-6 mb-2">
               <label for="role_id">Role <span class="text-danger">*</span></label>
@@ -115,15 +115,12 @@ $(document).ready(function () {
   $('#user-login-form input , #user-login-form select').on('input change', function () {
     $('#saveUserBtn').prop('disabled', $('#user-login-form').serialize() === initialFormData);
   });
- document.getElementById('phonenumber').addEventListener('input', function () {
-  let val = this.value;
-  // Allow + only at the beginning and remove all other non-digit characters
-  if (val.charAt(0) === '+') {
-    this.value = '+' + val.slice(1).replace(/[^0-9]/g, '');
-  } else {
-    this.value = val.replace(/[^0-9]/g, '');
-  }
-});
+
+  document.getElementById('phonenumber').addEventListener('input', function () {
+            let val = this.value;
+            // Allow + only at the beginning, keep digits, space, parentheses, and dashes
+            this.value = val.replace(/(?!^)\+/g, '').replace(/[^0-9\s\-\(\)\+]/g, '');
+        });
 
 $(document).on('click', '.toggle-password', function () {
   const input = $($(this).attr('toggle'));
@@ -155,7 +152,7 @@ $(document).on('click', '.toggle-password', function () {
     const newPw = $('#new_password').val()?.trim() || '';
     const confPw = $('#confirm_new_password').val()?.trim() || '';
     const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;  
-    const phonePattern = /^\+?[0-9]{7,15}$/;
+    const phonePattern = /^[\+0-9\s\-\(\)]{7,25}$/;
 
     if (phone !== '') {
       if (!phonePattern.test(phone)) {

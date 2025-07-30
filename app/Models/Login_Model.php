@@ -11,12 +11,18 @@ class Login_Model extends Model
         $this->db = \Config\Database::connect();
     }
 
-    public function authenticateNow($email = '', $password = '')
+  public function authenticateNow($email = '', $password = '')
 {
-    $sql = "SELECT user_id, name, email, role_id, company_id FROM user WHERE email = ? AND password = ?";
+    $sql = "
+        SELECT user.user_id, user.name, user.email, user.role_id, user.company_id
+        FROM user
+        JOIN company ON company.company_id = user.company_id
+        WHERE user.email = ? 
+          AND user.password = ? 
+          AND company.deleted_at IS NULL
+    ";
     $query = $this->db->query($sql, [$email, md5($password)]);
     return $query->getRow();
 }
-
 
 }

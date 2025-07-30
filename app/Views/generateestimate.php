@@ -62,7 +62,8 @@
                 </div>
                 <div class=" col-6 text-end">
                     <p><strong>From:</strong></p>
-                    <p><?= esc($user_name ?? '') ?></p>
+                   <p><?= ucwords(strtolower(esc($user_name ?? ''))) ?></p>
+                    <p><?= ucwords(strtolower(esc($role_name ?? ''))) ?></p>
                 </div>
             </div>
             <!-- <div class="table-responsive"> -->
@@ -94,7 +95,7 @@
                     </tbody>
                 </table>
             <!-- </div> -->
-            <div class="d-flex">
+            <div class=" d-flex">
                 <div class="col-8 terms mt-5">
                     <strong>TERMS & CONDITIONS</strong><br>
                     1. This estimate is valid for 60 days.<br>
@@ -105,7 +106,7 @@
 
                 <div class="col-4 mt-3">
                     <!-- <div class="table-responsive"> -->
-                        <table class="table summary-table table-borderless w-100 text-end">
+                        <table class="table summary-table table-borderless text-end">
                             <tbody>
                                 <tr>
                                     <td class="label">SUBTOTAL</td>

@@ -167,8 +167,8 @@
                 <?php if (!empty($items)): ?>
                     <?php foreach ($items as $index => $item): ?>
                         <tr class="item-row">
-                            <td><input type="text" name="description[]" class="form-control"
-                                    value="<?= esc($item['item_name']) ?>"></td>
+                           <td><input type="text" name="description[]" class="form-control"
+           value="<?= esc($item['description'] ?? $item['item_name'] ?? '') ?>"></td>
                             <td><input type="number" class="form-control price" name="price[]" value="<?= $item['price'] ?>">
                             </td>
                             <td><input type="number" class="form-control quantity" name="quantity[]"
@@ -253,7 +253,33 @@
 <?php include "common/footer.php"; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<?php if (isset($estimate)): ?>
+    <script>
+        $(document).ready(function () {
+            $('#customer_id').val('<?= $estimate['customer_id'] ?>').trigger('change');
+            $('#address').val('<?= $customer['address'] ?>');
 
+           <?php foreach ($items as $index => $item): ?>
+    addInvoiceItemRow(
+        '<?= $item['product_id'] ?? '' ?>',
+        '<?= $item['quantity'] ?? 0 ?>',
+        '<?= $item['price'] ?? 0 ?>'
+    );
+<?php endforeach; ?>
+
+        });
+
+        function addInvoiceItemRow(productId, quantity, price) {
+            let row = `<tr>
+                <td><input type="text" class="form-control" name="product_id[]" value="${productId}" readonly></td>
+                <td><input type="number" class="form-control" name="quantity[]" value="${quantity}" readonly></td>
+                <td><input type="number" class="form-control" name="price[]" value="${price}" readonly></td>
+                <td><input type="text" class="form-control total" name="total[]" value="${quantity * price}" readonly></td>
+            </tr>`;
+            $('#invoice-items tbody').append(row);
+        }
+    </script>
+<?php endif; ?>
 <script>
     let initialFormData;
     $(document).ready(function () {

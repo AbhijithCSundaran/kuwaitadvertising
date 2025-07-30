@@ -22,7 +22,9 @@ class Login extends BaseController
             $result = $loginModel->authenticateNow($email, $password);
 
             if ($result) {
-                // Load the role-based menu permissions
+                $roleModel = new \App\Models\RoleModel();
+                $role = $roleModel->find($result->role_id);
+                $roleName = $role ? $role['role_name'] : '';
                 $roleMenuModel = new Rolemanagement_Model();
                 $permissions = $roleMenuModel
                     ->where('role_id', $result->role_id)
@@ -36,6 +38,7 @@ class Login extends BaseController
                     'user_id' => $result->user_id,
                     'user_Name'     => $result->name,
                     'role_Id'       => $result->role_id,
+                    'role_Name'     => $roleName,
                     'allowed_menus' => $allowedMenus,
                     'status'        => 1,
                     'logged_in'     => true,

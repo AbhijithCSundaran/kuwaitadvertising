@@ -86,8 +86,7 @@
                         <label class="mt-md-0 mt-3"><strong>Contact Number</strong><span class="text-danger">*</span></label>
                         <input type="text" name="phone_number" id="phone_number" class="form-control"
                         value="<?= isset($estimate['phone_number']) ? esc($estimate['phone_number']) : '' ?>"
-                        minlength="7" maxlength="25" pattern="^\+?[0-9]{7,15}$"
-                        title="Phone number must be 7 to 15 digits and can start with +" />
+                        minlength="7" maxlength="25" pattern="^[\+0-9\s\-\(\)]{7,25}$" />
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -169,7 +168,12 @@
             <div class="text-right">
                 <a href="<?= base_url('estimatelist') ?>" class="btn btn-secondary">Discard</a>
                 <button type="submit" id="generate-btn" class="btn btn-primary">Generate Estimate</button>
-               <button type="button" class="btn btn-primary" id="convert-to-invoice">Convert Invoice</button>
+   <?php if (!empty($estimate) && isset($estimate['estimate_id'])): ?>
+    <a href="<?= base_url('invoice/convertFromEstimate/' . $estimate['estimate_id']) ?>" class="btn btn-primary">
+        Convert to Invoice
+    </a>
+<?php endif; ?>
+
 
             </div>
         </form>
@@ -235,47 +239,16 @@
             $(this).val(capitalized);
         });
 
-        document.getElementById('phone_number').addEventListener('input', function () {
+       document.getElementById('phone_number').addEventListener('input', function () {
             let val = this.value;
-            if (val.charAt(0) === '+') {
-                this.value = '+' + val.slice(1).replace(/[^0-9\s\-\(\)]/g, '');
-            } else {
-                // Remove any character except digits, space, -, (, )
-                this.value = val.replace(/[^0-9\s\-\(\)]/g, '');
-            }
+            // Allow + only at the beginning, keep digits, space, parentheses, and dashes
+            this.value = val.replace(/(?!^)\+/g, '').replace(/[^0-9\s\-\(\)\+]/g, '');
         });
 
-
-    $('#convert-to-invoice').on('click', function () {
-    let customer_id = $('#customer_id').val();
-    let customer_name = $("#customer_id option:selected").text();
-    let customer_address = $('#customer_address').val();
-    let phone = $('#customer_phone').val();
-
-    let items = [];
-    $('.description').each(function (i) {
-        let desc = $(this).val();
-        let price = $('.unit_price').eq(i).val();
-        let qty = $('.quantity').eq(i).val();
-        let amount = $('.amount').eq(i).val();
-        if (desc !== '') {
-            items.push({ desc, price, qty, amount });
-        }
-    });
-
-    let estimateData = {
-        customer_id,
-        customer_name,
-        customer_address,
-        phone,
-        items: JSON.stringify(items)
-    };
-
-    let query = new URLSearchParams(estimateData).toString();
-    window.location.href = `<?= base_url('invoice/convertFromEstimate') ?>?${query}`;
+   $('#convert-to-invoice').on('click', function () {
+    let estimateId = "<?= isset($estimate['estimate_id']) ? $estimate['estimate_id'] : '' ?>";
+    window.location.href = `<?= base_url('invoice/convert/') ?>${estimateId}`;
 });
-
-        
         $(document).on('input', 'input[name="description[]"]', function () {
             let value = $(this).val();
             let capitalized = value.replace(/\b\w/g, function (char) {
