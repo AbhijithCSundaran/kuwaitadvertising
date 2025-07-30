@@ -15,8 +15,6 @@
     }
 
     .invoice-container {
-      /* width: 100%; */
-      /* width: 730px; */
       margin: auto;
       border: 1px solid #ddd;
       padding: 30px; 
@@ -225,8 +223,9 @@
       }
 
       .no-print,
-      header,
-      footer,
+      .header,
+      .footer,
+      .navbar,
       .sidebar {
         display: none !important;
       }
@@ -237,20 +236,28 @@
 
   <div class="right_container">
     <div class="no-print" style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
-      <button onclick="window.print()"
-        style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px;">
-        🖨️ Print
-      </button>
-      <button onclick="window.location.href='<?= base_url('invoice/edit/' . $invoice['invoice_id']) ?>'"
-        style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
-        Discard
-      </button>
-      <!-- Paid/Unpaid Toggle Button -->
-      <button id="paymentStatusBtn"
-        style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
-        Unpaid
-      </button>
-    </div>
+  <button onclick="window.print()"
+    style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px;">
+    🖨️ Print
+  </button>
+
+  <button onclick="window.location.href='<?= base_url('invoice/edit/' . $invoice['invoice_id']) ?>'"
+    style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
+    Discard
+  </button>
+
+  <?php
+    $status = strtolower($invoice['status'] ?? 'unpaid');
+    $btnLabel = ucfirst($status);
+    $btnColor = $status === 'paid' ? '#28a745' : '#991b36';
+  ?>
+
+  <button id="statusBtn"
+    style="background-color: <?= $btnColor ?>; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">
+    <?= $btnLabel ?>
+  </button>
+</div>
+
     <div class="invoice-container">
 
       <!-- Header -->
@@ -289,10 +296,13 @@
         </div>
 
         <!-- Ship To -->
-        <div class="ship-to col-4">
+        <div class="ship-to col-4 pr-3">
          <div class="label">
           <span>SHIPPING ADDRESS</span><br>
-          <strong><?= nl2br(esc($invoice['shipping_address'] ?? '-')) ?></strong>
+          <span style="color: #000;">
+            <?= nl2br(esc($invoice['shipping_address'] ?? '-')) ?>
+          </span>
+
         </div>
           <!-- <div>Address:<strong><?= esc($invoice['shipping_address'] ?? '-') ?></strong></div> -->
           <!-- <div>Person Name:<strong><?= esc($customer['name'] ?? '-') ?></strong></div>
@@ -301,19 +311,19 @@
         </div>
 
         <!-- Invoice Info -->
-        <div class="col-4 pl-3 ml-auto">
+        <div class="col-4 pl-2 ml-auto">
           <table class="info-table table-sm  justify-content-end">
             <tr>
               <td>Invoice Date:</td>
               <td><?= date('d.m.Y', strtotime($invoice['invoice_date'])) ?></td>
             </tr>
             <tr>
-              <td>Delivery Date:</td>
-              <td>--</td>
+              <td>Delivery No:</td>
+              <td><?= esc($invoice['invoice_id']) ?></td>
             </tr>
             <tr>
-              <td>Delivery Note No:</td>
-              <td>--</td>
+              <td>Delivery Date:</td>
+              <td><span id="deliveryDateCell"></span></td>
             </tr>
             <tr>
               <td>LPO No:</td>
@@ -353,7 +363,7 @@
               <td><?= esc($item['item_name'] ?? '-') ?></td>
               <td><?= esc($item['quantity']) ?></td>
               <td><?= number_format($item['price'], 3) ?></td>
-              <td><?= number_format($finalTotal, 3) ?></td>
+              <td><?= number_format($lineTotal, 3) ?></td>
             </tr>
             <?php endforeach; ?>
           </tbody>
@@ -373,7 +383,7 @@
       <div class="totals grand-total">
         <div class="totals-row">
           <strong>Grand Total</strong>
-          <span><?= number_format($subtotal - $totalDiscountAmount, 3) ?></span>
+          <span>KD<?= number_format($subtotal - $totalDiscountAmount, 3) ?></span>
         </div>
       </div>
      <?php $grandTotal = $subtotal - $totalDiscountAmount; ?>
@@ -415,7 +425,7 @@
           <p>Do you want to download the delivery note?</p>
           <button onclick="downloadDeliveryNote()"
             style="background-color: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 5px; margin: 5px;">
-            Download
+            Yes
           </button>
           <button onclick="closeModal()"
             style="background-color: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 5px; margin: 5px;">
@@ -431,31 +441,48 @@
 <?php include "common/footer.php"; ?>
 <script>
   function numberToWords(num) {
-    const a = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven',
-      'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
-    const b = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
-    num = num.toString().replace(/,/g, '');
-    
-    let [dinars, fils] = num.split('.');
-    
-    if (dinars.length > 9) return 'overflow';
-    dinars = parseInt(dinars, 10);
-    fils = parseInt((fils || '0').padEnd(3, '0').slice(0, 2)); // Handle fils up to 2 decimal places
+  const a = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven',
+    'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+  const b = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
 
-      const convert = (n) => {
-        if (n < 20) return a[n];
-        if (n < 100) return b[Math.floor(n / 10)] + (n % 10 ? '-' + a[n % 10] : '');
-        if (n < 1000) return a[Math.floor(n / 100)] + ' hundred' + (n % 100 ? ' ' + convert(n % 100) : '');
-        if (n < 1000000) return convert(Math.floor(n / 1000)) + ' thousand' + (n % 1000 ? ' ' + convert(n % 1000) : '');
-        if (n < 1000000000) return convert(Math.floor(n / 1000000)) + ' million' + (n % 1000000 ? ' ' + convert(n % 1000000) : '');
-        return '';
-    };
+  num = num.toString().replace(/,/g, '');
+  let [dinars, fils] = num.split('.');
 
-    let words = '';
-    if (dinars > 0) words += convert(dinars) + ' Kuwaiti Dinar';
-    if (fils > 0) words += (words ? ' and ' : '') + convert(fils) + ' Fils';
-    return words || 'Zero';
+  dinars = parseInt(dinars || '0', 10);
+  fils = parseInt((fils || '0').padEnd(3, '0').slice(0, 3));
+
+  const convert = (n) => {
+    if (n === 0) return 'zero';
+    if (n < 20) return a[n];
+    if (n < 100) return b[Math.floor(n / 10)] + (n % 10 ? '-' + a[n % 10] : '');
+    if (n < 1000) {
+      const rem = n % 100;
+      return a[Math.floor(n / 100)] + ' hundred' + (rem ? ' and ' + convert(rem) : '');
+    }
+    if (n < 1000000) {
+      const rem = n % 1000;
+      return convert(Math.floor(n / 1000)) + ' thousand' + (rem ? ' ' + convert(rem) : '');
+    }
+    if (n < 1000000000) {
+      const rem = n % 1000000;
+      return convert(Math.floor(n / 1000000)) + ' million' + (rem ? ' ' + convert(rem) : '');
+    }
+    return '';
+  };
+
+  let words = '';
+  if (dinars > 0) {
+    const dinarWord = convert(dinars);
+    words += dinarWord + ' Kuwaiti ' + (dinars === 1 ? 'Dinar' : 'Dinars');
   }
+
+  if (fils > 0) {
+    const filsWord = convert(fils);
+    words += (words ? ' and ' : '') + filsWord + ' Fils';
+  }
+
+  return words || 'Zero';
+}
 
 
   function numberToArabicWords(num) {
@@ -536,19 +563,19 @@
   `;
 
 
-  const paymentStatusBtn = document.getElementById('paymentStatusBtn');
+  // const paymentStatusBtn = document.getElementById('paymentStatusBtn');
   const deliveryNoteModal = document.getElementById('deliveryNoteModal');
 
-  paymentStatusBtn.addEventListener('click', function () {
-    if (paymentStatusBtn.textContent === 'Unpaid') {
-      paymentStatusBtn.textContent = 'Paid';
-      paymentStatusBtn.style.backgroundColor = '#28a745'; // green for paid
-      showModal();
-    } else {
-      paymentStatusBtn.textContent = 'Unpaid';
-      paymentStatusBtn.style.backgroundColor = '#991b36'; // back to original
-    }
-  });
+  // paymentStatusBtn.addEventListener('click', function () {
+  //   if (paymentStatusBtn.textContent === 'Unpaid') {
+  //     paymentStatusBtn.textContent = 'Paid';
+  //     paymentStatusBtn.style.backgroundColor = '#28a745'; // green for paid
+  //     showModal();
+  //   } else {
+  //     paymentStatusBtn.textContent = 'Unpaid';
+  //     paymentStatusBtn.style.backgroundColor = '#991b36'; // back to original
+  //   }
+  // });
 
   function showModal() {
     deliveryNoteModal.style.display = 'block';
@@ -562,4 +589,79 @@
     deliveryNoteModal.style.display = 'none';
     window.location.href = '<?= base_url("invoice/delivery_note/" . $invoice["invoice_id"]) ?>';
   }
+  function formatDateToDDMMYYYY(date) {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}.${month}.${year}`;
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const deliveryCell = document.getElementById('deliveryDateCell');
+    if (deliveryCell) {
+      deliveryCell.textContent = formatDateToDDMMYYYY(new Date());
+    }
+  });
+
+  window.onbeforeprint = function () {
+    const deliveryCell = document.getElementById('deliveryDateCell');
+    if (deliveryCell) {
+      deliveryCell.textContent = formatDateToDDMMYYYY(new Date());
+    }
+  };
+
+
+document.getElementById('statusBtn').addEventListener('click', function () {
+  const btn = this;
+  const currentStatus = btn.textContent.trim().toLowerCase();
+
+  if (currentStatus === 'unpaid') {
+    // First update to 'Paid', then show modal
+    updateStatus('paid', function () {
+      showModal();
+    });
+  } else if (currentStatus === 'paid') {
+    // Already paid, just show modal again
+    showModal();
+  }
+});
+
+function updateStatus(newStatus, callback = null) {
+  const btn = document.getElementById('statusBtn');
+
+  fetch("<?= base_url('invoice/update_status') ?>", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Requested-With": "XMLHttpRequest"
+    },
+    body: JSON.stringify({
+      invoice_id: <?= $invoice['invoice_id'] ?>,
+      status: newStatus
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      // Update UI status
+      btn.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+      btn.style.backgroundColor = newStatus === 'paid' ? '#28a745' : '#991b36';
+
+      if (callback) callback(); // Show modal after status update
+    } else {
+      alert("Failed to update invoice status.");
+    }
+  })
+  .catch(error => {
+    alert("Error while updating status.");
+    console.error(error);
+  });
+}
+function downloadDeliveryNote() {
+  deliveryNoteModal.style.display = 'none';
+  window.location.href = '<?= base_url("invoice/delivery_note/" . $invoice["invoice_id"]) ?>';
+}
+
+
 </script>
