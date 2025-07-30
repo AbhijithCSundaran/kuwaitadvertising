@@ -253,26 +253,27 @@
         <tbody>
           <?php
           $totalAmount = 0;
-          $discountPercent = isset($invoice['discount']) ? $invoice['discount'] : 0;
           foreach ($items as $index => $item):
-            $originalLineTotal = $item['quantity'] * $item['price'];
-            $lineTotal = $originalLineTotal - ($originalLineTotal * $discountPercent / 100);
+            $lineTotal = $item['quantity'] * $item['price']; // NO DISCOUNT
             $kd = floor($item['price']);
             $fils = str_pad(number_format(($item['price'] - $kd) * 100, 0), 3, '0', STR_PAD_LEFT);
+
             $lineKd = floor($lineTotal);
             $lineFils = str_pad(number_format(($lineTotal - $lineKd) * 100, 0), 3, '0', STR_PAD_LEFT);
-            $totalAmount += $lineTotal;
-            ?>
+
+            $totalAmount += $lineTotal; // this can remain
+          ?>
             <tr>
               <td><?= $index + 1 ?></td>
               <td><?= esc($item['item_name']) ?></td>
               <td><?= $item['quantity'] ?></td>
               <td><?= $kd ?></td>
               <td><?= $fils ?></td>
-              <td><?= $lineKd ?></td> <!-- discounted total -->
+              <td><?= $lineKd ?></td> <!-- shows quantity * price -->
               <td><?= $lineFils ?></td>
             </tr>
           <?php endforeach; ?>
+        </tbody>
           <?php $grandTotal = $totalAmount; ?>
           <?php
           $subtotal = 0;

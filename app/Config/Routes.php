@@ -105,10 +105,10 @@ $routes->post('customer/fetch', 'Customer::fetch');
 $routes->post('customer/create', 'Customer::create');
 $routes->post('customer/delete', 'Customer::delete');
 $routes->post('customer/get_address', 'Customer::get_address');
-$routes->get('customer/edit/(:num)', 'Customer::edit/$1'); // If you support edit page
+$routes->get('customer/edit/(:num)', 'Customer::edit/$1'); 
 $routes->get('customer/getCustomer/(:num)', 'Customer::getCustomer/$1');
 $routes->get('estimate/customer/(:num)', 'Estimate::viewByCustomer/$1');
-$routes->get('customer', 'Customer::index'); // Or whatever your controller is
+$routes->get('customer', 'Customer::index'); 
 
 
 $routes->get('invoicelist', 'Invoice::list');
@@ -116,14 +116,18 @@ $routes->get('invoice/add', 'Invoice::add');
 $routes->post('invoice/save', 'Invoice::save');
 $routes->get('invoice/print/(:segment)', 'Invoice::print/$1');
 $routes->post('invoice/invoicelistajax', 'Invoice::invoicelistajax');
-$routes->get('invoice/edit/(:segment)', 'Invoice::edit/$1');        // Edit page
+$routes->get('invoice/edit/(:segment)', 'Invoice::edit/$1');      
 $routes->post('invoice/delete/(:segment)', 'Invoice::delete/$1');
 $routes->get('invoice/edit/(:num)', 'Invoice::edit/$1');
-$routes->post('invoice/save', 'Invoice::save'); // if you handle saving here
+$routes->post('invoice/save', 'Invoice::save'); 
 $routes->get('invoice/from_estimate/(:num)', 'Invoice::fromEstimate/$1');
 $routes->get('invoice/add/(:num)', 'Invoice::add/$1');
 $routes->get('invoice/convertFromEstimate/(:num)', 'Invoice::convertFromEstimate/$1');
 $routes->get('invoice/delivery_note/(:num)', 'Invoice::delivery_note/$1');
+$routes->post('invoice/update_status', 'Invoice::update_status');
+
+
+
 
 
 

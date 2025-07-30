@@ -13,7 +13,7 @@
     }
 
     .invoice-container {
-      width: 100%;
+      width: 99%;
       border: 1px solid #ddd;
       padding: 30px;
     }
@@ -46,7 +46,7 @@
 
     .delivery-note-title {
       text-align: center;
-      color: #0a0a0aff;
+      color: #0a0a0a8d;
       font-weight: bold;
       font-size: 18px;
       margin: 20px 0;
@@ -122,8 +122,9 @@
     }
 
     .no-print,
-    header,
-    footer,
+    .header,
+    .footer,
+    .navbar,
     .sidebar {
       display: none !important;
     }
@@ -156,20 +157,18 @@
     .ship-to {
       width: 50% !important;
     }
+      .signature-section, .signature-box {
+    page-break-inside: avoid;
   }
-  
-
+    }
   </style>
-
-</head>
-<body>
-  <div class="right_container">
-    <div class="no-print" style="text-align: right; margin-bottom: 20px;">
-  <button onclick="window.print()" class="btn btn-sm btn-primary">🖨️ Print</button>
- <button onclick="downloadPDF()" class="btn btn-sm btn-success">⬇️ Download PDF</button>
-</div>
-
-
+  </head>
+  <body>
+    <div class="right_container">
+      <div class="no-print" style="text-align: right; margin-bottom: 20px;">
+    <button onclick="window.print()" class="btn btn-sm btn-primary">🖨️ Print</button>
+  <button onclick="downloadPDF()" class="btn btn-sm btn-success">⬇️ Download PDF</button>
+  </div>
     <div class="invoice-container">
       <div class="top-section">
         <div class="address">
@@ -185,19 +184,17 @@
       <div class="delivery-note-title">
         DELIVERY NOTE NO. <?= esc($invoice['invoice_id']) ?>
       </div>
-  
-  
       <div class="info-section">
         <div class="ship-to">
           <b>SHIP TO :</b><br>
           <div><?= nl2br(esc($invoice['shipping_address'] ?? '-')) ?></div>
         </div>
         <div class="delivery-date">
-          Delivery Date: <?= date('d.m.Y', strtotime($invoice['invoice_date'] ?? '')) ?>
-        </div>
-  
+  Delivery Date:<span id="deliveryDate" style="color: black;"></span>
+
+</div>
+
       </div>
-  
       <table>
         <thead>
           <tr>
@@ -236,6 +233,13 @@
                 <p><strong>Signature :</strong></p>
               </td>
             </tr>
+            <!-- <hr style="margin: 1rem 0; color: inherit; border: 0; border-top: var(--bs-border-width) solid; opacity: 0.25; margin-left: 570px; margin-top: 25px;
+    margin-bottom: 4px;
+}">
+<div class="" style="font-size: 15px; height: 0; margin-left: 65%; ">
+  For Al Shaya International Printng Co
+</div> -->
+
           </table>
         </div>
     </div>
@@ -257,4 +261,21 @@
 
     html2pdf().set(opt).from(element).save();
   }
+
+  function formatDateToDDMMYYYY(date) {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}.${month}.${year}`;
+  }
+
+  
+  document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('deliveryDate').textContent = formatDateToDDMMYYYY(new Date());
+  });
+
+  // window.onbeforeprint = function () {
+  //   document.getElementById('deliveryDate').textContent = formatDateToDDMMYYYY(new Date());
+  // };
 </script>
