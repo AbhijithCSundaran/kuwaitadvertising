@@ -11,41 +11,42 @@ class Manageuser_Model extends Model{
     public function getAllUserCount()
     {
         $db = \Config\Database::connect();
-        return $db->query("SELECT COUNT(*) as totuser FROM user")->getRow();
+         $session = \Config\Services::session();
+        $companyId = $session->get('company_id');
+        return $db->query("SELECT COUNT(*) as totuser FROM user  WHERE company_id = ?", [$companyId])->getRow();
     }
-    public function getFilterUserCount($condition) {
-		
-		$db = \Config\Database::connect();
-    	$builder = $db->table('user');
-        $builder->select('COUNT(*) as totuser');
-        $builder->join('role_acces', 'role_acces.role_id = user.role_id', 'left');
-        $builder->where($condition);
-
-    return $builder->select("COUNT(*) as totuser")->get()->getRow();
-
-	}
-	public function getAllFilteredRecords($condition, $fromstart, $tolimit, $orderColumn = 'user_id', $orderDir = 'DESC')
+   public function getFilterUserCount($condition)
 {
-    $allowedColumns = ['user_id', 'name', 'role_name', 'email', 'phonenumber'];
+    $db = \Config\Database::connect();
+    $builder = $db->table('user');
+    $session = \Config\Services::session();
+    $companyId = $session->get('company_id');
 
-    if (!in_array($orderColumn, $allowedColumns)) {
-        $orderColumn = 'user_id';
+    $builder->select('COUNT(*) as totuser');
+    $builder->join('role_acces', 'role_acces.role_id = user.role_id', 'left');
+
+    // Apply existing condition
+    if (!empty($condition)) {
+        $builder->where($condition);
     }
 
-    $orderDir = strtoupper($orderDir) === 'ASC' ? 'ASC' : 'DESC';
+    // Apply company filter
+    $builder->where('user.company_id', $companyId);
 
-    $db = \Config\Database::connect();
-    $builder = $db->query("
-        SELECT user.*, role_acces.role_name 
-        FROM user 
-        LEFT JOIN role_acces ON role_acces.role_id = user.role_id 
-        WHERE $condition 
-        ORDER BY $orderColumn $orderDir 
-        LIMIT $fromstart, $tolimit
-    ");
-
-    return $builder->getResult();
+    return $builder->get()->getRow();
 }
+
+	public function getAllFilteredRecords($condition, $fromstart, $tolimit, $orderColumn, $orderDir)
+{
+    $builder = $this->db->table('user');
+    $builder->select('user.*, role_acces.role_name');
+    $builder->join('role_acces', 'role_acces.role_id = user.role_id', 'left');
+    $builder->where($condition);
+    $builder->orderBy($orderColumn, $orderDir);
+    $builder->limit($tolimit, $fromstart);
+    return $builder->get()->getResult();
+}
+
 
 
 	

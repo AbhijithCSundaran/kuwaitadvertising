@@ -4,6 +4,7 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use App\Models\Manageuser_Model;
 use App\Models\RoleModel;
+use App\Models\Managecompany_Model;
 
 class Manageuser extends BaseController
 {
@@ -15,24 +16,39 @@ class Manageuser extends BaseController
             exit;
         }
     }
-   public function index($uid = null){
-        $isEdit = !empty($uid);
+public function index($uid = null)
+{
+    $session = session();
+    $isEdit = !empty($uid);
 
-        $userModel = new Manageuser_Model();
-        $roleModel = new RoleModel();
-        $managecompany_Model = new \App\Models\Managecompany_Model();
-        $userData = $isEdit ? $userModel->find($uid) : [];
-        $roles    = $roleModel->findAll();
+    $userModel         = new Manageuser_Model();
+    $roleModel         = new RoleModel();
+    $managecompany_Model = new Managecompany_Model();
+
+    $userData = $isEdit ? $userModel->find($uid) : [];
+    $roles    = $roleModel->findAll();
+
+    $loggedInCompanyId = $session->get('company_id');
+    $loggedInRoleId    = $session->get('role_Id');
+
+    // Determine visible companies based on role
+    if ($loggedInRoleId == 1) {
+        // Admin: show all companies
         $companies = $managecompany_Model->findAll();
-
-        return view('adduser', [
-            'uid'      => $uid,
-            'isEdit'   => $isEdit,
-            'userData' => $userData,
-            'roles'    => $roles,
-            'companies' => $companies
-        ]);
+    } else {
+        // Regular user: only show their own company
+        $companies = $managecompany_Model->where('company_id', $loggedInCompanyId)->findAll();
     }
+
+    return view('adduser', [
+        'uid'        => $uid,
+        'isEdit'     => $isEdit,
+        'userData'   => $userData,
+        'roles'      => $roles,
+        'companies'  => $companies
+    ]);
+}
+
     public function add(){
         return view('adduserlist');
     }
@@ -147,6 +163,9 @@ public function save()
 public function userlistajax()
 {
     $db = \Config\Database::connect();
+    $session = \Config\Services::session();
+    $roleId = $session->get('role_Id');
+    $companyId = $session->get('company_id');
 
     $draw = $_POST['draw'] ?? 1;
     $fromstart = $_POST['start'] ?? 0;
@@ -154,10 +173,8 @@ public function userlistajax()
     $orderDir = $_POST['order'][0]['dir'] ?? 'desc';
     $columnIndex = $_POST['order'][0]['column'] ?? 1;
     $search = $_POST['search']['value'] ?? '';
-
     $slno = $fromstart + 1;
 
-    // Map DataTable column indexes to database column names
     $columnMap = [
         0 => 'user_id',
         1 => 'name',
@@ -168,24 +185,25 @@ public function userlistajax()
     ];
     $orderColumn = $columnMap[$columnIndex] ?? 'user_id';
 
-    // Build search condition
-    $condition = "1=1";
-   $search = trim(preg_replace('/\s+/', ' ', $search)); // Normalize whitespace
-
-if (!empty($search)) {
-    // Create a version with all spaces removed for flexible matching
-    $normalizedSearch = str_replace(' ', '', strtolower($search));
-
-    $condition .= " AND (
-        REPLACE(LOWER(user.name), ' ', '') LIKE '%$normalizedSearch%' OR
-        REPLACE(LOWER(user.email), ' ', '') LIKE '%$normalizedSearch%' OR
-        REPLACE(LOWER(user.phonenumber), ' ', '') LIKE '%$normalizedSearch%' OR
-        REPLACE(LOWER(role_acces.role_name), ' ', '') LIKE '%$normalizedSearch%'
-    )";
+  $condition = "1=1";
+if ($roleId != 1) {
+    $condition .= " AND user.company_id = " . (int)$companyId;
 }
 
 
-    $userModel = new Manageuser_Model();
+    // Search logic
+    $search = trim(preg_replace('/\s+/', ' ', $search));
+    if (!empty($search)) {
+        $normalizedSearch = str_replace(' ', '', strtolower($search));
+        $condition .= " AND (
+            REPLACE(LOWER(user.name), ' ', '') LIKE '%$normalizedSearch%' OR
+            REPLACE(LOWER(user.email), ' ', '') LIKE '%$normalizedSearch%' OR
+            REPLACE(LOWER(user.phonenumber), ' ', '') LIKE '%$normalizedSearch%' OR
+            REPLACE(LOWER(role_acces.role_name), ' ', '') LIKE '%$normalizedSearch%'
+        )";
+    }
+
+    $userModel = new \App\Models\Manageuser_Model();
     $users = $userModel->getAllFilteredRecords($condition, $fromstart, $tolimit, $orderColumn, $orderDir);
 
     $result = [];
@@ -200,20 +218,19 @@ if (!empty($search)) {
         ];
     }
 
-    $total = $userModel->getAllUserCount()->totuser ?? 0;
+    // Count logic
+    $totalCondition = ($roleId == 1) ? "1=1" : "user.company_id = " . (int)$companyId;
+    $total = $userModel->getAllUserCount($totalCondition)->totuser ?? 0;
     $filtered = $userModel->getFilterUserCount($condition);
     $filteredTotal = isset($filtered->totuser) ? (int) $filtered->totuser : 0;
 
-
     return $this->response->setJSON([
-    'draw' => intval($draw),
-    'recordsTotal' => $total,
-    'recordsFiltered' => $filteredTotal,
-    'data' => $result
-]);
-
+        'draw' => intval($draw),
+        'recordsTotal' => $total,
+        'recordsFiltered' => $filteredTotal,
+        'data' => $result
+    ]);
 }
-
    public function delete()
     {
         $user_id = $this->request->getPost('user_id');

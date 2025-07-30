@@ -3,7 +3,11 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use App\Models\InvoiceModel;
+use App\Models\InvoiceItemModel;
 use App\Models\customerModel;
+use App\Models\EstimateModel;
+use App\Models\EstimateItemModel;
+use App\Models\Manageuser_Model;
 
 
 class Invoice extends BaseController
@@ -50,8 +54,8 @@ class Invoice extends BaseController
 
         $orderByColumn = $columns[$orderColumnIndex] ?? 'invoices.invoice_id';
 
-        $invoiceModel = new \App\Models\InvoiceModel();
-        $itemModel = new \App\Models\InvoiceItemModel();
+        $invoiceModel = new InvoiceModel();
+        $itemModel = new InvoiceItemModel();
 
         $totalRecords = $invoiceModel->getInvoiceCount();
         $filteredRecords = $invoiceModel->getFilteredCount($searchValue);
@@ -265,7 +269,7 @@ log_message('debug', 'Current user_id in session: ' . session()->get('user_id'))
         $items = $itemModel->where('invoice_id', $id)->findAll(); 
 
         $user_id = $invoice['user_id'];
-        $userModel = new UserModel();
+        $userModel = new Manageuser_Model();
         $user = $userModel->find($user_id);
         $user_name = $user['name'] ?? 'N/A';
 
@@ -277,12 +281,12 @@ log_message('debug', 'Current user_id in session: ' . session()->get('user_id'))
     }
 public function delivery_note($id)
 {
-    $invoiceModel = new \App\Models\InvoiceModel();
-    $itemModel = new \App\Models\InvoiceItemModel(); // Assuming you have this
+    $invoiceModel = new InvoiceModel();
+    $itemModel = new InvoiceItemModel(); // Assuming you have this
 
     $invoice = $invoiceModel->find($id);
     $items = $itemModel->where('invoice_id', $id)->findAll();
-    $customerModel = new \App\Models\CustomerModel();
+    $customerModel = new customerModel();
     $customer = $customerModel->find($invoice['customer_id']);
 
     return view('delivery_note', [
@@ -292,30 +296,58 @@ public function delivery_note($id)
 ]);
 
 }
-
 public function convertFromEstimate($estimateId)
 {
-    $estimateModel = new \App\Models\EstimateModel();
-    $itemModel = new \App\Models\EstimateItemModel();
-    $customerModel = new \App\Models\CustomerModel();
- 
-    // Get estimate
+    $estimateModel = new EstimateModel();
+    $itemModel = new EstimateItemModel();
+    $customerModel = new CustomerModel();
+    // Get estimate details
     $estimate = $estimateModel->find($estimateId);
- 
-    // Get estimate items
     $items = $itemModel->where('estimate_id', $estimateId)->findAll();
- 
-    // Get all customers (for dropdown)
+    $customer = $customerModel->find($estimate['customer_id']);
     $customers = $customerModel->findAll();
- 
-    $data = [
-        'invoice' => $estimate,
+     foreach ($items as &$item) {
+        // Convert description → item_name (for invoice form input)
+        $item['item_name'] = $item['description'] ?? '';
+
+        // Ensure product_id exists (invoice form JS needs it)
+        $item['product_id'] = $item['product_id'] ?? '';
+    }
+
+
+    return view('invoice_form', [
+        'estimate' => $estimate,
         'items' => $items,
-        'customers' => $customers
-    ];
+        'customers' => $customers 
+    ]);
+}
+public function update_status()
+{
+    $request = service('request');
  
-    return view('invoice/invoice_form', $data);
+    // Make sure it's an AJAX request
+    if (!$request->isAJAX()) {
+        return $this->response->setJSON(['success' => false, 'message' => 'Invalid request']);
+    }
+ 
+    $data = $request->getJSON(true);
+ 
+    $invoiceId = $data['invoice_id'] ?? null;
+    $status = $data['status'] ?? null;
+ 
+    if (!$invoiceId || !in_array($status, ['paid', 'unpaid'])) {
+        return $this->response->setJSON(['success' => false, 'message' => 'Invalid data']);
+    }
+ 
+    $invoiceModel = new \App\Models\InvoiceModel();
+ 
+    $updated = $invoiceModel->update($invoiceId, ['status' => $status]);
+ 
+    if ($updated) {
+        return $this->response->setJSON(['success' => true]);
+    } else {
+        return $this->response->setJSON(['success' => false, 'message' => 'Failed to update status']);
+    }
 }
  
-
 }

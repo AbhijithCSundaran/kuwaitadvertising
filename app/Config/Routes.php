@@ -122,7 +122,7 @@ $routes->get('invoice/edit/(:num)', 'Invoice::edit/$1');
 $routes->post('invoice/save', 'Invoice::save'); // if you handle saving here
 $routes->get('invoice/from_estimate/(:num)', 'Invoice::fromEstimate/$1');
 $routes->get('invoice/add/(:num)', 'Invoice::add/$1');
-$routes->get('invoice/convertFromEstimate', 'Invoice::convertFromEstimate');
+$routes->get('invoice/convertFromEstimate/(:num)', 'Invoice::convertFromEstimate/$1');
 $routes->get('invoice/delivery_note/(:num)', 'Invoice::delivery_note/$1');
 
 

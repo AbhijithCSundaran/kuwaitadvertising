@@ -50,7 +50,7 @@
                         <div class="col-12 col-md-6 mb-3 px-2">
                             <label for="phone" class="form-label">Phone <span class="text-danger">*</span></label>
                             <input type="text" name="phone" id="phone" class="form-control" maxlength="20"
-                            pattern="^[0-9+\-\s]{7,20}$"
+                            pattern="^[\+0-9\s\-\(\)]{7,25}$"
                             title="Please enter a valid phone number (digits, +, -, spaces allowed, 7–20 characters)"
                             value="<?= isset($company['phone']) ? esc($company['phone']) : '' ?>" required>
                         </div>
@@ -247,7 +247,7 @@
                 return;
             }
 
-            let phoneRegex = /^[0-9+\-\s]{7,20}$/;
+            let phoneRegex = /^[\+0-9\s\-\(\)]{7,25}$/;
             if (!phoneRegex.test(phone)) {
                 showMessage('Please Enter a Valid Phone Number.', 'danger');
                 $saveBtn.prop('disabled', false).css('opacity', 1);
