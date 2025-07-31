@@ -276,30 +276,36 @@ public function save()
         return $this->response->setJSON(['status' => 'success']);
     }
  
-    public function edit($id)
-    {
-        $estimateModel = new EstimateModel();
-        $estimateItemModel = new EstimateItemModel();
-        $customerModel = new customerModel();
- 
-       
-        $data['items'] = $estimateItemModel->where('estimate_id', $id)->findAll();
-        $data['customers'] = $customerModel->where('is_deleted', 0)->orderBy('customer_id', 'DESC')->findAll();
-       $data['estimate'] = $estimateModel
-        ->select('estimates.*,customers.address AS customer_address, customers.name AS customer_name')
+   public function edit($id)
+{
+    $estimateModel = new EstimateModel();
+    $estimateItemModel = new EstimateItemModel();
+    $customerModel = new customerModel();
+
+    // Get estimate
+    $estimate = $estimateModel
+        ->select('estimates.*, customers.address AS customer_address, customers.name AS customer_name')
         ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
         ->where('estimate_id', $id)
         ->first();
- 
- 
- 
-        if (!$data['estimate']) {
-            return redirect()->to('estimatelist')->with('error', 'Estimate not found.');
-        }
- 
-        return view('add_estimate', $data);
-        
+
+    if (!$estimate) {
+        return redirect()->to('estimatelist')->with('error', 'Estimate not found.');
     }
+
+    // Now get customer details using estimate's customer_id
+    $customer = $customerModel->find($estimate['customer_id']);
+
+    $data = [
+        'estimate' => $estimate,
+        'items' => $estimateItemModel->where('estimate_id', $id)->findAll(),
+        'customers' => $customerModel->where('is_deleted', 0)->orderBy('customer_id', 'DESC')->findAll(),
+        'customer' => $customer
+    ];
+
+    return view('add_estimate', $data);
+}
+
   public function generateEstimate($id)
 {
     $estimateModel = new EstimateModel();
