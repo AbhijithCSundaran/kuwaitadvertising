@@ -300,9 +300,19 @@ public function convertFromEstimate($estimateId)
     $customerModel = new CustomerModel();
     // Get estimate details
     $estimate = $estimateModel->find($estimateId);
-    $items = $itemModel->where('estimate_id', $estimateId)->findAll();
-    $customer = $customerModel->find($estimate['customer_id']);
-    $customers = $customerModel->findAll();
+    $customerModel = new \App\Models\CustomerModel();
+$customer = $customerModel->find($estimate['customer_id']);
+
+$items = $itemModel->where('estimate_id', $estimateId)->findAll();
+$customer = $customerModel->find($estimate['customer_id']);
+$customers = $customerModel->where('is_deleted', 0)->findAll();
+
+// Populate address and phone details from customer record
+$estimate['customer_address'] = $customer['address'] ?? '';
+$estimate['billing_address'] = $customer['billing_address'] ?? '';
+$estimate['shipping_address'] = $customer['shipping_address'] ?? '';
+$estimate['phone_number'] = $customer['phone_number'] ?? '';
+
      foreach ($items as &$item) {
         $item['item_name'] = $item['description'] ?? '';
         $item['product_id'] = $item['product_id'] ?? '';
@@ -310,11 +320,13 @@ public function convertFromEstimate($estimateId)
 
 
     return view('invoice_form', [
-        'invoice' => $estimate,
-        'items' => $items,
-        'customers' => $customers ,
-        'customer'  => $customer 
-    ]);
+    'invoice' => $estimate,
+    'items'   => $items,
+    'customers' => $customers,
+    'customer' => $customer,
+    'estimate_id' => $estimateId
+]);
+
 }
 public function update_status()
 {

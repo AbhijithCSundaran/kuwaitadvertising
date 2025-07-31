@@ -440,7 +440,7 @@
 </div>
 <?php include "common/footer.php"; ?>
 <script>
-  function numberToWords(num) {
+ function numberToWords(num) {
   const a = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven',
     'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
   const b = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
@@ -481,9 +481,10 @@
     words += (words ? ' and ' : '') + filsWord + ' Fils';
   }
 
-  return words || 'Zero';
+  return words
+    ? words.replace(/\b\w/g, c => c.toUpperCase())
+    : 'Zero';
 }
-
 
   function numberToArabicWords(num) {
   const ones = ['', 'واحد', 'اثنان', 'ثلاثة', 'أربعة', 'خمسة', 'ستة', 'سبعة', 'ثمانية', 'تسعة'];
