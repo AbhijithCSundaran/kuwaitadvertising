@@ -92,9 +92,6 @@ class Invoice extends BaseController
             'data' => $data,
         ]);
     }
-
-
-
   public function print($id)
 {
     $invoiceModel = new InvoiceModel();
@@ -114,7 +111,7 @@ class Invoice extends BaseController
         'invoice' => $invoice,
         'items' => $invoice['items'],
         'user_name' => session()->get('user_name') ?? 'Salesman',
-        'customer' => $customer ?? [] // ✅ Pass customer to view
+        'customer' => $customer ?? []
     ];
 
     if ($companyId == 69) {
@@ -131,7 +128,7 @@ class Invoice extends BaseController
     {
         $request = $this->request;
         $invoiceModel = new InvoiceModel();
-        $itemModel = new \App\Models\InvoiceItemModel(); // Make sure this model exists
+        $itemModel = new InvoiceItemModel(); // Make sure this model exists
         $customerModel = new customerModel();
         $discount = $this->request->getPost('discount');
         $customerId = $request->getPost('customer_id');
@@ -213,7 +210,7 @@ log_message('debug', 'Current user_id in session: ' . session()->get('user_id'))
     public function edit($id)
     {
         $invoiceModel = new InvoiceModel();
-        $itemModel = new \App\Models\InvoiceItemModel();
+        $itemModel = new InvoiceItemModel();
         $customerModel = new customerModel();
 
         // Fetch invoice
@@ -252,7 +249,7 @@ log_message('debug', 'Current user_id in session: ' . session()->get('user_id'))
             return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid ID']);
         }
 
-        $model = new \App\Models\InvoiceModel();
+        $model = new InvoiceModel();
         $deleted = $model->delete($id);
 
         return $this->response->setJSON([
@@ -307,18 +304,16 @@ public function convertFromEstimate($estimateId)
     $customer = $customerModel->find($estimate['customer_id']);
     $customers = $customerModel->findAll();
      foreach ($items as &$item) {
-        // Convert description → item_name (for invoice form input)
         $item['item_name'] = $item['description'] ?? '';
-
-        // Ensure product_id exists (invoice form JS needs it)
         $item['product_id'] = $item['product_id'] ?? '';
     }
 
 
     return view('invoice_form', [
-        'estimate' => $estimate,
+        'invoice' => $estimate,
         'items' => $items,
-        'customers' => $customers 
+        'customers' => $customers ,
+        'customer'  => $customer 
     ]);
 }
 public function update_status()
@@ -339,7 +334,7 @@ public function update_status()
         return $this->response->setJSON(['success' => false, 'message' => 'Invalid data']);
     }
  
-    $invoiceModel = new \App\Models\InvoiceModel();
+    $invoiceModel = new InvoiceModel();
  
     $updated = $invoiceModel->update($invoiceId, ['status' => $status]);
  
