@@ -105,9 +105,9 @@
                 </div>
             </div>
             <?php
-            $billingVal = isset($invoice['customer_address']) ? trim($invoice['customer_address']) : '';
-            $shippingVal = isset($invoice['shipping_address']) ? trim($invoice['shipping_address']) : '';
-            $isSame = $billingVal !== '' && $billingVal === $shippingVal;
+                $billingVal = $invoice['customer_address'] ?? $customers['customer_address'] ?? '';
+                $shippingVal = $invoice['shipping_address'] ?? $billingVal;
+                $isSame = $billingVal !== '' && $billingVal === $shippingVal;
             ?>
             <div class="row">
                 <!-- Billing Address -->
@@ -146,7 +146,7 @@
                 <div class="col-md-6">
                     <label class="mt-3"><strong>Phone Number</strong><span class="text-danger">*</span></label>
                     <input type="text" name="phone_number" id="phone_number" class="form-control"
-                        value="<?= isset($invoice['phone_number']) ? esc($invoice['phone_number']) : '' ?>"
+                       value="<?= esc($invoice['phone_number'] ?? $customer['phone_number'] ?? '') ?>"
                         minlength="7" maxlength="15" pattern="^\+?[0-9]{7,15}$"
                         title="Phone number must be 7 to 15 digits and can start with +" />
                 </div>
@@ -206,7 +206,7 @@
                 <td><strong>Discount:</strong></td>
                 <td>
                     <input type="number" name="discount" id="discount" class="form-control w-50 d-inline"
-                        value="<?= isset($invoice['discount']) ? $invoice['discount'] : '0' ?>" min="0"> %
+                       value="<?= esc($invoice['discount'] ?? 0) ?>" min="0"> %
                 </td>
             </tr>
             <tr>
