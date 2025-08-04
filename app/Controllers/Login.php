@@ -3,6 +3,7 @@ namespace App\Controllers;
 
 use App\Models\Login_Model;
 use App\Models\Rolemanagement_Model;
+use App\Models\RoleModel;
 use App\Controllers\BaseController;
 
 class Login extends BaseController
@@ -21,8 +22,10 @@ class Login extends BaseController
             $loginModel = new Login_Model();
             $result = $loginModel->authenticateNow($email, $password);
 
-            if ($result) {
-                $roleModel = new \App\Models\RoleModel();
+          if (is_array($result) && isset($result['status']) && $result['status'] == 0) {
+             return $this->response->setJSON($result);
+            } elseif ($result) {
+                $roleModel = new RoleModel();
                 $role = $roleModel->find($result->role_id);
                 $roleName = $role ? $role['role_name'] : '';
                 $roleMenuModel = new Rolemanagement_Model();

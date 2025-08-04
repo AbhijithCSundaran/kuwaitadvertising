@@ -3,51 +3,67 @@ namespace App\Models;
 use CodeIgniter\Model;
 
 
-class Manageuser_Model extends Model{
-	protected $table = 'user';
+class Manageuser_Model extends Model
+{
+    protected $table = 'user';
     protected $primaryKey = 'user_id';
-    protected $allowedFields = ['name', 'email', 'phonenumber', 'password','role_id','company_id'];
+    protected $allowedFields = ['name', 'email', 'phonenumber', 'password', 'role_id', 'company_id'];
 
     public function getAllUserCount()
     {
         $db = \Config\Database::connect();
-         $session = \Config\Services::session();
+        $session = \Config\Services::session();
         $companyId = $session->get('company_id');
         return $db->query("SELECT COUNT(*) as totuser FROM user  WHERE company_id = ?", [$companyId])->getRow();
     }
-   public function getFilterUserCount($condition)
-{
-    $db = \Config\Database::connect();
-    $builder = $db->table('user');
-    $session = \Config\Services::session();
-    $companyId = $session->get('company_id');
+    public function getFilterUserCount($condition)
+    {
+        $db = \Config\Database::connect();
+        $builder = $db->table('user');
+        $session = \Config\Services::session();
+        $companyId = $session->get('company_id');
 
-    $builder->select('COUNT(*) as totuser');
-    $builder->join('role_acces', 'role_acces.role_id = user.role_id', 'left');
+        $builder->select('COUNT(*) as totuser');
+        $builder->join('role_acces', 'role_acces.role_id = user.role_id', 'left');
 
-    // Apply existing condition
-    if (!empty($condition)) {
-        $builder->where($condition);
+        // Apply existing condition
+        if (!empty($condition)) {
+            $builder->where($condition);
+        }
+
+        // Apply company filter
+        $builder->where('user.company_id', $companyId);
+
+        return $builder->get()->getRow();
     }
 
-    // Apply company filter
-    $builder->where('user.company_id', $companyId);
+    public function getAllFilteredRecords($condition, $fromstart, $tolimit, $orderColumn, $orderDir, $roleId)
+    {
 
-    return $builder->get()->getRow();
-}
+        $builder = $this->db->table('user');
 
-	public function getAllFilteredRecords($condition, $fromstart, $tolimit, $orderColumn, $orderDir)
-{
-    $builder = $this->db->table('user');
-    $builder->select('user.*, role_acces.role_name');
-    $builder->join('role_acces', 'role_acces.role_id = user.role_id', 'left');
-    $builder->where($condition);
-    $builder->orderBy($orderColumn, $orderDir);
-    $builder->limit($tolimit, $fromstart);
-    return $builder->get()->getResult();
-}
+        $builder->select('user.*, role_acces.role_name');
+
+        $builder->join('role_acces', 'role_acces.role_id = user.role_id', 'left');
+
+        // Only apply condition if role is not Admin (1)
+
+        if ($roleId != 1) {
+
+            $builder->where($condition);
+
+        }
+
+        $builder->orderBy($orderColumn, $orderDir);
+
+        $builder->limit($tolimit, $fromstart);
+
+        return $builder->get()->getResult();
+
+    }
 
 
 
-	
+
+
 }

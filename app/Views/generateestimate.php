@@ -37,7 +37,10 @@
             style="background-color: #a1263a; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
             Discard
         </button>
-
+        <button onclick="window.location.href='<?= base_url('invoice/convertFromEstimate/' . $estimate['estimate_id']) ?>'"
+            style="background-color:  #a1263a; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
+            Convert Invoice
+        </button>
         </div>
 
 
@@ -96,7 +99,7 @@
                 </table>
             <!-- </div> -->
             <div class=" d-flex">
-                <div class="col-8 terms mt-5">
+                <div class="col-6 terms mt-5">
                     <strong>TERMS & CONDITIONS</strong><br>
                     1. This estimate is valid for 60 days.<br>
                     2. Additional amount will be added according to the requirements.<br>
@@ -104,27 +107,30 @@
                     4. Cancellation of processed order will not be accepted.
                 </div>
 
-                <div class="col-4 mt-3">
-                    <!-- <div class="table-responsive"> -->
-                        <table class="table summary-table table-borderless text-end">
-                            <tbody>
-                                <tr>
-                                    <td class="label">SUBTOTAL</td>
-                                    <td><?= number_format($grandTotal, 2) ?> KWD</td>
-                                </tr>
-                                <tr>
-                                    <td class="label">DISCOUNTS</td>
-                                    <td><?= number_format($estimate['discount'] ?? 0, 2) ?>%</td>
-                                </tr>
-                                <tr>
-                                    <td class="label total">TOTAL</td>
-                                    <td class="total">
-                                        <?= number_format($estimate['total_amount'] ?? 0, 2) ?> KWD
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    <!-- </div> -->
+                <div class="col-6 mt-4">
+                      <div class="text-end mt-4">
+
+                        <!-- SUBTOTAL -->
+                        <div class="d-flex justify-content-end mb-1">
+                            <div class="me-4 ">SUBTOTAL</div>
+                            <div><?= number_format($grandTotal, 2) ?> KWD</div>
+                        </div>
+
+                        <!-- DISCOUNTS -->
+                        <div class="d-flex justify-content-end mb-2">
+                            <div class="me-4">DISCOUNTS</div>
+                            <div><?= number_format($estimate['discount'] ?? 0, 2) ?> KWD</div>
+                        </div>
+
+                        <!-- TOTAL in colored box -->
+                        <div class="d-flex justify-content-end">
+                            <div style="background-color: #a1263a; color: #fff; padding: 8px 16px; min-width: 220px;" class="d-flex justify-content-between">
+                                <div class="fw-bold">TOTAL</div>
+                                <div class="fw-bold"><?= number_format($estimate['total_amount'] ?? 0, 2) ?> KWD</div>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
 
             </div>

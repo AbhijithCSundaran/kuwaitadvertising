@@ -1,4 +1,5 @@
-<?php include "common/header.php"; ?>
+
+<?php include "common/header.php";?>
 <div class="form-control mb-3 right_container">
     <div class="alert d-none text-center position-fixed" role="alert"></div>
 
@@ -12,7 +13,6 @@
     </div>
 
     <hr>
-
     <!-- Responsive table wrapper -->
     <div class="table-responsive">
         <table class="table " id="userTable">

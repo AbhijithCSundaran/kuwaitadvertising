@@ -8,39 +8,39 @@ use CodeIgniter\Exceptions\PageNotFoundException;
 
 class Managecompany extends BaseController
 {
-    protected $companyModel;
+	protected $companyModel;
 
-    public function __construct()
-    {
-        $this->companyModel = new Managecompany_Model();
+	public function __construct()
+	{
+		$this->companyModel = new Managecompany_Model();
 		$session = \Config\Services::session();
-        if (!$session->get('logged_in')) {
-            header('Location: ' . base_url('/'));
-            exit;
-        }
-    }
+		if (!$session->get('logged_in')) {
+			header('Location: ' . base_url('/'));
+			exit;
+		}
+	}
 
-    public function index()
-    {
-        return view('addcompany');
-    }
+	public function index()
+	{
+		return view('addcompany');
+	}
 
-    public function add($id = null)
-    {
-        $data = [];
+	public function add($id = null)
+	{
+		$data = [];
 
-        if ($id) {
-            $company = $this->companyModel->find($id);
-            if (!$company) {
-                throw PageNotFoundException::forPageNotFound('Company Not Found.');
-            }
-            $data['company'] = $company;
-        }
+		if ($id) {
+			$company = $this->companyModel->find($id);
+			if (!$company) {
+				throw PageNotFoundException::forPageNotFound('Company Not Found.');
+			}
+			$data['company'] = $company;
+		}
 
-        return view('addcompany', $data);
-    }
+		return view('addcompany', $data);
+	}
 
-    public function save()
+	public function save()
 	{
 		helper(['form']);
 		$validation = \Config\Services::validation();
@@ -80,7 +80,7 @@ class Managecompany extends BaseController
 		$rawAddress = trim($this->request->getPost('address'));
 		$newData = [
 			'company_name' => $this->request->getPost('company_name'),
-			'address' => $rawAddress !== '-N/A-' ? $rawAddress : '', 
+			'address' => $rawAddress !== '-N/A-' ? $rawAddress : '',
 			'billing_address' => $this->request->getPost('billing_address'),
 			'tax_number' => $this->request->getPost('tax_number'),
 			'email' => $this->request->getPost('email'),
@@ -109,12 +109,12 @@ class Managecompany extends BaseController
 					'message' => 'Another Company With The Same Name And Tax Number Already Exists.'
 				]);
 			}
-			
+
 			if (!preg_match('/^[0-9+\-\s]{7,20}$/', $newData['phone'])) {
 				return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid Phone Number']);
 			}
 
-			
+
 			if ($logoName) {
 				$newData['company_logo'] = $logoName;
 			} else {
@@ -138,7 +138,7 @@ class Managecompany extends BaseController
 				]);
 			}
 
-			 
+
 			if ($logoName && !empty($existing['company_logo']) && file_exists(ROOTPATH . 'public/uploads/' . $existing['company_logo'])) {
 				unlink(ROOTPATH . 'public/uploads/' . $existing['company_logo']);
 			}
@@ -146,8 +146,8 @@ class Managecompany extends BaseController
 			$this->companyModel->update($uid, $newData);
 			return $this->response->setJSON(['status' => 'success', 'message' => 'Company Updated Successfully']);
 		} else {
-			
-			
+
+
 			$existing = $this->companyModel
 				->where('company_name', $newData['company_name'])
 				->where('tax_number', $newData['tax_number'])
@@ -173,19 +173,19 @@ class Managecompany extends BaseController
 	}
 
 
-    public function companyList()
-    {
-        $data['companies'] = $this->companyModel->findAll();
-        return view('companylist', $data);
-    }
+	public function companyList()
+	{
+		$data['companies'] = $this->companyModel->findAll();
+		return view('companylist', $data);
+	}
 
-    public function getCompany($id)
-    {
-        $company = $this->companyModel->find($id);
-        return $this->response->setJSON($company);
-    }
+	public function getCompany($id)
+	{
+		$company = $this->companyModel->find($id);
+		return $this->response->setJSON($company);
+	}
 
-   public function delete()
+	public function delete()
 	{
 		$id = $this->request->getPost('id');
 
@@ -206,7 +206,10 @@ class Managecompany extends BaseController
 			]);
 		}
 
-		if ($companyModel->delete($id)) {
+		// Soft delete: set company_status = 3
+		$update = $companyModel->update($id, ['company_status' => 3]);
+
+		if ($update) {
 			return $this->response->setJSON([
 				'status' => 'success',
 				'message' => 'Company Deleted Successfully.'
@@ -220,63 +223,63 @@ class Managecompany extends BaseController
 	}
 
 	public function companylistjson()
-{
-    $draw       = $this->request->getPost('draw') ?? 1;
-    $fromstart  = $this->request->getPost('start') ?? 0;
-    $tolimit    = $this->request->getPost('length') ?? 10;
-    $order      = $this->request->getPost('order')[0]['dir'] ?? 'desc';
-    $columnIndex= $this->request->getPost('order')[0]['column'] ?? 1;
-    $search     = $this->request->getPost('search')['value'] ?? '';
+	{
+		$draw = $this->request->getPost('draw') ?? 1;
+		$fromstart = $this->request->getPost('start') ?? 0;
+		$tolimit = $this->request->getPost('length') ?? 10;
+		$order = $this->request->getPost('order')[0]['dir'] ?? 'desc';
+		$columnIndex = $this->request->getPost('order')[0]['column'] ?? 1;
+		$search = $this->request->getPost('search')['value'] ?? '';
 
-    $slno = $fromstart + 1;
+		$slno = $fromstart + 1;
 
-    $columnMap = [
-        0 => 'company_id',
-        1 => 'company_name',
-        2 => 'address',
-        3 => 'tax_number',
-        4 => 'email',
-        5 => 'phone',
-        6 => 'company_logo',
-        7 => 'company_id'
-    ];
-    $orderColumn = $columnMap[$columnIndex] ?? 'company_id';
+		$columnMap = [
+			0 => 'company_id',
+			1 => 'company_name',
+			2 => 'address',
+			3 => 'tax_number',
+			4 => 'email',
+			5 => 'phone',
+			6 => 'company_logo',
+			7 => 'company_id'
+		];
+		$orderColumn = $columnMap[$columnIndex] ?? 'company_id';
 
-    $companyModel = new Managecompany_Model();
+		$companyModel = new Managecompany_Model();
 
-    // Fetch filtered records based on updated search logic
-    $companies = $companyModel->getAllFilteredRecords($search, $fromstart, $tolimit, $orderColumn, $order);
+		// Fetch filtered records based on updated search logic
+		$companies = $companyModel->getAllFilteredRecords($search, $fromstart, $tolimit, $orderColumn, $order);
 
-    $result = [];
-    foreach ($companies as $company) {
-        $tax = trim($company['tax_number']);
-        $company['tax_number'] = ($tax === '0' || $tax === '') ? '-N/A-' : $tax;
+		$result = [];
+		foreach ($companies as $company) {
+			$tax = trim($company['tax_number']);
+			$company['tax_number'] = ($tax === '0' || $tax === '') ? '-N/A-' : $tax;
 
-        $address = trim($company['address']);
-        $company['address'] = $address === '' ? '-N/A-' : $address;
+			$address = trim($company['address']);
+			$company['address'] = $address === '' ? '-N/A-' : $address;
 
-        $result[] = [
-            'slno'          => $slno++,
-            'company_id'    => $company['company_id'],
-            'company_name'  => $company['company_name'],
-            'address'       => $company['address'],
-            'tax_number'    => $company['tax_number'],
-            'email'         => $company['email'],
-            'phone'         => $company['phone'],
-            'company_logo'  => $company['company_logo']
-        ];
-    }
+			$result[] = [
+				'slno' => $slno++,
+				'company_id' => $company['company_id'],
+				'company_name' => $company['company_name'],
+				'address' => $company['address'],
+				'tax_number' => $company['tax_number'],
+				'email' => $company['email'],
+				'phone' => $company['phone'],
+				'company_logo' => $company['company_logo']
+			];
+		}
 
-    $total          = $companyModel->getAllCompanyCount()->totcompanies;
-    $filteredTotal  = $companyModel->getFilteredCompanyCount($search)->filCompanies;
+		$total = $companyModel->getAllCompanyCount()->totcompanies;
+		$filteredTotal = $companyModel->getFilteredCompanyCount($search)->filCompanies;
 
-    return $this->response->setJSON([
-        'draw'            => intval($draw),
-        'recordsTotal'    => $total,
-        'recordsFiltered' => $filteredTotal,
-        'data'            => $result
-    ]);
-}
+		return $this->response->setJSON([
+			'draw' => intval($draw),
+			'recordsTotal' => $total,
+			'recordsFiltered' => $filteredTotal,
+			'data' => $result
+		]);
+	}
 
 
 }

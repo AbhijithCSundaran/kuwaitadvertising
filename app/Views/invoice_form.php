@@ -183,7 +183,7 @@
                 <?php else: ?>
                     <tr class="item-row">
                         <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
-                        <td><input type="number" name="price[]" class="form-control price" step="0.01" min="0"></td>
+                        <td><input type="number" name="price[]" class="form-control price" step="0.01" min="0" inputmode="decimal"></td>
                         <td><input type="number" name="quantity[]" class="form-control quantity"></td>
                         <td><input type="number" name="total[]" class="form-control total" readonly></td>
                         <td class="text-center">
@@ -355,6 +355,15 @@
                 this.value = val.replace(/[^0-9]/g, '');
             }
         });
+
+          $(document).on('input', 'input[name="description[]"]', function () {
+            let value = $(this).val();
+            let capitalized = value.replace(/\b\w/g, function (char) {
+                return char.toUpperCase();
+            });
+            $(this).val(capitalized);
+        });
+        
         $(document).on('click', '.remove-item-btn', function () {
             $(this).closest('tr').remove();
             calculateTotals();
