@@ -8,7 +8,20 @@ class InvoiceModel extends Model
     protected $table = 'invoices';
     protected $primaryKey = 'invoice_id';
 
-    protected $allowedFields = ['customer_id', 'billing_address','shipping_address','phone_number','lpo_no','discount', 'total_amount', 'sub_total','invoice_date','status','user_id'];
+    protected $allowedFields = 
+    ['customer_id', 
+    'billing_address',
+    'shipping_address',
+    'phone_number',
+    'lpo_no',
+    'discount', 
+    'total_amount',
+    'invoice_date',
+    'status',
+    'delivery_date',
+    'paid_amount',
+    'balance_amount',
+    'user_id'];
     protected $returnType = 'array';
 
      public function getInvoiceCount()
@@ -37,7 +50,6 @@ class InvoiceModel extends Model
                 ->orLike('DATE_FORMAT(invoices.invoice_date, "%d-%m-%Y")', $search)
                 ->groupEnd();
         }
-
         return $builder->countAllResults();
     }
 
@@ -47,7 +59,7 @@ class InvoiceModel extends Model
     {
 
     $builder = $this->db->table('invoices')
-    ->select('invoices.invoice_id, invoices.customer_id, invoices.discount, invoices.total_amount, invoices.invoice_date, invoices.shipping_address, invoices.phone_number, invoices.lpo_no, customers.name AS customer_name, customers.address AS customer_address')
+    ->select('invoices.invoice_id, invoices.customer_id, invoices.discount, invoices.total_amount, invoices.invoice_date, invoices.shipping_address, invoices.phone_number, invoices.lpo_no, invoices.status,customers.name AS customer_name, customers.address AS customer_address')
     ->join('customers', 'customers.customer_id = invoices.customer_id', 'left');
 
         if ($search) {

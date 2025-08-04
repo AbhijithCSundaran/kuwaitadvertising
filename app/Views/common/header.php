@@ -99,61 +99,67 @@
     $allowedMenus = $session->get('allowed_menus') ?? [];
     $uri = service('uri');
     ?>
+    <?php $currentPath = uri_string(); ?>
     <nav class="sidebar sidebar-offcanvas" id="sidebar">
       <ul class="nav">
         <?php if (in_array('dashboard', $allowedMenus)): ?>
           <li class="nav-item">
-            <a class="nav-link <?= $uri->getSegment(1) == 'dashboard' ? 'active' : '' ?>"
-              href="<?= base_url('dashboard') ?>">
-              <i class="mdi mdi-home menu-icon"></i>
-              <span class="menu-title">Dashboard</span>
-            </a>
+           <a class="nav-link <?= strpos($currentPath, 'dashboard') !== false ? 'active' : '' ?>"
+   href="<?= base_url('dashboard') ?>">
+  <i class="mdi mdi-home menu-icon"></i>
+  <span class="menu-title">Dashboard</span>
+</a>
+
           </li>
         <?php endif; ?>
 
         <?php if (in_array('companylist', $allowedMenus)): ?>
           <li class="nav-item">
-            <a class="nav-link <?= $uri->getSegment(1) == 'companylist' ? 'active' : '' ?>"
-              href="<?= base_url('companylist') ?>">
-              <i class="mdi mdi-view-headline menu-icon"></i>
-              <span class="menu-title">Company Management</span>
-            </a>
+            <a class="nav-link <?= strpos($currentPath, 'company') !== false ? 'active' : '' ?>"
+   href="<?= base_url('companylist') ?>">
+  <i class="mdi mdi-view-headline menu-icon"></i>
+  <span class="menu-title">Company Management</span>
+</a>
+
           </li>
         <?php endif; ?>
 
         <?php if (in_array('adduserlist', $allowedMenus)): ?>
           <li class="nav-item">
-            <a class="nav-link <?= $uri->getSegment(1) == 'adduserlist' ? 'active' : '' ?>"
-              href="<?= base_url('adduserlist') ?>">
-              <i class="mdi mdi-bi bi-person menu-icon"></i>
-              <span class="menu-title">Manage User</span>
-            </a>
+            <a class="nav-link <?= strpos($currentPath, 'adduser') !== false || strpos($currentPath, 'manageuser') !== false ? 'active' : '' ?>"
+   href="<?= base_url('adduserlist') ?>">
+  <i class="mdi mdi-bi bi-person menu-icon"></i>
+  <span class="menu-title">Manage User</span>
+</a>
+
           </li>
         <?php endif; ?>
 
         <?php if (in_array('rolemanagement', $allowedMenus)): ?>
           <li class="nav-item">
-            <a class="nav-link <?= $uri->getSegment(1) == 'rolemanagement' ? 'active' : '' ?>"
-              href="<?= base_url('rolemanagement/rolelist') ?>">
-              <i class="mdi mdi-chart-pie menu-icon"></i>
-              <span class="menu-title">Role Management</span>
-            </a>
+            <a class="nav-link <?= strpos($currentPath, 'rolemanagement') !== false ? 'active' : '' ?>"
+   href="<?= base_url('rolemanagement/rolelist') ?>">
+  <i class="mdi mdi-chart-pie menu-icon"></i>
+  <span class="menu-title">Role Management</span>
+</a>
+
           </li>
         <?php endif; ?>
 
         <?php if (in_array('customer', $allowedMenus)): ?>
           <li class="nav-item">
-            <a class="nav-link <?= $uri->getSegment(1) == 'customer' ? 'active' : '' ?>"
-              href="<?= base_url('customer/list') ?>">
-              <i class="mdi mdi-account-multiple menu-icon"></i>
-              <span class="menu-title">Customer List</span>
-            </a>
+            <a class="nav-link <?= strpos($currentPath, 'customer') !== false ? 'active' : '' ?>"
+   href="<?= base_url('customer/list') ?>">
+  <i class="mdi mdi-account-multiple menu-icon"></i>
+  <span class="menu-title">Customer List</span>
+</a>
+
           </li>
         <?php endif; ?>
 
         <?php if (in_array('estimatelist', $allowedMenus)): ?>
           <li class="nav-item">
-            <a class="nav-link <?= $uri->getSegment(1) == 'estimatelist' ? 'active' : '' ?>"
+           <a class="nav-link <?= strpos(uri_string(), 'estimate') !== false || uri_string() == 'estimatelist' ? 'active' : '' ?>"
               href="<?= base_url('estimatelist') ?>">
               <i class="mdi mdi-grid-large menu-icon"></i>
               <span class="menu-title">Estimate Generation</span>
@@ -163,19 +169,22 @@
 
         <?php if (in_array('expense', $allowedMenus)): ?>
           <li class="nav-item">
-            <a class="nav-link <?= $uri->getSegment(1) == 'expense' ? 'active' : '' ?>" href="<?= base_url('expense') ?>">
-              <i class="mdi mdi-square-outline menu-icon"></i>
-              <span class="menu-title">Expenses</span>
-            </a>
+            <a class="nav-link <?= strpos($currentPath, 'expense') !== false ? 'active' : '' ?>"
+   href="<?= base_url('expense') ?>">
+  <i class="mdi mdi-square-outline menu-icon"></i>
+  <span class="menu-title">Expenses</span>
+</a>
+
           </li>
         <?php endif; ?>
         <?php if (in_array('invoices', $allowedMenus)): ?>
           <li class="nav-item">
-            <a class="nav-link <?= $uri->getSegment(1) == 'invoicelist' ? 'active' : '' ?>"
-              href="<?= base_url('invoicelist') ?>">
-              <i class="mdi mdi-receipt menu-icon"></i>
-              <span class="menu-title">Invoice List</span>
-            </a>
+            <a class="nav-link <?= strpos($currentPath, 'invoice') !== false ? 'active' : '' ?>"
+   href="<?= base_url('invoicelist') ?>">
+  <i class="mdi mdi-receipt menu-icon"></i>
+  <span class="menu-title">Invoice List</span>
+</a>
+
           </li>
         <?php endif; ?>
         <?php if (in_array('reports', $allowedMenus)): ?>
