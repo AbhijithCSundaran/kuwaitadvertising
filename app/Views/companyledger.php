@@ -13,8 +13,11 @@
             <select class="form-control" name="company_id" id="company_id" required>
                 <option value="">-- Select Company --</option>
                 <?php foreach ($companies as $company): ?>
-                    <option value="<?= $company['company_id'] ?>"><?= esc($company['company_name']) ?></option>
-                <?php endforeach; ?>
+    <option value="<?= $company['company_id'] ?>">
+        <?= ucwords(strtolower(esc($company['company_name']))) ?>
+    </option>
+<?php endforeach; ?>
+
             </select>
         </div>
     </div>

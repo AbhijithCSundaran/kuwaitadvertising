@@ -243,19 +243,38 @@
 
   <button onclick="window.location.href='<?= base_url('invoice/edit/' . $invoice['invoice_id']) ?>'"
     style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
-    Discard
+    Edit Invoice
   </button>
 
-  <?php
-    $status = strtolower($invoice['status'] ?? 'unpaid');
-    $btnLabel = ucfirst($status);
-    $btnColor = $status === 'paid' ? '#28a745' : '#991b36';
-  ?>
+ <button onclick="window.location.href='<?= base_url('invoice/delivery_note/' . $invoice['invoice_id']) ?>'"
+    style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
+   Delivery Note
+</button>
 
-  <button id="statusBtn"
-    style="background-color: <?= $btnColor ?>; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">
+
+
+ <?php
+  $status = strtolower($invoice['status'] ?? 'unpaid');
+  $btnLabel = ucfirst($status);
+  $btnColor = $status === 'paid' ? '#28a745' : ($status === 'partial paid' ? '#ffc107' : '#991b36');
+?>
+<div class="btn-group ml-2 position-relative" style="z-index: 1000; margin-left: 10px;">
+  <button
+    id="statusBtn"
+    type="button"
+    class="btn btn-sm"
+    style="background-color: <?= $btnColor ?>; color: white; padding: 8px 16px; border-radius: 5px;">
     <?= $btnLabel ?>
   </button>
+
+  <?php if ($status === 'unpaid'): ?>
+    <div id="statusOptions" class="dropdown-menu" style="position: absolute; top: 100%; left: 0; min-width: 100%; z-index: 9999;">
+      <a href="#" class="dropdown-item" onclick="updateStatus('paid')">Paid</a>
+      <a href="#" class="dropdown-item" onclick="openPartialPayment()">Partial Paid</a>
+    </div>
+  <?php endif; ?>
+</div>
+
 </div>
 
     <div class="invoice-container">
@@ -288,21 +307,29 @@
       <div class="d-flex col-12 mb-3">
         <!-- Bill To -->
         <div class="bill-to col-4 pr-3">
-          <div class="label">BILL TO: <strong><?= esc($customer['name'] ?? '-') ?></strong></div>
-          <div>Person Name: <strong><?= esc($customer['name'] ?? '-') ?></strong></div>
-          <div>Business Name:<strong><?= esc($invoice['company_name'] ?? 'Company Name Not Found') ?></strong></div>
-          <div>Address: <strong><?= esc($invoice['customer_address'] ?? '-') ?></strong></div>
-          <div>Contact Number:<strong><?= esc($invoice['phone_number'] ?? '-') ?></strong></div>
+          <div class="label">
+            BILL TO: <strong><?= ucwords(strtolower(esc($customer['name'] ?? '-'))) ?></strong>
+          </div>
+          <div>
+            Person Name: <strong><?= ucwords(strtolower(esc($customer['name'] ?? '-'))) ?></strong>
+          </div>
+          <div>
+            Business Name: <strong><?= ucwords(strtolower(esc($invoice['company_name'] ?? 'Company Name Not Found'))) ?></strong>
+          </div>
+          <div>
+            Address: <strong><?= ucwords(strtolower(esc($invoice['customer_address'] ?? '-'))) ?></strong>
+          </div>
+          <div>
+            Contact Number: <strong><?= esc($invoice['phone_number'] ?? '-') ?></strong>
+          </div>
         </div>
-
         <!-- Ship To -->
         <div class="ship-to col-4 pr-3">
          <div class="label">
           <span>SHIPPING ADDRESS</span><br>
           <span style="color: #000;">
-            <?= nl2br(esc($invoice['shipping_address'] ?? '-')) ?>
+            <?= nl2br(ucwords(strtolower(esc($invoice['shipping_address'] ?? '-')))) ?>
           </span>
-
         </div>
           <!-- <div>Address:<strong><?= esc($invoice['shipping_address'] ?? '-') ?></strong></div> -->
           <!-- <div>Person Name:<strong><?= esc($customer['name'] ?? '-') ?></strong></div>
@@ -337,7 +364,7 @@
         <thead>
           <tr>
             <th>SR. NO</th>
-            <th style="width: 518px;">DESCRIPTION</th>
+            <th style="width: 518px;"><?= ucwords(strtolower('description')) ?></th>
             <th>QTY</th>
             <th>UNIT PRICE (KD)</th>
             <th>TOTAL (KD)</th>
@@ -362,8 +389,8 @@
               <td><?= $i++ ?></td>
               <td><?= esc($item['item_name'] ?? '-') ?></td>
               <td><?= esc($item['quantity']) ?></td>
-              <td><?= number_format($item['price'], 3) ?></td>
-              <td><?= number_format($lineTotal, 3) ?></td>
+              <td><?= number_format($item['price'], 2) ?></td>
+              <td><?= number_format($lineTotal, 2) ?></td>
             </tr>
             <?php endforeach; ?>
           </tbody>
@@ -373,7 +400,7 @@
       <div class="totals">
         <div class="totals-row">
           <div class="tot">SUBTOTAL</div>
-          <div class="value"><?= number_format($subtotal, 3) ?></div>
+          <div class="value"><?= number_format($subtotal, 2) ?></div>
         </div>
         <div class="totals-row">
           <div class="tot">DISCOUNT</div>
@@ -383,13 +410,22 @@
       <div class="totals grand-total">
         <div class="totals-row">
           <strong>Grand Total</strong>
-          <span>KD<?= number_format($subtotal - $totalDiscountAmount, 3) ?></span>
+          <span>KD<?= number_format($subtotal - $totalDiscountAmount, 2) ?></span>
         </div>
       </div>
      <?php $grandTotal = $subtotal - $totalDiscountAmount; ?>
       <div class="amount-words">
        In Words:: <span id="amount-words"></span>
       </div>
+      <div class="totals-row" id="paidAmountRow" style="display:none;">
+  <div class="tot">Paid Amount</div>
+  <div class="value" id="paidValue"></div>
+</div>
+<div class="totals-row" id="balanceAmountRow" style="display:none;">
+  <div class="tot">Balance</div>
+  <div class="value" id="balanceValue"></div>
+</div>
+
 
 
       <!-- Footer -->
@@ -417,8 +453,22 @@
           </table>
         </div>
       </div>
+
+      <!-- Partial Payment Modal -->
+      <div id="partialPaymentModal" style="display: none;">
+  <div class="modal-content">
+    <h5>Enter Partial Payment Amount</h5>
+    <input type="number" id="partialPaidInput" class="form-control" min="1" placeholder="Amount">
+    <div class="mt-3">
+      <button class="btn btn-success" onclick="submitPartialPayment()">Submit</button>
+      <button class="btn btn-secondary" onclick="closePartialModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
       <!-- Delivery Note Popup -->
-      <div id="deliveryNoteModal" class="modal" style="display:none; position: fixed; z-index: 9999; left: 0; top: 0;
+      <!-- <div id="deliveryNoteModal" class="modal" style="display:none; position: fixed; z-index: 9999; left: 0; top: 0;
         width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
       <div
         style="background-color: #fff; margin: 15% auto; padding: 20px; border-radius: 10px; width: 300px; text-align: center;">
@@ -432,10 +482,10 @@
             Cancel
           </button>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
-</body>
+ </body>
 </html>
 </div>
 <?php include "common/footer.php"; ?>
@@ -449,7 +499,7 @@
   let [dinars, fils] = num.split('.');
 
   dinars = parseInt(dinars || '0', 10);
-  fils = parseInt((fils || '0').padEnd(3, '0').slice(0, 3));
+  fils = parseInt((fils || '0').padEnd(2, '0').slice(0, 2));
 
   const convert = (n) => {
     if (n === 0) return 'zero';
@@ -546,7 +596,7 @@
   num = num.toString().replace(/,/g, '');
   let [dinars, fils] = num.split('.');
   dinars = parseInt(dinars || '0', 10);
-  fils = parseInt((fils || '0').padEnd(3, '0').slice(0, 2));
+  fils = parseInt((fils || '0').padEnd(2, '0').slice(0, 2));
 
   let words = '';
   if (dinars > 0) words += convertNumber(dinars) + ' دينار';
@@ -554,7 +604,7 @@
   return words || 'صفر';
 }
 
-  const grandTotal = <?= json_encode(number_format($grandTotal, 3, '.', '')) ?>;
+  const grandTotal = <?= json_encode(number_format($grandTotal, 2, '.', '')) ?>;
 
   const englishWords = numberToWords(grandTotal);
   const arabicWords = numberToArabicWords(grandTotal);
@@ -564,19 +614,7 @@
   `;
 
 
-  // const paymentStatusBtn = document.getElementById('paymentStatusBtn');
   const deliveryNoteModal = document.getElementById('deliveryNoteModal');
-
-  // paymentStatusBtn.addEventListener('click', function () {
-  //   if (paymentStatusBtn.textContent === 'Unpaid') {
-  //     paymentStatusBtn.textContent = 'Paid';
-  //     paymentStatusBtn.style.backgroundColor = '#28a745'; // green for paid
-  //     showModal();
-  //   } else {
-  //     paymentStatusBtn.textContent = 'Unpaid';
-  //     paymentStatusBtn.style.backgroundColor = '#991b36'; // back to original
-  //   }
-  // });
 
   function showModal() {
     deliveryNoteModal.style.display = 'block';
@@ -612,24 +650,73 @@
     }
   };
 
+  
+const statusBtn = document.getElementById('statusBtn');
+const statusOptions = document.getElementById('statusOptions');
 
-document.getElementById('statusBtn').addEventListener('click', function () {
-  const btn = this;
-  const currentStatus = btn.textContent.trim().toLowerCase();
+if (statusBtn && statusOptions) {
+  statusBtn.addEventListener('click', function () {
+    statusOptions.style.display = (statusOptions.style.display === 'block') ? 'none' : 'block';
+  });
 
-  if (currentStatus === 'unpaid') {
-    // First update to 'Paid', then show modal
-    updateStatus('paid', function () {
-      showModal();
-    });
-  } else if (currentStatus === 'paid') {
-    // Already paid, just show modal again
-    showModal();
+  document.addEventListener('click', function (e) {
+    if (!statusBtn.contains(e.target) && !statusOptions.contains(e.target)) {
+      statusOptions.style.display = 'none';
+    }
+  });
+}
+
+function openPartialPayment() {
+  document.getElementById('partialPaymentModal').style.display = 'block';
+}
+
+function closePartialModal() {
+  document.getElementById('partialPaymentModal').style.display = 'none';
+}
+
+function submitPartialPayment() {
+  const paid = parseFloat(document.getElementById('partialPaidInput').value);
+  if (isNaN(paid) || paid <= 0 || paid > grandTotal) {
+    alert("Invalid amount.");
+    return;
   }
-});
 
-function updateStatus(newStatus, callback = null) {
-  const btn = document.getElementById('statusBtn');
+  fetch("<?= base_url('invoice/update_partial_payment') ?>", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Requested-With": "XMLHttpRequest"
+    },
+    body: JSON.stringify({
+      invoice_id: <?= $invoice['invoice_id'] ?>,
+      paid_amount: paid
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      document.getElementById('paidAmountRow').style.display = 'flex';
+      document.getElementById('balanceAmountRow').style.display = 'flex';
+      document.getElementById('paidValue').innerText = paid.toFixed(2);
+      document.getElementById('balanceValue').innerText = (grandTotal - paid).toFixed(2);
+      statusBtn.innerText = 'Partial Paid';
+      statusBtn.style.backgroundColor = '#ffc107';
+      closePartialModal();
+    } else {
+      alert("Failed to update.");
+      console.error("Partial update error:", data);
+    }
+  })
+  .catch(err => {
+    alert("Network or server error.");
+    console.error("Fetch failed:", err);
+  });
+}
+
+function updateStatus(newStatus) {
+  const invoiceId = <?= $invoice['invoice_id'] ?>;
+
+  console.log("Updating invoice:", invoiceId, "to status:", newStatus);
 
   fetch("<?= base_url('invoice/update_status') ?>", {
     method: "POST",
@@ -638,31 +725,85 @@ function updateStatus(newStatus, callback = null) {
       "X-Requested-With": "XMLHttpRequest"
     },
     body: JSON.stringify({
-      invoice_id: <?= $invoice['invoice_id'] ?>,
+      invoice_id: invoiceId,
       status: newStatus
     })
   })
-  .then(response => response.json())
+  .then(res => res.json())
   .then(data => {
     if (data.success) {
-      // Update UI status
-      btn.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
-      btn.style.backgroundColor = newStatus === 'paid' ? '#28a745' : '#991b36';
+      statusBtn.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+      statusBtn.style.backgroundColor = newStatus === 'paid' ? '#28a745' : '#991b36';
+      statusOptions.style.display = 'none';
 
-      if (callback) callback(); // Show modal after status update
+      // if (newStatus === 'paid') {
+      //   alert("Status updated to Paid. You can now download the Delivery Note.");
+      //   // Optionally show delivery note button here
+      // }
     } else {
-      alert("Failed to update invoice status.");
+      alert("Status update failed.");
+      console.error("Update status failed:", data);
     }
   })
-  .catch(error => {
-    alert("Error while updating status.");
-    console.error(error);
+  .catch(err => {
+    alert("Network or server error.");
+    console.error("Fetch error:", err);
   });
 }
+
+
+
+
+
+// document.getElementById('statusBtn').addEventListener('click', function () {
+//   const btn = this;
+//   const currentStatus = btn.textContent.trim().toLowerCase();
+
+//   if (currentStatus === 'unpaid') {
+//     // First update to 'Paid', then show modal
+//     updateStatus('paid', function () {
+//       showModal();
+//     });
+//   } else if (currentStatus === 'paid') {
+//     // Already paid, just show modal again
+//     showModal();
+//   }
+// });
+
+// function updateStatus(newStatus, callback = null) {
+//   const btn = document.getElementById('statusBtn');
+
+//   fetch("<?= base_url('invoice/update_status') ?>", {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//       "X-Requested-With": "XMLHttpRequest"
+//     },
+//     body: JSON.stringify({
+//       invoice_id: <?= $invoice['invoice_id'] ?>,
+//       status: newStatus
+//     })
+//   })
+//   .then(response => response.json())
+//   .then(data => {
+//     if (data.success) {
+//       // Update UI status
+//       btn.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+//       btn.style.backgroundColor = newStatus === 'paid' ? '#28a745' : '#991b36';
+
+//       if (callback) callback(); 
+//     } else {
+//       alert("Failed to update invoice status.");
+//     }
+//   })
+//   .catch(error => {
+//     alert("Error while updating status.");
+//     console.error(error);
+//   });
+// }
 function downloadDeliveryNote() {
   deliveryNoteModal.style.display = 'none';
   window.location.href = '<?= base_url("invoice/delivery_note/" . $invoice["invoice_id"]) ?>';
 }
-
 
 </script>

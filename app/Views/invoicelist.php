@@ -5,6 +5,28 @@
         font-size: 14px;
         vertical-align: middle;
     }
+    .status-badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 1px;
+    min-width: 70px;
+    text-align: center;
+    color: #fff;
+}
+.status-paid {
+    background-color: #28a745;
+}
+.status-unpaid {
+    background-color: #dc3545;
+}
+.status-pending {
+    background-color: #ffc107;
+    color: #000;
+}
+
 </style>
 
 <div class="form-control mb-3 right_container">
@@ -107,15 +129,22 @@ $(document).ready(function () {
             },
             { data: 'invoice_date' },
             {
-                 data: 'status',
-                render: function (data) {
-                    let badgeClass = 'secondary';
-                    if (data === 'paid') badgeClass = 'success';
-                    else if (data === 'unpaid') badgeClass = 'danger';
-                    else if (data === 'pending') badgeClass = 'warning';
-                    return `<span class="badge bg-${badgeClass} text-uppercase">${data}</span>`;
-                }
-            },
+    data: 'status',
+    render: function (data, type, row) {
+        if (!data) return '';
+
+        let className = '';
+        let text = data.toUpperCase();
+
+        if (data.toLowerCase() === 'paid') className = 'status-badge status-paid';
+        else if (data.toLowerCase() === 'unpaid') className = 'status-badge status-unpaid';
+        else if (data.toLowerCase() === 'pending') className = 'status-badge status-pending';
+        else className = 'status-badge bg-secondary';
+
+        return `<span class="${className}">${text}</span>`;
+    }
+},
+
             {
                 data: "invoice_id",
                 render: function (id) {
