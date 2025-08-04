@@ -168,13 +168,6 @@
             <div class="text-right">
                 <a href="<?= base_url('estimatelist') ?>" class="btn btn-secondary">Discard</a>
                 <button type="submit" id="generate-btn" class="btn btn-primary">Generate Estimate</button>
-   <?php if (!empty($estimate) && isset($estimate['estimate_id'])): ?>
-    <a href="<?= base_url('invoice/convertFromEstimate/' . $estimate['estimate_id']) ?>" class="btn btn-primary">
-        Convert to Invoice
-    </a>
-<?php endif; ?>
-
-
             </div>
         </form>
     </div>
@@ -244,11 +237,6 @@
             // Allow + only at the beginning, keep digits, space, parentheses, and dashes
             this.value = val.replace(/(?!^)\+/g, '').replace(/[^0-9\s\-\(\)\+]/g, '');
         });
-
-   $('#convert-to-invoice').on('click', function () {
-    let estimateId = "<?= isset($estimate['estimate_id']) ? $estimate['estimate_id'] : '' ?>";
-    window.location.href = `<?= base_url('invoice/convert/') ?>${estimateId}`;
-});
         $(document).on('input', 'input[name="description[]"]', function () {
             let value = $(this).val();
             let capitalized = value.replace(/\b\w/g, function (char) {

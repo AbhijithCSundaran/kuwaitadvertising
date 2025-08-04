@@ -183,7 +183,6 @@ public function save()
             $item['estimate_id'] = $estimateId;
         }
         $estimateItemModel->insertBatch($items);
-        
 
         return $this->response->setJSON([
             'status' => 'success',

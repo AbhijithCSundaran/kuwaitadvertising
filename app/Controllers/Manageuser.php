@@ -204,10 +204,11 @@ if ($roleId != 1) {
     }
 
     $userModel = new \App\Models\Manageuser_Model();
-    $users = $userModel->getAllFilteredRecords($condition, $fromstart, $tolimit, $orderColumn, $orderDir);
+    $users = $userModel->getAllFilteredRecords($condition, $fromstart, $tolimit, $orderColumn, $orderDir,$roleId);
 
     $result = [];
-    foreach ($users as $user) {
+    if (!empty($users)){
+        foreach ($users as $user) {
         $result[] = [
             'slno'        => $slno++,
             'user_id'     => $user->user_id,
@@ -218,6 +219,8 @@ if ($roleId != 1) {
         ];
     }
 
+    }
+    
     // Count logic
     $totalCondition = ($roleId == 1) ? "1=1" : "user.company_id = " . (int)$companyId;
     $total = $userModel->getAllUserCount($totalCondition)->totuser ?? 0;

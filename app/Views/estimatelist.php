@@ -131,8 +131,11 @@ $(document).ready(function () {
                             <a href="<?= base_url('estimate/generateEstimate/') ?>${id}" title="Print" style="color:green;">
                                 <i class="bi bi-printer-fill"></i>
                             </a>
-                            <a href="<?= base_url('estimate/edit/') ?>${id}" title="Edit" style="color:rgb(13, 162, 199); margin-right: 10px;">
+                            <a href="<?= base_url('estimate/edit/') ?>${id}" title="Edit" style="color:rgb(13, 162, 199); ">
                                 <i class="bi bi-pencil-fill"></i>
+                            </a>
+                            <a href="<?= base_url('invoice/convertFromEstimate/') ?>${id}" title="Convert Invoice" style="color:orange;">
+                                <i class="bi bi-arrow-right-circle"></i>
                             </a>
                             <a href="javascript:void(0);" class="delete-estimate" data-id="${id}" title="Delete" style="color: #dc3545;">
                                 <i class="bi bi-trash-fill"></i>

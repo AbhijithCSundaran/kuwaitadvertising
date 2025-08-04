@@ -53,7 +53,7 @@
             </tbody>
         </table>
     <?php else: ?>
-        <!-- <div class="alert alert-warning">No sales data found for selected criteria.</div> -->
+        <div class="alert alert-warning">No sales data found for selected criteria.</div>
     <?php endif; ?>
 </div>
     </div>

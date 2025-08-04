@@ -77,7 +77,10 @@
         style="background-color: #a1263a; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
         Discard
       </button>
-
+      <button onclick="window.location.href='<?= base_url('invoice/convertFromEstimate/' . $estimate['estimate_id']) ?>'"
+        style="background-color:  #a1263a; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
+        Convert Invoice
+      </button>
     </div>
     <div class="estimate-container">
 
