@@ -77,10 +77,6 @@
       margin-bottom: 10px;
     }
 
-    /* .bill-to,
-    .ship-to {
-      width: 48%;
-    } */
 
     .bill-to td,
     .ship-to td {
@@ -158,16 +154,10 @@
       font-weight: bold;
       margin-top: 5px;
     }
-
-    /* .invoice-footer-text .thanks {
-      margin-top: 5px;
-    } */
-
     .recipient-box {
       width: 300px;
       border: 2px solid #000;
       margin-top: 20px;
-      /* float: right; */
     }
 
     .recipient-box.table {
@@ -185,41 +175,38 @@
       font-size: 16px;
       text-decoration: underline 1px solid #000;
     }
+     .tot{
+    font-weight: bold;
+    }
 
     .bill-to strong,
     .ship-to strong {
       color: black;
-      /* Ensure strong tags are black */
     }
+   .partial-row {
+    display: flex;
+    justify-content: end;
+    width: 300px;
+    margin-bottom: 5px;
+    gap: 53px;
+  }
 
-    /* .totals {
-  margin-top: 20px;
-  max-width: 300px;
-  font-size: 14px;
-} */
+  .partial {
+    font-weight: bold;
+  }
 
-    /* .totals-row {
-  display: right;
-  justify-content: space-between;
-  padding: 4px 0;
-  border-bottom: 1px solid #ccc;
-} */
+.value {
+  text-align: right;
+  min-width: 100px;
+}
 
-    .tot {
-      font-weight: bold;
-    }
-
-    .value {
-      text-align: right;
-      min-width: 80px;
-    }
 
     @media print {
       * {
         -webkit-print-color-adjust: exact !important;
-        /* Safari/Chrome */
+        Safari/Chrome 
         print-color-adjust: exact !important;
-        /* Firefox */
+        Firefox 
       }
 
       .no-print,
@@ -241,10 +228,15 @@
     🖨️ Print
   </button>
 
-  <button onclick="window.location.href='<?= base_url('invoice/edit/' . $invoice['invoice_id']) ?>'"
-    style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
-    Edit Invoice
-  </button>
+ <?php
+  $isPaid = strtolower($invoice['status']) === 'paid';
+?>
+<button
+  <?= $isPaid ? 'disabled title="Paid invoice cannot be edited"' : 'onclick="window.location.href=\'' . base_url('invoice/edit/' . $invoice['invoice_id']) . '\'"' ?>
+  style="background-color: <?= $isPaid ? '#6c757d' : '#991b36' ?>; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px; cursor: <?= $isPaid ? 'not-allowed' : 'pointer' ?>;">
+  Edit Invoice
+</button>
+
 
  <button onclick="window.location.href='<?= base_url('invoice/delivery_note/' . $invoice['invoice_id']) ?>'"
     style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
@@ -254,31 +246,35 @@
 
 
  <?php
-  $status = strtolower($invoice['status'] ?? 'unpaid');
-  $btnLabel = ucfirst($status);
-  $btnColor = $status === 'paid' ? '#28a745' : ($status === 'partial paid' ? '#ffc107' : '#991b36');
-?>
+    $status = strtolower($invoice['status'] ?? 'unpaid');
+    $btnLabel = ucfirst($status);
+    $btnColor = $status === 'paid' ? '#28a745' : ($status === 'partial paid' ? '#ffc107' : '#991b36');
+  ?>
 <div class="btn-group ml-2 position-relative" style="z-index: 1000; margin-left: 10px;">
-  <button
-    id="statusBtn"
-    type="button"
-    class="btn btn-sm"
-    style="background-color: <?= $btnColor ?>; color: white; padding: 8px 16px; border-radius: 5px;">
-    <?= $btnLabel ?>
-  </button>
+ <button
+  id="statusBtn"
+  type="button"
+  class="btn btn-sm"
+  onclick="toggleStatusOptions()"
+  style="background-color: <?= $btnColor ?>; color: white; padding: 8px 16px; border-radius: 5px;">
+  <?= $btnLabel ?>
+</button>
 
-  <?php if ($status === 'unpaid'): ?>
-    <div id="statusOptions" class="dropdown-menu" style="position: absolute; top: 100%; left: 0; min-width: 100%; z-index: 9999;">
-      <a href="#" class="dropdown-item" onclick="updateStatus('paid')">Paid</a>
-      <a href="#" class="dropdown-item" onclick="openPartialPayment()">Partial Paid</a>
+  <?php if ($status === 'unpaid' || $status === 'partial paid'): ?>
+    <div class="dropdown" style="position: relative;">
+      <div id="statusOptions" class="dropdown-menu p-2" style="position: absolute; top: 100%; right: 0px; z-index: 1050; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        <a href="#" class="dropdown-item text-success fw-semibold" onclick="updateStatus('paid')">
+          <i class="fas fa-check-circle me-2"></i> Mark as Paid
+        </a>
+        <a href="#" class="dropdown-item text-warning fw-semibold" onclick="openPartialPayment()">
+          <i class="fas fa-hourglass-half me-2"></i> Partial Payment
+        </a>
+      </div>
     </div>
   <?php endif; ?>
 </div>
-
 </div>
-
     <div class="invoice-container">
-
       <!-- Header -->
       <div class="d-flex col-12 mb-3">
         <div class="col-6">
@@ -298,11 +294,7 @@
           </div>
         </div>
       </div>
-
       <h2 class="invoice-title">INVOICE NO. <?= esc($invoice['invoice_id']) ?></h2>
-
-
-
       <!-- Billing & Shipping -->
       <div class="d-flex col-12 mb-3">
         <!-- Bill To -->
@@ -417,17 +409,23 @@
       <div class="amount-words">
        In Words:: <span id="amount-words"></span>
       </div>
-      <div class="totals-row" id="paidAmountRow" style="display:none;">
-  <div class="tot">Paid Amount</div>
-  <div class="value" id="paidValue"></div>
-</div>
-<div class="totals-row" id="balanceAmountRow" style="display:none;">
-  <div class="tot">Balance</div>
-  <div class="value" id="balanceValue"></div>
-</div>
+      <?php
+        $paidAmount = floatval($invoice['paid_amount'] ?? 0);
+        $grandTotal = $subtotal - $totalDiscountAmount;
+        $balanceAmount = $grandTotal - $paidAmount;
+        $status = strtolower($invoice['status'] ?? 'unpaid');
+      ?>
 
-
-
+        <div style="display: flex; flex-direction: column; align-items: flex-end; margin-top: 10px;">
+        <div class="partial-row" id="paidAmountRow" style="display: <?= ($status === 'partial paid' && $paidAmount > 0) ? 'flex' : 'none' ?>;">
+          <div class="partial">Paid Amount</div>
+          <div class="value" id="paidAmountValue"><?= number_format($paidAmount, 2) ?></div>
+        </div>
+        <div class="partial-row" id="balanceAmountRow" style="display: <?= ($status === 'partial paid' && $paidAmount > 0) ? 'flex' : 'none' ?>;">
+          <div class="partial">Balance</div>
+          <div class="value" id="balanceAmountValue"><?= number_format($balanceAmount, 2) ?></div>
+        </div>
+      </div>
       <!-- Footer -->
       <div class="d-flex col-12">
         <div class="invoice-footer-text col-6">
@@ -455,38 +453,33 @@
       </div>
 
       <!-- Partial Payment Modal -->
-      <div id="partialPaymentModal" style="display: none;">
-  <div class="modal-content">
-    <h5>Enter Partial Payment Amount</h5>
-    <input type="number" id="partialPaidInput" class="form-control" min="1" placeholder="Amount">
-    <div class="mt-3">
-      <button class="btn btn-success" onclick="submitPartialPayment()">Submit</button>
-      <button class="btn btn-secondary" onclick="closePartialModal()">Cancel</button>
-    </div>
-  </div>
-</div>
-
-
-      <!-- Delivery Note Popup -->
-      <!-- <div id="deliveryNoteModal" class="modal" style="display:none; position: fixed; z-index: 9999; left: 0; top: 0;
-        width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
-      <div
-        style="background-color: #fff; margin: 15% auto; padding: 20px; border-radius: 10px; width: 300px; text-align: center;">
-          <p>Do you want to download the delivery note?</p>
-          <button onclick="downloadDeliveryNote()"
-            style="background-color: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 5px; margin: 5px;">
-            Yes
-          </button>
-          <button onclick="closeModal()"
-            style="background-color: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 5px; margin: 5px;">
-            Cancel
-          </button>
+      <div id="partialPaymentModal" class="modal fade show" style="display: none; background-color: rgba(235, 170, 71, 0.7); position: fixed; inset: 0; z-index: 1055; align-items: center; justify-content: center;">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content shadow-lg border-0 rounded-4 p-4">
+            <div class="modal-header border-0">
+              <h5 class="modal-title text-primary fw-bold">Partial Payment</h5>
+              <button type="button" class="btn-close" onclick="closePartialModal()"></button>
+            </div>
+            <div class="modal-body">
+              <label for="partialPaidInput" class="form-label">Enter Amount</label>
+              <input type="number" id="partialPaidInput" class="form-control form-control-lg border-primary" min="1" placeholder="Enter partial amount">
+            </div>
+            <div class="modal-footer border-0">
+              <button class="btn btn-success px-4" onclick="submitPartialPayment()">
+                <i class="fas fa-check me-1"></i> Submit
+              </button>
+              <button class="btn btn-outline-secondary px-4" onclick="closePartialModal()">
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
-      </div> -->
+    </div>
     </div>
   </div>
  </body>
 </html>
+</div>
 </div>
 <?php include "common/footer.php"; ?>
 <script>
@@ -650,7 +643,19 @@
     }
   };
 
-  
+ function toggleStatusOptions() {
+    const dropdown = document.getElementById('statusOptions');
+    dropdown.classList.toggle('show');
+  }
+
+  document.addEventListener('click', function (e) {
+    const statusBtn = document.getElementById('statusBtn');
+    const statusOptions = document.getElementById('statusOptions');
+
+    if (!statusBtn.contains(e.target) && !statusOptions.contains(e.target)) {
+      statusOptions.classList.remove('show');
+    }
+  });
 const statusBtn = document.getElementById('statusBtn');
 const statusOptions = document.getElementById('statusOptions');
 
@@ -674,6 +679,7 @@ function closePartialModal() {
   document.getElementById('partialPaymentModal').style.display = 'none';
 }
 
+// let grandTotal = <?= json_encode($invoice['total'] ?? 0) ?>;
 function submitPartialPayment() {
   const paid = parseFloat(document.getElementById('partialPaidInput').value);
   if (isNaN(paid) || paid <= 0 || paid > grandTotal) {
@@ -681,36 +687,45 @@ function submitPartialPayment() {
     return;
   }
 
-  fetch("<?= base_url('invoice/update_partial_payment') ?>", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Requested-With": "XMLHttpRequest"
-    },
-    body: JSON.stringify({
-      invoice_id: <?= $invoice['invoice_id'] ?>,
-      paid_amount: paid
-    })
+ fetch("<?= base_url('invoice/update_partial_payment') ?>", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "X-Requested-With": "XMLHttpRequest"
+  },
+  body: JSON.stringify({
+    invoice_id: <?= $invoice['invoice_id'] ?>,
+    paid_amount: paid
   })
-  .then(res => res.json())
-  .then(data => {
-    if (data.success) {
-      document.getElementById('paidAmountRow').style.display = 'flex';
-      document.getElementById('balanceAmountRow').style.display = 'flex';
-      document.getElementById('paidValue').innerText = paid.toFixed(2);
-      document.getElementById('balanceValue').innerText = (grandTotal - paid).toFixed(2);
-      statusBtn.innerText = 'Partial Paid';
-      statusBtn.style.backgroundColor = '#ffc107';
-      closePartialModal();
-    } else {
-      alert("Failed to update.");
-      console.error("Partial update error:", data);
+})
+.then(res => res.json())  // ✅ now safe to use
+.then(data => {
+  if (data.success) {
+    const paidRow = document.getElementById('paidAmountRow');
+    const balanceRow = document.getElementById('balanceAmountRow');
+    const paidVal = document.getElementById('paidAmountValue');
+    const balanceVal = document.getElementById('balanceAmountValue');
+
+    if (paidRow && balanceRow && paidVal && balanceVal) {
+      paidRow.style.display = 'flex';
+      balanceRow.style.display = 'flex';
+      paidVal.innerText = paid.toFixed(2);
+      balanceVal.innerText = (grandTotal - paid).toFixed(2);
     }
-  })
-  .catch(err => {
-    alert("Network or server error.");
-    console.error("Fetch failed:", err);
-  });
+
+    statusBtn.innerText = 'Partial Paid';
+    statusBtn.style.backgroundColor = '#ffc107';
+    closePartialModal();
+  } else {
+    alert("Failed to update.");
+    console.error("Partial update error:", data);
+  }
+})
+
+.catch(err => {
+  alert("Network or server error.");
+  console.error("Fetch failed:", err);
+});
 }
 
 function updateStatus(newStatus) {
@@ -736,10 +751,11 @@ function updateStatus(newStatus) {
       statusBtn.style.backgroundColor = newStatus === 'paid' ? '#28a745' : '#991b36';
       statusOptions.style.display = 'none';
 
-      // if (newStatus === 'paid') {
-      //   alert("Status updated to Paid. You can now download the Delivery Note.");
-      //   // Optionally show delivery note button here
-      // }
+       if (newStatus === 'paid') {
+        document.getElementById('paidAmountRow')?.style.setProperty('display', 'none', 'important');
+        document.getElementById('balanceAmountRow')?.style.setProperty('display', 'none', 'important');
+      }
+
     } else {
       alert("Status update failed.");
       console.error("Update status failed:", data);
@@ -751,56 +767,6 @@ function updateStatus(newStatus) {
   });
 }
 
-
-
-
-
-// document.getElementById('statusBtn').addEventListener('click', function () {
-//   const btn = this;
-//   const currentStatus = btn.textContent.trim().toLowerCase();
-
-//   if (currentStatus === 'unpaid') {
-//     // First update to 'Paid', then show modal
-//     updateStatus('paid', function () {
-//       showModal();
-//     });
-//   } else if (currentStatus === 'paid') {
-//     // Already paid, just show modal again
-//     showModal();
-//   }
-// });
-
-// function updateStatus(newStatus, callback = null) {
-//   const btn = document.getElementById('statusBtn');
-
-//   fetch("<?= base_url('invoice/update_status') ?>", {
-//     method: "POST",
-//     headers: {
-//       "Content-Type": "application/json",
-//       "X-Requested-With": "XMLHttpRequest"
-//     },
-//     body: JSON.stringify({
-//       invoice_id: <?= $invoice['invoice_id'] ?>,
-//       status: newStatus
-//     })
-//   })
-//   .then(response => response.json())
-//   .then(data => {
-//     if (data.success) {
-//       // Update UI status
-//       btn.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
-//       btn.style.backgroundColor = newStatus === 'paid' ? '#28a745' : '#991b36';
-
-//       if (callback) callback(); 
-//     } else {
-//       alert("Failed to update invoice status.");
-//     }
-//   })
-//   .catch(error => {
-//     alert("Error while updating status.");
-//     console.error(error);
-//   });
-// }
 function downloadDeliveryNote() {
   deliveryNoteModal.style.display = 'none';
   window.location.href = '<?= base_url("invoice/delivery_note/" . $invoice["invoice_id"]) ?>';

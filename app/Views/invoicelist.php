@@ -1,5 +1,9 @@
 <?php include "common/header.php"; ?>
-
+<!-- <?php if (session()->getFlashdata('error')): ?>
+  <div class="alert alert-danger alert-fixed text-center">
+    <?= session()->getFlashdata('error') ?>
+  </div>
+<?php endif; ?> -->
 <style>
     #invoiceTable.dataTable tbody td {
         font-size: 14px;
@@ -31,6 +35,10 @@
 
 <div class="form-control mb-3 right_container">
     <div class="alert d-none text-center position-fixed" role="alert"></div>
+    <div class="alert d-none text-center position-fixed" role="alert"
+     style="top: 30px; left: 50%; transform: translateX(-50%); z-index: 9999; background-color: #f8d7da; color: #721c24;">
+</div>
+
 
     <div class="row align-items-center mb-2">
         <div class="col-md-6">
@@ -129,9 +137,9 @@ $(document).ready(function () {
             },
             { data: 'invoice_date' },
             {
-    data: 'status',
-    render: function (data, type, row) {
-        if (!data) return '';
+            data: 'status',
+            render: function (data, type, row) {
+                if (!data) return '';
 
         let className = '';
         let text = data.toUpperCase();
@@ -144,24 +152,35 @@ $(document).ready(function () {
         return `<span class="${className}">${text}</span>`;
     }
 },
-
-            {
+           {
                 data: "invoice_id",
-                render: function (id) {
+                render: function (id, type, row) {
+                    const status = row.status.toLowerCase();
+                    const isPaid = status === 'paid';
+
                     return `
                         <div class="d-flex gap-2">
                             <a href="<?= base_url('invoice/print/') ?>${id}" title="Print" style="color:green;">
                                 <i class="bi bi-printer-fill"></i>
                             </a>
-                            <a href="<?= base_url('invoice/edit/') ?>${id}" title="Edit" style="color:rgb(13, 162, 199);">
+
+                            <a
+                                href="${isPaid ? 'javascript:void(0);' : '<?= base_url('invoice/edit/') ?>' + id}"
+                                title="${isPaid ? 'Paid invoice cannot be edited' : 'Edit Invoice'}"
+                                style="color:${isPaid ? 'gray' : 'rgb(13, 162, 199)'}; cursor: ${isPaid ? 'not-allowed' : 'pointer'};"
+                                ${isPaid ? 'onclick="showEditAlert()"' : ''}
+                            >
                                 <i class="bi bi-pencil-fill"></i>
                             </a>
+
                             <a href="javascript:void(0);" class="delete-invoice" data-id="${id}" title="Delete" style="color: #dc3545;">
                                 <i class="bi bi-trash-fill"></i>
                             </a>
-                        </div>`;
+                        </div>
+                    `;
                 }
             },
+
             { data: "invoice_id", visible: false } 
         ],
         columnDefs: [
@@ -205,5 +224,15 @@ $(document).ready(function () {
             .text(message).fadeIn();
         setTimeout(() => alertBox.fadeOut(), 2000);
     }
+ function showEditAlert() {
+    const alertBox = document.querySelector('.alert');
+    alertBox.textContent = 'Paid invoice cannot be edited.';
+    alertBox.classList.remove('d-none');
+
+    setTimeout(() => {
+        alertBox.classList.add('d-none');
+    }, 3000);
+}
+
 });
 </script>

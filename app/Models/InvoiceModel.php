@@ -79,22 +79,30 @@ class InvoiceModel extends Model
         return $builder->get()->getResultArray( );
     }
 
-    public function getInvoiceWithItems($id)
+   public function getInvoiceWithItems($id)
 {
     $invoice = $this->select(
-            'invoices.*, 
-             customers.name AS customer_name, 
-             customers.address AS customer_address, 
-             invoices.phone_number, 
-             invoices.billing_address, 
-             invoices.shipping_address,
-             company.company_name AS company_name'
-        )
-        ->join('customers', 'customers.customer_id = invoices.customer_id', 'left')
-        ->join('user', 'user.user_id = invoices.user_id', 'left')
-        ->join('company', 'company.company_id = user.company_id', 'left')
-        ->where('invoices.invoice_id', $id)
-        ->first();
+        'invoices.invoice_id,
+         invoices.customer_id,
+         invoices.phone_number,
+         invoices.billing_address,
+         invoices.shipping_address,
+         invoices.discount,
+         invoices.total_amount,
+         invoices.paid_amount,
+         invoices.balance_amount,
+         invoices.status,
+         invoices.lpo_no,
+         invoices.invoice_date,
+         company.company_name AS company_name,
+         customers.name AS customer_name, 
+         customers.address AS customer_address'
+    )
+    ->join('customers', 'customers.customer_id = invoices.customer_id', 'left')
+    ->join('user', 'user.user_id = invoices.user_id', 'left')
+    ->join('company', 'company.company_id = user.company_id', 'left')
+    ->where('invoices.invoice_id', $id)
+    ->first();
 
     if ($invoice) {
         $itemModel = new \App\Models\InvoiceItemModel();
