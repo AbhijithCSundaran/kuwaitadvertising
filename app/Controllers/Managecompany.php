@@ -151,6 +151,7 @@ class Managecompany extends BaseController
 			$existing = $this->companyModel
 				->where('company_name', $newData['company_name'])
 				->where('tax_number', $newData['tax_number'])
+				->where('company_status!=',3)
 				->first();
 
 			if ($existing) {

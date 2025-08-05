@@ -77,10 +77,17 @@
         style="background-color: #a1263a; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
         Discard
       </button>
-      <button onclick="window.location.href='<?= base_url('invoice/convertFromEstimate/' . $estimate['estimate_id']) ?>'"
-        style="background-color:  #a1263a; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
-        Convert Invoice
-      </button>
+             <?php if (isset($estimate['is_converted']) && $estimate['is_converted'] == 1): ?>
+            <button disabled
+                style="background-color: orange; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
+                Converted
+            </button>
+        <?php else: ?>
+            <button onclick="window.location.href='<?= base_url('invoice/convertFromEstimate/' . $estimate['estimate_id']) ?>'"
+                style="background-color: #a1263a; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
+                Convert Invoice
+            </button>
+        <?php endif; ?>
     </div>
     <div class="estimate-container">
 

@@ -131,7 +131,7 @@
                         <?php else: ?>
                             <tr class="item-row">
                                 <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
-                                <td><input type="number" name="price[]" class="form-control price"></td>
+                                <td><input type="number" name="price[]" class="form-control price" step="0.01" min="0" inputmode="decimal"></td>
                                 <td><input type="number" name="quantity[]" class="form-control quantity"></td>
                                 <td><input type="number" name="total[]" class="form-control total" readonly></td>
                                 <td class="text-center">
@@ -234,7 +234,6 @@
 
        document.getElementById('phone_number').addEventListener('input', function () {
             let val = this.value;
-            // Allow + only at the beginning, keep digits, space, parentheses, and dashes
             this.value = val.replace(/(?!^)\+/g, '').replace(/[^0-9\s\-\(\)\+]/g, '');
         });
         $(document).on('input', 'input[name="description[]"]', function () {
@@ -243,6 +242,24 @@
                 return char.toUpperCase();
             });
             $(this).val(capitalized);
+        });
+
+         $(document).on('input', '.price', function () {
+            let input = this;
+            let val = input.value;
+            if (val === '' || val === '.') return;
+            let match = val.match(/^(\d{0,8})(\.(\d{0,2})?)?/);
+            if (match) {
+                let newVal = (match[1] || '') + (match[2] || '');
+                if (newVal !== val) {
+                    input.value = newVal;
+                    input.setSelectionRange(newVal.length, newVal.length);
+                }
+            } else {
+                val = val.slice(0, -1);
+                input.value = val;
+                input.setSelectionRange(val.length, val.length);
+            }
         });
 
         $('#addCustomerBtn').on('click', function () {

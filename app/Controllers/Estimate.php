@@ -62,7 +62,7 @@ public function save()
     if (empty($customerId) || empty($address)) {
         return $this->response->setJSON([
             'status' => 'error',
-            'message' => 'Please fill customer name and address.'
+            'message' => 'Please Fill Customer Name And Address.'
         ]);
     }
 
@@ -76,7 +76,7 @@ public function save()
     if ($validItems === 0) {
         return $this->response->setJSON([
             'status' => 'error',
-            'message' => 'Please fill at least one item with description.'
+            'message' => 'Please Fill At Least One Item With Description.'
         ]);
     }
 
@@ -108,7 +108,7 @@ public function save()
         if ($desc === '' || $unitPrice === '' || $qty === '') {
             return $this->response->setJSON([
                 'status' => 'error',
-                'message' => 'Each item must have Description, Unit Price, and Quantity filled.'
+                'message' => 'Each Item Must Have Description, Unit Price, And Quantity Filled.'
             ]);
         }
 
@@ -120,11 +120,9 @@ public function save()
         ];
     }
 
-    $estimateModel = new \App\Models\EstimateModel();
-    $estimateItemModel = new \App\Models\EstimateItemModel();
-    $customerModel = new \App\Models\customerModel();
-
-    // ✅ Check and update customer name or address if needed
+    $estimateModel = new EstimateModel();
+    $estimateItemModel = new EstimateItemModel();
+    $customerModel = new customerModel();
     $customer = $customerModel->find($customerId);
     if ($customer) {
         if (
@@ -139,7 +137,6 @@ public function save()
     }
 
     if (!empty($estimateId)) {
-        // Update mode
         $existing = $estimateModel->find($estimateId);
         if (!$existing) {
             return $this->response->setJSON([
@@ -177,7 +174,6 @@ public function save()
         }
 
     } else {
-        // Insert mode
         $estimateId = $estimateModel->insert($estimateData);
         foreach ($items as &$item) {
             $item['estimate_id'] = $estimateId;
@@ -201,15 +197,15 @@ public function save()
     $length = $request->getPost('length');
     $searchValue = $request->getPost('search')['value'];
  
-    $orderColumnIndex = $request->getPost('order')[0]['column'] ?? 8; // fallback to estimate_id
+    $orderColumnIndex = $request->getPost('order')[0]['column'] ?? 8;
     $orderDir = $request->getPost('order')[0]['dir'] ?? 'desc';
  
     // Match DataTable column index to DB field names
     $columns = [
-        0 => 'estimate_id',          // slno
+        0 => 'estimate_id',         
         1 => 'customers.name',
         2 => 'customers.address',
-        3 => 'estimates.total_amount', // subtotal (not in DB directly)
+        3 => 'estimates.total_amount', 
         4 => 'estimates.discount',
         5 => 'estimates.total_amount',
         6 => 'estimates.date',
@@ -291,8 +287,6 @@ public function save()
     if (!$estimate) {
         return redirect()->to('estimatelist')->with('error', 'Estimate not found.');
     }
-
-    // Now get customer details using estimate's customer_id
     $customer = $customerModel->find($estimate['customer_id']);
 
     $data = [
@@ -328,20 +322,16 @@ public function save()
     $items = $itemModel->where('estimate_id', $id)->findAll();
     $userId = session()->get('user_id');
     $userName = session()->get('user_Name');
-    $roleId = session()->get('role_Id'); // ✅ Correct key from session
+    $roleId = session()->get('role_Id'); 
     $companyId = session()->get('company_id');
 
     // Get role name
-    $roleName = session()->get('role_Name'); // Try session first
+    $roleName = session()->get('role_Name');
     if (!$roleName && $roleId) {
         $role = $roleModel->find($roleId);
         $roleName = $role['role_name'] ?? '';
     }
-
-    // Fetch company details
     $company = $companyModel->find($companyId);
-
-    // Prepare data
     $data = [
         'estimate'      => $estimate,
         'items'         => $items,
@@ -365,10 +355,10 @@ public function save()
         // dashboardlisting
     public function recentEstimates()
         {
-            $estimateModel = new \App\Models\EstimateModel();
-            $itemModel = new \App\Models\EstimateItemModel();
+            $estimateModel = new EstimateModel();
+            $itemModel = new EstimateItemModel();
     
-            $estimates = $estimateModel->getRecentEstimatesWithCustomer(10); // Includes name & address
+            $estimates = $estimateModel->getRecentEstimatesWithCustomer(10); 
  
         foreach ($estimates as &$est) {
             $items = $itemModel->where('estimate_id', $est['estimate_id'])->findAll();
@@ -386,9 +376,9 @@ public function save()
  
     public function viewByCustomer($customerId)
     {
-        $estimateModel = new \App\Models\EstimateModel();
-        $itemModel = new \App\Models\EstimateItemModel();
-        $customerModel = new \App\Models\customerModel();
+        $estimateModel = new EstimateModel();
+        $itemModel = new EstimateItemModel();
+        $customerModel = new customerModel();
 
         $estimates = $estimateModel
             ->where('customer_id', $customerId)
@@ -412,23 +402,5 @@ public function save()
             'customer' => $customer
         ]);
 
-    }
-    public function fromEstimate($estimateId)
-    {
-        $estimateModel = new \App\Models\EstimateModel();
-        $estimateItemModel = new \App\Models\EstimateitemModel();
-
-        $estimate = $estimateModel->find($estimateId);
-        if (!$estimate) {
-            throw new \CodeIgniter\Exceptions\PageNotFoundException("Estimate not found.");
-        }
-
-        $items = $estimateItemModel->where('estimate_id', $estimateId)->findAll();
-
-        // Load your invoice design view and pass data
-        return view('invoice/add_invoice', [
-            'estimate' => $estimate,
-            'items' => $items
-        ]);
     }
 }
