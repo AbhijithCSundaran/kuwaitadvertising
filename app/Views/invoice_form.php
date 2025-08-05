@@ -146,8 +146,8 @@
                 <div class="col-md-6">
                     <label class="mt-3"><strong>Phone Number</strong><span class="text-danger">*</span></label>
                     <input type="text" name="phone_number" id="phone_number" class="form-control"
-                       value="<?= esc($invoice['phone_number'] ?? $customer['phone_number'] ?? '') ?>"
-                        minlength="7" maxlength="15" pattern="^\+?[0-9]{7,15}$"
+                       value=" <?= esc($invoice['phone_number'] ?? '') ?>"
+                        minlength="7" maxlength="15" pattern="^[\+0-9\s\-\(\)]{7,25}$" 
                         title="Phone number must be 7 to 15 digits and can start with +" />
                 </div>
             </div>
@@ -217,7 +217,7 @@
 
         <input type="hidden" name="invoice_id"
             value="<?= isset($invoice['invoice_id']) ? $invoice['invoice_id'] : '' ?>">
-
+        <input type="hidden" name="original_status" value="<?= isset($invoice['status']) ? esc($invoice['status']) : 'unpaid' ?>">
         <div class="text-end">
             <a href="<?= base_url('invoicelist') ?>" class="btn btn-secondary">Discard</a>
             <button type="submit" id="save-invoice-btn" class="btn btn-primary">Generate Invoice</button>
@@ -346,14 +346,10 @@
         });
 
 
-        document.getElementById('phone_number').addEventListener('input', function () {
+       document.getElementById('phone_number').addEventListener('input', function () {
             let val = this.value;
-            // Allow + only at the beginning and remove all other non-digit characters
-            if (val.charAt(0) === '+') {
-                this.value = '+' + val.slice(1).replace(/[^0-9]/g, '');
-            } else {
-                this.value = val.replace(/[^0-9]/g, '');
-            }
+            // Allow + only at the beginning, keep digits, space, parentheses, and dashes
+            this.value = val.replace(/(?!^)\+/g, '').replace(/[^0-9\s\-\(\)\+]/g, '');
         });
 
           $(document).on('input', 'input[name="description[]"]', function () {

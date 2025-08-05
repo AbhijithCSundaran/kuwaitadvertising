@@ -94,6 +94,8 @@ $routes->get('expense/report', 'Expense::report');
 $routes->post('expense/getExpenseReportAjax', 'Expense::getExpenseReportAjax');
 
 $routes->get('sales/report', 'Sales::report');
+$routes->post('sales/getSalesReportAjax', 'Sales::getSalesReportAjax');
+
 
 
 
@@ -120,7 +122,6 @@ $routes->get('invoice/edit/(:segment)', 'Invoice::edit/$1');
 $routes->post('invoice/delete/(:segment)', 'Invoice::delete/$1');
 $routes->get('invoice/edit/(:num)', 'Invoice::edit/$1');
 $routes->post('invoice/save', 'Invoice::save'); 
-$routes->get('invoice/from_estimate/(:num)', 'Invoice::fromEstimate/$1');
 $routes->get('invoice/add/(:num)', 'Invoice::add/$1');
 $routes->get('invoice/convertFromEstimate/(:num)', 'Invoice::convertFromEstimate/$1');
 $routes->get('invoice/delivery_note/(:num)', 'Invoice::delivery_note/$1');

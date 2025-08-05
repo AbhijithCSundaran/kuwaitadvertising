@@ -86,32 +86,30 @@
     });
 
     $('.enter-btn').click(function () {
-      debugger;
-      const body = $('#login-form').serialize();
-      var url = '<?= base_url("login/authenticate") ?>';
+  const body = $('#login-form').serialize();
+  const url = '<?= base_url("login/authenticate") ?>';
 
-      $.post(url, body, function (response) {
-        if (response.status === 1) {
-          
-          $('#loginalert').removeClass('alert-danger').addClass('alert-success');
-          $('#loginalert').html('Login Successful');
-          $('#loginalert').fadeIn();
+  $.post(url, body, function (response) {
+    if (response.status === 1) {
+      $('#loginalert').removeClass('alert-danger').addClass('alert-success');
+      $('#loginalert').html('Login Successful').fadeIn();
 
-          setTimeout(function () {
-            $('#loginalert').fadeOut();
-            window.location.href = "<?= base_url('dashboard') ?>";
-            // alert(response.user_Id);
-          }, 2000); 
-        } else {
-          $('#loginalert').removeClass('alert-success').addClass('alert-danger');
-          $('#loginalert').html('Invalid Credentials');
-          $('#loginalert').fadeIn();
-          setTimeout(function () {
-            $('#loginalert').fadeOut();
-          }, 2000);
-        }
-      }, 'json');
-    });
+      setTimeout(function () {
+        $('#loginalert').fadeOut();
+        window.location.href = "<?= base_url('dashboard') ?>";
+      }, 2000);
+    } else {
+      $('#loginalert').removeClass('alert-success').addClass('alert-danger');
+      const errorMessage = response.message || 'Invalid Credentials';
+      $('#loginalert').html(errorMessage).fadeIn();
+
+      setTimeout(function () {
+        $('#loginalert').fadeOut();
+      }, 2000);
+    }
+  }, 'json');
+});
+
   });
 </script>
 
