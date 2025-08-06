@@ -99,16 +99,21 @@ class Managecompany extends BaseController
 
 			$duplicate = $this->companyModel
 				->where('company_name', $newData['company_name'])
-				->where('tax_number', $newData['tax_number'])
-				->where('company_id !=', $uid)
-				->first();
+				->where('company_id !=', $uid);
+
+			if (!empty($newData['tax_number'])) {
+				$duplicate = $duplicate->where('tax_number', $newData['tax_number']);
+			} else {
+				$duplicate = $duplicate->where('tax_number IS NULL');
+			}
+
+			$duplicate = $duplicate->first();
 
 			if ($duplicate) {
-				return $this->response->setJSON([
-					'status' => 'error',
-					'message' => 'Another Company With The Same Name And Tax Number Already Exists.'
-				]);
+				return $this->response->setJSON(['success' => false, 'message' => 'Another company with same name exists.']);
 			}
+
+			$this->companyModel->update($uid, $newData);
 
 			if (!preg_match('/^[0-9+\-\s]{7,20}$/', $newData['phone'])) {
 				return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid Phone Number']);
@@ -149,16 +154,18 @@ class Managecompany extends BaseController
 
 
 			$existing = $this->companyModel
-				->where('company_name', $newData['company_name'])
-				->where('tax_number', $newData['tax_number'])
-				->where('company_status!=',3)
-				->first();
+				 ->where('company_name', $newData['company_name'])
+    			 ->where('company_status !=', 3);
+
+				if (!empty($newData['tax_number'])) {
+					$existing = $existing->where('tax_number', $newData['tax_number']);
+				} else {
+					$existing = $existing->where('tax_number IS NULL');
+				}
+			$existing = $existing->first();
 
 			if ($existing) {
-				return $this->response->setJSON([
-					'status' => 'error',
-					'message' => 'Company With The Same Name And Tax Number Already Exists.'
-				]);
+				return $this->response->setJSON(['success' => false, 'message' => 'Company with same name already exists.']);
 			}
 
 			if ($logoName) {

@@ -35,9 +35,9 @@
 
 <div class="form-control mb-3 right_container">
     <div class="alert d-none text-center position-fixed" role="alert"></div>
-    <div class="alert d-none text-center position-fixed" role="alert"
+    <!-- <div class="alert d-none text-center position-fixed" role="alert"
      style="top: 30px; left: 50%; transform: translateX(-50%); z-index: 9999; background-color: #f8d7da; color: #721c24;">
-</div>
+</div> -->
 
 
     <div class="row align-items-center mb-2">
@@ -147,7 +147,7 @@ $(document).ready(function () {
         if (data.toLowerCase() === 'paid') className = 'status-badge status-paid';
         else if (data.toLowerCase() === 'unpaid') className = 'status-badge status-unpaid';
         else if (data.toLowerCase() === 'pending') className = 'status-badge status-pending';
-        else className = 'status-badge bg-secondary';
+        else className = 'status-badge bg-warning';
 
         return `<span class="${className}">${text}</span>`;
     }
@@ -164,13 +164,12 @@ $(document).ready(function () {
                                 <i class="bi bi-printer-fill"></i>
                             </a>
 
-                            <a
-                                href="${isPaid ? 'javascript:void(0);' : '<?= base_url('invoice/edit/') ?>' + id}"
+                           <a
+                                href="${isPaid ? '#' : '<?= base_url('invoice/edit/') ?>' + id}"
                                 title="${isPaid ? 'Paid invoice cannot be edited' : 'Edit Invoice'}"
                                 style="color:${isPaid ? 'gray' : 'rgb(13, 162, 199)'}; cursor: ${isPaid ? 'not-allowed' : 'pointer'};"
-                                ${isPaid ? 'onclick="showEditAlert()"' : ''}
-                            >
-                                <i class="bi bi-pencil-fill"></i>
+                                ${isPaid ? 'onclick="event.preventDefault(); showEditAlert();"' : ''}>
+                                    <i class="bi bi-pencil-fill"></i>
                             </a>
 
                             <a href="javascript:void(0);" class="delete-invoice" data-id="${id}" title="Delete" style="color: #dc3545;">

@@ -63,6 +63,7 @@
             </div>
         </div>
         <form id="estimate-form">
+             <input type="hidden" name="estimate_id" id="estimate_id" value="<?= isset($estimate['estimate_id']) ? $estimate['estimate_id'] : '' ?>">
             <div class="row">
                 <div class="col-md-6">
                     <label><strong> Customer</strong><span class="text-danger">*</span></label>
