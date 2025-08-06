@@ -93,7 +93,7 @@
       border: 1px solid #ccc;
       padding: 8px;
       font-size: 14px;
-      text-align: left;
+      text-align: center;
     }
 
     .signature-section {

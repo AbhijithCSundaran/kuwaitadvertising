@@ -228,20 +228,23 @@
     🖨️ Print
   </button>
 
- <?php
-  $isPaid = strtolower($invoice['status']) === 'paid';
-?>
-<button
-  <?= $isPaid ? 'disabled title="Paid invoice cannot be edited"' : 'onclick="window.location.href=\'' . base_url('invoice/edit/' . $invoice['invoice_id']) . '\'"' ?>
-  style="background-color: <?= $isPaid ? '#6c757d' : '#991b36' ?>; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px; cursor: <?= $isPaid ? 'not-allowed' : 'pointer' ?>;">
-  Edit Invoice
+<?php if (strtolower($invoice['status']) !== 'paid'): ?>
+  <button id="editinvoicebtn"
+    onclick="window.location.href='<?= base_url('invoice/edit/' . $invoice['invoice_id']) ?>'"
+    style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px; cursor: pointer;">
+    Edit Invoice
+  </button>
+<?php endif; ?>
+
+
+ <!-- Always render the button, but control visibility using JS -->
+<button id="deliveryNoteBtn"
+  onclick="window.location.href='<?= base_url('invoice/delivery_note/' . $invoice['invoice_id']) ?>'"
+  style="display: <?= (strtolower($invoice['status']) === 'paid') ? 'inline-block' : 'none' ?>; background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
+  Delivery Note
 </button>
 
 
- <button onclick="window.location.href='<?= base_url('invoice/delivery_note/' . $invoice['invoice_id']) ?>'"
-    style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
-   Delivery Note
-</button>
 
 
 
@@ -318,7 +321,7 @@
         <!-- Ship To -->
         <div class="ship-to col-4 pr-3">
          <div class="label">
-          <span>SHIPPING ADDRESS</span><br>
+          <span>SHIP TO</span><br>
           <span style="color: #000;">
             <?= nl2br(ucwords(strtolower(esc($invoice['shipping_address'] ?? '-')))) ?>
           </span>
@@ -465,10 +468,10 @@
               <input type="number" id="partialPaidInput" class="form-control form-control-lg border-primary" min="1" placeholder="Enter partial amount">
             </div>
             <div class="modal-footer border-0">
-              <button class="btn btn-success px-4" onclick="submitPartialPayment()">
-                <i class="fas fa-check me-1"></i> Submit
+              <button class="btn btn-danger px-4" onclick="submitPartialPayment()">
+               Submit
               </button>
-              <button class="btn btn-outline-secondary px-4" onclick="closePartialModal()">
+              <button class="btn btn-secondary px-4" onclick="closePartialModal()">
                 Cancel
               </button>
             </div>
@@ -754,7 +757,11 @@ function updateStatus(newStatus) {
        if (newStatus === 'paid') {
         document.getElementById('paidAmountRow')?.style.setProperty('display', 'none', 'important');
         document.getElementById('balanceAmountRow')?.style.setProperty('display', 'none', 'important');
+        document.getElementById('deliveryNoteBtn')?.style.setProperty('display', 'inline-block');
+       const editBtn = document.getElementById('editinvoicebtn');
+  if (editBtn) editBtn.style.display = 'none';
       }
+
 
     } else {
       alert("Status update failed.");
@@ -766,6 +773,7 @@ function updateStatus(newStatus) {
     console.error("Fetch error:", err);
   });
 }
+
 
 function downloadDeliveryNote() {
   deliveryNoteModal.style.display = 'none';
