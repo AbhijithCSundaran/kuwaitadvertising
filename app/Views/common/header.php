@@ -196,7 +196,7 @@
             <div class="collapse" id="auth">
               <ul class="nav flex-column sub-menu">
                 <li class="nav-item"><a class="nav-link" href="<?= base_url('expense/report') ?>">Expense Report</a></li>
-                <li class="nav-item"><a class="nav-link" href="<?= base_url('sales/report') ?>">Sales Report</a></li>
+                <li class="nav-item"><a class="nav-link" href="<?= base_url('invoice/report') ?>">Sales Report</a></li>
                 <li class="nav-item"><a class="nav-link" href="<?= base_url('companyledger') ?>">Company Ledger</a></li>
               </ul>
             </div>

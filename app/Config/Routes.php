@@ -93,9 +93,6 @@ $routes->get('estimate/recentEstimates', 'Estimate::recentEstimates');
 $routes->get('expense/report', 'Expense::report');
 $routes->post('expense/getExpenseReportAjax', 'Expense::getExpenseReportAjax');
 
-$routes->get('sales/report', 'Sales::report');
-$routes->post('sales/getSalesReportAjax', 'Sales::getSalesReportAjax');
-
 
 
 
@@ -127,8 +124,8 @@ $routes->get('invoice/convertFromEstimate/(:num)', 'Invoice::convertFromEstimate
 $routes->get('invoice/delivery_note/(:num)', 'Invoice::delivery_note/$1');
 $routes->post('invoice/update_status', 'Invoice::update_status');
 $routes->post('invoice/update_partial_payment', 'Invoice::update_partial_payment');
-
-
+$routes->post('invoice/getSalesReportAjax', 'Invoice::getSalesReportAjax');
+$routes->get('invoice/report', 'Invoice::report');
 
 
 
