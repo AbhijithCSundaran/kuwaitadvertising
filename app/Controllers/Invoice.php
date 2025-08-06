@@ -8,7 +8,7 @@ use App\Models\customerModel;
 use App\Models\EstimateModel;
 use App\Models\EstimateItemModel;
 use App\Models\Manageuser_Model;
-
+use App\Models\SalesModel;
 
 class Invoice extends BaseController
 {
@@ -310,7 +310,7 @@ public function convertFromEstimate($estimateId)
         return redirect()->back()->with('error', 'This estimate has already been converted to an invoice.');
     }
     $db = \Config\Database::connect();
-  $db->table('estimates')->where('estimate_id', $estimateId)->update(['is_converted' => 1]);
+     $db->table('estimates')->where('estimate_id', $estimateId)->update(['is_converted' => 1]);
     $customerModel = new customerModel();
     $customer = $customerModel->find($estimate['customer_id']);
  
@@ -412,6 +412,48 @@ public function update_partial_payment()
         'success' => $updated,
         'message' => $updated ? 'Updated' : 'Failed to update'
     ]);
+}
+public function report()
+{
+    $salesModel = new SalesModel();
+    $customerModel = new customerModel();
+    $from = $this->request->getGet('from_date');
+    $to = $this->request->getGet('to_date');
+    $customer_id = $this->request->getGet('customer_id');
+    $data['customers'] = $customerModel->findAll();
+
+    $data['invoices'] = $salesModel->getSalesReport($from, $to, $customer_id);
+
+    return view('salesform', $data);
+}
+
+public function getSalesReportAjax()
+{
+    $from = $this->request->getPost('fromDate');
+    $to = $this->request->getPost('toDate');
+    $customerId = $this->request->getPost('customerId');
+
+    $db = \Config\Database::connect();
+    $builder = $db->table('invoices');
+    $builder->select('invoices.invoice_id, invoices.invoice_date, customers.name as customer_name, invoices.total_amount, invoices.status');
+    $builder->join('customers', 'customers.customer_id = invoices.customer_id');
+
+    // Apply filters
+    if (!empty($from)) {
+        $builder->where('DATE(invoices.invoice_date) >=', $from);
+    }
+    if (!empty($to)) {
+        $builder->where('DATE(invoices.invoice_date) <=', $to);
+    }
+    if (!empty($customerId)) {
+        $builder->where('invoices.customer_id', $customerId);
+    }
+    
+    $builder->orderBy('invoices.invoice_id', 'DESC');
+    $query = $builder->get();
+    $data = $query->getResultArray();
+
+    return $this->response->setJSON(['invoices' => $data]);
 }
 
 }

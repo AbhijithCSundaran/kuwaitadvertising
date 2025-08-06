@@ -168,8 +168,8 @@
                     <?php foreach ($items as $index => $item): ?>
                         <tr class="item-row">
                            <td><input type="text" name="description[]" class="form-control"
-           value="<?= esc($item['description'] ?? $item['item_name'] ?? '') ?>"></td>
-                            <td><input type="number" class="form-control price" name="price[]" value="<?= $item['price'] ?>">
+                                value="<?= esc($item['description'] ?? $item['item_name'] ?? '') ?>"></td>
+                            <td><input type="number" class="form-control price" step="0.01" min="0" inputmode="decimal" name="price[]" value="<?= $item['price'] ?>">
                             </td>
                             <td><input type="number" class="form-control quantity" name="quantity[]"
                                     value="<?= $item['quantity'] ?>"></td>
@@ -260,12 +260,12 @@
             $('#address').val('<?= $customer['address'] ?>');
 
            <?php foreach ($items as $index => $item): ?>
-    addInvoiceItemRow(
-        '<?= $item['product_id'] ?? '' ?>',
-        '<?= $item['quantity'] ?? 0 ?>',
-        '<?= $item['price'] ?? 0 ?>'
-    );
-<?php endforeach; ?>
+                addInvoiceItemRow(
+                    '<?= $item['product_id'] ?? '' ?>',
+                    '<?= $item['quantity'] ?? 0 ?>',
+                    '<?= $item['price'] ?? 0 ?>'
+                );
+            <?php endforeach; ?>
 
         });
 

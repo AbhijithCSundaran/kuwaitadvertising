@@ -31,12 +31,10 @@ public function index($uid = null)
     $loggedInCompanyId = $session->get('company_id');
     $loggedInRoleId    = $session->get('role_Id');
 
-    // Determine visible companies based on role
     if ($loggedInRoleId == 1) {
-        // Admin: show all companies
-        $companies = $managecompany_Model->findAll();
+        $companies = $managecompany_Model->getActiveCompanies();
+
     } else {
-        // Regular user: only show their own company
         $companies = $managecompany_Model->where('company_id', $loggedInCompanyId)->findAll();
     }
 
@@ -221,7 +219,6 @@ if ($roleId != 1) {
 
     }
     
-    // Count logic
     $totalCondition = ($roleId == 1) ? "1=1" : "user.company_id = " . (int)$companyId;
     $total = $userModel->getAllUserCount($totalCondition)->totuser ?? 0;
     $filtered = $userModel->getFilterUserCount($condition);

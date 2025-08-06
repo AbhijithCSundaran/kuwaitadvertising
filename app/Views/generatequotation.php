@@ -47,6 +47,7 @@
       padding: 8px;
       font-size: 13px;
       border: 1px solid #ccc;
+      text-align: center;
     }
 
     .items-table td {

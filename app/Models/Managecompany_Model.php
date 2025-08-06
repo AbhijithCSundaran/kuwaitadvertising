@@ -127,4 +127,9 @@ class Managecompany_Model extends Model
 
         return $builder->get()->getResultArray();
     }
+    public function getActiveCompanies()
+{
+    return $this->where('company_status', 1)->findAll();
+}
+
 }
