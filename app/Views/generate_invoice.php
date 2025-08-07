@@ -69,6 +69,7 @@
       padding: 5px 10px;
       font-weight: bold;
     }
+    
 
     .bill-ship {
       display: flex;
@@ -379,7 +380,7 @@
           <tbody>
             <tr>
               <td><?= $i++ ?></td>
-              <td><?= esc($item['item_name'] ?? '-') ?></td>
+             <td style="text-align: left;"><?= esc($item['item_name'] ?? '-') ?></td>
               <td><?= esc($item['quantity']) ?></td>
               <td><?= number_format($item['price'], 2) ?></td>
               <td><?= number_format($lineTotal, 2) ?></td>

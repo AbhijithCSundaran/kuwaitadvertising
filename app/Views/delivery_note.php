@@ -210,7 +210,7 @@
           foreach ($items as $item): ?>
             <tr>
               <td><?= $i++ ?></td>
-              <td><?= esc($item['item_name']) ?></td>
+              <td style="text-align: left;"><?= esc($item['item_name'] ?? '-') ?></td>
               <td><?= esc($item['price'] ?? '-') ?></td>
               <td><?= esc($item['quantity']) ?></td>
               <td>--</td>

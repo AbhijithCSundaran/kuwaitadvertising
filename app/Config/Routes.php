@@ -92,12 +92,13 @@ $routes->get('estimate/recentEstimates', 'Estimate::recentEstimates');
 //for report
 $routes->get('expense/report', 'Expense::report');
 $routes->post('expense/getExpenseReportAjax', 'Expense::getExpenseReportAjax');
-
-
-
-
 $routes->get('companyledger', 'CompanyLedger::index');
 $routes->post('companyledger/save', 'CompanyLedger::save');
+$routes->post('companyledger/getPaidInvoices', 'CompanyLedger::getPaidInvoices');
+
+
+
+
 
 $routes->get('customer/list', 'Customer::list');
 $routes->post('customer/fetch', 'Customer::fetch');

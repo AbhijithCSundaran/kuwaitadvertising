@@ -42,26 +42,44 @@ class CompanyLedger extends BaseController
 
         return $this->response->setJSON(['status' => 'success', 'message' => 'Ledger Entry Created For The Company.']);
     }
-    public function getPaidInvoices()
+public function getPaidInvoices()
 {
-    $companyId = $this->request->getPost('company_id');
+    $session = session();
+    $companyId = $session->get('company_id');
 
     if (!$companyId) {
         return $this->response->setJSON([
             'status' => 'error',
-            'message' => 'Company ID is required.'
+            'message' => 'Company ID is missing from session.'
         ]);
     }
+
+    $from     = $this->request->getPost('from');
+    $to       = $this->request->getPost('to');
+    $month    = $this->request->getPost('month');
+    $year     = $this->request->getPost('year');
 
     $invoiceModel = new \App\Models\InvoiceModel();
 
     $builder = $invoiceModel->builder()
-        ->select('invoices.invoice_id, invoices.date, invoices.total_amount, customers.name AS customer_name')
+        ->select('invoices.invoice_id, invoices.invoice_date, invoices.total_amount, customers.name AS customer_name')
         ->join('customers', 'customers.customer_id = invoices.customer_id', 'left')
         ->where('invoices.company_id', $companyId)
-        ->where('LOWER(invoices.status)', 'paid')  // Handles lowercase match
-        ->orderBy('invoices.date', 'DESC');
+        ->where('LOWER(invoices.status)', 'paid');
 
+    // Apply date range filter
+    if (!empty($from) && !empty($to)) {
+        $builder->where('invoices.invoice_date >=', $from)
+                ->where('invoices.invoice_date <=', $to);
+    }
+
+    // Apply month/year filter
+    if (!empty($month) && !empty($year)) {
+        $builder->where('MONTH(invoices.invoice_date)', $month)
+                ->where('YEAR(invoices.invoice_date)', $year);
+    }
+
+    $builder->orderBy('invoices.invoice_date', 'DESC');
     $results = $builder->get()->getResultArray();
 
     return $this->response->setJSON([
