@@ -105,9 +105,9 @@
                 </div>
             </div>
             <?php
-                $billingVal = $invoice['customer_address'] ?? $customers['customer_address'] ?? '';
-                $shippingVal = $invoice['shipping_address'] ?? $billingVal;
-                $isSame = $billingVal !== '' && $billingVal === $shippingVal;
+            $billingVal = $invoice['customer_address'] ?? $customers['customer_address'] ?? '';
+            $shippingVal = $invoice['shipping_address'] ?? $billingVal;
+            $isSame = $billingVal !== '' && $billingVal === $shippingVal;
             ?>
             <div class="row">
                 <!-- Billing Address -->
@@ -146,8 +146,8 @@
                 <div class="col-md-6">
                     <label class="mt-3"><strong>Phone Number</strong><span class="text-danger">*</span></label>
                     <input type="text" name="phone_number" id="phone_number" class="form-control"
-                       value=" <?= esc($invoice['phone_number'] ?? '') ?>"
-                        minlength="7" maxlength="15" pattern="^[\+0-9\s\-\(\)]{7,25}$" 
+                        value=" <?= esc($invoice['phone_number'] ?? '') ?>" minlength="7" maxlength="15"
+                        pattern="^[\+0-9\s\-\(\)]{7,25}$"
                         title="Phone number must be 7 to 15 digits and can start with +" />
                 </div>
             </div>
@@ -167,9 +167,10 @@
                 <?php if (!empty($items)): ?>
                     <?php foreach ($items as $index => $item): ?>
                         <tr class="item-row">
-                           <td><input type="text" name="description[]" class="form-control"
-                                value="<?= esc($item['description'] ?? $item['item_name'] ?? '') ?>"></td>
-                            <td><input type="number" class="form-control price" step="0.01" min="0" inputmode="decimal" name="price[]" value="<?= $item['price'] ?>">
+                            <td><input type="text" name="description[]" class="form-control"
+                                    value="<?= esc($item['description'] ?? $item['item_name'] ?? '') ?>"></td>
+                            <td><input type="number" class="form-control price" step="0.01" min="0" inputmode="decimal"
+                                    name="price[]" value="<?= $item['price'] ?>">
                             </td>
                             <td><input type="number" class="form-control quantity" name="quantity[]"
                                     value="<?= $item['quantity'] ?>"></td>
@@ -183,7 +184,8 @@
                 <?php else: ?>
                     <tr class="item-row">
                         <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
-                        <td><input type="number" name="price[]" class="form-control price" step="0.01" min="0" inputmode="decimal"></td>
+                        <td><input type="number" name="price[]" class="form-control price" step="0.01" min="0"
+                                inputmode="decimal"></td>
                         <td><input type="number" name="quantity[]" class="form-control quantity"></td>
                         <td><input type="number" name="total[]" class="form-control total" readonly></td>
                         <td class="text-center">
@@ -206,7 +208,7 @@
                 <td><strong>Discount:</strong></td>
                 <td>
                     <input type="number" name="discount" id="discount" class="form-control w-50 d-inline"
-                       value="<?= esc($invoice['discount'] ?? 0) ?>" min="0"> %
+                        value="<?= esc($invoice['discount'] ?? 0) ?>" min="0"> %
                 </td>
             </tr>
             <tr>
@@ -214,10 +216,11 @@
                 <td><strong><span id="total_display">0.00</span> KWD</strong></td>
             </tr>
         </table>
-
+    <input type="hidden" name="estimate_id" value="<?= esc($estimate_id ?? '') ?>">
         <input type="hidden" name="invoice_id"
             value="<?= isset($invoice['invoice_id']) ? $invoice['invoice_id'] : '' ?>">
-        <input type="hidden" name="original_status" value="<?= isset($invoice['status']) ? esc($invoice['status']) : 'unpaid' ?>">
+        <input type="hidden" name="original_status"
+            value="<?= isset($invoice['status']) ? esc($invoice['status']) : 'unpaid' ?>">
         <div class="text-end">
             <a href="<?= base_url('invoicelist') ?>" class="btn btn-secondary">Discard</a>
             <button type="submit" id="save-invoice-btn" class="btn btn-primary">Generate Invoice</button>
@@ -259,7 +262,7 @@
             $('#customer_id').val('<?= $estimate['customer_id'] ?>').trigger('change');
             $('#address').val('<?= $customer['address'] ?>');
 
-           <?php foreach ($items as $index => $item): ?>
+            <?php foreach ($items as $index => $item): ?>
                 addInvoiceItemRow(
                     '<?= $item['product_id'] ?? '' ?>',
                     '<?= $item['quantity'] ?? 0 ?>',
@@ -328,7 +331,7 @@
             const hasChanged = currentFormData !== initialFormData;
             $('#save-invoice-btn').prop('disabled', !hasChanged);
         });
-       $('#popup_name').on('input', function () {
+        $('#popup_name').on('input', function () {
             let value = $(this).val();
             let capitalized = value.replace(/\b\w/g, function (char) {
                 return char.toUpperCase();
@@ -336,7 +339,7 @@
             $(this).val(capitalized);
         });
 
-       $('#popup_address').on('input', function () {
+        $('#popup_address').on('input', function () {
             let value = $(this).val();
             let capitalized = value.replace(/\b\w/g, function (char) {
                 return char.toUpperCase();
@@ -346,20 +349,20 @@
         });
 
 
-       document.getElementById('phone_number').addEventListener('input', function () {
+        document.getElementById('phone_number').addEventListener('input', function () {
             let val = this.value;
             // Allow + only at the beginning, keep digits, space, parentheses, and dashes
             this.value = val.replace(/(?!^)\+/g, '').replace(/[^0-9\s\-\(\)\+]/g, '');
         });
 
-          $(document).on('input', 'input[name="description[]"]', function () {
+        $(document).on('input', 'input[name="description[]"]', function () {
             let value = $(this).val();
             let capitalized = value.replace(/\b\w/g, function (char) {
                 return char.toUpperCase();
             });
             $(this).val(capitalized);
         });
-        
+
         $(document).on('click', '.remove-item-btn', function () {
             $(this).closest('tr').remove();
             calculateTotals();

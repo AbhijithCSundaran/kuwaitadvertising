@@ -382,7 +382,7 @@ td.logo-col {
 	background-color: #a1263a;
 	color: #fff;
 	font-weight: bold;
-	width:69px;
+	width: 69px;
 }
 
 #addCustomerBtn {
@@ -521,9 +521,11 @@ td.logo-col {
 		max-width: none;
 		overflow: hidden;
 	}
+
 	.form-control.w-50 {
-    width: 75% !important;
-}
+		width: 75% !important;
+	}
+
 	/* body {
 		overflow-x: auto;
 	} */
@@ -553,9 +555,13 @@ td.logo-col {
 	}
 }
 
+.input-suffix-icon {
+	position: absolute;
+	cursor: pointer;
+	right: 30px;
+	bottom: 35px;
+}
 
-/* @media (min-width:575px) {
-	.sidebar {
-		transform: translateX(-100%);
-	}
-} */
+.calendar-input-wrapper {
+	position: relative;
+}

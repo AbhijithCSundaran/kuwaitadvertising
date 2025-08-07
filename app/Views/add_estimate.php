@@ -116,8 +116,8 @@
                                 <tr class="item-row">
                                     <td><input type="text" name="description[]" class="form-control"
                                             value="<?= $item['description'] ?>"></td>
-                                    <td><input type="number" name="price[]" class="form-control price"
-                                            value="<?= $item['price'] ?>"></td>
+                                    <td><input type="number" class="form-control price" step="0.01" min="0" inputmode="decimal" name="price[]" value="<?= $item['price'] ?>">
+                            </td>
                                     <td><input type="number" name="quantity[]" class="form-control quantity"
                                             value="<?= $item['quantity'] ?>"></td>
                                     <td><input type="number" name="total[]" class="form-control total" value="<?= $item['total'] ?>"
