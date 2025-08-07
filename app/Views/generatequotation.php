@@ -185,13 +185,13 @@
     </div>
     <div class="row mt-3">
         <!-- Left: In Words -->
-        <div class="amount-words col-md-6">
+        <div class="amount-words col-6">
             <b>In Words:</b><br><br><span id="amount-words"></span>
             <?= ucwords($amountInWords ?? '') ?>
         </div>
 
         <!-- Right: Totals and Signatures -->
-        <div class="col-md-6 ">
+        <div class="col-6 ">
           <div style="width: 100%; display: flex; justify-content: flex-end;">
             <div style="text-align: right;">
               <div style="font-weight: bold;  text-align: left;">SUBTOTAL
@@ -206,7 +206,7 @@
             </div>
           </div>
         </div>
-         <div class="name-table col-md-12 d-flex justify-content-end">
+         <div class="name-table col-12 d-flex justify-content-end">
             <table class="table table-bordered w-auto mb-0 pt-6">
                 <tr>
                     <th class="text-center">Authorized Signatory</th>
@@ -240,16 +240,26 @@
     
     if (dinars.length > 9) return 'overflow';
     dinars = parseInt(dinars, 10);
-    fils = parseInt((fils || '0').padEnd(3, '0').slice(0, 2)); // Handle fils up to 2 decimal places
+    fils = parseInt((fils || '0').padEnd(3, '0').slice(0, 2)); 
 
       const convert = (n) => {
-        if (n < 20) return a[n];
-        if (n < 100) return b[Math.floor(n / 10)] + (n % 10 ? '-' + a[n % 10] : '');
-        if (n < 1000) return a[Math.floor(n / 100)] + ' hundred' + (n % 100 ? ' ' + convert(n % 100) : '');
-        if (n < 1000000) return convert(Math.floor(n / 1000)) + ' thousand' + (n % 1000 ? ' ' + convert(n % 1000) : '');
-        if (n < 1000000000) return convert(Math.floor(n / 1000000)) + ' million' + (n % 1000000 ? ' ' + convert(n % 1000000) : '');
-        return '';
-    };
+    if (n < 20) return a[n];
+    if (n < 100) return b[Math.floor(n / 10)] + (n % 10 ? '-' + a[n % 10] : '');
+    if (n < 1000) {
+        return a[Math.floor(n / 100)] + ' hundred' +
+            (n % 100 ? ' and ' + convert(n % 100) : '');
+    }
+    if (n < 1000000) {
+        return convert(Math.floor(n / 1000)) + ' thousand' +
+            (n % 1000 ? (n % 1000 < 100 ? ' and ' : ' ') + convert(n % 1000) : '');
+    }
+    if (n < 1000000000) {
+        return convert(Math.floor(n / 1000000)) + ' million' +
+            (n % 1000000 ? (n % 1000000 < 100 ? ' and ' : ' ') + convert(n % 1000000) : '');
+    }
+    return '';
+};
+
 
     let words = '';
     if (dinars > 0) words += convert(dinars) + ' Kuwaiti Dinar';

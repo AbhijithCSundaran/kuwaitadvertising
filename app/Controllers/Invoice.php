@@ -31,7 +31,8 @@ class Invoice extends BaseController
     }
     public function invoicelistajax()
     {
-        $companyId = session()->get('company_id');
+       $session = session();
+       
         $request = service('request');
         $draw = $request->getPost('draw');
         $start = $request->getPost('start');
@@ -54,13 +55,14 @@ class Invoice extends BaseController
         ];
 
         $orderByColumn = $columns[$orderColumnIndex] ?? 'invoices.invoice_id';
-
+          $companyId = $session->get('company_id');
+          
         $invoiceModel = new InvoiceModel();
         $itemModel = new InvoiceItemModel();
-
-        $totalRecords = $invoiceModel->getInvoiceCount();
-        $filteredRecords = $invoiceModel->getFilteredCount($searchValue);
-        $records = $invoiceModel->getFilteredInvoices($searchValue, $start, $length, $orderByColumn, $orderDir);
+        $invoices = $invoiceModel->where('company_id', $companyId)->findAll();
+        $totalRecords = $invoiceModel->getInvoiceCount($companyId);
+        $filteredRecords = $invoiceModel->getFilteredCount($searchValue,$companyId);
+        $records = $invoiceModel->getFilteredInvoices($searchValue, $start, $length, $orderByColumn, $orderDir,$companyId);
 
         $data = [];
         $slno = $start + 1;
@@ -150,7 +152,7 @@ class Invoice extends BaseController
 
         $invoiceId = $request->getPost('invoice_id');
         $originalStatus = $request->getPost('original_status');
-
+       $companyId = session()->get('company_id');
         $invoiceData = [
             'customer_id' => $customerId,
             'billing_address' => $customer['billing_address'] ?? $customer['customer_address'] ?? '',
@@ -162,7 +164,7 @@ class Invoice extends BaseController
             'invoice_date' => date('Y-m-d'),
             'user_id' => session()->get('user_id') ?? 1,
             'status' => ($invoiceId && $originalStatus) ? $originalStatus : 'unpaid',
-            'company_id' => session()->get('company_id')
+            'company_id' => $companyId 
         ];
 
         if ($invoiceId) {
