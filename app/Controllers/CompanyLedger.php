@@ -42,4 +42,32 @@ class CompanyLedger extends BaseController
 
         return $this->response->setJSON(['status' => 'success', 'message' => 'Ledger Entry Created For The Company.']);
     }
+    public function getPaidInvoices()
+{
+    $companyId = $this->request->getPost('company_id');
+
+    if (!$companyId) {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Company ID is required.'
+        ]);
+    }
+
+    $invoiceModel = new \App\Models\InvoiceModel();
+
+    $builder = $invoiceModel->builder()
+        ->select('invoices.invoice_id, invoices.date, invoices.total_amount, customers.name AS customer_name')
+        ->join('customers', 'customers.customer_id = invoices.customer_id', 'left')
+        ->where('invoices.company_id', $companyId)
+        ->where('LOWER(invoices.status)', 'paid')  // Handles lowercase match
+        ->orderBy('invoices.date', 'DESC');
+
+    $results = $builder->get()->getResultArray();
+
+    return $this->response->setJSON([
+        'status' => 'success',
+        'data' => $results
+    ]);
+}
+
 }

@@ -6,7 +6,7 @@ class EstimateModel extends Model
 {
     protected $table = 'estimates';
     protected $primaryKey = 'estimate_id';
-    protected $allowedFields = ['customer_id','discount', 'total_amount', 'sub_total','date','phone_number', 'is_converted'];
+    protected $allowedFields = ['customer_id','discount', 'total_amount', 'sub_total','date','phone_number', 'is_converted', 'company_id'];
 
     public function insertEstimateWithItems($estimateData, $items)
     {
@@ -20,6 +20,7 @@ class EstimateModel extends Model
 
         return $estimateId;
     }
+
     public function updateEstimateWithItems($estimateId, $estimateData, $items)
     {
         $this->update($estimateId, $estimateData);
@@ -32,66 +33,61 @@ class EstimateModel extends Model
             $itemModel->insert($item);
         }
     }
-    public function getEstimateCount()
+
+    // ✅ Filter by company ID
+    public function getEstimateCount($companyId)
     {
-        return $this->db->table('estimates')->countAllResults();
+        return $this->where('company_id', $companyId)->countAllResults();
     }
 
-   public function getFilteredCount($search = '')
+    // ✅ Filtered Count with search and company
+    public function getFilteredCount($searchValue, $companyId)
     {
         $builder = $this->db->table('estimates')
-            ->join('customers', 'customers.customer_id = estimates.customer_id', 'left');
+            ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
+            ->where('estimates.company_id', $companyId);
 
-        if ($search) {
-            $search = trim(strtolower($search));
-
+        if (!empty($searchValue)) {
             $builder->groupStart()
-                ->like('LOWER(customers.name)', $search)
-                ->orLike('LOWER(customers.address)', $search)
-                ->orLike('FORMAT(estimates.discount, 2)', $search)
-                ->orLike('DATE_FORMAT(estimates.date, "%d-%m-%Y")', $search)
+                ->like('customers.name', $searchValue)
+                ->orLike('customers.address', $searchValue)
+                ->orLike('estimates.estimate_id', $searchValue)
                 ->groupEnd();
         }
 
         return $builder->countAllResults();
     }
 
-
-
-    public function getFilteredEstimates($search = '', $start = 0, $length = 10, $orderColumn = 'estimate_id', $orderDir = 'desc')
+    // ✅ Filtered Estimates List with search, pagination, and company
+    public function getFilteredEstimates($searchValue, $start, $length, $orderByColumn, $orderDir, $companyId)
     {
         $builder = $this->db->table('estimates')
             ->select('estimates.*, customers.name AS customer_name, customers.address AS customer_address')
-            ->join('customers', 'customers.customer_id = estimates.customer_id', 'left');
+            ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
+            ->where('estimates.company_id', $companyId);
 
-        if ($search) {
-            $search = trim(strtolower($search));
-
+        if (!empty($searchValue)) {
             $builder->groupStart()
-                ->like('LOWER(customers.name)', $search)
-                ->orLike('LOWER(customers.address)', $search)
-                ->orLike('FORMAT(estimates.discount, 2)', $search)
-                ->orLike('DATE_FORMAT(estimates.date, "%d-%m-%Y")', $search)
+                ->like('customers.name', $searchValue)
+                ->orLike('customers.address', $searchValue)
+                ->orLike('estimates.estimate_id', $searchValue)
                 ->groupEnd();
         }
 
-        $builder->orderBy($orderColumn, $orderDir)
+        $builder->orderBy($orderByColumn, $orderDir)
                 ->limit($length, $start);
 
         return $builder->get()->getResultArray();
     }
-
 
     public function getRecentEstimatesWithCustomer($limit = 5)
     {
         return $this->db->table('estimates')
             ->select('estimates.*, customers.name AS customer_name, customers.address AS customer_address')
             ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
-            ->orderBy('estimates.date', 'DESC') // Or 'estimate_id' if you prefer
+            ->orderBy('estimates.date', 'DESC')
             ->limit($limit)
             ->get()
             ->getResultArray();
     }
-
 }
-
