@@ -68,13 +68,13 @@
 
 
     .ship-to b {
-      color: #D32F2F;
+      color: #a1263a;
     }
 
     .delivery-date {
       font-size: 14px;
       font-weight: bold;
-      color: #D32F2F;
+      color: #a1263a;
     }
 
     table {
@@ -84,7 +84,7 @@
     }
 
     table thead {
-      background: #D32F2F;
+      background: #a1263a;
       color: white;
     }
 

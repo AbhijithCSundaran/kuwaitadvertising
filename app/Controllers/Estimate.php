@@ -47,6 +47,7 @@ class Estimate extends BaseController
  
 public function save()
 {
+    
     $estimateId = $this->request->getPost('estimate_id');
     $customerId = $this->request->getPost('customer_id');
     $address = trim($this->request->getPost('customer_address'));
@@ -89,6 +90,7 @@ public function save()
     $discountAmount = ($subtotal * $discount) / 100;
     $grandTotal = $subtotal - $discountAmount;
 
+    $companyId = session()->get('company_id');
     $estimateData = [
         'customer_id' => $customerId,
         'customer_address' => $address,
@@ -96,6 +98,7 @@ public function save()
         'total_amount' => $grandTotal,
         'date' => date('Y-m-d'),
         'phone_number' => $phoneNumber, 
+        'company_id'       => $companyId
     ];
 
     // Build items array
@@ -191,6 +194,7 @@ public function save()
  
  public function estimatelistajax()
 {
+    
     $request = service('request');
     $draw = $request->getPost('draw');
     $start = $request->getPost('start');
@@ -214,12 +218,14 @@ public function save()
     ];
     $orderByColumn = $columns[$orderColumnIndex] ?? 'estimates.estimate_id';
  
+    $companyId = session()->get('company_id');
+
     $estimateModel = new EstimateModel();
     $itemModel = new EstimateItemModel();
  
-    $totalRecords = $estimateModel->getEstimateCount();
-    $filteredRecords = $estimateModel->getFilteredCount($searchValue);
-    $records = $estimateModel->getFilteredEstimates($searchValue, $start, $length, $orderByColumn, $orderDir);
+    $totalRecords = $estimateModel->getEstimateCount($companyId);
+    $filteredRecords = $estimateModel->getFilteredCount($searchValue, $companyId);
+    $records = $estimateModel->getFilteredEstimates($searchValue, $start, $length, $orderByColumn, $orderDir,  $companyId);
  
     $data = [];
     $slno = $start + 1;
@@ -243,6 +249,7 @@ public function save()
             'total_amount'      => round($row['total_amount'], 2),
             'date'              => $row['date'],
             'description'       => implode(', ', $descList),
+            'is_converted'      =>$row['is_converted'],
         
         ];
     }
