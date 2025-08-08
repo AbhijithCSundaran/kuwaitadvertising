@@ -43,7 +43,8 @@ public function index($uid = null)
         'isEdit'     => $isEdit,
         'userData'   => $userData,
         'roles'      => $roles,
-        'companies'  => $companies
+        'companies'  => $companies,
+        // 'loggedInRoleId'   => $loggedInRoleId
     ]);
 }
 
