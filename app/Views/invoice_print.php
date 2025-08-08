@@ -265,7 +265,7 @@
           ?>
             <tr>
               <td><?= $index + 1 ?></td>
-              <td><?= esc($item['item_name']) ?></td>
+              <td style="text-align: left;"><?= esc($item['item_name'] ?? '-') ?></td>
               <td><?= $item['quantity'] ?></td>
               <td><?= $kd ?></td>
               <td><?= $fils ?></td>

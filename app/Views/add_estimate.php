@@ -305,6 +305,12 @@
         $(document).on('click', '.remove-item-btn', function () {
             $(this).closest('tr').remove();
             calculateTotals();
+
+            const currentData = $('#estimate-form').serialize();
+            const hasChanged = currentData !== initialEstimateData;
+
+    
+             $('#generate-btn').prop('disabled', !hasChanged);
         });
 
         $(document).on('input change', '.price, .quantity, #discount', calculateTotals);

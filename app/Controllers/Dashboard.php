@@ -13,13 +13,27 @@ class Dashboard extends BaseController
             exit;
         }
     }
-    public function index()
-    {
-        $estimateModel = new \App\Models\EstimateModel();
-        $recentEstimates = $estimateModel->getRecentEstimatesWithCustomer();
+   public function index()
+{
+    $session = session();
+    $company_id = $session->get('company_id'); // Get logged-in user's company
 
-        return view('dashboard', ['estimates' => $recentEstimates]);
-    }
+    // Get recent estimates
+    $estimateModel = new \App\Models\EstimateModel();
+    $recentEstimates = $estimateModel->getRecentEstimatesWithCustomer($company_id);
+
+    // Get revenue data
+    $invoiceModel = new \App\Models\InvoiceModel();
+    $dailyRevenue = $invoiceModel->getTodayRevenue($company_id);
+    $monthlyRevenue = $invoiceModel->getMonthlyRevenue($company_id);
+
+    return view('dashboard', [
+        'estimates' => $recentEstimates,
+        'dailyRevenue' => $dailyRevenue,
+        'monthlyRevenue' => $monthlyRevenue
+    ]);
+}
+
 
     public function getTodayExpenseTotal()
     {
@@ -49,5 +63,40 @@ class Dashboard extends BaseController
 
     return $this->response->setJSON(['total' => $total['amount'] ?? 0]);
 }
+
+public function getTodayRevenueTotal()
+{
+    $invoiceModel = new \App\Models\InvoiceModel();
+    $session = session();
+    $company_id = $session->get('company_id');
+
+    $today = date('Y-m-d'); // only date
+
+    $total = $invoiceModel
+        ->selectSum('total_amount')
+        ->where('invoice_date', $today)
+        ->where('company_id', $company_id)
+        ->first();
+
+    return $this->response->setJSON(['total' => (float)($total['total_amount'] ?? 0)]);
+}
+
+
+public function getMonthlyRevenueTotal()
+{
+    $invoiceModel = new \App\Models\InvoiceModel();
+    $session = session();
+    $company_id = $session->get('company_id');
+
+    $total = $invoiceModel
+        ->selectSum('total_amount')
+        ->where('MONTH(invoice_date)', date('m'))
+        ->where('YEAR(invoice_date)', date('Y'))
+        ->where('company_id', $company_id)
+        ->first();
+
+    return $this->response->setJSON(['total' => (float)($total['total_amount'] ?? 0)]);
+}
+
 
 }

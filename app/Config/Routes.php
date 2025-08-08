@@ -84,6 +84,8 @@ $routes->get('expense/report', 'Expense::report');
 $routes->post('dashboard/getTodayExpenseTotal', 'Dashboard::getTodayExpenseTotal');
 $routes->post('dashboard/getMonthlyExpenseTotal', 'Dashboard::getMonthlyExpenseTotal');
 $routes->get('estimate/recentEstimates', 'Estimate::recentEstimates');
+$routes->get('dashboard/getMonthlyRevenueTotal', 'Dashboard::getMonthlyRevenueTotal');
+$routes->get('dashboard/getTodayRevenueTotal', 'Dashboard::getTodayRevenueTotal');
 
 
 

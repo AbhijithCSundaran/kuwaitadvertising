@@ -80,14 +80,17 @@ class EstimateModel extends Model
         return $builder->get()->getResultArray();
     }
 
-    public function getRecentEstimatesWithCustomer($limit = 5)
-    {
-        return $this->db->table('estimates')
-            ->select('estimates.*, customers.name AS customer_name, customers.address AS customer_address')
-            ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
-            ->orderBy('estimates.date', 'DESC')
-            ->limit($limit)
-            ->get()
-            ->getResultArray();
-    }
+  public function getRecentEstimatesWithCustomer($limit = 5)
+{
+    $companyId = session()->get('company_id'); // Ensure company filter
+    return $this->db->table('estimates')
+        ->select('estimates.*, customers.name AS customer_name, customers.address AS customer_address')
+        ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
+        ->where('estimates.company_id', $companyId) // ✅ Add this line
+        ->orderBy('estimates.date', 'DESC')
+        ->limit($limit)
+        ->get()
+        ->getResultArray();
+}
+
 }
