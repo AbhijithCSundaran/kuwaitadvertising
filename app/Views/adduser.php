@@ -15,36 +15,44 @@
         <div class="form-group">
           <div class="row">
             <div class="col-md-6 mb-2">
-              <label for="company_id">Company <span class="text-danger">*</span></label>
-              <?php $session = session(); ?>
-                <?php $loggedInCompanyId = $session->get('company_id'); ?>
-                  <?php if ($loggedInCompanyId == 1): ?>
-                    <select name="company_id" id="company_id" class="form-control" required>
-                        <option value="">Select Company</option>
-                        <?php if (!empty($companies)): ?>
-                            <?php foreach ($companies as $company): ?>
-                                <option value="<?= $company['company_id'] ?>"
-                                    <?= isset($userData['company_id']) && $userData['company_id'] == $company['company_id'] ? 'selected' : '' ?>>
-                                    <?= ucfirst($company['company_name']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <option value="">No companies available</option>
-                        <?php endif; ?>
-                    </select>
-                    <?php else: ?>
-                      <?php
-                          $companyName = '';
-                          foreach ($companies as $comp) {
-                              if ($comp['company_id'] == $loggedInCompanyId) {
-                                  $companyName = $comp['company_name'];
-                                  break;
-                              }
-                          }
-                      ?>
-                      <input type="text" class="form-control" value="<?= esc($companyName) ?>" readonly>
-                      <input type="hidden" name="company_id" value="<?= esc($loggedInCompanyId) ?>">
-                  <?php endif; ?>
+             <label for="company_id">Company <span class="text-danger">*</span></label>
+
+<?php
+    $session = session();
+    $loggedInCompanyId = $session->get('company_id');
+?>
+
+<?php if (session()->get('role_Id') == 1): ?>
+    <select name="company_id" id="company_id" class="form-control" required>
+        <option value="">Select Company</option>
+        <?php if (!empty($companies)): ?>
+            <?php foreach ($companies as $company): ?>
+                <?php if (!isset($company['deleted_at']) || $company['deleted_at'] === null): ?>
+                    <option value="<?= $company['company_id'] ?>"
+                        <?= isset($userData['company_id']) && $userData['company_id'] == $company['company_id'] ? 'selected' : '' ?>>
+                        <?= ucfirst($company['company_name']) ?>
+                    </option>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <option value="">No companies available</option>
+        <?php endif; ?>
+    </select>
+
+<?php else: ?>
+    <?php
+        $companyName = '';
+        foreach ($companies as $comp) {
+            if ($comp['company_id'] == $loggedInCompanyId) {
+                $companyName = $comp['company_name'];
+                break;
+            }
+        }
+    ?>
+    <input type="text" class="form-control" value="<?= esc($companyName) ?>" readonly>
+    <input type="hidden" name="company_id" value="<?= esc($loggedInCompanyId) ?>">
+<?php endif; ?>
+
             </div>
             <div class="col-md-6 mb-2">
               <label>Name <span class="text-danger">*</span></label>
@@ -134,7 +142,6 @@ $(document).ready(function () {
 
   document.getElementById('phonenumber').addEventListener('input', function () {
             let val = this.value;
-            // Allow + only at the beginning, keep digits, space, parentheses, and dashes
             this.value = val.replace(/(?!^)\+/g, '').replace(/[^0-9\s\-\(\)\+]/g, '');
         });
 
