@@ -133,5 +133,38 @@ class InvoiceModel extends Model
 
     return $invoice;
 }
+// Get Total Revenue for Today
+public function getTodayRevenue($companyId)
+{
+    $today = date('Y-m-d');
+    $tomorrow = date('Y-m-d', strtotime('+1 day'));
+
+    $row = $this->selectSum('total_amount')
+        ->where('company_id', $companyId)
+        ->where('invoice_date >=', $today)
+        ->where('invoice_date <', $tomorrow)
+        ->get()
+        ->getRow();
+
+    return $row ? (float)$row->total_amount : 0;
+}
+
+
+// Get Total Revenue for Current Month
+public function getMonthlyRevenue($companyId)
+{
+    $start = date('Y-m-01');
+    $end = date('Y-m-t');
+
+    $row = $this->selectSum('total_amount')
+        ->where('company_id', $companyId)
+        ->where('invoice_date >=', $start)
+        ->where('invoice_date <=', $end)
+        ->get()
+        ->getRow();
+
+    return $row ? (float)$row->total_amount : 0;
+}
+
 
 }
