@@ -37,6 +37,9 @@ class Expense extends BaseController
     public function store()
     {
         $expenseModel = new Expense_Model();
+         $session = session(); // <-- get session
+            $companyId = $session->get('company_id'); // <-- logged-in company
+
 
         $id           = $this->request->getPost('id');
         $date         = $this->request->getPost('date');
@@ -58,7 +61,8 @@ class Expense extends BaseController
             'particular'   => $particular,
             'amount'       => $amount,
             'payment_mode' => $payment_mode,
-            'reference'    => $reference
+            'reference'    => $reference,
+            'company_id'   => $companyId
         ];
 
         if (!empty($id)) {

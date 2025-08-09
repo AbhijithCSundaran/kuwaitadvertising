@@ -35,34 +35,45 @@ class Dashboard extends BaseController
 }
 
 
-    public function getTodayExpenseTotal()
-    {
-        $expenseModel = new \App\Models\Expense_Model();
-        $today = date('Y-m-d');
-
-        $total = $expenseModel
-            ->selectSum('amount')
-            ->where('date', $today)
-            ->first();
-
-        return $this->response->setJSON(['total' => (int)$total['amount']]);
-    }
-
-    public function getMonthlyExpenseTotal()
+   public function getTodayExpenseTotal()
 {
     $expenseModel = new \App\Models\Expense_Model();
-
-    $start = date('Y-m-01'); // 1st of this month
-    $end = date('Y-m-t');    // Last day of this month
+    $session = session();
+    $company_id = $session->get('company_id'); // company from logged-in user
+    $today = date('Y-m-d');
 
     $total = $expenseModel
-        ->where('date >=', $start)
-        ->where('date <=', $end)
         ->selectSum('amount')
+        ->where('date', $today)
+        ->where('company_id', $company_id)
         ->first();
 
-    return $this->response->setJSON(['total' => $total['amount'] ?? 0]);
+    return $this->response->setJSON([
+        'total' => (float)($total['amount'] ?? 0)
+    ]);
 }
+
+public function getMonthlyExpenseTotal()
+{
+    $expenseModel = new \App\Models\Expense_Model();
+    $session = session();
+    $company_id = $session->get('company_id'); // company from logged-in user
+
+    $start = date('Y-m-01'); // First day of month
+    $end = date('Y-m-t');    // Last day of month
+
+    $total = $expenseModel
+        ->selectSum('amount')
+        ->where('date >=', $start)
+        ->where('date <=', $end)
+        ->where('company_id', $company_id)
+        ->first();
+
+    return $this->response->setJSON([
+        'total' => (float)($total['amount'] ?? 0)
+    ]);
+}
+
 
 public function getTodayRevenueTotal()
 {
