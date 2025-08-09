@@ -40,7 +40,7 @@
     }
 
     .top-heading img {
-      width: 280px;
+      width: 138px;
     }
 
     .invoice-type {
@@ -260,23 +260,31 @@
       </div>
     </div>
     <div class="container">
-      <div class="top-heading">
-        <img src="<?php echo ASSET_PATH; ?>assets/images/invoice-heading.png" alt="Invoice Heading">
-        <hr>
-        <div
-          style="background-color: #991b36;color: white;font-weight: bold;padding: 5px 20px;display: inline-block;border-radius: 4px;margin: 5px auto;font-size: 14px;">
-          فاتورة / نقداً / بالحساب<br>CASH / CREDIT INVOICE
-        </div>
+      <div class="top-heading" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+      <span style="font-size: 14px; font-weight: bold;">Al Rai Printing Press</span>
+      <img src="<?php echo ASSET_PATH; ?>assets/images/invoice-heading.png" alt="Invoice Heading" style="max-height: 50px;">
+      <span style="font-size: 14px; font-weight: bold; direction: rtl;">مطبعة الري الأعمال الطباعة</span>
+    </div>
+    <hr>
+    <div class="row align-items-center" style="margin-bottom: 10px;">
+      <div class="col-4 text-start">
+        <label style="font-weight: bold; margin-right: 4px;">No / رقم :</label>
+        <input type="text" readonly value="<?= esc($invoice['invoice_id']) ?>" 
+            style="display: inline-block; width: 87px; height: 30px; text-align:left;">
       </div>
-      <div class="invoice-header">
-        <div class="row">
-          <div class="half">
-            No.: <input type="text" readonly value="<?= esc($invoice['invoice_id']) ?>">
-          </div>
-          <div class="half" style="text-align: right;">
-            Date: <input type="text" value="<?= date('d-m-Y', strtotime($invoice['invoice_date'])) ?>" readonly><br><br>
-          </div>
+      <div class="col-4 text-center">
+        <div style="background-color: #991b36; color: white; font-weight: bold; padding: 3px 15px; display: inline-block; border-radius: 4px; font-size: 13px;">
+            فاتورة / نقداً / بالحساب<br>CASH / CREDIT INVOICE
         </div>
+     </div>
+      <div class="col-4 text-end">
+    <label style="font-weight: bold; margin-right: 4px;">Date / التاريخ :</label>
+    <input type="text" readonly value="<?= date('d-m-Y', strtotime($invoice['invoice_date'])) ?>" 
+        style="display: inline-block; width: 87px; height: 30px; text-align: center;">
+    </div>
+    </div>
+
+        <div class="invoice-header">
         <div class="col-12">
           Mr./Mrs: <span><?= esc($invoice['customer_name'] ?? '') ?></span>:السيد
         </div>
