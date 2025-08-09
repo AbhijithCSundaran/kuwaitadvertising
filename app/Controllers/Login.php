@@ -21,10 +21,10 @@ class Login extends BaseController
     if ($isAdminLogin) {
         $companyModel = new Managecompany_Model();
         $data['companies'] = $companyModel
-            ->where('company_status', 1) 
+            ->where('company_status', 1)
             ->findAll();
     } else {
-        $data['companies'] = []; 
+        $data['companies'] = [];
     }
 
     return view('login', $data);
@@ -67,7 +67,7 @@ class Login extends BaseController
                     'allowed_menus' => $allowedMenus,
                     'status'        => 1,
                     'logged_in'     => true,
-                    'company_id'    => $result->company_id,
+                    'company_id'   => $result->company_id, 
                     'user_status'   => $result->user_status
                 ]);
 

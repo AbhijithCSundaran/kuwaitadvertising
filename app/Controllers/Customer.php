@@ -33,7 +33,6 @@ class Customer extends BaseController
         'address' => $address
     ];
 
-    // ✅ Check if it's an update or create
     if (!empty($customer_id)) {
         $updated = $model->update($customer_id, $data);
 
@@ -87,13 +86,13 @@ class Customer extends BaseController
 {
     $term = $this->request->getGet('term');
 
-    $model = new \App\Models\customerModel();
+    $model = new customerModel();
     $results = $model
-        ->where('is_deleted', 0) // ✅ Only show active customers
+        ->where('is_deleted', 0) 
         ->like('name', $term)
         ->select('customer_id, name, address')
-        ->orderBy('customer_id', 'DESC') // ✅ Newest first
-        ->findAll(10); // or remove limit if needed
+        ->orderBy('customer_id', 'DESC') 
+        ->findAll(10); 
 
     $data = [];
     foreach ($results as $row) {
@@ -115,7 +114,7 @@ public function list()
 public function fetch()
 {
     $request = service('request');
-    $model = new \App\Models\customerModel();
+    $model = new customerModel();
 
     $draw = $request->getPost('draw') ?? 1;
     $start = $request->getPost('start') ?? 0;
@@ -160,7 +159,7 @@ public function fetch()
 
 public function getCustomer($id)
 {
-    $model = new \App\Models\customerModel();
+    $model = new customerModel();
     $customer = $model->find($id);
 
     if ($customer) {
@@ -172,7 +171,7 @@ public function getCustomer($id)
 
 public function edit($id)
 {
-    $model = new \App\Models\customerModel();
+    $model = new customerModel();
     $data['customer'] = $model->find($id);
 
     if (!$data['customer']) {
@@ -186,7 +185,7 @@ public function edit($id)
 public function delete()
 {
     $id = $this->request->getPost('id');
-    $model = new \App\Models\customerModel();
+    $model = new customerModel();
 
     if ($model->update($id, ['is_deleted' => 1])) {
         return $this->response->setJSON(['status' => 'success', 'message' => 'Customer Deleted Successfully.']);
@@ -196,11 +195,11 @@ public function delete()
 }
 public function viewByCustomer($customerId)
 {
-    $estimateModel = new \App\Models\Estimate_Model(); // adjust to your model
+    $estimateModel = new Estimate_Model(); 
     $data['estimates'] = $estimateModel->where('customer_id', $customerId)->findAll();
-    $data['customer'] = (new \App\Models\Customer_Model())->find($customerId);
+    $data['customer'] = (new Customer_Model())->find($customerId);
     
-    return view('estimate/customer_estimates', $data); // create this view file
+    return view('estimate/customer_estimates', $data); 
 }
 
 
