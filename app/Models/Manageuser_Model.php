@@ -7,7 +7,7 @@ class Manageuser_Model extends Model
 {
     protected $table = 'user';
     protected $primaryKey = 'user_id';
-    protected $allowedFields = ['name', 'email', 'phonenumber', 'password', 'role_id', 'company_id'];
+    protected $allowedFields = ['name', 'email', 'phonenumber', 'password', 'role_id', 'company_id','user_status'];
 
     public function getAllUserCount()
     {
@@ -48,10 +48,14 @@ class Manageuser_Model extends Model
 
         // Only apply condition if role is not Admin (1)
 
-        if ($roleId != 1) {
+       $session = \Config\Services::session();
+        $companyId = $session->get('company_id');
 
+       if (!empty($companyId)) {
+            $builder->where('user.company_id', $companyId);
+        }
+        if (!empty($condition) && $condition !== "1=1") {
             $builder->where($condition);
-
         }
 
         $builder->orderBy($orderColumn, $orderDir);
