@@ -31,12 +31,12 @@ public function index($uid = null)
     $loggedInCompanyId = $session->get('company_id');
     $loggedInRoleId    = $session->get('role_Id');
 
-    if ($loggedInRoleId == 1) {
-        $companies = $managecompany_Model->getActiveCompanies();
-
+   if ($loggedInRoleId == 1 && $session->get('user_status') == 1) {
+    $companies = $managecompany_Model->where('company_id', $loggedInCompanyId)->findAll();
     } else {
         $companies = $managecompany_Model->where('company_id', $loggedInCompanyId)->findAll();
     }
+
 
     return view('adduser', [
         'uid'        => $uid,
@@ -185,7 +185,7 @@ public function userlistajax()
     $orderColumn = $columnMap[$columnIndex] ?? 'user_id';
 
   $condition = "1=1";
-if ($roleId != 1) {
+if (!empty($companyId)) {
     $condition .= " AND user.company_id = " . (int)$companyId;
 }
 

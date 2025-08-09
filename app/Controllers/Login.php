@@ -4,6 +4,7 @@ namespace App\Controllers;
 use App\Models\Login_Model;
 use App\Models\Rolemanagement_Model;
 use App\Models\RoleModel;
+use App\Models\Managecompany_Model;
 use App\Controllers\BaseController;
 
 class Login extends BaseController
@@ -12,11 +13,29 @@ class Login extends BaseController
     {
         $this->session = \Config\Services::session();
     }
+    public function index()
+{
+    $isAdminLogin = $this->request->getGet('admin') == 1;
+    $data['isAdminLogin'] = $isAdminLogin;
+
+    if ($isAdminLogin) {
+        $companyModel = new Managecompany_Model();
+        $data['companies'] = $companyModel
+            ->where('company_status', 1) 
+            ->findAll();
+    } else {
+        $data['companies'] = []; 
+    }
+
+    return view('login', $data);
+}
 
     public function authenticate()
     {
         $email = $this->request->getPost('email');
         $password = $this->request->getPost('password');
+         $companyId = $this->request->getPost('company_id');
+         $loginMode  = $this->request->getPost('login_mode'); 
 
         if ($email && $password) {
             $loginModel = new Login_Model();
@@ -35,6 +54,9 @@ class Login extends BaseController
                     ->findAll();
 
                 $allowedMenus = array_column($permissions, 'menu_name');
+                if ($loginMode === 'admin_with_company' && $companyId && $result->user_status == 1) {
+                    $result->company_id = $companyId;
+                }
 
                 // Set session variables
                 $this->session->set([
@@ -45,7 +67,8 @@ class Login extends BaseController
                     'allowed_menus' => $allowedMenus,
                     'status'        => 1,
                     'logged_in'     => true,
-                    'company_id'    => $result->company_id 
+                    'company_id'    => $result->company_id,
+                    'user_status'   => $result->user_status
                 ]);
 
                 return $this->response->setJSON([
@@ -53,10 +76,10 @@ class Login extends BaseController
                     'user_Id'  => $result->user_id
                 ]);
             } else {
-                return $this->response->setJSON(['status' => 0, 'message' => 'Invalid credentials']);
+                return $this->response->setJSON(['status' => 0, 'message' => 'Invalid Credentials']);
             }
         } else {
-            return $this->response->setJSON(['status' => 0, 'message' => 'Email and password are required']);
+            return $this->response->setJSON(['status' => 0, 'message' => 'Email And Password Are Required']);
         }
     }
 }

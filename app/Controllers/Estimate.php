@@ -338,14 +338,20 @@ public function save()
         $role = $roleModel->find($roleId);
         $roleName = $role['role_name'] ?? '';
     }
-    $company = $companyModel->find($companyId);
+    $companyId = $estimate['company_id'] ?? session()->get('company_id');
+    $company = $companyModel->find($companyId) ?? [
+        'company_name' => '',
+        'email' => '',
+        'phone' => ''
+    ];
     $data = [
         'estimate'      => $estimate,
         'items'         => $items,
         'user_id'       => $userId,
         'user_name'     => $userName,
         'role_name'     => $roleName,
-        'company_name'  => $company['company_name'] ?? ''
+        'company_name'  => $company['company_name'] ?? '',
+        'company'   => $company
     ];
 
     // Load view

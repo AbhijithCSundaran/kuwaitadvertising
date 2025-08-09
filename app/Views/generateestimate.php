@@ -7,6 +7,20 @@
         width: 100%;
         z-index: -1;
     }
+    .total-tab{
+        width: auto; float: right; 
+        border-collapse: collapse;
+    }
+    .totals{
+        padding: 4px 12px; 
+        text-align: right;
+    }
+    .total-td{
+        background-color: #a1263a; 
+        color: #fff; font-weight: 
+        bold; padding: 6px 12px; 
+        text-align: right;
+    }
     @media print {
        *{
          -webkit-print-color-adjust: exact !important;
@@ -114,37 +128,37 @@
                     4. Cancellation of processed order will not be accepted.
                 </div>
 
-                <div class="col-6 mt-4">
-                      <div class="text-end mt-4">
-
-                        <!-- SUBTOTAL -->
-                        <div class="d-flex justify-content-end mb-1">
-                            <div class="me-4 ">SUBTOTAL</div>
-                            <div><?= number_format($grandTotal, 2) ?> KWD</div>
-                        </div>
-
-                        <!-- DISCOUNTS -->
-                        <div class="d-flex justify-content-end mb-2">
-                            <div class="me-4">DISCOUNTS</div>
-                            <div><?= number_format($estimate['discount'] ?? 0, 2) ?> KWD</div>
-                        </div>
-
-                        <!-- TOTAL in colored box -->
-                        <div class="d-flex justify-content-end">
-                            <div style="background-color: #a1263a; color: #fff; padding: 8px 16px; min-width: 220px;" class="d-flex justify-content-between">
-                                <div class="fw-bold">TOTAL</div>
-                                <div class="fw-bold"><?= number_format($estimate['total_amount'] ?? 0, 2) ?> KWD</div>
-                            </div>
-                        </div>
-
+               <div class="col-6 mt-4">
+                    <div class="text-end mt-4">
+                       <table class="total-tab">
+                            <tbody>
+                                <tr>
+                                    <td class="totals">SUBTOTAL</td>
+                                    <td class="totals"><?= number_format($grandTotal, 2) ?> KWD</td>
+                                </tr>
+                                <tr>
+                                    <td class="totals">DISCOUNTS</td>
+                                    <td class="totals"><?= number_format($estimate['discount'] ?? 0, 2) ?> KWD</td>
+                                </tr>
+                                <tr>
+                                    <td class="total-td">
+                                        TOTAL   
+                                    </td>
+                                    <td class="total-td">
+                                        <?= number_format($estimate['total_amount'] ?? 0, 2) ?> KWD
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-
             </div>
 
             <div class="footer-f">
                 If you have any queries about this estimate, please contact<br>
-                (Name, Email, Phone)<br>
+                    (<?= esc($company['company_name']) ?>,
+                    <?= esc($company['email']) ?>,
+                    <?= esc($company['phone']) ?>)<br>
                 <strong>Thank You For Your Business!</strong>
             </div>
         </div>
@@ -152,15 +166,3 @@
 </div>
 </div>
 <?php include "common/footer.php"; ?>
-<!-- <script>
-    function printEstimate() {
-        var printContents = document.getElementById('printArea').innerHTML;
-        var originalContents = document.body.innerHTML;
-
-        document.body.innerHTML = printContents;
-        window.print();
-        // document.body.innerHTML = originalContents;
-        location.reload();
-    }
-
-</script> -->
