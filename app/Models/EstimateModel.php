@@ -34,15 +34,14 @@ class EstimateModel extends Model
         }
     }
 
-    // ✅ Filter by company ID
     public function getEstimateCount($companyId)
     {
         return $this->where('company_id', $companyId)->countAllResults();
     }
 
-    // ✅ Filtered Count with search and company
     public function getFilteredCount($searchValue, $companyId)
     {
+        $searchValue = trim($searchValue);
         $builder = $this->db->table('estimates')
             ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
             ->where('estimates.company_id', $companyId);
@@ -57,10 +56,9 @@ class EstimateModel extends Model
 
         return $builder->countAllResults();
     }
-
-    // ✅ Filtered Estimates List with search, pagination, and company
     public function getFilteredEstimates($searchValue, $start, $length, $orderByColumn, $orderDir, $companyId)
     {
+        $searchValue = trim($searchValue); 
         $builder = $this->db->table('estimates')
             ->select('estimates.*, customers.name AS customer_name, customers.address AS customer_address')
             ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
@@ -82,11 +80,11 @@ class EstimateModel extends Model
 
   public function getRecentEstimatesWithCustomer($limit = 5)
 {
-    $companyId = session()->get('company_id'); // Ensure company filter
+    $companyId = session()->get('company_id');
     return $this->db->table('estimates')
         ->select('estimates.*, customers.name AS customer_name, customers.address AS customer_address')
         ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
-        ->where('estimates.company_id', $companyId) // ✅ Add this line
+        ->where('estimates.company_id', $companyId) 
         ->orderBy('estimates.date', 'DESC')
         ->limit($limit)
         ->get()
