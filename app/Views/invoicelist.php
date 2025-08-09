@@ -11,12 +11,12 @@
     }
     .status-badge {
     display: inline-block;
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 600;
     text-transform: uppercase;
-    padding: 6px 12px;
+    padding: 0.375rem 0.5625rem;
     border-radius: 1px;
-    min-width: 70px;
+    min-width: 90px;
     text-align: center;
     color: #fff;
 }
@@ -35,10 +35,6 @@
 
 <div class="form-control mb-3 right_container">
     <div class="alert d-none text-center position-fixed" role="alert"></div>
-    <!-- <div class="alert d-none text-center position-fixed" role="alert"
-     style="top: 30px; left: 50%; transform: translateX(-50%); z-index: 9999; background-color: #f8d7da; color: #721c24;">
-</div> -->
-
 
     <div class="row align-items-center mb-2">
         <div class="col-md-6">
