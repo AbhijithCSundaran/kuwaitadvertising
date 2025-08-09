@@ -199,12 +199,11 @@ public function save()
     $draw = $request->getPost('draw');
     $start = $request->getPost('start');
     $length = $request->getPost('length');
-    $searchValue = $request->getPost('search')['value'];
+    $searchValue = trim($request->getPost('search')['value'] ?? '');
  
     $orderColumnIndex = $request->getPost('order')[0]['column'] ?? 8;
     $orderDir = $request->getPost('order')[0]['dir'] ?? 'desc';
- 
-    // Match DataTable column index to DB field names
+
     $columns = [
         0 => 'estimate_id',         
         1 => 'customers.name',

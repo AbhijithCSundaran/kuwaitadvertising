@@ -16,6 +16,7 @@ class Customer extends BaseController
     }
    public function create()
 {
+    $session = session();
     $name = ucwords(strtolower(trim($this->request->getPost('name'))));
     $address = ucfirst(strtolower(trim($this->request->getPost('address'))));
     $customer_id = $this->request->getPost('customer_id'); 
@@ -30,7 +31,8 @@ class Customer extends BaseController
     $model = new customerModel();
     $data = [
         'name' => $name,
-        'address' => $address
+        'address' => $address,
+        'company_id'    => $session->get('company_id') 
     ];
 
     if (!empty($customer_id)) {
@@ -108,13 +110,24 @@ class Customer extends BaseController
 
 public function list()
 {
-    return view('customerlist');
+    $session = session();
+    $customerModel = new CustomerModel();
+    $company_id = $session->get('company_id');
+
+   $data['customers'] = $customerModel
+        ->where('company_id', $company_id)
+        ->where('is_deleted', 0)
+        ->findAll();
+
+    return view('customerlist', $data);
 }
 
 public function fetch()
 {
+    $session = session();
     $request = service('request');
     $model = new customerModel();
+    $company_id = $session->get('company_id');
 
     $draw = $request->getPost('draw') ?? 1;
     $start = $request->getPost('start') ?? 0;
@@ -132,7 +145,7 @@ public function fetch()
     ];
     $orderColumn = $columnMap[$columnIndex] ?? 'customer_id';
 
-    $customers = $model->getAllFilteredRecords($search, $start, $length, $orderColumn, $orderDir);
+    $customers = $model->getAllFilteredRecords($search, $start, $length, $orderColumn, $orderDir,$company_id);
 
     $result = [];
     $slno = $start + 1;
@@ -146,12 +159,12 @@ public function fetch()
         ];
     }
 
-    $total = $model->getAllCustomerCount()->totcustomers;
-    $filteredTotal = $model->getFilteredCustomerCount($search)->filCustomers;
+   $total = $model->getAllCustomerCount()->totcustomers;
+    $filteredTotal = $model->getFilteredCustomerCount($search, $company_id)->filCustomers;
 
     return $this->response->setJSON([
         'draw' => intval($draw),
-        'recordsTotal' => $total,
+        'recordsTotal' => $filteredTotal,
         'recordsFiltered' => $filteredTotal,
         'data' => $result
     ]);
