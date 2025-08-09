@@ -112,7 +112,10 @@
     .signature-box p {
       margin: 5px 0;
     }
-
+  .delivery-value {
+    margin-left: 2px; 
+    display: inline-block;
+  }
 
 
     @media print {
@@ -160,14 +163,15 @@
       .signature-section, .signature-box {
     page-break-inside: avoid;
   }
+  
     }
   </style>
   </head>
   <body>
     <div class="right_container">
       <div class="no-print" style="text-align: right; margin-bottom: 20px;">
-    <button onclick="window.print()" class="btn btn-sm btn-primary">🖨️ Print</button>
-  <button onclick="downloadPDF()" class="btn btn-sm btn-success">⬇️ Download PDF</button>
+    <button onclick="window.print()" class="btn btn-sm btn-primary"> Print</button>
+  <button onclick="downloadPDF()" class="btn btn-sm btn-success"> Download PDF</button>
   </div>
     <div class="invoice-container">
       <div class="top-section">
@@ -190,10 +194,8 @@
           <div><?= nl2br(esc($invoice['shipping_address'] ?? '-')) ?></div>
         </div>
         <div class="delivery-date">
-  Delivery Date:<span id="deliveryDate" style="color: black;"></span>
-
-</div>
-
+          Delivery Date: <span id="deliveryDate" class="delivery-value" style="color: black;"></span>
+        </div>
       </div>
       <table>
         <thead>
@@ -209,10 +211,10 @@
           <?php $i = 1;
           foreach ($items as $item): ?>
             <tr>
-              <td><?= $i++ ?></td>
+              <td style="text-align: left;"><?= $i++ ?></td>
               <td style="text-align: left;"><?= esc($item['item_name'] ?? '-') ?></td>
-              <td><?= esc($item['price'] ?? '-') ?></td>
-              <td><?= esc($item['quantity']) ?></td>
+              <td style="text-align: left;"><?= esc($item['price'] ?? '-') ?></td>
+              <td style="text-align: left;"><?= esc($item['quantity']) ?></td>
               <td>--</td>
             </tr>
           <?php endforeach; ?>
@@ -221,27 +223,27 @@
           <table style="width: 100%; border: 1px solid #000; border-collapse: collapse;">
             <tr>
               <td style="width: 50%; border-right: 1px solid #000; padding: 10px;">
-                <p><strong>Received by :</strong></p>
-                <p><strong>Signature :</strong></p>
+                <p style="text-align: left;"><strong>Received by :</strong></p>
+                <p style="text-align: left;"><strong>Signature :</strong></p>
               </td>
               <td style="width: 50%; padding: 10px; position: relative;">
-                <div
+                <!-- <div
                   style="position: absolute; top: -12px; right: 10px; background: white; font-weight: bold; font-size: 13px; padding: 0 6px;">
                   For Al Shaya International Printng Co
-                </div>
-                <p><strong>Issued by :</strong></p>
-                <p><strong>Signature :</strong></p>
+                </div> -->
+                <p style="text-align: left;"><strong>Issued by :</strong></p>
+                <p style="text-align: left;"><strong>Signature :</strong></p>
               </td>
             </tr>
-            <!-- <hr style="margin: 1rem 0; color: inherit; border: 0; border-top: var(--bs-border-width) solid; opacity: 0.25; margin-left: 570px; margin-top: 25px;
-    margin-bottom: 4px;
-}">
-<div class="" style="font-size: 15px; height: 0; margin-left: 65%; ">
-  For Al Shaya International Printng Co
-</div> -->
-
-          </table>
-        </div>
+            <div class="d-flex w-100 position-relative">
+              <div class="col-6 ms-auto">
+                <hr>
+                 <div class="text-center" style="font-size: 14px;">For Al Shaya International Printing Co</div>
+              </div>
+            </div>
+          </div>
+        </table>
+      </div>
     </div>
   </div>
 </body>

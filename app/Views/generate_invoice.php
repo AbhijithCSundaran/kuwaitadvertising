@@ -55,7 +55,7 @@
       margin: 20px 0 40px;
       margin-top: -1px;
       font-size: 1.45rem;
-    }
+      color: #0a0a0a8d;    }
 
     .info-table {
       border-collapse: collapse;
@@ -357,7 +357,8 @@
         <thead>
           <tr>
             <th>SR. NO</th>
-            <th style="width: 518px;"><?= ucwords(strtolower('description')) ?></th>
+            <!-- <th style="width: 518px;"><?= ucwords(strtolower('description')) ?></th> -->
+            <th style="width: 518px;">DESCRIPTION</th>
             <th>QTY</th>
             <th>UNIT PRICE (KD)</th>
             <th>TOTAL (KD)</th>
@@ -406,6 +407,7 @@
           <span>KD<?= number_format($subtotal - $totalDiscountAmount, 2) ?></span>
         </div>
       </div>
+      
      <?php $grandTotal = $subtotal - $totalDiscountAmount; ?>
       <div class="amount-words">
        In Words:: <span id="amount-words"></span>
