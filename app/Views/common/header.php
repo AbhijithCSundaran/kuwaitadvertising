@@ -76,10 +76,10 @@
         <?php if (in_array('dashboard', $allowedMenus)): ?>
           <li class="nav-item">
            <a class="nav-link <?= strpos($currentPath, 'dashboard') !== false ? 'active' : '' ?>"
-   href="<?= base_url('dashboard') ?>">
-  <i class="mdi mdi-home menu-icon"></i>
-  <span class="menu-title">Dashboard</span>
-</a>
+            href="<?= base_url('dashboard') ?>">
+            <i class="mdi mdi-home menu-icon"></i>
+            <span class="menu-title">Dashboard</span>
+          </a>
 
           </li>
         <?php endif; ?>
