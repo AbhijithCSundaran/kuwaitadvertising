@@ -152,7 +152,7 @@ $(document).ready(function () {
                 data: "invoice_id",
                 render: function (id, type, row) {
                     const status = row.status.toLowerCase();
-                    const isPaid = status === 'paid';
+                    const isPaidOrPartial = status === 'paid' || status === 'partial paid';
 
                     return `
                         <div class="d-flex gap-2">
@@ -161,12 +161,13 @@ $(document).ready(function () {
                             </a>
 
                            <a
-                                href="${isPaid ? '#' : '<?= base_url('invoice/edit/') ?>' + id}"
-                                title="${isPaid ? 'Paid invoice cannot be edited' : 'Edit Invoice'}"
-                                style="color:${isPaid ? 'gray' : 'rgb(13, 162, 199)'}; cursor: ${isPaid ? 'not-allowed' : 'pointer'};"
-                                ${isPaid ? 'onclick="event.preventDefault(); showEditAlert();"' : ''}>
-                                    <i class="bi bi-pencil-fill"></i>
-                            </a>
+    href="${isPaidOrPartial ? '#' : '<?= base_url('invoice/edit/') ?>' + id}"
+    title="${isPaidOrPartial ? 'This invoice cannot be edited' : 'Edit Invoice'}"
+    style="color:${isPaidOrPartial ? 'gray' : 'rgb(13, 162, 199)'}; cursor: ${isPaidOrPartial ? 'not-allowed' : 'pointer'};"
+    ${isPaidOrPartial ? 'onclick="event.preventDefault(); showEditAlert();"' : ''}>
+        <i class="bi bi-pencil-fill"></i>
+</a>
+
 
                             <a href="javascript:void(0);" class="delete-invoice" data-id="${id}" title="Delete" style="color: #dc3545;">
                                 <i class="bi bi-trash-fill"></i>
@@ -219,9 +220,9 @@ $(document).ready(function () {
             .text(message).fadeIn();
         setTimeout(() => alertBox.fadeOut(), 2000);
     }
- function showEditAlert() {
+function showEditAlert() {
     const alertBox = document.querySelector('.alert');
-    alertBox.textContent = 'Paid invoice cannot be edited.';
+    alertBox.textContent = 'Paid or Partial Paid invoice cannot be edited.';
     alertBox.classList.remove('d-none');
 
     setTimeout(() => {

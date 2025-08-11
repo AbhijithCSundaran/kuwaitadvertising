@@ -243,6 +243,10 @@
                     <label>Address</label>
                     <textarea id="popup_address" class="form-control" rows="3" required></textarea>
                     <div class="alert alert-danger d-none mt-2" id="customerError"></div>
+                    <div class="mb-3">
+                        <label>Maximum Discount (%)</label>
+                        <input type="number" name="max_discount" id="max_discount" class="form-control" min="0" max="100" step="0.01" placeholder="Enter discount percentage">
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">Save</button>
@@ -322,11 +326,8 @@
                 <td class="text-center"><span class="remove-item-btn" title="Remove"><i class="fas fa-trash text-danger"></i></span></td>
             </tr>`;
             $('#item-container').append(row);
-
-            // ✅ Recalculate totals
             calculateTotals();
 
-            // ✅ Force trigger change tracking by binding again
             const currentFormData = $('#invoice-form').serialize();
             const hasChanged = currentFormData !== initialFormData;
             $('#save-invoice-btn').prop('disabled', !hasChanged);
@@ -351,7 +352,6 @@
 
         document.getElementById('phone_number').addEventListener('input', function () {
             let val = this.value;
-            // Allow + only at the beginning, keep digits, space, parentheses, and dashes
             this.value = val.replace(/(?!^)\+/g, '').replace(/[^0-9\s\-\(\)\+]/g, '');
         });
 
@@ -371,6 +371,7 @@
             const hasChanged = currentFormData !== initialFormData;
             $('#save-invoice-btn').prop('disabled', !hasChanged);
         });
+       
         $(document).on('input', '.price', function () {
             let input = this;
             let val = input.value;
@@ -454,6 +455,25 @@
             }, 'json');
         });
 
+          $('#customer_id').on('change', function () {
+        let customerId = $(this).val();
+
+        if (customerId) {
+            $.ajax({
+                url: '<?= base_url("customer/get_discount") ?>/' + customerId,
+                type: 'GET',
+                dataType: 'json',
+                success: function (res) {
+                    if (res.discount !== undefined) {
+                        $('#discount').val(res.discount);
+                    }
+                }
+            });
+        } else {
+            $('#discount').val(0); // reset if none selected
+        }
+    });
+
         $('#invoice-form').submit(function (e) {
             e.preventDefault();
             const currentFormData = $('#invoice-form').serialize();
@@ -529,6 +549,51 @@
                 }
             });
         });
+
+        let maxCustomerDiscount = 0; 
+
+        $('#customer_id').on('change', function () {
+    let customerId = $(this).val();
+
+    if (customerId) {
+        $.ajax({
+            url: '<?= base_url("customer/get_discount") ?>/' + customerId,
+            type: 'GET',
+            dataType: 'json',
+            success: function (res) {
+                if (res.discount !== undefined) {
+                    maxCustomerDiscount = parseFloat(res.discount) || 0;
+                    $('#discount').val(maxCustomerDiscount);
+                }
+            }
+        });
+    } else {
+        maxCustomerDiscount = 0;
+        $('#discount').val(0);
+    }
+});
+
+       // Initialize tooltip (once)
+            $('#discount').tooltip({
+                trigger: 'manual',
+                placement: 'top'
+            });
+
+            $('#discount').on('input', function () {
+                let val = parseFloat($(this).val()) || 0;
+                if (val > maxCustomerDiscount) {
+                    $(this).val(maxCustomerDiscount);
+
+                    $(this).attr('data-bs-original-title', 'Unable to increase beyond max discount for this customer').tooltip('show');
+
+                    setTimeout(() => {
+                        $('#discount').tooltip('hide');
+                    }, 2000);
+                } else {
+                    $(this).tooltip('hide');
+                }
+            });
+
 
         function showAlert(message, type) {
             $('.alert')
