@@ -54,6 +54,10 @@
                         <label>Address</label>
                         <textarea name="address" id="address" class="form-control" required style="text-transform: capitalize;"></textarea>
                     </div>
+                    <div class="mb-3">
+                        <label>Maximum Discount (%)</label>
+                        <input type="number" name="max_discount" id="max_discount" class="form-control" min="0" max="100" step="0.01" placeholder="Enter discount percentage">
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" id="saveCustomerBtn" class="btn btn-primary" disabled>Save</button>
@@ -153,6 +157,7 @@ $(document).ready(function () {
 
         originalName = '';
         originalAddress = '';
+        originalMaxDiscount = '';
     });
 
     // Edit Customer
@@ -163,10 +168,12 @@ $(document).ready(function () {
                 $('#customer_id').val(data.customer_id);
                 $('#name').val(data.name);
                 $('#address').val(data.address);
+                 $('#max_discount').val(data.max_discount || '');
                 $('#customerModalLabel').text('Edit Customer');
 
                 originalName = data.name.trim();
                 originalAddress = data.address.trim();
+                originalMaxDiscount = data.max_discount ? data.max_discount.toString() : '';
 
                 $('#saveCustomerBtn').prop('disabled', true);
                 customerModal.show();
@@ -177,16 +184,18 @@ $(document).ready(function () {
     });
 
     // Check if input values changed from original (only in Edit)
-    $('#name, #address').on('input', function () {
-        const isEdit = $('#customer_id').val() !== '';
-        if (!isEdit) return;
+    $('#name, #address, #max_discount').on('input', function () {
+    const isEdit = $('#customer_id').val() !== '';
+    if (!isEdit) return;
 
-        const currentName = $('#name').val().trim();
-        const currentAddress = $('#address').val().trim();
+    const currentName = $('#name').val().trim();
+    const currentAddress = $('#address').val().trim();
+    const currentMaxDiscount = $('#max_discount').val().trim();
 
-        const hasChanged = currentName !== originalName || currentAddress !== originalAddress;
-        $('#saveCustomerBtn').prop('disabled', !hasChanged);
-    });
+    const hasChanged = currentName !== originalName || currentAddress !== originalAddress || currentMaxDiscount !== originalMaxDiscount;
+    $('#saveCustomerBtn').prop('disabled', !hasChanged);
+});
+
 
     // Submit Form
     $('#customerForm').submit(function (e) {

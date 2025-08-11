@@ -155,38 +155,37 @@
       font-size: 12px;
       color: white;
       background-color: #991b36;
-      padding: 10px;
-      margin-top: 20px;
+      padding: 3px;
+      margin-top: 0px;
 
     }
 
     .tfoot {
       background-color: #cfc7c7ff;
     }
-     .partial-row {
-    display: flex;
-    justify-content: end;
-    width: 300px;
-    margin-bottom: 5px;
-    gap: 53px;
-  }
 
-  .partial {
-    font-weight: bold;
-  }
+    .partial-row {
+      display: flex;
+      justify-content: end;
+      width: 300px;
+      margin-bottom: 5px;
+      gap: 53px;
+    }
 
-.value {
-  text-align: right;
-  min-width: 100px;
-}
+    .partial {
+      font-weight: bold;
+    }
+
+    .value {
+      text-align: right;
+      min-width: 100px;
+    }
 
 
     @media print {
       * {
         -webkit-print-color-adjust: exact !important;
-        /* Safari/Chrome */
         print-color-adjust: exact !important;
-        /* Firefox */
       }
 
       .no-print,
@@ -197,22 +196,50 @@
         display: none !important;
       }
 
+      body {
+        margin: 0;
+        padding: 0;
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        table-layout: fixed;
+      }
+
+      table th,
       table td {
+        border: 1px solid #000;
+        padding: 4px;
         font-size: 10px;
+        word-break: break-word;
       }
 
       td:nth-child(2) {
         max-width: 250px;
-        word-wrap: break-word;
-        word-break: break-word;
         white-space: normal;
       }
+
+      /* Optional: Avoid page breaks inside rows */
+      tr {
+        page-break-inside: avoid;
+      }
+
+      /* Optional: Remove background images if not needed */
+      body,
+      table {
+        background: none !important;
+      }
+
+      /* .container {
+        min-width: 690px;
+        min-height: 900px;
+      } */
     }
   </style>
-
-
 </head>
-
 <body>
   <div class="outer-container">
     <div class="no-print" style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
@@ -220,7 +247,7 @@
         style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px;">
         Print
       </button>
-      <?php if (strtolower($invoice['status']) !== 'paid'): ?>
+      <?php if (!in_array(strtolower($invoice['status']), ['paid', 'partial paid'])): ?>
         <button id="editinvoicebtn"
           onclick="window.location.href='<?= base_url('invoice/edit/' . $invoice['invoice_id']) ?>'"
           style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px; cursor: pointer;">
@@ -228,10 +255,12 @@
         </button>
       <?php endif; ?>
       <button id="deliveryNoteBtn"
-        onclick="window.location.href='<?= base_url('invoice/delivery_note/' . $invoice['invoice_id']) ?>'"
-        style="display: <?= (strtolower($invoice['status']) === 'paid') ? 'inline-block' : 'none' ?>; background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
-        Delivery Note
-      </button>
+    onclick="window.location.href='<?= base_url('invoice/delivery_note/' . $invoice['invoice_id']) ?>'"
+    style="display: <?= in_array(strtolower($invoice['status']), ['paid', 'partial paid']) ? 'inline-block' : 'none' ?>;
+           background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
+    Delivery Note
+</button>
+
       <?php
       $status = strtolower($invoice['status'] ?? 'unpaid');
       $btnLabel = ucfirst($status);
@@ -261,30 +290,46 @@
     </div>
     <div class="container">
       <div class="top-heading" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-      <span style="font-size: 14px; font-weight: bold;">Al Rai Printing Press</span>
-      <img src="<?php echo ASSET_PATH; ?>assets/images/invoice-heading.png" alt="Invoice Heading" style="max-height: 50px;">
-      <span style="font-size: 14px; font-weight: bold; direction: rtl;">مطبعة الري الأعمال الطباعة</span>
-    </div>
-    <hr>
-    <div class="row align-items-center" style="margin-bottom: 10px;">
-      <div class="col-4 text-start">
-        <label style="font-weight: bold; margin-right: 4px;">No / رقم :</label>
-        <input type="text" readonly value="<?= esc($invoice['invoice_id']) ?>" 
-            style="display: inline-block; width: 87px; height: 30px; text-align:left;">
+        <span style="font-size: 14px; font-weight: bold;">Al Rai Printing Press</span>
+        <img src="<?php echo ASSET_PATH; ?>assets/images/invoice-heading.png" alt="Invoice Heading"
+          style="max-height: 50px;">
+        <span style="font-size: 14px; font-weight: bold; direction: rtl;">مطبعة الري الأعمال الطباعة</span>
       </div>
-      <div class="col-4 text-center">
-        <div style="background-color: #991b36; color: white; font-weight: bold; padding: 3px 15px; display: inline-block; border-radius: 4px; font-size: 13px;">
-            فاتورة / نقداً / بالحساب<br>CASH / CREDIT INVOICE
+      <hr>
+      <div class="row align-items-center" style="margin-bottom: 10px;">
+        <div class="col-4 text-start">
+          <div>
+            <label style="font-weight: bold; margin-right: 4px;">No / رقم :</label>
+            <input type="text" readonly value="<?= esc($invoice['invoice_id']) ?>"
+              style="display: inline-block; width: 87px; height: 23px; text-align:left;">
+          </div>
+          <div style="margin-top: 4px;">
+            <label style="font-weight: bold; margin-right: 4px;">LPO No :</label>
+            <span><?= esc($invoice['lpo_no']) ?></span>
+          </div>
         </div>
-     </div>
-      <div class="col-4 text-end">
-    <label style="font-weight: bold; margin-right: 4px;">Date / التاريخ :</label>
-    <input type="text" readonly value="<?= date('d-m-Y', strtotime($invoice['invoice_date'])) ?>" 
-        style="display: inline-block; width: 87px; height: 30px; text-align: center;">
-    </div>
-    </div>
+        <div class="col-4 text-center">
+          <div
+            style="background-color: #991b36; color: white; font-weight: bold; padding: 3px 15px; display: inline-block; border-radius: 4px; font-size: 13px;">
+            فاتورة / نقداً / بالحساب<br>CASH / CREDIT INVOICE
+          </div>
+        </div>
+        <div class="col-4 text-end">
+          <div style="white-space: nowrap;">
+            <label style="font-weight: bold; margin-right: 6px;">Date / التاريخ:</label>
+            <input type="text" readonly value="<?= date('d-m-Y', strtotime($invoice['invoice_date'])) ?>"
+              style="width: 87px; height: 23px; text-align: center;">
+          </div>
+          <div style="margin-top: 4px; white-space: nowrap;">
+            <label style="font-weight: bold; margin-right: 6px;">Delivery Date :</label>
+            <span id="deliveryDateCell">
+              <?= !empty($invoice['delivery_date']) ? date('d-m-Y', strtotime($invoice['delivery_date'])) : '' ?>
+            </span>
+          </div>
+        </div>
+      </div>
 
-        <div class="invoice-header">
+      <div class="invoice-header">
         <div class="col-12">
           Mr./Mrs: <span><?= esc($invoice['customer_name'] ?? '') ?></span>:السيد
         </div>
@@ -298,7 +343,7 @@
         <thead>
           <tr>
             <th rowspan="2" style="width: 6%;">رقم<br>No.</th>
-            <th rowspan="2" style="width: 38%;">Description التفاصيل</th>
+            <th rowspan="2" style="width: 38%;"> التفاصيل<br>Description</th>
             <th rowspan="2" style="width: 8%;">الكمية<br>Qty.</th>
             <th colspan="2" style="width: 24%;">سعر الوحدة<br>Unit Price</th>
             <th colspan="2" style="width: 24%;">المبلغ الإجمالي<br>Total Amount</th>
@@ -371,7 +416,7 @@
       </table>
 
       <div class="amount-words">
-        Amount Chargeable (in words): <span id="amount-words"></span>
+        المبلغ (بالكلمات): <span id="amount-words"></span>
       </div>
 
       <?php
@@ -395,8 +440,8 @@
       </div>
 
       <div class="table-footer">
-        <div>Received by. المستلم</div>
-        <div style="text-align: right;">Salesman Signature. توقيع البائع</div>
+        <div>Receiver signature / توقيع المتلقي</div>
+        <div style="text-align: right;">Accountant Signature / توقيع المحاسب</div>
       </div>
 
 
@@ -439,15 +484,15 @@
     </div>
   </div>
 </body>
-
 </html>
 </div>
 <?php include "common/footer.php"; ?>
 <script>
+
   function numberToWords(num) {
-    const a = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven',
-      'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
-    const b = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+    const a = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven',
+      'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+    const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
     num = num.toString().replace(/,/g, '');
 
     let [dinars, fils] = num.split('.');
@@ -459,15 +504,15 @@
     const convert = (n) => {
       if (n < 20) return a[n];
       if (n < 100) return b[Math.floor(n / 10)] + (n % 10 ? '-' + a[n % 10] : '');
-      if (n < 1000) return a[Math.floor(n / 100)] + ' hundred' + (n % 100 ? ' ' + convert(n % 100) : '');
-      if (n < 1000000) return convert(Math.floor(n / 1000)) + ' thousand' + (n % 1000 ? ' ' + convert(n % 1000) : '');
-      if (n < 1000000000) return convert(Math.floor(n / 1000000)) + ' million' + (n % 1000000 ? ' ' + convert(n % 1000000) : '');
+      if (n < 1000) return a[Math.floor(n / 100)] + ' Hundred' + (n % 100 ? ' ' + convert(n % 100) : '');
+      if (n < 1000000) return convert(Math.floor(n / 1000)) + ' Thousand' + (n % 1000 ? ' ' + convert(n % 1000) : '');
+      if (n < 1000000000) return convert(Math.floor(n / 1000000)) + ' Million' + (n % 1000000 ? ' ' + convert(n % 1000000) : '');
       return '';
     };
 
     let words = '';
     if (dinars > 0) words += convert(dinars) + ' Kuwaiti Dinar';
-    if (fils > 0) words += (words ? ' and ' : '') + convert(fils) + ' Fils';
+    if (fils > 0) words += (words ? ' And ' : '') + convert(fils) + ' Fils';
     return words || 'Zero';
   }
 
@@ -563,6 +608,7 @@
     deliveryNoteModal.style.display = 'none';
     window.location.href = '<?= base_url("invoice/delivery_note/" . $invoice["invoice_id"]) ?>';
   }
+
   function formatDateToDDMMYYYY(date) {
     const d = new Date(date);
     const day = String(d.getDate()).padStart(2, '0');
@@ -612,29 +658,36 @@
       }
     });
   }
+  
+  let isFirstPartialPayment = localStorage.getItem('firstPartialDone_<?= $invoice['invoice_id'] ?>') !== 'true';
 
   function openPartialPayment() {
-    document.getElementById('partialPaymentModal').style.display = 'block';
+  const modalTitle = document.querySelector('#partialPaymentModal .modal-title');
+  const inputLabel = document.querySelector('label[for="partialPaidInput"]');
+
+  if (isFirstPartialPayment) {
+    modalTitle.innerText = "Advance Payment";
+    inputLabel.innerText = "Enter Amount";
+  } else {
+    modalTitle.innerText = "Partial Payment";
+    inputLabel.innerText = "Enter Amount";
   }
+  document.getElementById('partialPaymentModal').style.display = 'block';
+}
 
   function closePartialModal() {
     document.getElementById('partialPaymentModal').style.display = 'none';
   }
 
-
   function submitPartialPayment() {
     const paid = parseFloat(document.getElementById('partialPaidInput').value);
     const errorMsg = document.getElementById('partialErrorMsg');
-    errorMsg.style.display = 'none'; // Hide any previous error
-
-    // Assuming grandTotal is defined somewhere globally or above
+    errorMsg.style.display = 'none'; 
     if (isNaN(paid) || paid <= 0 || paid > grandTotal) {
       errorMsg.innerText = 'Entered amount exceeds balance.';
       errorMsg.style.display = 'block';
       return;
     }
-
-
     const alreadyPaid = parseFloat(document.getElementById('paidAmountValue')?.innerText || 0);
     const balanceRemaining = grandTotal - alreadyPaid;
 
@@ -686,6 +739,14 @@
           alert("Failed to update.");
           console.error("Partial update error:", data);
         }
+        if (isFirstPartialPayment) {
+            document.querySelector('#paidAmountRow .partial').innerText = "Advance Amount";
+            localStorage.setItem('firstPartialDone_<?= $invoice['invoice_id'] ?>', 'true'); 
+            isFirstPartialPayment = false;
+        } else {
+            document.querySelector('#paidAmountRow .partial').innerText = "Paid Amount";
+        }
+
       })
       .catch(err => {
         alert("Network or server error.");

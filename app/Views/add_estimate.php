@@ -509,7 +509,33 @@ $('#estimate-form').submit(function (e) {
     
 });
 
-// ✅ Helper function to show alerts
+
+$('#customer_id').on('change', function() {
+    var customerId = $(this).val();
+    if (!customerId) return;
+
+    $.ajax({
+        url: base_url + '/customer/getMaxDiscount/' + customerId,
+        type: 'GET',
+        dataType: 'json',
+        success: function(res) {
+            if (res.status === 'success') {
+                $('#discount').val(res.max_discount);
+                $('#discount').attr('max', res.max_discount); // limit
+            }
+        }
+    });
+});
+
+$('#discount').on('input', function() {
+    var max = parseFloat($(this).attr('max'));
+    var val = parseFloat($(this).val());
+    if (val > max) {
+        alert('Cannot exceed maximum discount set for this customer.');
+        $(this).val(max);
+    }
+});
+
 function showAlert(message, type = 'success') {
     $('.alert')
         .removeClass('d-none alert-success alert-danger alert-warning')

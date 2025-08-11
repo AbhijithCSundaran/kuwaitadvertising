@@ -32,7 +32,8 @@ class Customer extends BaseController
     $data = [
         'name' => $name,
         'address' => $address,
-        'company_id'    => $session->get('company_id') 
+        'company_id'    => $session->get('company_id'),
+        'max_discount' => $this->request->getPost('max_discount')
     ];
 
     if (!empty($customer_id)) {
@@ -182,6 +183,7 @@ public function getCustomer($id)
     }
 }
 
+
 public function edit($id)
 {
     $model = new customerModel();
@@ -214,6 +216,18 @@ public function viewByCustomer($customerId)
     
     return view('estimate/customer_estimates', $data); 
 }
+public function get_discount($id)
+{
+    $customerModel = new \App\Models\CustomerModel();
+    $customer = $customerModel->find($id);
 
+    if ($customer) {
+        return $this->response->setJSON([
+            'discount' => $customer['max_discount'] ?? 0
+        ]);
+    } else {
+        return $this->response->setJSON(['discount' => 0]);
+    }
+}
 
 }
