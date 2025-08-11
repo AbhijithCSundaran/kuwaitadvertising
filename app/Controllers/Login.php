@@ -81,5 +81,12 @@ class Login extends BaseController
         } else {
             return $this->response->setJSON(['status' => 0, 'message' => 'Email And Password Are Required']);
         }
+        if ($user->role_id == 1) { // Admin
+        if (!empty($selectedCompanyId)) {
+            session()->set('company_id', $selectedCompanyId);
+        }
+        } else {
+            session()->set('company_id', $user->company_id);
+        }
     }
 }

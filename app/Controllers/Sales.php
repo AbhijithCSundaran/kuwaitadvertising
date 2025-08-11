@@ -23,12 +23,10 @@ class Sales extends BaseController
 
     $result = $salesModel->getSalesReport($from, $to, $customer_id);
 
-    // If this is an AJAX request, return JSON
     if ($this->request->isAJAX()) {
        return $this->response->setJSON(['sales' => $result]);
     }
 
-    // Normal load
     $data['sales'] = $result;
     $data['customers'] = $customerModel->findAll();
     $data['filters'] = compact('from', 'to', 'customer_id');
@@ -48,7 +46,6 @@ public function getSalesReportAjax()
     $builder->join('customers', 'customers.customer_id = sales.customer_id');
     $builder->join('invoices', 'invoices.sale_id = sales.sale_id', 'left');
 
-    // Apply filters if set
     if (!empty($from)) {
         $builder->where('sales.date >=', $from);
     }

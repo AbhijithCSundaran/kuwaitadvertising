@@ -64,7 +64,6 @@
                 </div>
                 <?php if (!empty($isAdminLogin) && $isAdminLogin): ?>
                   <div class="form-group mt-2">
-                    <!-- <label>Select Company</label> -->
                     <select name="company_id" class="form-control form-control-lg px-4" required>
                       <option value=""> Select Company </option>
                       <?php foreach ($companies as $company): ?>
