@@ -83,32 +83,6 @@
       border-collapse: collapse;
       margin-top: 10px;
     }
-
-    /* table,
-    th,
-    td {
-      border: 1px solid black;
-    } */
-
-    /* table.min_height {
-      min-height: 350px;
-    } */
-
-    /* table.min_height tbody td {
-      vertical-align: top;
-      padding: 5px 0;
-      height: 20px !important;
-    } */
-
-    /* tbody td {
-      border-top: 1px solid transparent;
-      border-bottom: 1px solid transparent;
-    }
-
-    tbody tr:last-child td {
-      border-bottom: 1px solid black;
-    } */
-
     th {
       background-color: #cfc7c7ff;
       text-align: center;
@@ -337,19 +311,19 @@
    <!-- /.container -->
     <!-- Bottom Bar -->
    <div class="bottom-bar">
-    <div style="direction: rtl; text-align: center;">
-        <?= esc($company['address_ar'] ?? '') ?>
+      <div style="direction: rtl; text-align: center;">
+          <?= esc($company['address_ar'] ?? '') ?>
+      </div>
+      <div style="direction: ltr; text-align: center;">
+          <?= esc($company['address'] ?? '') ?>
+      </div>
+      <div style="margin-top: 5px;">
+          📞 <?= esc($company['phone'] ?? '') ?> &nbsp;&nbsp; | &nbsp;&nbsp;
+          📧 <a href="mailto:<?= esc($company['email'] ?? '') ?>" style="color: white; text-decoration: none;">
+              <?= esc($company['email'] ?? '') ?>
+          </a>
+      </div>
     </div>
-    <div style="direction: ltr; text-align: center;">
-        <?= esc($company['address'] ?? '') ?>
-    </div>
-    <div style="margin-top: 5px;">
-        📞 <?= esc($company['phone'] ?? '') ?> &nbsp;&nbsp; | &nbsp;&nbsp;
-        📧 <a href="mailto:<?= esc($company['email'] ?? '') ?>" style="color: white; text-decoration: none;">
-            <?= esc($company['email'] ?? '') ?>
-        </a>
-    </div>
-</div>
 
 
 
