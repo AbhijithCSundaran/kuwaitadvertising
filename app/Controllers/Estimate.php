@@ -9,6 +9,8 @@ use App\Models\customerModel;
 use App\Models\Manageuser_Model;
  use App\Models\Managecompany_Model;
  use App\Models\RoleModel;
+ use Google\Cloud\Translate\V2\TranslateClient;
+
 
 class Estimate extends BaseController
 {
@@ -304,6 +306,27 @@ public function save()
 
     return view('add_estimate', $data);
 }
+private function translateToArabic($text)
+{
+    if (empty($text)) {
+        return '';
+    }
+
+    $url = "https://api.mymemory.translated.net/get?q=" . urlencode($text) . "&langpair=en|ar";
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    if (!$response) {
+        return $text;
+    }
+
+    $result = json_decode($response, true);
+    return $result['responseData']['translatedText'] ?? $text;
+}
 
   public function generateEstimate($id)
 {
@@ -340,9 +363,27 @@ public function save()
     $companyId = $estimate['company_id'] ?? session()->get('company_id');
     $company = $companyModel->find($companyId) ?? [
         'company_name' => '',
+        'company_name_ar' => '',
         'email' => '',
+         'address' => '',
+         'address_ar'   => '',
         'phone' => ''
     ];
+  if (empty($company['company_name_ar']) && !empty($company['company_name'])) {
+        $translated = $this->translateToArabic($company['company_name']);
+
+        if (!empty($translated)) {
+            $companyModel->update($companyId, ['company_name_ar' => $translated]);
+            $company['company_name_ar'] = $translated;
+        }
+    }
+     if (empty(trim($company['address_ar'])) && !empty(trim($company['address']))) {
+        $translatedAddress = $this->translateToArabic($company['address']);
+        if (!empty($translatedAddress) && $translatedAddress !== $company['address']) {
+            $companyModel->update($companyId, ['address_ar' => $translatedAddress]);
+            $company['address_ar'] = $translatedAddress;
+        }
+    }
     $data = [
         'estimate'      => $estimate,
         'items'         => $items,
@@ -350,6 +391,9 @@ public function save()
         'user_name'     => $userName,
         'role_name'     => $roleName,
         'company_name'  => $company['company_name'] ?? '',
+        'company_name_ar'  => $company['company_name_ar'] ?? '',
+          'address'      => $company['address'] ?? '',
+        'address_ar'   => $company['address_ar'] ?? '',
         'company'   => $company
     ];
 
