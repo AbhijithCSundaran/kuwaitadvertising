@@ -290,11 +290,19 @@
     </div>
     <div class="container">
       <div class="top-heading" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-        <span style="font-size: 14px; font-weight: bold;">Al Rai Printing Press</span>
-        <img src="<?php echo ASSET_PATH; ?>assets/images/invoice-heading.png" alt="Invoice Heading"
-          style="max-height: 50px;">
-        <span style="font-size: 14px; font-weight: bold; direction: rtl;">مطبعة الري الأعمال الطباعة</span>
-      </div>
+        <span style="font-size: 14px; font-weight: bold;">
+            <?= esc($company['company_name']) ?>
+        </span>
+ 
+        <?php if (!empty($company['company_logo'])): ?>
+            <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>"
+                alt="Company Logo" style="max-height: 50px;">
+        <?php endif; ?>
+ 
+        <span style="font-size: 14px; font-weight: bold; direction: rtl;">
+            <?= esc($company['company_name_ar'] ?? '') ?>
+        </span>
+    </div>
       <hr>
       <div class="row align-items-center" style="margin-bottom: 10px;">
         <div class="col-4 text-start">
@@ -448,41 +456,58 @@
     </div> <!-- /.container -->
     <!-- Bottom Bar -->
     <div class="bottom-bar">
-      الراي ، قطعة ٣ ، شارع ٣٢ ، مبنى رقم ٤٣٧ ، محل رقم ٤ ، بالقرب من زجاج الروان ، الشويخ - الكويت<br>
-      Al-Rai, Block 3, Street 32, Build No. 437, Shop No. 4, Near Al Rawan Glass, Shuwaik - Kuwait<br>
-      📞 +965 6006 0102 &nbsp;&nbsp; | &nbsp;&nbsp;
-      📧 <a href="mailto:alraiprintpress@gmail.com" style="color: white; text-decoration: none;">
-        alraiprintpress@gmail.com
-      </a>
+       <div style="direction: rtl; text-align: center;">
+          <?= esc($company['address_ar'] ?? '') ?>
+      </div>
+      <div style="direction: ltr; text-align: center;">
+          <?= esc($company['address'] ?? '') ?>
+      </div>
+      <div style="margin-top: 5px;">
+          📞 <?= esc($company['phone'] ?? '') ?> &nbsp;&nbsp; | &nbsp;&nbsp;
+          📧 <a href="mailto:<?= esc($company['email'] ?? '') ?>" style="color: white; text-decoration: none;">
+              <?= esc($company['email'] ?? '') ?>
+          </a>
+      </div>
     </div>
   </div>
 
   <!-- Partial Payment Modal -->
-  <div id="partialPaymentModal" class="modal fade show style=" display: none; background-color: rgba(235, 170, 71, 0.7);
+ <div id="partialPaymentModal" class="modal fade show" style="display: none; background-color: rgba(235, 170, 71, 0.7);
     position: fixed; inset: 0; z-index: 1055; align-items: center; justify-content: center;">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content shadow-lg border-0 rounded-4 p-4">
-        <div class="modal-header border-0">
-          <h5 class="modal-title text-primary fw-bold">Partial Payment</h5>
-          <button type="button" class="btn-close" onclick="closePartialModal()"></button>
+        <div class="modal-content shadow-lg border-0 rounded-4 p-4">
+            <div class="modal-header border-0">
+                <h5 class="modal-title text-primary fw-bold">Partial Payment</h5>
+                <button type="button" class="btn-close" onclick="closePartialModal()"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Amount Input -->
+                <label for="partialPaidInput" class="form-label">Enter Amount</label>
+                <input type="number" id="partialPaidInput" class="form-control form-control-lg border-primary" min="1"
+                    placeholder="Enter partial amount">
+                <small id="partialErrorMsg" style="color:red; display:none;">Entered amount exceeds balance.</small>
+
+                <!-- Payment Mode -->
+                <div class="mt-3">
+                  <label for="paymentMode" class="form-label">Payment Mode</label>
+                  <select id="paymentMode" class="form-control form-control-lg border-primary">
+                      <option value="" selected disabled>Select payment mode</option>
+                      <option value="cash">Cash</option>
+                      <option value="bank_transfer">Bank Transfer</option>
+                      <option value="bank_link">Bank Link</option>
+                      <option value="wamd">WAMD</option>
+                  </select>
+              </div>
+            </div>
+
+            <div class="modal-footer border-0">
+                <button class="btn btn-danger px-4" onclick="submitPartialPayment()">Submit</button>
+                <button class="btn btn-secondary px-4" onclick="closePartialModal()">Cancel</button>
+            </div>
         </div>
-        <div class="modal-body">
-          <label for="partialPaidInput" class="form-label">Enter Amount</label>
-          <input type="number" id="partialPaidInput" class="form-control form-control-lg border-primary" min="1"
-            placeholder="Enter partial amount">
-          <small id="partialErrorMsg" style="color:red; display:none;">Entered amount exceeds balance.</small>
-        </div>
-        <div class="modal-footer border-0">
-          <button class="btn btn-danger px-4" onclick="submitPartialPayment()">
-            Submit
-          </button>
-          <button class="btn btn-secondary px-4" onclick="closePartialModal()">
-            Cancel
-          </button>
-        </div>
-      </div>
     </div>
-  </div>
+</div>
+
 </body>
 </html>
 </div>
@@ -684,9 +709,13 @@
     const errorMsg = document.getElementById('partialErrorMsg');
     errorMsg.style.display = 'none'; 
     if (isNaN(paid) || paid <= 0 || paid > grandTotal) {
-      errorMsg.innerText = 'Entered amount exceeds balance.';
+      errorMsg.innerText = 'Entered Amount Exceeds Balance.';
       errorMsg.style.display = 'block';
       return;
+    }
+    if (!paymentMode) { 
+        alert('Please Select a Payment Mode.');
+        return;
     }
     const alreadyPaid = parseFloat(document.getElementById('paidAmountValue')?.innerText || 0);
     const balanceRemaining = grandTotal - alreadyPaid;
@@ -707,7 +736,8 @@
       },
       body: JSON.stringify({
         invoice_id: <?= $invoice['invoice_id'] ?>,
-        paid_amount: paid
+        paid_amount: paid,
+        payment_mode: document.getElementById('paymentMode').value
       })
     })
       .then(res => res.json())

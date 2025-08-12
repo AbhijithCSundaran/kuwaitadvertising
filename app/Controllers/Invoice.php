@@ -9,6 +9,8 @@ use App\Models\EstimateModel;
 use App\Models\EstimateItemModel;
 use App\Models\Manageuser_Model;
 use App\Models\SalesModel;
+use App\Models\Managecompany_Model;
+use Google\Cloud\Translate\V2\TranslateClient;
 
 class Invoice extends BaseController
 {
@@ -97,10 +99,34 @@ class Invoice extends BaseController
             'data' => $data,
         ]);
     }
+
+    private function translateToArabic($text)
+{
+    if (empty($text)) {
+        return '';
+    }
+ 
+    $url = "https://api.mymemory.translated.net/get?q=" . urlencode($text) . "&langpair=en|ar";
+ 
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    $response = curl_exec($ch);
+    curl_close($ch);
+ 
+    if (!$response) {
+        return $text;
+    }
+ 
+    $result = json_decode($response, true);
+    return $result['responseData']['translatedText'] ?? $text;
+}
     public function print($id)
     {
         $invoiceModel = new InvoiceModel();
         $customerModel = new customerModel();
+        $companyModel = new Managecompany_Model();
+
 
         $invoice = $invoiceModel->getInvoiceWithItems($id);
 
@@ -116,13 +142,14 @@ class Invoice extends BaseController
             'invoice' => $invoice,
             'items' => $invoice['items'],
             'user_name' => session()->get('user_name') ?? 'Salesman',
-            'customer' => $customer ?? []
+            'customer' => $customer ?? [],
+            'company' => $company
         ];
 
         if ($companyId == 69) {
             return view('invoice_print', $viewData);
         } elseif ($companyId == 70) {
-            return view('invoice_print', $viewData);
+            return view('generate_invoice', $viewData);
         } else {
             return view('invoice_print', $viewData);
         }
@@ -396,6 +423,7 @@ class Invoice extends BaseController
  
     $invoice_id = $json->invoice_id;
     $new_payment = floatval($json->paid_amount);
+    $payment_mode = trim($json->payment_mode);
  
     $invoiceModel = new InvoiceModel();
     $invoice = $invoiceModel->find($invoice_id);
@@ -413,7 +441,7 @@ class Invoice extends BaseController
     // Determine status
     if ($updated_paid >= $total) {
         $status = 'paid';
-        $updated_paid = $total; // prevent overpayment
+        $updated_paid = $total;// prevent overpayment
         $balance = 0;
     } else {
         $status = 'partial paid';
@@ -422,7 +450,8 @@ class Invoice extends BaseController
     $data = [
         'status' => $status,
         'paid_amount' => $updated_paid,
-        'balance_amount' => $balance
+        'balance_amount' => $balance,
+        'payment_mode'  => $payment_mode 
     ];
  
     $updated = $invoiceModel->update($invoice_id, $data);
@@ -460,6 +489,26 @@ class Invoice extends BaseController
         $data = $salesModel->getFilteredSales($from, $to, $customerId);
 
         return $this->response->setJSON(['invoices' => $data]);
+    }
+    public function savePartialPayment()
+{
+    $invoiceId = $this->request->getPost('invoice_id');
+    $paidAmount = $this->request->getPost('paid_amount');
+    $paymentMode = $this->request->getPost('payment_mode');
+
+    if (!$invoiceId || !$paidAmount || !$paymentMode) {
+        return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid data.']);
+    }
+
+    $invoiceModel = new \App\Models\InvoiceModel();
+
+    // Update invoice
+    $invoiceModel->update($invoiceId, [
+        'paid_amount'  => $paidAmount, // or add to existing amount if multiple partials
+        'payment_mode' => $paymentMode
+    ]);
+
+    return $this->response->setJSON(['status' => 'success']);
     }
 
 }

@@ -19,8 +19,8 @@
          text-align: center !important;
     }
 
-    #plainExpenseTable th:nth-child(4),
-    #plainExpenseTable td:nth-child(4) {
+    #plainExpenseTable th:nth-child(3),
+    #plainExpenseTable td:nth-child(3) {
         width: 20% !important;
         text-align: center !important;
     }
@@ -32,6 +32,11 @@
     }
     #plainExpenseTable th:nth-child(6),
     #plainExpenseTable td:nth-child(6) {
+        width: 15% !important;
+        text-align: center !important;
+    }
+    #plainExpenseTable th:nth-child(7),
+    #plainExpenseTable td:nth-child(7) {
         width: 15% !important;
         text-align: center !important;
     }
@@ -89,9 +94,10 @@
             <tr>
                 <th><strong>SI No</strong></th>
                 <th><strong>Invoice ID</strong></th>
-                <th><strong>Customer</strong></th>
                 <th><strong>Date</strong></th>
+                <th><strong>Customer</strong></th>
                 <th><strong>Amount</strong></th>
+                <th><strong>Payment Mode</strong></th>
                 <th><strong>Status</strong></th>
             </tr>
         </thead>
@@ -165,9 +171,18 @@ $(document).ready(function () {
                             <tr>
                                 <td class="text-center">${index + 1}</td>
                                 <td>${invoice.invoice_id}</td>
-                                <td>${invoice.customer_name}</td>
                                 <td>${formatDate(invoice.invoice_date)}</td>
+                                <td>${invoice.customer_name}</td>
                                 <td class="text-end">₹${parseFloat(invoice.total_amount).toFixed(2)}</td>
+                                <td class="text-center">
+    ${invoice.payment_mode 
+        ? invoice.payment_mode
+            .replace('_', ' ')
+            .toLowerCase()
+            .replace(/\b\w/g, c => c.toUpperCase()) 
+        : '-'}
+</td>
+
                                         <td class="text-center">
     ${invoice.status === 'paid' 
         ? '<span class="badge bg-success w-100">Paid</span>' 
@@ -233,8 +248,8 @@ $(document).ready(function () {
         <tr>
             <td class="text-center">${index + 1}</td>
             <td>${invoice.invoice_id}</td>
-            <td>${invoice.customer_name}</td>
             <td>${formatDate(invoice.invoice_date)}</td>
+            <td>${invoice.customer_name}</td>
             <td class="text-end">₹${parseFloat(invoice.total_amount).toFixed(2)}</td>
             <td class="text-center">${statusBadge}</td>
         </tr>

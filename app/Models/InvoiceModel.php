@@ -22,7 +22,8 @@ class InvoiceModel extends Model
     'paid_amount',
     'balance_amount',
     'user_id',
-    'company_id' ];
+    'company_id',
+    'payment_mode'];
     protected $returnType = 'array';
 
      public function getInvoiceCount($companyId)
@@ -133,7 +134,6 @@ class InvoiceModel extends Model
 
     return $invoice;
 }
-// Get Total Revenue for Today
 public function getTodayRevenue($companyId)
 {
     $today = date('Y-m-d');
@@ -148,9 +148,6 @@ public function getTodayRevenue($companyId)
 
     return $row ? (float)$row->total_amount : 0;
 }
-
-
-// Get Total Revenue for Current Month
 public function getMonthlyRevenue($companyId)
 {
     $start = date('Y-m-01');
