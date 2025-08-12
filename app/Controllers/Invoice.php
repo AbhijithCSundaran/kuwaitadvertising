@@ -122,7 +122,7 @@ class Invoice extends BaseController
         if ($companyId == 69) {
             return view('invoice_print', $viewData);
         } elseif ($companyId == 70) {
-            return view('generate_invoice', $viewData);
+            return view('invoice_print', $viewData);
         } else {
             return view('invoice_print', $viewData);
         }
