@@ -351,11 +351,13 @@ td.logo-col {
 	border: 1px solid black;
 	padding: 8px;
 	text-align: center;
+	font-size:14px;
 }
 .generate-table td {
 	border: 1px solid black;
 	padding: 8px;
 	text-align: left;
+	font-size:14px;
 }
 
 .generate-table th {
