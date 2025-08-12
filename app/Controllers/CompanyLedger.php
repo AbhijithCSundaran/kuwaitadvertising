@@ -62,10 +62,14 @@ public function getPaidInvoices()
     $invoiceModel = new \App\Models\InvoiceModel();
 
     $builder = $invoiceModel->builder()
-        ->select('invoices.invoice_id, invoices.invoice_date, invoices.total_amount, customers.name AS customer_name')
+        ->select('invoices.invoice_id, invoices.invoice_date, invoices.status, invoices.total_amount, customers.name AS customer_name')
         ->join('customers', 'customers.customer_id = invoices.customer_id', 'left')
         ->where('invoices.company_id', $companyId)
-        ->where('LOWER(invoices.status)', 'paid');
+        ->groupStart()
+        ->where('LOWER(invoices.status)', 'paid')
+        ->orWhere('LOWER(invoices.status)', 'partial paid')
+        ->groupEnd();
+
 
     // Apply date range filter
     if (!empty($from) && !empty($to)) {

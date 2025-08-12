@@ -197,6 +197,10 @@
                             <textarea class="form-control" id="popup_address" rows="3" required></textarea>
                         </div>
                         <div class="alert alert-danger d-none" id="customerError"></div>
+                        <div class="mb-3">
+                        <label>Maximum Discount (%)</label>
+                        <input type="number" name="max_discount" id="max_discount" class="form-control" min="0" max="100" step="0.01" placeholder="Enter discount percentage">
+                    </div>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary" id="saveCustomerBtn">Save</button>
@@ -237,6 +241,7 @@
             let val = this.value;
             this.value = val.replace(/(?!^)\+/g, '').replace(/[^0-9\s\-\(\)\+]/g, '');
         });
+
         $(document).on('input', 'input[name="description[]"]', function () {
             let value = $(this).val();
             let capitalized = value.replace(/\b\w/g, function (char) {
@@ -344,6 +349,7 @@
                 }
             });
         });
+
         $('#customerForm').submit(function (e) {
             e.preventDefault();
             let name = $('#popup_name').val().trim();
@@ -397,168 +403,196 @@
                 }
             });
         });
-        // Track original state of the form
-let initialEstimateData = $('#estimate-form').serialize();
+        
+        let initialEstimateData = $('#estimate-form').serialize();
 
-// Disable button initially if it's an existing estimate (edit mode)
-$('#generate-btn').prop('disabled', true);
+        // Disable button initially if it's an existing estimate (edit mode)
+        $('#generate-btn').prop('disabled', true);
 
-// Listen for changes in form fields
-$('#estimate-form').on('input change', 'input, select, textarea', function () {
-    const currentData = $('#estimate-form').serialize();
-    const hasChanged = currentData !== initialEstimateData;
-    $('#generate-btn').prop('disabled', !hasChanged); // Enable only if form changed
-});
+        // Listen for changes in form fields
+        $('#estimate-form').on('input change', 'input, select, textarea', function () {
+            const currentData = $('#estimate-form').serialize();
+            const hasChanged = currentData !== initialEstimateData;
+            $('#generate-btn').prop('disabled', !hasChanged); // Enable only if form changed
+        });
 
-// After successful save, update the reference state
-function updateInitialFormState() {
-    initialEstimateData = $('#estimate-form').serialize();
-    $('#generate-btn').prop('disabled', true); // Re-disable after saving
-}
-
-
-$('#estimate-form').submit(function (e) {
-    e.preventDefault();
-
-    const customerId = $('#customer_id').val();
-    const customerAddress = $('#customer_address').val().trim();
-    const customerName = $('#customer_id option:selected').text().trim();
-    const phoneNumber = $('#phone_number').val()?.trim();
-
-    if (!customerId) {
-        showAlert('Please Select A Customer.', 'danger');
-        return;
-    }
-
-    if (!customerAddress) {
-        showAlert('Please Enter The Customer Address.', 'danger');
-        return;
-    }
-    if (!phoneNumber) { // ✅ new validation
-        showAlert('Please Enter The Customer Number.', 'danger');
-        return;
-    }
-
-    // Ensure at least one valid item
-    let validItemExists = false;
-    $('.item-row').each(function () {
-        const desc = $(this).find('input[name="description[]"]').val().trim();
-        const price = parseFloat($(this).find('input[name="price[]"]').val()) || 0;
-        const qty = parseFloat($(this).find('input[name="quantity[]"]').val()) || 0;
-
-        if (desc && price > 0 && qty > 0) {
-            validItemExists = true;
-            return false;
+        // After successful save, update the reference state
+        function updateInitialFormState() {
+            initialEstimateData = $('#estimate-form').serialize();
+            $('#generate-btn').prop('disabled', true); // Re-disable after saving
         }
-    });
-
-    if (!validItemExists) {
-        showAlert('Please Enter At Least One Valid Item With Description, Price, and Quantity.', 'danger');
-        return;
-    }
-
-    // Remove empty rows
-    $('.item-row').each(function () {
-        const desc = $(this).find('input[name="description[]"]').val().trim();
-        const price = parseFloat($(this).find('input[name="price[]"]').val()) || 0;
-        const qty = parseFloat($(this).find('input[name="quantity[]"]').val()) || 0;
-
-        if (!desc && price === 0 && qty === 0) {
-            $(this).remove();
-        }
-    });
-
-    $('#generate-btn').prop('disabled', true).text('Generating...');
-
-    // ✅ Use FormData to include extra field
-    const formData = new FormData(this);
-    formData.append('customer_name', customerName);
-
-        $.ajax({
-            url: "<?= site_url('estimate/save') ?>",
-            type: "POST",
-            data: formData,
-            processData: false,
-            contentType: false,
-            dataType: "json",
-            success: function (res) {
-        if (res.status === 'success') {
-            showAlert(res.message, 'success');
-
-            updateInitialFormState(); // ✅ Reset change tracker after save
-
-            setTimeout(function () {
-                window.location.href = "<?= site_url('estimate/generateEstimate/') ?>" + res.estimate_id;
-            }, 1500);
-        } else if (res.status === 'nochange') {
-            showAlert(res.message, 'warning');
-            $('#generate-btn').prop('disabled', true).text('Generate Estimate');
-        } else {
-            showAlert(res.message || 'Failed To Save Estimate.', 'danger');
-            $('#generate-btn').prop('disabled', false).text('Generate Estimate');
-        }
-    },
-
-        error: function () {
-            showAlert('Something Went Wrong While Saving The Estimate.', 'danger');
-            $('#generate-btn').prop('disabled', false).text('Generate Estimate');
-        }
-    });
 
 
-    
-});
+        $('#estimate-form').submit(function (e) {
+            e.preventDefault();
 
+            const customerId = $('#customer_id').val();
+            const customerAddress = $('#customer_address').val().trim();
+            const customerName = $('#customer_id option:selected').text().trim();
+            const phoneNumber = $('#phone_number').val()?.trim();
 
-$('#customer_id').on('change', function() {
-    var customerId = $(this).val();
-    if (!customerId) return;
-
-    $.ajax({
-        url: base_url + '/customer/getMaxDiscount/' + customerId,
-        type: 'GET',
-        dataType: 'json',
-        success: function(res) {
-            if (res.status === 'success') {
-                $('#discount').val(res.max_discount);
-                $('#discount').attr('max', res.max_discount); // limit
+            if (!customerId) {
+                showAlert('Please Select A Customer.', 'danger');
+                return;
             }
-        }
-    });
-});
 
-$('#discount').on('input', function() {
-    var max = parseFloat($(this).attr('max'));
-    var val = parseFloat($(this).val());
-    if (val > max) {
-        alert('Cannot exceed maximum discount set for this customer.');
-        $(this).val(max);
+            if (!customerAddress) {
+                showAlert('Please Enter The Customer Address.', 'danger');
+                return;
+            }
+            if (!phoneNumber) { // ✅ new validation
+                showAlert('Please Enter The Customer Number.', 'danger');
+                return;
+            }
+
+            // Ensure at least one valid item
+            let validItemExists = false;
+            $('.item-row').each(function () {
+                const desc = $(this).find('input[name="description[]"]').val().trim();
+                const price = parseFloat($(this).find('input[name="price[]"]').val()) || 0;
+                const qty = parseFloat($(this).find('input[name="quantity[]"]').val()) || 0;
+
+                if (desc && price > 0 && qty > 0) {
+                    validItemExists = true;
+                    return false;
+                }
+            });
+
+            if (!validItemExists) {
+                showAlert('Please Enter At Least One Valid Item With Description, Price, and Quantity.', 'danger');
+                return;
+            }
+
+            // Remove empty rows
+            $('.item-row').each(function () {
+                const desc = $(this).find('input[name="description[]"]').val().trim();
+                const price = parseFloat($(this).find('input[name="price[]"]').val()) || 0;
+                const qty = parseFloat($(this).find('input[name="quantity[]"]').val()) || 0;
+
+                if (!desc && price === 0 && qty === 0) {
+                    $(this).remove();
+                }
+            });
+
+            $('#generate-btn').prop('disabled', true).text('Generating...');
+
+            // ✅ Use FormData to include extra field
+            const formData = new FormData(this);
+            formData.append('customer_name', customerName);
+
+                $.ajax({
+                    url: "<?= site_url('estimate/save') ?>",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    dataType: "json",
+                    success: function (res) {
+                if (res.status === 'success') {
+                    showAlert(res.message, 'success');
+
+                    updateInitialFormState(); // ✅ Reset change tracker after save
+
+                    setTimeout(function () {
+                        window.location.href = "<?= site_url('estimate/generateEstimate/') ?>" + res.estimate_id;
+                    }, 1500);
+                } else if (res.status === 'nochange') {
+                    showAlert(res.message, 'warning');
+                    $('#generate-btn').prop('disabled', true).text('Generate Estimate');
+                } else {
+                    showAlert(res.message || 'Failed To Save Estimate.', 'danger');
+                    $('#generate-btn').prop('disabled', false).text('Generate Estimate');
+                }
+            },
+
+                error: function () {
+                    showAlert('Something Went Wrong While Saving The Estimate.', 'danger');
+                    $('#generate-btn').prop('disabled', false).text('Generate Estimate');
+                }
+            });
+
+
+            
+        });
+
+
+
+        $('#discount').on('input', function() {
+            var max = parseFloat($(this).attr('max'));
+            var val = parseFloat($(this).val());
+            if (val > max) {
+                alert('Cannot exceed maximum discount set for this customer.');
+                $(this).val(max);
+            }
+        });
+
+
+         let maxCustomerDiscount = 0; 
+
+        $('#customer_id').on('change', function () {
+    let customerId = $(this).val();
+
+    if (customerId) {
+        $.ajax({
+            url: '<?= base_url("customer/get_discount") ?>/' + customerId,
+            type: 'GET',
+            dataType: 'json',
+            success: function (res) {
+                if (res.discount !== undefined) {
+                    maxCustomerDiscount = parseFloat(res.discount) || 0;
+                    $('#discount').val(maxCustomerDiscount);
+                }
+            }
+        });
+    } else {
+        maxCustomerDiscount = 0;
+        $('#discount').val(0);
     }
 });
 
-function showAlert(message, type = 'success') {
-    $('.alert')
-        .removeClass('d-none alert-success alert-danger alert-warning')
-        .addClass('alert-' + type)
-        .text(message)
-        .fadeIn()
-        .delay(3000)
-        .fadeOut();
-}
+       // Initialize tooltip (once)
+            $('#discount').tooltip({
+                trigger: 'manual',
+                placement: 'top'
+            });
 
-    });
+            $('#discount').on('input', function () {
+                let val = parseFloat($(this).val()) || 0;
+                if (val > maxCustomerDiscount) {
+                    $(this).val(maxCustomerDiscount);
 
-    $(window).on('keydown', function (e) {
-        if (e.ctrlKey && e.key === 'Enter') {
-            e.preventDefault();
-            $('#generate-btn').trigger('click');
-        }
+                    $(this).attr('data-bs-original-title', 'Unable to increase beyond max discount for this customer').tooltip('show');
 
-        if (e.ctrlKey && e.key.toLowerCase() === 'f') {
-            e.preventDefault();
-            $('#add-item').trigger('click');
-        }
-    });
+                    setTimeout(() => {
+                        $('#discount').tooltip('hide');
+                    }, 2000);
+                } else {
+                    $(this).tooltip('hide');
+                }
+            });
+
+        function showAlert(message, type = 'success') {
+            $('.alert')
+                .removeClass('d-none alert-success alert-danger alert-warning')
+                .addClass('alert-' + type)
+                .text(message)
+                .fadeIn()
+                .delay(3000)
+                .fadeOut();
+             }
+        });
+
+        $(window).on('keydown', function (e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                $('#generate-btn').trigger('click');
+            }
+
+            if (e.ctrlKey && e.key.toLowerCase() === 'f') {
+                e.preventDefault();
+                $('#add-item').trigger('click');
+            }
+        });
 </script>
 
 

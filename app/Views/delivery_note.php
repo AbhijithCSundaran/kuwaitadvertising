@@ -4,77 +4,86 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Delivery Note</title>
+  <title>Cash Invoice</title>
   <style>
     body {
-      background: #FFFFFF;
-      /* margin: 40px; */
-    }
-
-    .invoice-container {
-      width: 99%;
-      border: 1px solid #ddd;
-      padding: 30px;
-    }
-
-    .top-section {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-    }
-
-    .address {
+      font-family: Arial, sans-serif;
       font-size: 14px;
-      line-height: 1.5;
+      margin: 0;
+      padding: 0;
+      background-color: #fff;
     }
 
-    .logo-section {
-      text-align: right !important;
+    /* New outer brown container */
+    .outer-container {
+      width: fit-content;
+      margin: auto;
+      padding: 15px;
+      background-color: #991b36;
     }
 
-    .logo-section img {
-      width: 265px;
-      margin-top: -29px;
+    .container {
+      width: 720px;
+      border: 5px solid #000;
+      border-radius: 23px;
+      padding: 20px;
+      position: relative;
+      background: url('<?= ASSET_PATH ?>assets/images/invoice-bg.png') no-repeat;
+      background-size: 30%;
+      background-position: 52% 60%;
+      background-color: white;
     }
 
-    .company-name {
-      font-size: 18px;
-      font-weight: bold;
-      line-height: 1.2;
-    }
-
-    .delivery-note-title {
+    .top-heading {
       text-align: center;
-      color: #0a0a0a8d;
+      margin-bottom: 5px;
+    }
+
+    .top-heading img {
+      width: 138px;
+    }
+
+    .invoice-type {
+      background-color: #991b36;
+      color: white;
       font-weight: bold;
-      font-size: 18px;
-      margin: 20px 0;
-    }
-
-    .info-section {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
-
-    .ship-to {
+      padding: 5px 20px;
+      display: inline-block;
+      border-radius: 4px;
+      margin: 5px auto;
       font-size: 14px;
-      word-wrap: break-word;
-      word-break: break-word;
-      white-space: normal;
+    }
+
+    .invoice-header {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      justify-content: space-between;
+      margin-top: 15px;
+    }
+
+    .invoice-header>div {
+      display: flex;
+      font-weight: bold;
+      width: 100%;
+    }
+
+
+    .invoice-header .half {
       width: 50%;
     }
 
-
-    .ship-to b {
-      color: #a1263a;
+    .invoice-header input {
+      border: 1px solid #000;
+      width: 100px;
+      height: 35px;
     }
 
-    .delivery-date {
-      font-size: 14px;
-      font-weight: bold;
-      color: #a1263a;
+    .invoice-header span {
+      width: 90%;
+      /* text-decoration: underline; */
+      border-bottom: 1px solid black;
+      margin: 0 5px;
     }
 
     table {
@@ -83,171 +92,307 @@
       margin-top: 20px;
     }
 
-    table thead {
-      background: #a1263a;
-      color: white;
+    table,
+    th,
+    td {
+      border: 1px solid black;
     }
 
-    table th,
-    table td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      font-size: 14px;
+    table.min_height {
+      min-height: 350px;
+    }
+
+    table.min_height tbody td {
+      vertical-align: top;
+      padding: 5px 0;
+      height: 20px !important;
+    }
+
+    tbody td {
+      border-top: 1px solid transparent;
+      border-bottom: 1px solid transparent;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 1px solid black;
+    }
+
+    th {
+      background-color: #cfc7c7ff;
       text-align: center;
+      font-weight: bold;
+      padding: 2px;
     }
 
-    .signature-section {
+    td {
+      text-align: center;
+      height: 25px;
+      padding: 4px;
+      word-wrap: break-word;
+      word-break: break-word;
+      white-space: normal;
+    }
+
+    .table-footer {
       display: flex;
       justify-content: space-between;
-      margin-top: 40px;
-      font-size: 14px;
+      margin-top: 30px;
+      font-weight: bold;
     }
 
-    .signature-box {
+    .amount-words {
+      margin-top: 20px;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    .table-footer div {
       width: 48%;
-      border-top: 1px solid #000;
-      padding-top: 10px;
     }
 
-    .signature-box p {
-      margin: 5px 0;
+    .bottom-bar {
+      text-align: center;
+      font-size: 12px;
+      color: white;
+      background-color: #991b36;
+      padding: 3px;
+      margin-top: 0px;
+
     }
-  .delivery-value {
-    margin-left: 2px; 
-    display: inline-block;
-  }
+
+    .tfoot {
+      background-color: #cfc7c7ff;
+    }
+
+    .partial-row {
+      display: flex;
+      justify-content: end;
+      width: 300px;
+      margin-bottom: 5px;
+      gap: 53px;
+    }
+
+    .partial {
+      font-weight: bold;
+    }
+
+    .value {
+      text-align: right;
+      min-width: 100px;
+    }
 
 
     @media print {
-    * {
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
-    }
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
 
-    .no-print,
-    .header,
-    .footer,
-    .navbar,
-    .sidebar {
-      display: none !important;
-    }
+      .no-print,
+      .header,
+      .footer,
+      .sidebar,
+      .navbar {
+        display: none !important;
+      }
 
-    .top-section {
-      display: flex !important;
-      justify-content: space-between !important;
-      align-items: flex-start !important;
-    }
+      body {
+        margin: 0;
+        padding: 0;
+        font-size: 12px;
+        line-height: 1.4;
+      }
 
-    .logo-section {
-      text-align: right !important;
-      width: 50% !important;
-    }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        table-layout: fixed;
+      }
 
-    .address {
-      width: 50% !important;
-    }
+      table th,
+      table td {
+        border: 1px solid #000;
+        padding: 4px;
+        font-size: 10px;
+        word-break: break-word;
+      }
 
-    .info-section {
-      display: flex !important;
-      justify-content: space-between !important;
-    }
+      td:nth-child(2) {
+        max-width: 250px;
+        white-space: normal;
+      }
 
-    .delivery-date {
-      text-align: right !important;
-      width: 50% !important;
-    }
+      /* Optional: Avoid page breaks inside rows */
+      tr {
+        page-break-inside: avoid;
+      }
 
-    .ship-to {
-      width: 50% !important;
-    }
-      .signature-section, .signature-box {
-    page-break-inside: avoid;
-  }
-  
+      /* Optional: Remove background images if not needed */
+      body,
+      table {
+        background: none !important;
+      }
+
+      /* .container {
+        min-width: 690px;
+        min-height: 900px;
+      } */
     }
   </style>
-  </head>
-  <body>
-    <div class="right_container">
-      <div class="no-print" style="text-align: right; margin-bottom: 20px;">
+</head>
+<body>
+  <div class="outer-container">
+    <!-- <div class="no-print" style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+      <button onclick="window.print()"
+        style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px;">
+        Print
+      </button>
+      <?php if (!in_array(strtolower($invoice['status']), ['paid', 'partial paid'])): ?>
+        <button id="editinvoicebtn"
+          onclick="window.location.href='<?= base_url('invoice/edit/' . $invoice['invoice_id']) ?>'"
+          style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px; cursor: pointer;">
+          Edit Invoice
+        </button>
+      <?php endif; ?>
+      <button id="deliveryNoteBtn"
+        onclick="window.location.href='<?= base_url('invoice/delivery_note/' . $invoice['invoice_id']) ?>'"
+        style="display: <?= in_array(strtolower($invoice['status']), ['paid', 'partial paid']) ? 'inline-block' : 'none' ?>;
+              background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
+        Delivery Note
+      </button>
+
+      <?php
+      $status = strtolower($invoice['status'] ?? 'unpaid');
+      $btnLabel = ucfirst($status);
+      $btnColor = $status === 'paid' ? '#28a745' : ($status === 'partial paid' ? '#ffc107' : '#991b36');
+      ?>
+      <div class="btn-group ml-2 position-relative" style="z-index: 1000; margin-left: 10px;">
+        <button id="statusBtn" type="button" class="btn btn-sm"
+          style="background-color: <?= $btnColor ?>; color: white; padding: 8px 16px; border-radius: 5px;"
+          <?= $status === 'paid' ? 'disabled title="Fully paid invoice cannot be changed"' : 'onclick="toggleStatusOptions()"' ?>>
+          <?= $btnLabel ?>
+        </button>
+
+        <?php if ($status === 'unpaid' || $status === 'partial paid'): ?>
+          <div class="dropdown" style="position: relative;">
+            <div id="statusOptions" class="dropdown-menu p-2"
+              style="position: absolute; top: 100%; right: 0px; z-index: 1050; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: none;">
+              <a href="#" class="dropdown-item text-success fw-semibold" onclick="updateStatus('paid')">
+                <i class="fas fa-check-circle me-2"></i> Mark as Paid
+              </a>
+              <a href="#" class="dropdown-item text-warning fw-semibold" onclick="openPartialPayment()">
+                <i class="fas fa-hourglass-half me-2"></i> Partial Payment
+              </a>
+            </div>
+          </div>
+        <?php endif; ?>
+      </div>
+    </div> -->
+    <div class="no-print" style="text-align: right; margin-bottom: 20px;">
     <button onclick="window.print()" class="btn btn-sm btn-primary"> Print</button>
   <button onclick="downloadPDF()" class="btn btn-sm btn-success"> Download PDF</button>
   </div>
-    <div class="invoice-container">
-      <div class="top-section">
-        <div class="address">
-          Al-Shuwaikh Area, 3<br>
-          <em>Behind Sultan center - 4th ring Road</em><br>
-          Tel: +965 600 60 102
-        </div>
-        <div class="logo-section">
-          <img src="<?php echo ASSET_PATH; ?>assets/images/invoice-logo.png" alt="Invoicelogo">
-        </div>
+    
+    <div class="container">
+      <div class="top-heading" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+        <span style="font-size: 14px; font-weight: bold;">Al Rai Printing Press</span>
+        <img src="<?php echo ASSET_PATH; ?>assets/images/invoice-heading.png" alt="Invoice Heading"
+          style="max-height: 50px;">
+        <span style="font-size: 14px; font-weight: bold; direction: rtl;">مطبعة الري الأعمال الطباعة</span>
       </div>
-  
-      <div class="delivery-note-title">
-        DELIVERY NOTE NO. <?= esc($invoice['invoice_id']) ?>
-      </div>
-      <div class="info-section">
-        <div class="ship-to">
-          <b>SHIP TO :</b><br>
-          <div><?= nl2br(esc($invoice['shipping_address'] ?? '-')) ?></div>
+      <hr>
+      <div class="row align-items-center" style="margin-bottom: 10px;">
+        <div class="col-4 text-start">
+          <div>
+  <label style="font-weight: bold; margin-right: 4px;">Invoice No :</label>
+  <span style="display: inline-block; width: 87px; height: 23px; line-height: 23px; text-align: left; color: black;">
+    <?= esc($invoice['invoice_id']) ?>
+  </span>
+</div>
+
         </div>
-        <div class="delivery-date">
-          Delivery Date: <span id="deliveryDate" class="delivery-value" style="color: black;"></span>
-        </div>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>SR. NO</th>
-            <th>DESCRIPTION</th>
-            <th>Unit</th>
-            <th>Qty</th>
-            <th>LOCATION</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php $i = 1;
-          foreach ($items as $item): ?>
-            <tr>
-              <td style="text-align: left;"><?= $i++ ?></td>
-              <td style="text-align: left;"><?= esc($item['item_name'] ?? '-') ?></td>
-              <td style="text-align: left;"><?= esc($item['price'] ?? '-') ?></td>
-              <td style="text-align: left;"><?= esc($item['quantity']) ?></td>
-              <td>--</td>
-            </tr>
-          <?php endforeach; ?>
-        </tbody>
-        <div style="margin-top: 40px;">
-          <table style="width: 100%; border: 1px solid #000; border-collapse: collapse;">
-            <tr>
-              <td style="width: 50%; border-right: 1px solid #000; padding: 10px;">
-                <p style="text-align: left;"><strong>Received by :</strong></p>
-                <p style="text-align: left;"><strong>Signature :</strong></p>
-              </td>
-              <td style="width: 50%; padding: 10px; position: relative;">
-                <!-- <div
-                  style="position: absolute; top: -12px; right: 10px; background: white; font-weight: bold; font-size: 13px; padding: 0 6px;">
-                  For Al Shaya International Printng Co
-                </div> -->
-                <p style="text-align: left;"><strong>Issued by :</strong></p>
-                <p style="text-align: left;"><strong>Signature :</strong></p>
-              </td>
-            </tr>
-            <div class="d-flex w-100 position-relative">
-              <div class="col-6 ms-auto">
-                <hr>
-                 <div class="text-center" style="font-size: 14px;">For Al Shaya International Printing Co</div>
-              </div>
-            </div>
+        <div class="col-4 text-center">
+          <div
+            style="background-color: #991b36; color: white; font-weight: bold; padding: 3px 15px; display: inline-block; border-radius: 4px; font-size: 13px;">
+           ملاحظة التسليم<br> DELIVERY NOTE
           </div>
-        </table>
+        </div>
+        <div class="col-4 text-end">
+          <div class="delivery-date">
+            <strong>Delivery Date:</strong> 
+              <span id="deliveryDate" class="delivery-value" style="color: black;">
+                <?= !empty($invoice['delivery_date']) ? date('d-m-Y', strtotime($invoice['delivery_date'])) : '' ?>
+              </span>
+          </div>
+
+        </div>
       </div>
+
+      <div class="invoice-header">
+        <div class="col-12">
+          Address: <span><?= esc($customer['address'] ?? '') ?>
+</span>:عنوان
+        </div>
+      </div>
+
+      <!-- Invoice Table -->
+       <table class="min_height" style="width:100%; border-collapse: collapse; font-size: 14px;">
+  <thead>
+    <tr>
+      <th style="width: 10%; border: 1px solid #000; padding: 8px;">SR. NO</th>
+      <th style="width: 37%; border: 1px solid #000; padding: 8px; text-align: left;">DESCRIPTION</th>
+      <th style="width: 10%; border: 1px solid #000; padding: 8px;">Unit</th>
+      <th style="width: 10%; border: 1px solid #000; padding: 8px;">Qty</th>
+      <th style="width: 33%; border: 1px solid #000; padding: 8px;">LOCATION</th>
+    </tr>
+  </thead>
+  <tbody>
+    <?php
+    $i = 1;
+    foreach ($items as $item):
+    ?>
+      <tr>
+        <td style="border: 1px solid #000; padding: 8px; text-align: center;"><?= $i++ ?></td>
+        <td style="border: 1px solid #000; padding: 8px; text-align: left;"><?= esc($item['item_name'] ?? '-') ?></td>
+        <td style="border: 1px solid #000; padding: 8px; text-align: center;"><?= number_format($item['price'], 3) ?></td>
+        <td style="border: 1px solid #000; padding: 8px; text-align: center;"><?= esc($item['quantity']) ?></td>
+        <td style="border: 1px solid #000; padding: 8px; text-align: left;">--</td>
+      </tr>
+    <?php endforeach; ?>
+  </tbody>
+</table>
+
+<div class="d-flex w-100 position-relative" style="margin-top: 10px;">
+    <div class="col-6 ms-auto">
+      <hr>
+      <div class="text-center" style="font-size: 15px;">For Al Shaya International Printing Co</div>
     </div>
   </div>
+ <div class="table-footer">
+        <div>Received By/ تم الاستلام بواسطة </div>
+        <div style="text-align: right;">Issued By / صادرة عن</div>
+      </div>
+<div class="table-footer">
+        <div> signature / إمضاء</div>
+        <div style="text-align: right;">signature / إمضاء</div>
+      </div>
+    </div> <!-- /.container -->
+    <!-- Bottom Bar -->
+    <div class="bottom-bar">
+      الراي ، قطعة ٣ ، شارع ٣٢ ، مبنى رقم ٤٣٧ ، محل رقم ٤ ، بالقرب من زجاج الروان ، الشويخ - الكويت<br>
+      Al-Rai, Block 3, Street 32, Build No. 437, Shop No. 4, Near Al Rawan Glass, Shuwaik - Kuwait<br>
+      📞 +965 6006 0102 &nbsp;&nbsp; | &nbsp;&nbsp;
+      📧 <a href="mailto:alraiprintpress@gmail.com" style="color: white; text-decoration: none;">
+        alraiprintpress@gmail.com
+      </a>
+    </div>
+  </div>
+
+  <!-- Partial Payment Modal -->
+ 
 </body>
 </html>
+</div>
 <?php include "common/footer.php"; ?>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
