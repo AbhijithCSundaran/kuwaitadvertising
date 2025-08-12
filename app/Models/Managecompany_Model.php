@@ -8,7 +8,7 @@ class Managecompany_Model extends Model
 {
     protected $table = 'company';
     protected $primaryKey = 'company_id';
-    protected $allowedFields = ['company_name', 'address', 'billing_address','tax_number', 'company_logo', 'email', 'phone','company_status'];
+    protected $allowedFields = ['company_name', 'company_name_ar','address', 'address_ar','billing_address','tax_number', 'company_logo', 'email', 'phone','company_status'];
 
     
     // public function getAllCompanyCount()
