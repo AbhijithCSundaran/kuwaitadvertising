@@ -30,7 +30,16 @@
         width: 20% !important;
         text-align: center !important;
     }
+    #plainExpenseTable th:nth-child(6),
+    #plainExpenseTable td:nth-child(6) {
+        width: 15% !important;
+        text-align: center !important;
+    }
 
+.bg-success {
+    background-color: #28a745 !important;
+    color: #ffffff !important;
+}
     .filter_item {
         width: 50%;
     }
@@ -83,6 +92,7 @@
                 <th><strong>Customer</strong></th>
                 <th><strong>Date</strong></th>
                 <th><strong>Amount</strong></th>
+                <th><strong>Status</strong></th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -158,11 +168,20 @@ $(document).ready(function () {
                                 <td>${invoice.customer_name}</td>
                                 <td>${formatDate(invoice.invoice_date)}</td>
                                 <td class="text-end">₹${parseFloat(invoice.total_amount).toFixed(2)}</td>
+                                        <td class="text-center">
+    ${invoice.status === 'paid' 
+        ? '<span class="badge bg-success w-100">Paid</span>' 
+        : (invoice.status === 'partial paid' 
+            ? '<span class="badge bg-warning text-dark w-100">Partial Paid</span>' 
+            : '<span class="badge bg-secondary w-100">Unknown</span>')}
+</td>
+
                             </tr>
                         `;
                     });
                 } else {
-                    rows = `<tr><td colspan="5" class="text-center">No paid invoices found.</td></tr>`;
+                  rows = `<tr><td colspan="5" class="text-center">No paid or partial paid invoices found.</td></tr>`;
+
                 }
 
                 $('#plainExpenseTable tbody').html(rows);
@@ -200,6 +219,28 @@ $(document).ready(function () {
         loadPaidInvoices();
     });
 
-    loadPaidInvoices();
+    loadPaidInvoices();{
+       res.forEach((invoice, index) => {
+    total += parseFloat(invoice.total_amount);
+
+    const statusBadge = invoice.status === 'paid'
+        ? '<span class="status-badge status-paid w-100">Paid</span>'
+        : (invoice.status === 'partial paid'
+            ? '<span class="status-badge status-partial w-100">Partial Paid</span>'
+            : '<span class="status-badge status-unknown w-100">Unknown</span>');
+
+    rows += `
+        <tr>
+            <td class="text-center">${index + 1}</td>
+            <td>${invoice.invoice_id}</td>
+            <td>${invoice.customer_name}</td>
+            <td>${formatDate(invoice.invoice_date)}</td>
+            <td class="text-end">₹${parseFloat(invoice.total_amount).toFixed(2)}</td>
+            <td class="text-center">${statusBadge}</td>
+        </tr>
+    `;
+});
+
+    }
 });
 </script>
