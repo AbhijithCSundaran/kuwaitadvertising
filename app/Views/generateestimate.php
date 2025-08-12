@@ -181,40 +181,8 @@
         margin: 0;
         padding: 0;
         font-size: 12px;
-        line-height: 1.4;
+        line-height: 1;
       }
-
-      table {
-        border-collapse: collapse;
-        width: 100%;
-        table-layout: fixed;
-      }
-
-      table th,
-      table td {
-        border: 1px solid #000;
-        padding: 4px;
-        font-size: 10px;
-        word-break: break-word;
-      }
-
-      td:nth-child(2) {
-        max-width: 250px;
-        white-space: normal;
-      }
-      tr {
-        page-break-inside: avoid;
-      }
-
-      body,
-      table {
-        background: none !important;
-      }
-
-      /* .container {
-        min-width: 690px;
-        min-height: 900px;
-      } */
     }
   </style>
 </head>
@@ -231,7 +199,7 @@
         </button>
       <?php if (isset($estimate['is_converted']) && $estimate['is_converted'] == 1): ?>
         <button disabled
-            style="background-color: orange; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
+            style="background-color:white; color: black; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
             Converted
         </button>
         <?php else: ?>
@@ -268,8 +236,8 @@
         </div>
         <div class="col-4 text-center">
           <div
-            style="background-color: #991b36; color: white; font-weight: bold; padding: 3px 15px; display: inline-block; border-radius: 4px; font-size: 13px;">
-            عرض سعر / نقداً / بالحساب<br>CASH / CREDIT ESTIMATE
+            style="background-color: #991b36; color: white; font-weight: bold; padding: 3px 30px; display: inline-block; border-radius: 4px; font-size: 13px;">
+            تسعيرة <br>QUOTATION
           </div>
         </div>
         <div class="col-4 text-end">
@@ -324,7 +292,7 @@
                 </table>
 
             <div class=" d-flex">
-                <div class="col-6 terms mt-3">
+                <div class="col-6 terms mt-3" style="font-size:11px;">
                     <strong>TERMS & CONDITIONS</strong><br>
                     1. This estimate is valid for 60 days.<br>
                     2. Additional amount will be added according to the requirements.<br>
@@ -332,7 +300,7 @@
                     4. Cancellation of processed order will not be accepted.
                 </div>
 
-               <div class="col-6 mt-3">
+               <div class="col-6 mt-3" style="font-size:12px;">
                     <div class="text-end ">
                        <table class="total-tab">
                             <tbody>
