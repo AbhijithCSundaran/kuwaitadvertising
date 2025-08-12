@@ -30,7 +30,7 @@
       position: relative;
       background: url('<?= ASSET_PATH ?>assets/images/invoice-bg.png') no-repeat;
       background-size: 30%;
-      background-position: 52% 60%;
+      background-position: 52% 50%;
       background-color: white;
     }
 
@@ -104,10 +104,10 @@
 
     table.min_height tbody td {
       vertical-align: top;
-      padding: 5px 0;
+      padding: 5px 6px;
       height: 20px !important;
     }
-
+   
     tbody td {
       border-top: 1px solid transparent;
       border-bottom: 1px solid transparent;
@@ -222,21 +222,21 @@
         white-space: normal;
       }
 
-      /* Optional: Avoid page breaks inside rows */
+     
       tr {
         page-break-inside: avoid;
       }
 
-      /* Optional: Remove background images if not needed */
+    
       body,
       table {
         background: none !important;
       }
-
-      /* .container {
+/* 
+       .container {
         min-width: 690px;
         min-height: 900px;
-      } */
+      }   */
     }
   </style>
 </head>
