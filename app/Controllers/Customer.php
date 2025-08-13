@@ -20,6 +20,7 @@ class Customer extends BaseController
     $name = ucwords(strtolower(trim($this->request->getPost('name'))));
     $address = ucfirst(strtolower(trim($this->request->getPost('address'))));
     $customer_id = $this->request->getPost('customer_id'); 
+    $max_discount = $this->request->getPost('max_discount');
 
     if (empty($name) || empty($address)) {
         return $this->response->setJSON([
@@ -33,7 +34,7 @@ class Customer extends BaseController
         'name' => $name,
         'address' => $address,
         'company_id'    => $session->get('company_id'),
-        'max_discount' => $this->request->getPost('max_discount')
+        'max_discount'=> $max_discount ?? 0
     ];
 
     if (!empty($customer_id)) {

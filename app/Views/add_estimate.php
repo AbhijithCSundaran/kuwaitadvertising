@@ -354,6 +354,7 @@
             e.preventDefault();
             let name = $('#popup_name').val().trim();
             let address = $('#popup_address').val().trim();
+            let max_discount = $('#max_discount').val().trim();
             name = name.replace(/\b\w/g, char => char.toUpperCase());
             address = address.replace(/(^\s*\w|[.!?]\s*\w)/g, char => char.toUpperCase());
 
@@ -366,7 +367,7 @@
             $.ajax({
                 url: "<?= site_url('customer/create') ?>",
                 type: "POST",
-                data: { name, address },
+                data: { name, address, max_discount },
                 dataType: "json",
                 success: function (res) {
                     if (res.status === 'success') {
@@ -374,6 +375,7 @@
                         $('#customer_id').append(newOption).trigger('change');
                         $('#popup_name').val('');
                         $('#popup_address').val('');
+                        $('#max_discount').val(''); 
                         $('#customerModal').modal('hide');
                         $('.alert')
                             .removeClass('d-none alert-danger')
