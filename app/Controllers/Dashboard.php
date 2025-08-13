@@ -13,26 +13,53 @@ class Dashboard extends BaseController
             exit;
         }
     }
-   public function index()
+//    public function index()
+// {
+//     $session = session();
+//     $company_id = $session->get('company_id'); // Get logged-in user's company
+
+//     // Get recent estimates
+//     $estimateModel = new \App\Models\EstimateModel();
+//     $recentEstimates = $estimateModel->getRecentEstimatesWithCustomer($company_id);
+
+//     // Get revenue data
+//     $invoiceModel = new \App\Models\InvoiceModel();
+//     $dailyRevenue = $invoiceModel->getTodayRevenue($company_id);
+//     $monthlyRevenue = $invoiceModel->getMonthlyRevenue($company_id);
+
+//     return view('dashboard', [
+//         'estimates' => $recentEstimates,
+//         'dailyRevenue' => $dailyRevenue,
+//         'monthlyRevenue' => $monthlyRevenue
+//     ]);
+// }
+
+public function index()
 {
     $session = session();
-    $company_id = $session->get('company_id'); // Get logged-in user's company
+    $company_id = $session->get('company_id');
+    $roleName = strtolower($session->get('role_Name')); // normalize
 
-    // Get recent estimates
-    $estimateModel = new \App\Models\EstimateModel();
-    $recentEstimates = $estimateModel->getRecentEstimatesWithCustomer($company_id);
+    if ($roleName === 'admin') {
+        // ADMIN DASHBOARD
+        $estimateModel = new \App\Models\EstimateModel();
+        $recentEstimates = $estimateModel->getRecentEstimatesWithCustomer($company_id);
 
-    // Get revenue data
-    $invoiceModel = new \App\Models\InvoiceModel();
-    $dailyRevenue = $invoiceModel->getTodayRevenue($company_id);
-    $monthlyRevenue = $invoiceModel->getMonthlyRevenue($company_id);
+        $invoiceModel = new \App\Models\InvoiceModel();
+        $dailyRevenue = $invoiceModel->getTodayRevenue($company_id);
+        $monthlyRevenue = $invoiceModel->getMonthlyRevenue($company_id);
 
-    return view('dashboard', [
-        'estimates' => $recentEstimates,
-        'dailyRevenue' => $dailyRevenue,
-        'monthlyRevenue' => $monthlyRevenue
-    ]);
+        return view('dashboard', [
+            'estimates' => $recentEstimates,
+            'dailyRevenue' => $dailyRevenue,
+            'monthlyRevenue' => $monthlyRevenue
+        ]);
+    } else {
+        // USER DASHBOARD
+        return view('user_dashboard');
+    }
 }
+
 
 
    public function getTodayExpenseTotal()
