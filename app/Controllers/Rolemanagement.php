@@ -64,6 +64,17 @@ class Rolemanagement extends Controller
             'role_name' => ucwords($normalized_role_name),
         ]);
 
+         $company_id = session()->get('company_id');
+    if (empty($company_id)) {
+        return $this->response->setJSON(['status' => 'error', 'message' => 'Company ID missing.']);
+    }
+
+    // Insert role with company_id
+    $this->roleModel->insert([
+        'role_name'  => ucwords($normalized_role_name),
+        'company_id' => $company_id
+    ]);
+
         $role_id = $this->roleModel->getInsertID();
 
         if (!empty($access_data)) {
@@ -85,87 +96,95 @@ class Rolemanagement extends Controller
     }
 
    public function rolelistajax()
-    {
-        header('Content-Type: application/json');
+{
+    header('Content-Type: application/json');
 
-        $draw = $_POST['draw'] ?? 1;
-        $fromstart = $_POST['start'] ?? 0;
-        $tolimit = $_POST['length'] ?? 10;
-        $search = $_POST['search']['value'] ?? '';
+    $draw = $_POST['draw'] ?? 1;
+    $fromstart = $_POST['start'] ?? 0;
+    $tolimit = $_POST['length'] ?? 10;
+    $search = $_POST['search']['value'] ?? '';
 
-        $search = trim($this->db->escapeLikeString($search));
-        $condition = "1=1";
+    $search = trim($this->db->escapeLikeString($search));
+    $condition = "1=1";
+    $company_id = session()->get('company_id'); // your selected company
+// do NOT append company_id to $condition here
 
-        if (!empty($search)) {
-            $condition .= " AND (
-                role_name LIKE '%{$search}%' 
-                OR DATE_FORMAT(created_at, '%d-%m-%Y') LIKE '%{$search}%' 
-                OR DATE_FORMAT(updated_at, '%d-%m-%Y') LIKE '%{$search}%'
-            )";
-        }
-
-        // Sorting
-        $columns = ['slno', 'role_name', 'permissions', 'created_at', 'updated_at', 'action', 'role_id'];
-        $orderColumnIndex = $_POST['order'][0]['column'] ?? 0;
-        $orderDir = $_POST['order'][0]['dir'] ?? 'desc';
-        $orderBy = $columns[$orderColumnIndex] ?? 'role_id';
-        $allowedOrderColumns = ['role_name', 'created_at', 'updated_at', 'role_id'];
-        if (!in_array($orderBy, $allowedOrderColumns)) {
-            $orderBy = 'role_id';
-        }
-
-        $slno = $fromstart + 1;
-
-        $totalRec = $this->roleModel->getAllFilteredRecords($condition, $fromstart, $tolimit, $orderBy, $orderDir);
-        $result = [];
-        $searchLower = strtolower($search);
-
-        foreach ($totalRec as $role) {
-            $permissions = $this->roleMenuModel
-                ->where('role_id', $role->role_id)
-                ->where('access', 1)
-                ->findAll();
-
-            $menuList = [];
-            foreach ($permissions as $perm) {
-                $menuKey = $perm['menu_name'];
-                $menuLabel = $this->menus[$menuKey] ?? $menuKey;
-                $menuList[] = $menuLabel;
-            }
-
-            if (!empty($searchLower)) {
-                $allPermissions = implode(' ', array_map('strtolower', $menuList));
-                $created = date('d-m-Y', strtotime($role->created_at ?? ''));
-                $updated = date('d-m-Y', strtotime($role->updated_at ?? ''));
-                $roleName = strtolower($role->role_name);
-                $searchText = "$roleName $allPermissions $created $updated";
-
-                if (strpos($searchText, $searchLower) === false) {
-                    continue;
-                }
-            }
-
-            $result[] = [
-                'slno'        => $slno++,
-                'role_id'     => $role->role_id,
-                'role_name'   => $role->role_name,
-                'created_at'  => $role->created_at,
-                'updated_at'  => $role->updated_at,
-                'permissions' => $menuList
-            ];
-        }
-
-        $totalCount = $this->roleModel->getAllRoleCount()->totroles;
-        $filteredCount = $this->roleModel->getFilterRoleCount($condition)->filRecords;
-
-        echo json_encode([
-            "draw" => intval($draw),
-            "recordsTotal" => $totalCount,
-            "recordsFiltered" => $filteredCount,
-            "data" => $result
-        ]);
+if (empty($company_id)) {
+    die("Company ID missing in session!");
+}
+    if (!empty($search)) {
+        $condition .= " AND (
+            role_name LIKE '%{$search}%' 
+            OR DATE_FORMAT(created_at, '%d-%m-%Y') LIKE '%{$search}%' 
+            OR DATE_FORMAT(updated_at, '%d-%m-%Y') LIKE '%{$search}%'
+        )";
     }
 
+    // Sorting
+    $columns = ['slno', 'role_name', 'permissions', 'created_at', 'updated_at', 'action', 'role_id'];
+    $orderColumnIndex = $_POST['order'][0]['column'] ?? 0;
+    $orderDir = $_POST['order'][0]['dir'] ?? 'desc';
+    $orderBy = $columns[$orderColumnIndex] ?? 'role_id';
+    $allowedOrderColumns = ['role_name', 'created_at', 'updated_at', 'role_id'];
+    if (!in_array($orderBy, $allowedOrderColumns)) {
+        $orderBy = 'role_id';
+    }
+
+    $slno = $fromstart + 1;
+
+    // Pass $company_id to match your model signature
+    $totalRec = $this->roleModel->getAllFilteredRecords($condition, $fromstart, $tolimit, $orderBy, $orderDir, $company_id);
+    $result = [];
+    $searchLower = strtolower($search);
+
+    foreach ($totalRec as $role) {
+        $permissions = $this->roleMenuModel
+            ->where('role_id', $role->role_id)
+            ->where('access', 1)
+            ->findAll();
+
+        $menuList = [];
+        foreach ($permissions as $perm) {
+            $menuKey = $perm['menu_name'];
+            $menuLabel = $this->menus[$menuKey] ?? $menuKey;
+            $menuList[] = $menuLabel;
+        }
+
+        if (!empty($searchLower)) {
+            $allPermissions = implode(' ', array_map('strtolower', $menuList));
+            $created = date('d-m-Y', strtotime($role->created_at ?? ''));
+            $updated = date('d-m-Y', strtotime($role->updated_at ?? ''));
+            $roleName = strtolower($role->role_name);
+            $searchText = "$roleName $allPermissions $created $updated";
+
+            if (strpos($searchText, $searchLower) === false) {
+                continue;
+            }
+        }
+
+        $result[] = [
+            'slno'        => $slno++,
+            'role_id'     => $role->role_id,
+            'role_name'   => $role->role_name,
+            'created_at'  => $role->created_at,
+            'updated_at'  => $role->updated_at,
+            'permissions' => $menuList
+        ];
+    }
+
+    // Also pass $company_id to these methods
+   $totalRec = $this->roleModel->getAllFilteredRecords($condition, $fromstart, $tolimit, $orderBy, $orderDir, $company_id);
+$totalCount = $this->roleModel->getAllRoleCount($company_id);
+$filteredCountObj = $this->roleModel->getFilterRoleCount($condition, $company_id);
+$filteredCount = $filteredCountObj->filRecords ?? 0;
+
+    echo json_encode([
+        "draw" => intval($draw),
+        "recordsTotal" => $totalCount,
+        "recordsFiltered" => $filteredCount,
+        "data" => $result
+    ]);
+}
 
     public function delete()
     {
