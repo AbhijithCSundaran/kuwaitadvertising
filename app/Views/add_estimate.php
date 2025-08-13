@@ -405,21 +405,15 @@
         });
         
         let initialEstimateData = $('#estimate-form').serialize();
-
-        // Disable button initially if it's an existing estimate (edit mode)
         $('#generate-btn').prop('disabled', true);
-
-        // Listen for changes in form fields
         $('#estimate-form').on('input change', 'input, select, textarea', function () {
             const currentData = $('#estimate-form').serialize();
             const hasChanged = currentData !== initialEstimateData;
-            $('#generate-btn').prop('disabled', !hasChanged); // Enable only if form changed
+            $('#generate-btn').prop('disabled', !hasChanged);
         });
-
-        // After successful save, update the reference state
         function updateInitialFormState() {
             initialEstimateData = $('#estimate-form').serialize();
-            $('#generate-btn').prop('disabled', true); // Re-disable after saving
+            $('#generate-btn').prop('disabled', true); 
         }
 
 
@@ -440,12 +434,10 @@
                 showAlert('Please Enter The Customer Address.', 'danger');
                 return;
             }
-            if (!phoneNumber) { // ✅ new validation
+            if (!phoneNumber) {
                 showAlert('Please Enter The Customer Number.', 'danger');
                 return;
             }
-
-            // Ensure at least one valid item
             let validItemExists = false;
             $('.item-row').each(function () {
                 const desc = $(this).find('input[name="description[]"]').val().trim();
@@ -462,8 +454,6 @@
                 showAlert('Please Enter At Least One Valid Item With Description, Price, and Quantity.', 'danger');
                 return;
             }
-
-            // Remove empty rows
             $('.item-row').each(function () {
                 const desc = $(this).find('input[name="description[]"]').val().trim();
                 const price = parseFloat($(this).find('input[name="price[]"]').val()) || 0;
@@ -476,7 +466,6 @@
 
             $('#generate-btn').prop('disabled', true).text('Generating...');
 
-            // ✅ Use FormData to include extra field
             const formData = new FormData(this);
             formData.append('customer_name', customerName);
 
@@ -491,7 +480,7 @@
                 if (res.status === 'success') {
                     showAlert(res.message, 'success');
 
-                    updateInitialFormState(); // ✅ Reset change tracker after save
+                    updateInitialFormState(); 
 
                     setTimeout(function () {
                         window.location.href = "<?= site_url('estimate/generateEstimate/') ?>" + res.estimate_id;
@@ -510,12 +499,8 @@
                     $('#generate-btn').prop('disabled', false).text('Generate Estimate');
                 }
             });
-
-
             
         });
-
-
 
         $('#discount').on('input', function() {
             var max = parseFloat($(this).attr('max'));
@@ -525,7 +510,6 @@
                 $(this).val(max);
             }
         });
-
 
          let maxCustomerDiscount = 0; 
 
@@ -550,7 +534,6 @@
     }
 });
 
-       // Initialize tooltip (once)
             $('#discount').tooltip({
                 trigger: 'manual',
                 placement: 'top'

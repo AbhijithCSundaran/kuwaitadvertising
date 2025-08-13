@@ -37,7 +37,6 @@ class Login_Model extends Model
         }
         if ($user->role_id != 1) {
             if ($user->company_status != 1) {
-                // Company is not active
                  return ['status' => 0, 'message' => 'Staff Access Restricted'];
             }
         }
