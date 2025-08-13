@@ -151,13 +151,23 @@
         <?php if (in_array('invoices', $allowedMenus)): ?>
           <li class="nav-item">
             <a class="nav-link <?= strpos($currentPath, 'invoice') !== false ? 'active' : '' ?>"
-   href="<?= base_url('invoicelist') ?>">
-  <i class="mdi mdi-receipt menu-icon"></i>
-  <span class="menu-title">Invoice List</span>
-</a>
-
+              href="<?= base_url('invoicelist') ?>">
+              <i class="mdi mdi-receipt menu-icon"></i>
+              <span class="menu-title">Invoice List</span>
+            </a>
           </li>
         <?php endif; ?>
+        <?php if (in_array('customer', $allowedMenus)): ?>
+  <li class="nav-item">
+    <a class="nav-link <?= strpos($currentPath, 'cashlist') !== false ? 'active' : '' ?>" 
+       href="<?= base_url('cashlist') ?>">
+      <i class="mdi mdi-cash-multiple menu-icon"></i>
+      <span class="menu-title">Cash Receipt</span>
+    </a>
+  </li>
+<?php endif; ?>
+
+
         <?php if (in_array('reports', $allowedMenus)): ?>
           <li class="nav-item">
             <a class="nav-link" data-bs-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
@@ -249,6 +259,16 @@
               </a>
             </li>
           <?php endif; ?>
+
+          <?php if (in_array('invoices', $allowedMenus)): ?>
+            <li class="nav-item">
+              <a class="nav-link text-black <?= $uri->getSegment(1) == 'cashlist' ? 'active' : '' ?>" href="<?= base_url('cashlist') ?>">
+                <i class="mdi mdi-account-multiple menu-icon"></i>
+                <span class="menu-title">Cash Receipt</span>
+              </a>
+            </li>
+          <?php endif; ?>
+
 
           <?php if (in_array('reports', $allowedMenus)): ?>
             <li class="nav-item">

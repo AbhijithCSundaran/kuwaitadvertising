@@ -289,20 +289,29 @@
       </div>
     </div>
     <div class="container">
-      <div class="top-heading" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-        <span style="font-size: 14px; font-weight: bold;">
-            <?= esc($company['company_name']) ?>
+      <div class="row align-items-center text-center">
+    <!-- Company Name (English) - Left -->
+    <div class="col-md-4 text-start">
+        <span style="font-size: 12px; font-weight: bold;">
+            <?= esc(ucwords(strtolower($company['company_name']))) ?>
         </span>
- 
+    </div>
+
+    <!-- Company Logo - Center -->
+    <div class="col-md-4">
         <?php if (!empty($company['company_logo'])): ?>
-            <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>"
-                alt="Company Logo" style="max-height: 50px;">
+            <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" 
+                 alt="Company Logo" style="max-height: 30px;">
         <?php endif; ?>
- 
+    </div>
+
+    <!-- Company Name (Arabic) - Right -->
+    <div class="col-md-4 text-end">
         <span style="font-size: 14px; font-weight: bold; direction: rtl;">
             <?= esc($company['company_name_ar'] ?? '') ?>
         </span>
     </div>
+</div>
       <hr>
       <div class="row align-items-center" style="margin-bottom: 10px;">
         <div class="col-4 text-start">
@@ -512,6 +521,7 @@
 </html>
 </div>
 <?php include "common/footer.php"; ?>
+
 <script>
 
   function numberToWords(num) {
