@@ -403,6 +403,7 @@
             e.preventDefault();
             const name = $('#popup_name').val().trim();
             const address = $('#popup_address').val().trim();
+            const max_discount = $('#max_discount').val().trim();
 
             if (!name || !address) {
                 $('#customerError').removeClass('d-none').text('Name and address are required.');
@@ -412,19 +413,41 @@
             $.ajax({
                 url: "<?= base_url('customer/create') ?>",
                 type: "POST",
-                data: { name, address },
+                data: { name, address,max_discount },
                 dataType: "json",
                 success: function (res) {
                     if (res.status === 'success') {
                         const newOption = new Option(res.customer.name, res.customer.customer_id, true, true);
                         $('#customer_id').append(newOption).trigger('change');
+                        $('#popup_name').val('');
+                        $('#popup_address').val('');
+                        $('#max_discount').val(''); 
                         $('#customerModal').modal('hide');
+                         $('.alert')
+                            .removeClass('d-none alert-danger')
+                            .addClass('alert-success')
+                            .text('Customer Created Successfully.')
+                            .fadeIn()
+                            .delay(3000)
+                            .fadeOut();
                     } else {
-                        $('#customerError').removeClass('d-none').text(res.message || 'Error Adding Customer.');
+                        $('.alert')
+                            .removeClass('d-none alert-success')
+                            .addClass('alert-danger')
+                            .text(res.message || 'Failed To Create Customer.')
+                            .fadeIn()
+                            .delay(3000)
+                            .fadeOut();
                     }
                 },
                 error: function () {
-                    $('#customerError').removeClass('d-none').text('Server error.');
+                    $('.alert')
+                        .removeClass('d-none alert-success')
+                        .addClass('alert-danger')
+                        .text('Server Error Occurred While Creating Customer.')
+                        .fadeIn()
+                        .delay(3000)
+                        .fadeOut();
                 }
             });
         });

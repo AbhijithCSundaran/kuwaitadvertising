@@ -32,20 +32,12 @@
   <!-- MDI Icons -->
   <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.5.95/css/materialdesignicons.min.css" rel="stylesheet">
 
-
-  <!-- DataTables with Bootstrap 5 -->
 </head>
 
 <body>
-
-  <!-- partial:partials/_navbar.html -->
   <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
     <div class="navbar-brand-wrapper d-flex justify-content-center">
       <div class="navbar-brand-inner-wrapper d-flex justify-content-between align-items-center w-100">
-        <!-- <button id="menuToggle" class="btn btn-secondary d-lg-none">
-              <i class="fas fa-bars"></i>
-            </button> -->
-
         <a class="navbar-brand brand-logo" href="#">
           <img src="<?= base_url('public/uploads/' . ($company['company_logo'] ?? 'default.png')) ?>" alt="Logo">
         </a>
@@ -83,48 +75,43 @@
 
           </li>
         <?php endif; ?>
-
         <?php if (in_array('companylist', $allowedMenus)): ?>
           <li class="nav-item">
             <a class="nav-link <?= strpos($currentPath, 'company') !== false ? 'active' : '' ?>"
-   href="<?= base_url('companylist') ?>">
-  <i class="mdi mdi-view-headline menu-icon"></i>
-  <span class="menu-title">Company Management</span>
-</a>
+              href="<?= base_url('companylist') ?>">
+              <i class="mdi mdi-view-headline menu-icon"></i>
+              <span class="menu-title">Company Management</span>
+            </a>
 
           </li>
         <?php endif; ?>
-
         <?php if (in_array('adduserlist', $allowedMenus)): ?>
           <li class="nav-item">
             <a class="nav-link <?= strpos($currentPath, 'adduser') !== false || strpos($currentPath, 'manageuser') !== false ? 'active' : '' ?>"
-   href="<?= base_url('adduserlist') ?>">
-  <i class="mdi mdi-bi bi-person menu-icon"></i>
-  <span class="menu-title">Manage User</span>
-</a>
+              href="<?= base_url('adduserlist') ?>">
+              <i class="mdi mdi-bi bi-person menu-icon"></i>
+              <span class="menu-title">Manage User</span>
+            </a>
 
           </li>
         <?php endif; ?>
-
         <?php if (in_array('rolemanagement', $allowedMenus)): ?>
           <li class="nav-item">
             <a class="nav-link <?= strpos($currentPath, 'rolemanagement') !== false ? 'active' : '' ?>"
-   href="<?= base_url('rolemanagement/rolelist') ?>">
-  <i class="mdi mdi-chart-pie menu-icon"></i>
-  <span class="menu-title">Role Management</span>
-</a>
+              href="<?= base_url('rolemanagement/rolelist') ?>">
+              <i class="mdi mdi-chart-pie menu-icon"></i>
+              <span class="menu-title">Role Management</span>
+            </a>
 
           </li>
         <?php endif; ?>
-
         <?php if (in_array('customer', $allowedMenus)): ?>
           <li class="nav-item">
             <a class="nav-link <?= strpos($currentPath, 'customer') !== false ? 'active' : '' ?>"
-   href="<?= base_url('customer/list') ?>">
-  <i class="mdi mdi-account-multiple menu-icon"></i>
-  <span class="menu-title">Customer List</span>
-</a>
-
+              href="<?= base_url('customer/list') ?>">
+              <i class="mdi mdi-account-multiple menu-icon"></i>
+              <span class="menu-title">Customer List</span>
+            </a>
           </li>
         <?php endif; ?>
 
@@ -137,17 +124,6 @@
             </a>
           </li>
         <?php endif; ?>
-
-        <?php if (in_array('expense', $allowedMenus)): ?>
-          <li class="nav-item">
-            <a class="nav-link <?= strpos($currentPath, 'expense') !== false ? 'active' : '' ?>"
-   href="<?= base_url('expense') ?>">
-  <i class="mdi mdi-square-outline menu-icon"></i>
-  <span class="menu-title">Expenses</span>
-</a>
-
-          </li>
-        <?php endif; ?>
         <?php if (in_array('invoices', $allowedMenus)): ?>
           <li class="nav-item">
             <a class="nav-link <?= strpos($currentPath, 'invoice') !== false ? 'active' : '' ?>"
@@ -158,15 +134,24 @@
           </li>
         <?php endif; ?>
         <?php if (in_array('customer', $allowedMenus)): ?>
-  <li class="nav-item">
-    <a class="nav-link <?= strpos($currentPath, 'cashlist') !== false ? 'active' : '' ?>" 
-       href="<?= base_url('cashlist') ?>">
-      <i class="mdi mdi-cash-multiple menu-icon"></i>
-      <span class="menu-title">Cash Receipt</span>
-    </a>
-  </li>
-<?php endif; ?>
+          <li class="nav-item">
+            <a class="nav-link <?= strpos($currentPath, 'cashlist') !== false ? 'active' : '' ?>" 
+              href="<?= base_url('cashlist') ?>">
+              <i class="mdi mdi-cash-multiple menu-icon"></i>
+              <span class="menu-title">Cash Receipt</span>
+            </a>
+          </li>
+        <?php endif; ?>
+        <?php if (in_array('expense', $allowedMenus)): ?>
+          <li class="nav-item">
+            <a class="nav-link <?= strpos($currentPath, 'expense') !== false ? 'active' : '' ?>"
+              href="<?= base_url('expense') ?>">
+              <i class="mdi mdi-square-outline menu-icon"></i>
+              <span class="menu-title">Expenses</span>
+            </a>
 
+          </li>
+        <?php endif; ?>
 
         <?php if (in_array('reports', $allowedMenus)): ?>
           <li class="nav-item">
@@ -191,128 +176,19 @@
         </li>
       </ul>
     </nav>
-
-    <!-- <div class="offcanvas offcanvas-start  text-black" tabindex="-1" id="mobileSidebar" aria-labelledby="mobileSidebarLabel">
-      <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="mobileSidebarLabel">Menu</h5>
-        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-      </div>
-      <div class="offcanvas-body p-3">
-        <ul class="nav flex-column">
-          <?php if (in_array('dashboard', $allowedMenus)): ?>
-            <li class="nav-item">
-              <a class="nav-link text-black <?= $uri->getSegment(1) == 'dashboard' ? 'active' : '' ?>" href="<?= base_url('dashboard') ?>">
-                <i class="mdi mdi-home me-2"></i> Dashboard
-              </a>
-            </li>
-          <?php endif; ?>
-          <?php if (in_array('companylist', $allowedMenus)): ?>
-            <li class="nav-item">
-              <a class="nav-link text-black <?= $uri->getSegment(1) == 'companylist' ? 'active' : '' ?>" href="<?= base_url('companylist') ?>">
-                <i class="mdi mdi-view-headline menu-icon"></i>
-                <span class="menu-title">Company Management</span>
-              </a>
-            </li>
-          <?php endif; ?>
-
-          <?php if (in_array('adduserlist', $allowedMenus)): ?>
-            <li class="nav-item">
-              <a class="nav-link text-black <?= $uri->getSegment(1) == 'adduserlist' ? 'active' : '' ?>" href="<?= base_url('adduserlist') ?>">
-                <i class="mdi mdi-bi bi-person menu-icon"></i>
-                <span class="menu-title">Manage User</span>
-              </a>
-            </li>
-          <?php endif; ?>
-
-          <?php if (in_array('rolemanagement', $allowedMenus)): ?>
-            <li class="nav-item">
-              <a class="nav-link text-black <?= $uri->getSegment(1) == 'rolemanagement' ? 'active' : '' ?>" href="<?= base_url('rolemanagement/rolelist') ?>">
-                <i class="mdi mdi-chart-pie menu-icon"></i>
-                <span class="menu-title">Role Management</span>
-              </a>
-            </li>
-          <?php endif; ?>
-
-          <?php if (in_array('customer', $allowedMenus)): ?>
-            <li class="nav-item">
-              <a class="nav-link text-black <?= $uri->getSegment(1) == 'customer' ? 'active' : '' ?>" href="<?= base_url('customer/list') ?>">
-                <i class="mdi mdi-account-multiple menu-icon"></i>
-                <span class="menu-title">Customer List</span>
-              </a>
-            </li>
-          <?php endif; ?>
-
-          <?php if (in_array('estimatelist', $allowedMenus)): ?>
-            <li class="nav-item">
-              <a class="nav-link text-black <?= $uri->getSegment(1) == 'estimatelist' ? 'active' : '' ?>" href="<?= base_url('estimatelist') ?>">
-                <i class="mdi mdi-grid-large menu-icon"></i>
-                <span class="menu-title">Estimate Generation</span>
-              </a>
-            </li>
-          <?php endif; ?>
-
-          <?php if (in_array('expense', $allowedMenus)): ?>
-            <li class="nav-item">
-              <a class="nav-link text-black <?= $uri->getSegment(1) == 'expense' ? 'active' : '' ?>" href="<?= base_url('expense') ?>">
-                <i class="mdi mdi-square-outline menu-icon"></i>
-                <span class="menu-title">Expenses</span>
-              </a>
-            </li>
-          <?php endif; ?>
-
-          <?php if (in_array('invoices', $allowedMenus)): ?>
-            <li class="nav-item">
-              <a class="nav-link text-black <?= $uri->getSegment(1) == 'cashlist' ? 'active' : '' ?>" href="<?= base_url('cashlist') ?>">
-                <i class="mdi mdi-account-multiple menu-icon"></i>
-                <span class="menu-title">Cash Receipt</span>
-              </a>
-            </li>
-          <?php endif; ?>
-
-
-          <?php if (in_array('reports', $allowedMenus)): ?>
-            <li class="nav-item">
-              <a class="nav-link text-black " data-bs-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
-                <i class="mdi mdi-clipboard menu-icon"></i>
-                <span class="menu-title">Reports</span>
-              </a>
-              <div class="collapse" id="auth">
-                <ul class="nav flex-column sub-menu">
-                  <li class="nav-item"><a class="nav-link" href="<?= base_url('expense/report') ?>">Expense Report</a></li>
-                  <li class="nav-item"><a class="nav-link" href="<?= base_url('sales/report') ?>">Sales Report</a></li>
-                  <li class="nav-item"><a class="nav-link" href="<?= base_url('companyledger') ?>">Company Ledger</a></li>
-                </ul>
-              </div>
-            </li>
-          <?php endif; ?>
-          <li class="nav-item">
-            <a href="#" id="logoutLink" class="nav-link text-black ">
-              <i class="mdi mdi-logout menu-icon"></i>
-              <span class="menu-title">Logout</span>
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div> -->
-
-
     <!-- Logout Confirmation Modal -->
-    <div class="modal fade" id="logoutModel" tabindex="-1" role="dialog" aria-labelledby="logoutModelLabel"
-      aria-hidden="true">
+    <div class="modal fade" id="logoutModel" tabindex="-1" role="dialog" aria-labelledby="logoutModelLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
-
           <div class="modal-header">
             <h5 class="modal-title" id="logoutModelLabel">Confirmation</h5>
             <button type="button" class="close" id="closeModalBtn" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-
           <div class="modal-body">
             Are You Sure You Want To Logout?
           </div>
-
           <div class="modal-footer">
             <button type="button" class="btn btn-primary" id="confirmlogout">Logout</button>
             <button type="button" class="btn btn-secondary" id="cancelLogoutBtn">Cancel</button>
@@ -320,6 +196,5 @@
         </div>
       </div>
     </div>
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
