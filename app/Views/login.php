@@ -52,7 +52,8 @@
               <form class="pt-3" id="login-form">
                 <div class="alert alert-danger" role="alert" id="loginalert" style="display: none;">
                 </div>
-                <input type="hidden" name="login_mode" value="admin_with_company">
+                <input type="hidden" name="login_mode" 
+                  value="<?= !empty($isAdminLogin) && $isAdminLogin ? 'admin_with_company' : 'normal' ?>">
                 <div class="form-group">
                   <input type="text" name="email" class="form-control form-control-lg" placeholder="example@gmail.com">
                 </div>
@@ -79,9 +80,12 @@
                   <button type="button"
                     class="enter-btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn">SIGN IN</button>
                 </div>
+               <?php if (empty($isAdminLogin) || !$isAdminLogin): ?>
                 <div class="my-2 d-flex justify-content-between align-items-center">
                   <a href="<?= base_url('login?admin=1') ?>" class="auth-link text-black">Login As Admin</a>
                 </div>
+              <?php endif; ?>
+
 
               </form>
             </div>
@@ -119,7 +123,7 @@
           setTimeout(function () {
             $('#loginalert').fadeOut();
             window.location.href = "<?= base_url('dashboard') ?>";
-          }, 2000);
+          }, 2500);
         } else {
           $('#loginalert').removeClass('alert-success').addClass('alert-danger');
           const errorMessage = response.message || 'Invalid Credentials';
@@ -127,7 +131,7 @@
 
           setTimeout(function () {
             $('#loginalert').fadeOut();
-          }, 2000);
+          }, 2500);
         }
       }, 'json');
     });

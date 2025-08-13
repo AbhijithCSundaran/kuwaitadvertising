@@ -31,62 +31,68 @@ class Login extends BaseController
 }
 
     public function authenticate()
-    {
-        $email = $this->request->getPost('email');
-        $password = $this->request->getPost('password');
-         $companyId = $this->request->getPost('company_id');
-         $loginMode  = $this->request->getPost('login_mode'); 
+{
+    $email      = $this->request->getPost('email');
+    $password   = $this->request->getPost('password');
+    $companyId  = $this->request->getPost('company_id');
+    $loginMode  = $this->request->getPost('login_mode');
 
-        if ($email && $password) {
-            $loginModel = new Login_Model();
-            $result = $loginModel->authenticateNow($email, $password);
+    if (!$email || !$password) {
+        return $this->response->setJSON(['status' => 0, 'message' => 'Email And Password Are Required']);
+    }
 
-          if (is_array($result) && isset($result['status']) && $result['status'] == 0) {
-             return $this->response->setJSON($result);
-            } elseif ($result) {
-                $roleModel = new RoleModel();
-                $role = $roleModel->find($result->role_id);
-                $roleName = $role ? $role['role_name'] : '';
-                $roleMenuModel = new Rolemanagement_Model();
-                $permissions = $roleMenuModel
-                    ->where('role_id', $result->role_id)
-                    ->where('access', 1)
-                    ->findAll();
+    $loginModel = new Login_Model();
+    $result = $loginModel->authenticateNow($email, $password);
 
-                $allowedMenus = array_column($permissions, 'menu_name');
-                if ($loginMode === 'admin_with_company' && $companyId && $result->user_status == 1) {
-                    $result->company_id = $companyId;
-                }
+    if (is_array($result) && isset($result['status']) && $result['status'] == 0) {
+        return $this->response->setJSON($result);
+    }
 
-                // Set session variables
-                $this->session->set([
-                    'user_id' => $result->user_id,
-                    'user_Name'     => $result->name,
-                    'role_Id'       => $result->role_id,
-                    'role_Name'     => $roleName,
-                    'allowed_menus' => $allowedMenus,
-                    'status'        => 1,
-                    'logged_in'     => true,
-                    'company_id'   => $result->company_id, 
-                    'user_status'   => $result->user_status
-                ]);
+    if (!$result) {
+        return $this->response->setJSON(['status' => 0, 'message' => 'Invalid Credentials']);
+    }
+    $roleModel = new RoleModel();
+    $role = $roleModel->find($result->role_id);
+    $roleName = $role ? $role['role_name'] : '';
 
-                return $this->response->setJSON([
-                    'status'   => 1,
-                    'user_Id'  => $result->user_id
-                ]);
-            } else {
-                return $this->response->setJSON(['status' => 0, 'message' => 'Invalid Credentials']);
-            }
-        } else {
-            return $this->response->setJSON(['status' => 0, 'message' => 'Email And Password Are Required']);
+    $roleMenuModel = new Rolemanagement_Model();
+    $permissions = $roleMenuModel
+        ->where('role_id', $result->role_id)
+        ->where('access', 1)
+        ->findAll();
+    $allowedMenus = array_column($permissions, 'menu_name');
+
+    if ($loginMode === 'admin_with_company') {
+        // Admin login page
+        if ($result->role_id != 1) {
+            return $this->response->setJSON(['status' => 0, 'message' => 'Only Admins Can Log In Here']);
         }
-        if ($user->role_id == 1) { // Admin
-        if (!empty($selectedCompanyId)) {
-            session()->set('company_id', $selectedCompanyId);
+        if (empty($companyId)) {
+            return $this->response->setJSON(['status' => 0, 'message' => 'Please Select A Company']);
         }
-        } else {
-            session()->set('company_id', $user->company_id);
+        $result->company_id = $companyId;
+    } else {
+        // Normal login page
+        if ($result->role_id == 1) {
+            return $this->response->setJSON(['status' => 0, 'message' =>'Click \'Login as Admin\' To Log In As An Administrator']);
         }
     }
+    $this->session->set([
+        'user_id'       => $result->user_id,
+        'user_Name'     => $result->name,
+        'role_Id'       => $result->role_id,
+        'role_Name'     => $roleName,
+        'allowed_menus' => $allowedMenus,
+        'status'        => 1,
+        'logged_in'     => true,
+        'company_id'    => $result->company_id,
+        'user_status'   => $result->user_status
+    ]);
+
+    return $this->response->setJSON([
+        'status'   => 1,
+        'user_Id'  => $result->user_id
+    ]);
+}
+
 }
