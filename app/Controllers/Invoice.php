@@ -137,13 +137,14 @@ class Invoice extends BaseController
         $customer = $customerModel->find($invoice['customer_id']);
 
         $companyId = session()->get('company_id');
+        $company   = $companyModel->find($companyId);
 
         $viewData = [
             'invoice' => $invoice,
             'items' => $invoice['items'],
             'user_name' => session()->get('user_name') ?? 'Salesman',
             'customer' => $customer ?? [],
-            'company' => $company
+            'company' => $company,
         ];
 
         if ($companyId == 69) {

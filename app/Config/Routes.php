@@ -132,6 +132,8 @@ $routes->post('invoice/update_partial_payment', 'Invoice::update_partial_payment
 $routes->post('invoice/getSalesReportAjax', 'Invoice::getSalesReportAjax');
 $routes->get('invoice/report', 'Invoice::report');
 
+$routes->get('cashlist', 'CashReceipt::index');
+$routes->post('cashlist/ajax', 'CashReceipt::ajaxList');
 
 
 

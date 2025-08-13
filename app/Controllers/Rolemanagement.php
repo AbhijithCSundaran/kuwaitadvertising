@@ -20,7 +20,8 @@ class Rolemanagement extends Controller
     'ledger'            => 'Ledger',
     'reports'           => 'Reports',
     'rolemanagement'    => 'Role Management',
-    'customer'          => 'Customer List'
+    'customer'          => 'Customer List',
+    'cashreceipt'       => 'Cash Receipt'  
 ];
     
     public function __construct()
