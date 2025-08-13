@@ -47,7 +47,7 @@
             </button> -->
 
         <a class="navbar-brand brand-logo" href="#">
-          <img src="<?= ASSET_PATH; ?>assets/images/adminlogo.jpg" alt="Logo" style="height: 50px;">
+          <img src="<?= base_url('public/uploads/' . ($company['company_logo'] ?? 'default.png')) ?>" alt="Logo">
         </a>
         <a class="navbar-brand brand-logo-white" href="index.html"><img
             src="<?= ASSET_PATH; ?>assets/images/adminlogo.jpg" alt="logo" /></a>
