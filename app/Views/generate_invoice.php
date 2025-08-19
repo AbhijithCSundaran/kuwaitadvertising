@@ -289,29 +289,27 @@
       </div>
     </div>
     <div class="container">
-      <div class="row align-items-center text-center">
-    <!-- Company Name (English) - Left -->
-    <div class="col-md-4 text-start">
-        <span style="font-size: 12px; font-weight: bold;">
-            <?= esc(ucwords(strtolower($company['company_name']))) ?>
-        </span>
-    </div>
+      <div class="col-12">
+        <div class="d-flex align-items-center text-center">
+          <div class="col-md-4 text-start">
+              <span style="font-size: 12px; font-weight: bold;">
+                  <?= esc(ucwords(strtolower($company['company_name']))) ?>
+              </span>
+          </div>
+          <div class="col-md-4">
+              <?php if (!empty($company['company_logo'])): ?>
+                  <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" 
+                      alt="Company Logo" style="max-height: 50px;">
+              <?php endif; ?>
+          </div>
+          <div class="col-md-4 text-end">
+              <span style="font-size: 14px; font-weight: bold; direction: rtl;">
+                  <?= esc($company['company_name_ar'] ?? '') ?>
+              </span>
+          </div>
+      </div>
+  </div>
 
-    <!-- Company Logo - Center -->
-    <div class="col-md-4">
-        <?php if (!empty($company['company_logo'])): ?>
-            <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" 
-                 alt="Company Logo" style="max-height: 50px;">
-        <?php endif; ?>
-    </div>
-
-    <!-- Company Name (Arabic) - Right -->
-    <div class="col-md-4 text-end">
-        <span style="font-size: 14px; font-weight: bold; direction: rtl;">
-            <?= esc($company['company_name_ar'] ?? '') ?>
-        </span>
-    </div>
-</div>
       <hr>
       <div class="row align-items-center" style="margin-bottom: 10px;">
         <div class="col-4 text-start">
@@ -457,8 +455,8 @@
       </div>
 
       <div class="table-footer">
-        <div>Receiver signature / توقيع المتلقي</div>
-        <div style="text-align: right;">Accountant Signature / توقيع المحاسب</div>
+        <div>Receivers Name & Signature / اسم المستلمين والتوقيع</div>
+        <div style="text-align: right;">Accountant Name & Signature / اسم المحاسب والتوقيع</div>
       </div>
 
 

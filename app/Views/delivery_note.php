@@ -365,7 +365,14 @@
 <div class="d-flex w-100 position-relative" style="margin-top: 10px;">
     <div class="col-6 ms-auto">
       <hr>
-      <div class="text-center" style="font-size: 15px;">For Al Shaya International Printing Co</div>
+      <?php
+$company_name = $company['company_name'] ?? 'Unknown Company';
+?>
+<div class="text-center" style="font-size: 15px;">
+    For <?= esc(ucwords($company_name)) ?> 
+</div>
+
+
     </div>
   </div>
  <div class="table-footer">
@@ -373,8 +380,8 @@
         <div style="text-align: right;">Issued By / صادرة عن</div>
       </div>
 <div class="table-footer">
-        <div> signature / إمضاء</div>
-        <div style="text-align: right;">signature / إمضاء</div>
+        <div> Signature / إمضاء</div>
+        <div style="text-align: right;">Signature / إمضاء</div>
       </div>
     </div> <!-- /.container -->
     <!-- Bottom Bar -->

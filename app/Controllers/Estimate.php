@@ -129,17 +129,25 @@ public function save()
     $estimateItemModel = new EstimateItemModel();
     $customerModel = new customerModel();
     $customer = $customerModel->find($customerId);
-    if ($customer) {
-        if (
-            $customer['name'] !== $customerName ||
-            $customer['address'] !== $address
-        ) {
-            $customerModel->update($customerId, [
-                'name' => $customerName,
-                'address' => $address
-            ]);
+        if ($customer) {
+            // Update customer info if changed
+            if ($customer['name'] !== $customerName || $customer['address'] !== $address) {
+                $customerModel->update($customerId, [
+                    'name' => $customerName,
+                    'address' => $address
+                ]);
+            }
+
+            // Fix: Allow discounts lower than fixed_discount, only block if exceeding max
+            $maxDiscount = isset($customer['fixed_discount']) ? (float)$customer['fixed_discount'] : 100; // default 100%
+            if ($discount > $maxDiscount) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => "Discount cannot exceed maximum allowed value of $maxDiscount%"
+                ]);
+            }
+
         }
-    }
 
     if (!empty($estimateId)) {
         $existing = $estimateModel->find($estimateId);
@@ -150,7 +158,7 @@ public function save()
             ]);
         }
 
-        $hasChanges = (
+       $hasChanges = (
             $existing['customer_id'] != $customerId ||
             $existing['customer_address'] !== $address ||
             $existing['discount'] != $discount ||

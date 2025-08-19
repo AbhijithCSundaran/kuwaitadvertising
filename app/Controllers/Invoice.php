@@ -157,83 +157,92 @@ class Invoice extends BaseController
     }
 
 
-    public function save()
-    {
-        $request = $this->request;
-        $invoiceModel = new InvoiceModel();
-        $itemModel = new InvoiceItemModel();
-        $customerModel = new customerModel();
+public function save()
+{
+    $request = $this->request;
+    $invoiceModel = new InvoiceModel();
+    $itemModel = new InvoiceItemModel();
+    $customerModel = new CustomerModel();
 
-        $discount = $request->getPost('discount');
-        $customerId = $request->getPost('customer_id');
-        $customer = $customerModel->find($customerId);
-        $estimateId = $this->request->getPost('estimate_id');
+    $discount = (float) $request->getPost('discount');
+    $customerId = $request->getPost('customer_id');
+    $customer = $customerModel->find($customerId);
+    $estimateId = $this->request->getPost('estimate_id');
 
-        if (!$customer) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'Invalid customer selected.'
-            ]);
-        }
-
-        log_message('debug', 'Current user_id in session: ' . session()->get('user_id'));
-
-        $invoiceId = $request->getPost('invoice_id');
-        $originalStatus = $request->getPost('original_status');
-       $companyId = session()->get('company_id');
-        $invoiceData = [
-            'customer_id' => $customerId,
-            'billing_address' => $customer['billing_address'] ?? $customer['customer_address'] ?? '',
-            'shipping_address' => $customer['shipping_address'] ?? $request->getPost('shipping_address') ?? '',
-            'phone_number' => $customer['phone_number'] ?? $request->getPost('phone_number') ?? '',
-            'lpo_no' => $request->getPost('lpo_no'),
-            'total_amount' => $this->calculateTotal($request),
-            'discount' => $discount,
-            'invoice_date' => date('Y-m-d'),
-            'user_id' => session()->get('user_id') ?? 1,
-            'status' => ($invoiceId && $originalStatus) ? $originalStatus : 'unpaid',
-            'company_id' => $companyId 
-        ];
-
-        if ($invoiceId) {
-            $invoiceModel->update($invoiceId, $invoiceData);
-            $itemModel->where('invoice_id', $invoiceId)->delete();
-            $message = 'Invoice Updated Successfully';
-        } else {
-            if (!empty($estimateId)) {
-                $db = \Config\Database::connect();
-                $db->table('estimates')->where('estimate_id', $estimateId)->update(['is_converted' => 1]);
-            }
-            
-            $invoiceModel->insert($invoiceData);
-            $invoiceId = $invoiceModel->getInsertID();
-            $message = 'Generating Invoice';
-        }
-
-        $descriptions = $request->getPost('description');
-        $quantities = $request->getPost('quantity');
-        $prices = $request->getPost('price');
-
-        if ($descriptions && $quantities && $prices) {
-            foreach ($descriptions as $i => $desc) {
-                if (!empty($desc) && $quantities[$i] > 0 && $prices[$i] > 0) {
-                    $itemModel->insert([
-                        'invoice_id' => $invoiceId,
-                        'item_name' => ucfirst(trim($desc)),
-                        'quantity' => $quantities[$i],
-                        'price' => $prices[$i]
-                    ]);
-                }
-            }
-        }
-
+    if (!$customer) {
         return $this->response->setJSON([
-            'status' => 'success',
-            'message' => $message,
-            'redirect' => site_url('invoice/print/' . $invoiceId)
+            'status' => 'error',
+            'message' => 'Invalid customer selected.'
         ]);
     }
 
+    // ✅ Validation for discount
+    if (!empty($customer['max_discount']) && $discount > (float)$customer['max_discount']) {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Discount cannot exceed maximum allowed discount (' . $customer['max_discount'] . '%)'
+        ]);
+    }
+
+    log_message('debug', 'Current user_id in session: ' . session()->get('user_id'));
+
+    $invoiceId = $request->getPost('invoice_id');
+    $originalStatus = $request->getPost('original_status');
+    $companyId = session()->get('company_id');
+
+    $invoiceData = [
+        'customer_id'      => $customerId,
+        'billing_address'  => $customer['billing_address'] ?? $customer['customer_address'] ?? '',
+        'shipping_address' => $customer['shipping_address'] ?? $request->getPost('shipping_address') ?? '',
+        'phone_number'     => $customer['phone_number'] ?? $request->getPost('phone_number') ?? '',
+        'lpo_no'           => $request->getPost('lpo_no'),
+        'total_amount'     => $this->calculateTotal($request),
+        'discount'         => $discount,
+        'invoice_date'     => date('Y-m-d'),
+        'user_id'          => session()->get('user_id') ?? 1,
+        'status'           => ($invoiceId && $originalStatus) ? $originalStatus : 'unpaid',
+        'company_id'       => $companyId
+    ];
+
+    if ($invoiceId) {
+        $invoiceModel->update($invoiceId, $invoiceData);
+        $itemModel->where('invoice_id', $invoiceId)->delete();
+        $message = 'Invoice Updated Successfully';
+    } else {
+        if (!empty($estimateId)) {
+            $db = \Config\Database::connect();
+            $db->table('estimates')->where('estimate_id', $estimateId)->update(['is_converted' => 1]);
+        }
+
+        $invoiceModel->insert($invoiceData);
+        $invoiceId = $invoiceModel->getInsertID();
+        $message = 'Generating Invoice';
+    }
+
+    // Save items
+    $descriptions = $request->getPost('description');
+    $quantities = $request->getPost('quantity');
+    $prices = $request->getPost('price');
+
+    if ($descriptions && $quantities && $prices) {
+        foreach ($descriptions as $i => $desc) {
+            if (!empty($desc) && $quantities[$i] > 0 && $prices[$i] > 0) {
+                $itemModel->insert([
+                    'invoice_id' => $invoiceId,
+                    'item_name'  => ucfirst(trim($desc)),
+                    'quantity'   => $quantities[$i],
+                    'price'      => $prices[$i]
+                ]);
+            }
+        }
+    }
+
+    return $this->response->setJSON([
+        'status'   => 'success',
+        'message'  => $message,
+        'redirect' => site_url('invoice/print/' . $invoiceId)
+    ]);
+}
 
     private function calculateTotal($request)
     {
