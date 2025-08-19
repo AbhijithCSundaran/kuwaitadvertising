@@ -106,37 +106,17 @@
             </div>
             <?php
             $billingVal = $invoice['customer_address'] ?? $customers['customer_address'] ?? '';
-            $shippingVal = $invoice['shipping_address'] ?? $billingVal;
-            $isSame = $billingVal !== '' && $billingVal === $shippingVal;
             ?>
             <div class="row">
                 <!-- Billing Address -->
                 <div class="col-md-6">
-                    <label for="customer_address" class="form-label ">
+                    <label for="customer_address" class="form-label">
                         <strong>Billing Address</strong> <span class="text-danger">*</span>
-
                     </label>
                     <textarea name="customer_address" id="customer_address" class="form-control capitalize"
                         maxlength="150" style="resize: vertical;" rows="3"><?= esc($billingVal) ?></textarea>
                 </div>
-
-                <!-- Shipping Address -->
-                <div class="col-md-6">
-                    <label for="shipping_address"
-                        class="form-label d-flex flex-column-reverse flex-md-row justify-content-md-between align-items-md-center"><span><strong>Shipping
-                                Address</strong> <span class="text-danger">*</span></span>
-                        <div class="form-check d-flex align-items-center ps-3 ps-md-0 pb-2 pb-md-0 pe-2 m-0 sameas">
-                            <input type="checkbox" class="form-check-input me-1" id="sameAddressCheck" <?= $isSame ? 'checked' : '' ?>>
-                            <label class="form-check-label small m-0" for="sameAddressCheck">Same as Billing
-                                Address</label>
-                        </div>
-                    </label>
-                    <textarea name="shipping_address" id="shipping_address" class="form-control capitalize"
-                        maxlength="150" style="resize: vertical;" rows="3"><?= esc($shippingVal) ?></textarea>
-                </div>
             </div>
-
-
             <div class="row">
                 <div class="col-md-6">
                     <label class="mt-3"><strong>LPO No</strong></label>
@@ -451,22 +431,6 @@
                 }
             });
         });
-
-        $('#sameAddressCheck').on('change', function () {
-            if ($(this).is(':checked')) {
-                $('#shipping_address').val($('#customer_address').val()).prop('readonly', true);
-            } else {
-                $('#shipping_address').val('').prop('readonly', false);
-            }
-        });
-
-        // Keep shipping updated when billing changes and checkbox is checked
-        $('#customer_address').on('input', function () {
-            if ($('#sameAddressCheck').is(':checked')) {
-                $('#shipping_address').val($(this).val());
-            }
-        });
-
         $('#customer_id').on('change', function () {
             const customerId = $(this).val();
             $.post("<?= site_url('customer/get-address') ?>", { customer_id: customerId }, function (res) {
@@ -509,10 +473,9 @@
             const customerId = $('#customer_id').val();
             const customerName = $('#customer_id option:selected').text().trim();
             const billingAddress = $('#customer_address').val()?.trim();
-            const shippingAddress = $('#shipping_address').val()?.trim();
             const phoneNumber = $('#phone_number').val()?.trim();
 
-            if (!customerId || !billingAddress || !shippingAddress || !phoneNumber) {
+            if (!customerId || !billingAddress || !phoneNumber) {
                 showAlert('Please Fill All Mandatory Fields.', 'danger');
                 $submitBtn.prop('disabled', false).text('Generate Invoice');
                 return;

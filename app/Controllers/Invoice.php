@@ -501,7 +501,7 @@ class Invoice extends BaseController
         return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid data.']);
     }
 
-    $invoiceModel = new \App\Models\InvoiceModel();
+    $invoiceModel = new InvoiceModel();
 
     // Update invoice
     $invoiceModel->update($invoiceId, [
