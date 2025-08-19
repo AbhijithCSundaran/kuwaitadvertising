@@ -25,12 +25,37 @@
       background-position: 52% 60%;
       background-color: white;
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
+      margin-top: 20px;
     }
+
+    table,
+    th{
+      border: 1px solid black;
+    }
+
+    table.min_height {
+      min-height: 350px;
+    }
+
+    table.min_height tbody td {
+      vertical-align: top;
+      padding: 5px 6px;
+      height: 20px !important;
+          border: 1px solid black;
+    }
+   
+    tbody td {
+      border-top: 1px solid transparent;
+      border-bottom: 1px solid transparent;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 1px solid black;
+    }
+
     th {
       background-color: #cfc7c7ff;
       text-align: center;
@@ -38,19 +63,20 @@
       padding: 2px;
     }
 
-    td {
+     td {
       text-align: center;
-      height: 25px;
+      height: 10px !important;
       padding: 4px;
       word-wrap: break-word;
       word-break: break-word;
       white-space: normal;
-    }
+    } 
 
     .table-footer {
       display: flex;
       justify-content: space-between;
       margin-top: 30px;
+      font-weight: bold;
     }
     .table-footer div {
       width: 48%;
@@ -64,8 +90,9 @@
       padding: 3px;
       margin-top: 0px;
     }
+    
 
-     .total-tab{
+     /* .total-tab{
         width: auto; float: right; 
         border-collapse: collapse;
     }
@@ -80,7 +107,7 @@
         bold; padding: 6px 12px; 
         text-align: right;
         border: 1px solid black;
-    }
+    } */
     .table-footer div {
       width: 48%;
     }
@@ -185,40 +212,60 @@
              <?= esc($estimate['phone_number']) ?>
         </div>
       </div>
-      <table class="generate-table ">
-        <thead class="thead-dark">
-            <tr>
-                <th rowspan="2" style="width: 10%;">رقم<br>SR. No</th>
-                <th rowspan="2" style="width: 40%;"> التفاصيل<br>Description</th>
-                <th rowspan="2" style="width: 10%;">الكمية<br>QTY</th>
-                <th rowspan="2" style="width: 18%;">سعر الوحدة<br>Unit Price(KD)</th>
-                <th rowspan="2" style="width: 20%;">المبلغ الإجمالي<br>Total Amount(KD)</th>
-            </tr>
-        </thead>
-        <tbody>
-          <?php
-          $si = 1;
-          $grandTotal = 0;
-          foreach ($items as $item):
-              $grandTotal += $item['total'];
-          ?>
-          
-          <?php
-            $discount = $estimate['discount'] ?? 0;
-            $discountAmount = ($grandTotal * $discount) / 100;
-            $totalAfterDiscount = $grandTotal - $discountAmount;
-            ?>
-            
-          <tr>
-              <td><?= $si++ ?></td>
-              <td><?= esc($item['description']) ?></td>
-              <td><?= esc($item['quantity']) ?></td>
-              <td><?= number_format($item['price'], 3) ?></td>
-              <td><?= number_format($item['total'], 3) ?></td>
-          </tr>
-          <?php endforeach; ?>
-        </tbody>
-      </table>
+<table class="min_height">
+    <thead class="thead-dark">
+        <tr>
+            <th rowspan="2" style="width: 10%;">رقم<br>SR. No</th>
+            <th rowspan="2" style="width: 40%;">التفاصيل<br>Description</th>
+            <th rowspan="2" style="width: 10%;">الكمية<br>QTY</th>
+            <th rowspan="2" style="width: 20%;">سعر الوحدة<br>Unit Price (KD)</th>
+            <th rowspan="2" style="width: 20%;">المبلغ الإجمالي<br>Total Amount (KD)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        $si = 1;
+        $grandTotal = 0;
+        foreach ($items as $item):
+            $grandTotal += $item['total'];
+        ?>
+        <tr>
+            <td><?= $si++ ?></td>
+            <td><?= esc($item['description']) ?></td>
+            <td><?= esc($item['quantity']) ?></td>
+            <td><?= number_format($item['price'], 3) ?></td>
+            <td><?= number_format($item['total'], 3) ?></td>
+        </tr>
+        <?php endforeach; ?>
+
+        <?php
+        $discount = $estimate['discount'] ?? 0;
+        $discountAmount = ($grandTotal * $discount) / 100;
+        $totalAfterDiscount = $grandTotal - $discountAmount;
+        ?>
+
+        <!-- Subtotal -->
+        <tr>
+            <td colspan="4" style="text-align: right; font-weight: bold; background: #cfc7c7ff;">Subtotal</td>
+            <td colspan="2" style="font-weight: bold; background: #cfc7c7ff;"><?= number_format($grandTotal, 2) ?> KD</td>
+        </tr>
+
+        <!-- Discount -->
+        <tr>
+            <td colspan="4" style="text-align: right; font-weight: bold; background: #cfc7c7ff;">Discount</td>
+            <td colspan="2" style="font-weight: bold; background: #cfc7c7ff;"><?= number_format($discount) ?>%</td>
+        </tr>
+
+        <!-- Grand Total -->
+        <tr>
+            <td colspan="4" style="text-align: right; font-weight: bold; background: #cfc7c7ff;">Grand Total</td>
+            <td colspan="2" style="font-weight: bold; background: #cfc7c7ff;">
+                <?= number_format($totalAfterDiscount, 2) ?> KD
+            </td>
+        </tr>
+    </tbody>
+</table>
+
       <div class="mt-2" style="font-size: 13px;">
         <strong>دفعة مقدمة 70% والرصيد 30% بعد التسليم <br>Advance 70% Balance 30% After Delivery</strong>
       </div>
@@ -226,23 +273,7 @@
         <div class="amount-words col-6" style="font-size: 13px;">
             <b>بالكلمات:</b><br><span id="amount-words" style="font-size: 13px; "></span>
             <?= ucwords($amountInWords ?? '') ?>
-        </div>
-        <div class="col-6 ">
-          <div style="width: 100%; display: flex; justify-content: flex-end; font-size: 13px;">
-            <div style="text-align: right;">
-              <div style="font-weight: bold;  text-align: left;">SUBTOTAL
-              <?= number_format($grandTotal, 2) ?> </div>
-              <div style="font-weight: bold;  text-align: left;">DISCOUNT
-              <?= number_format($discount) ?>%</div>
-              <div style="border-top: 2px solid black; margin: 2px 0 4px 0;"></div>
-              <div style="display: flex; align-items: center; justify-content: flex-end;">
-                  <div style="color: #a1263a; font-weight: bold; margin-right: 5px;">Grand total</div>
-                  <div style="background-color: #cfc7c7ff; padding: 4px 10px; font-weight: bold;">
-                      <?= number_format($totalAfterDiscount, 2) ?></div>
-            </div>
-          </div>
-        </div>
-      </div>    
+        </div>   
       <div class="table-footer" style="font-size:13px;">
         <div><b>Receipient Name /اسم المستلم:</b><br><?= esc($user_name ?? '') ?></div>
         <div style="text-align: right;"><b>Receipient Signature / توقيع المستلم</b></div>

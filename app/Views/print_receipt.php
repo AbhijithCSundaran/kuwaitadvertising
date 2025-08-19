@@ -1,196 +1,211 @@
+<?php include "common/header.php"; ?>
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
-<head>
-  <meta charset="UTF-8">
-  <title>Receipt Voucher</title>
-  <style>
-    @page {
-      size: A5;
-      margin: 20mm;
-    }
-    body {
-      font-family: Arial, sans-serif;
-      background: #fff;
-      color: #000;
-      font-size: 14px;
-    }
-    .voucher {
-      border: 1px solid #000;
-      padding: 15px;
-      position: relative;
-    }
-    /* Header */
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .logo {
-      width: 120px;
-      height: 50px;
-      background: #ddd;
-      text-align: center;
-      line-height: 50px;
-      font-size: 12px;
-    }
-    .company {
-      text-align: center;
-      flex: 1;
-      font-weight: bold;
-    }
-    .company .en {
-      font-size: 16px;
-    }
-    .company .ar {
-      font-size: 16px;
-      font-weight: bold;
-    }
-    .voucher-title {
-      text-align: center;
-      margin-top: 10px;
-      font-size: 18px;
-      font-weight: bold;
-    }
-    .voucher-title .ar {
-      display: block;
-      font-size: 16px;
-    }
-    /* Currency boxes */
-    .currency-boxes {
-      border: 1px solid #000;
-      display: inline-block;
-      margin-top: 10px;
-    }
-    .currency-row {
-      display: flex;
-      border-bottom: 1px solid #000;
-    }
-    .currency-cell {
-      flex: 1;
-      border-left: 1px solid #000;
-      text-align: center;
-      padding: 5px;
-      font-weight: bold;
-    }
-    .currency-label {
-      text-align: center;
-      font-size: 12px;
-    }
-    /* Top-right No/Date */
-    .top-right {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      text-align: right;
-      font-size: 14px;
-    }
-    /* Fields */
-    .fields {
-      margin-top: 20px;
-    }
-    .field {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 15px;
-    }
-    .field .label {
-      flex: 0 0 200px;
-    }
-    .field .line {
-      flex: 1;
-      border-bottom: 1px dotted #000;
-      margin: 0 10px;
-    }
-    /* Signatures */
-    .signatures {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 30px;
-    }
-    .signature {
-      text-align: center;
-      flex: 0 0 45%;
-    }
-    .signature .label {
-      margin-top: 40px;
-      font-weight: bold;
-    }
-    /* Footer */
-    .footer {
-      background: #7c2d35;
-      color: #fff;
-      text-align: center;
-      font-size: 12px;
-      padding: 8px;
-      margin-top: 20px;
-    }
-  </style>
-</head>
-<body>
-  <div class="voucher">
-    <div class="header">
-      <div class="logo">LOGO</div>
-      <div class="company">
-        <div class="ar">مطـبـعــة الـرأي لأعمـــال الطباعة</div>
-        <div class="en">Alrai Printing Press</div>
-      </div>
-    </div>
+<html>
+    <head>
+        <title>Receipt Voucher</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif; 
+                font-size: 14px; 
+            }
+            .voucher-container { 
+                width: 800px; 
+                margin-left: 25%; 
+                padding: 20px;
+                position: relative;
+                background: url('<?= ASSET_PATH ?>assets/images/invoice-bg.png') no-repeat;
+                background-size: 44%;
+                background-position: 52% 50%;
+                background-color: white;
+            }
+            .header { 
+                text-align: center; 
+                margin-bottom: 10px; 
+            }
+            .header img {
+                max-height: 70px; 
+                display: block; 
+                margin: auto; 
+            }
+            .company-name { 
+                font-size: 20px; 
+                font-weight: bold; 
+                margin-top: 10px; 
+            }
+            .voucher-title { 
+                text-align: center;
+                font-size: 33px;  
+            }
+            .voucher-sub { 
+                text-align: center;    
+                font-size: 21px; 
+                margin-bottom: 64px; 
+            }    
+            .amount-box {
+                display: flex;
+                margin-top: 10px;
+                gap: 1px;
+                position: absolute;
+                top: 120px;
+                left: 43px;
+            }
 
-    <div class="voucher-title">
-      Receipt Voucher
-      <span class="ar">سند قبض</span>
-    </div>
+            .amount-field {
+                text-align: center;
+            }
 
-    <div class="currency-boxes">
-      <div class="currency-row">
-        <div class="currency-cell">K.D.</div>
-        <div class="currency-cell">Fils</div>
-      </div>
-      <div class="currency-label">دينار / فلس</div>
-    </div>
+            .amount-label {
+                font-weight: bold;
+                display: block;
+                margin-bottom: 5px;
+            }
 
-    <div class="top-right">
-      No: ______ <br>
-      Date: __________ <br>
-      التاريخ :
-    </div>
-
-    <div class="fields">
-      <div class="field">
-        <div class="label">Received From</div>
-        <div class="line"></div>
-        <div class="label">استلمنا من السيد / السادة</div>
-      </div>
-      <div class="field">
-        <div class="label">The Sum Of K.D.</div>
-        <div class="line"></div>
-        <div class="label">مبلغا وقدره دينار</div>
-      </div>
-      <div class="field">
-        <div class="label">Cash / Cheque No.</div>
-        <div class="line"></div>
-        <div class="label">نقداً / شيك رقم</div>
-      </div>
-      <div class="field">
-        <div class="label">Being of</div>
-        <div class="line"></div>
-        <div class="label">وذلك عن</div>
-      </div>
-    </div>
-
-    <div class="signatures">
-      <div class="signature">
-        <div class="label">Receiver<br>توقيع المستلم</div>
-      </div>
-      <div class="signature">
-        <div class="label">Cashier<br>أمين الصندوق</div>
-      </div>
-    </div>
-
-    <div class="footer">
-      Al-Rai, Block 3, Street 32, Build No. 437, Shop No. 4, Near Al Rawan Glass, Shuwaik - Kuwait <br>
-      +965 6006 0102 &nbsp; | &nbsp; alraiprintpress@gmail.com
-    </div>
-  </div>
-</body>
+            .amount-value {
+                border: 2px solid black;
+                border-radius: 12px;
+                padding: 15px 30px;
+                min-width: 100px;
+                font-size: 18px;
+                font-weight: bold;
+            }
+            .field { 
+                margin:25px 15px; 
+                font-weight: bold; 
+            }
+            .label { 
+                width: 200px; 
+            }
+            .dots { 
+                border-bottom: 2px dotted #000; 
+                display: inline-block; 
+                width: 72%; 
+                vertical-align: middle; 
+            }
+            .voucher-no{  
+                position: absolute;
+                top: 20%;
+                left: 70%;
+            }
+            .voucher-meta {
+                text-align: right; 
+                margin-bottom: 45px; 
+                font-weight: bold; 
+                position: relative;
+                right: 35px;
+            }
+            .signatures { 
+                margin-top: 25px; 
+                display: flex; 
+                justify-content: space-between; 
+                margin-left: 20px;
+            }
+            .sign-box { 
+                width: 40%; 
+                text-align: left; 
+                padding-top: 10px; 
+                font-weight: bold; 
+            }
+            .sign-label {
+                display: flex;
+                justify-content: left;
+                gap: 65px; 
+            }
+            .sign-cash{
+                 display: flex;
+                justify-content: right;
+                gap: 85px; 
+                margin-right: 56px;
+            }
+            .bottom-footer { 
+                text-align: center; 
+                font-size: 12px; 
+                margin-top: 40px; 
+                line-height: 1.5; 
+                background:  #a1263a; 
+                color: #fff; 
+                padding: 10px; 
+            }
+            .label{
+                font-size:15px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="voucher-container">
+            <div class="header">
+                <?php if (!empty($company['company_logo'])): ?>
+                    <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" 
+                        alt="Company Logo" style=" max-height: 70px; width: 45%;">
+                <?php endif; ?>
+            </div>
+            <div class="voucher-title"><strong> سند قبض</strong></div>
+            <div class="voucher-sub"><strong>Receipt Voucher</strong></div>
+            <div class="amount-box">
+              <div class="amount-field">
+                  <span class="amount-label">K.D. دينار</span>
+                  <div class="amount-value">
+                      <?= isset($invoice['amount']) ? floor($invoice['amount']) : '-' ?>
+                  </div>
+              </div>
+              <div class="amount-field">
+                  <span class="amount-label">Fils فلس</span>
+                  <div class="amount-value">
+                      <?= isset($invoice['amount']) ? sprintf("%02d", ($invoice['amount']*100)%100) : '-' ?>
+                  </div>
+              </div>
+          </div>
+            <div class=" col-6 voucher-no">
+                <span class="label" style="font-size: 20px;"><strong>No:</strong></span> 
+            </div> 
+            <div class="voucher-meta">
+            
+                Date:<span class="dots" style=" width: 20%; text-align: center;"> <?= date('d-m-Y') ?></span> التاريخ:
+            </div>
+            <div class="field">
+                <span class="label">Received From : </span>
+                <span class="dots"><?= esc($customer['customer_name'] ?? '') ?></span>تم الاستلام من:
+            </div>
+            <div class="field">
+                <span class="label">The Sum of K.D.</span>
+                <span class="dots" style="width:73%;"><?= esc($invoice['amount'] ?? '') ?></span>مجموع K.D:
+            </div>
+            <div class="field">
+                <span class="label"> Cash / Cheque No.</span>
+                <span class="dots" style=" width: 69%;"><?= esc($invoice['cheque_no'] ?? '') ?></span>بموجب شيك رقم:
+            </div>
+            <div class="field">
+                <span class="label">Being Of.</span>
+                <span class="dots" style="width: 83%;"><?= esc($invoice['details'] ?? '') ?></span>كونه من
+            </div>
+            <div class="col-12 signatures">
+                <div class="col-6 sign-box">
+                  <div class="sign-label">
+                      <span>Receiver</span>
+                      <span>المتلقي</span>
+                  </div>
+                    <span class="dots" style="width: 70%; margin-top: 50px;"></span>
+                </div>
+                <div class="col-6 sign-box">
+                   <div class="sign-cash">
+                       <span>Cashier </span>
+                      <span> أمين الصندوق</span>
+                   </div>  
+                    <span class="dots" style="width: 83%; margin-top: 50px;"></span>
+                </div>
+            </div>
+            <!-- Footer -->
+            <div class="bottom-footer">
+            <div style="direction: rtl; text-align: center;"><?= esc($company['address_ar'] ?? '') ?></div>
+            <div style="direction: ltr; text-align: center;"><?= esc($company['address'] ?? '') ?></div>
+            <div style="margin-top: 5px;">
+                📞 <?= esc($company['phone'] ?? '') ?> &nbsp;&nbsp; | &nbsp;&nbsp;
+                📧 <a href="mailto:<?= esc($company['email'] ?? '') ?>" style="color: white; text-decoration: none;">
+                    <?= esc($company['email'] ?? '') ?>
+                    </a>
+            </div>
+            </div>
+        </div>
+        </div>
+    </body>
 </html>
+<?php include "common/footer.php"; ?>
