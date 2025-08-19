@@ -513,48 +513,72 @@
             }
         });
 
-         let maxCustomerDiscount = 0; 
+       let maxCustomerDiscount = 0;
 
-        $('#customer_id').on('change', function () {
+// When customer changes
+$('#customer_id').on('change', function () {
     let customerId = $(this).val();
-
     if (customerId) {
+
+        // Fetch address
+        $.post("<?= site_url('customer/get-address') ?>", { customer_id: customerId }, function (res) {
+            $('#customer_address').val(res.status === 'success' ? res.address : '');
+        }, 'json');
+
+        // Fetch max discount
         $.ajax({
             url: '<?= base_url("customer/get_discount") ?>/' + customerId,
             type: 'GET',
             dataType: 'json',
             success: function (res) {
-                if (res.discount !== undefined) {
-                    maxCustomerDiscount = parseFloat(res.discount) || 0;
+                maxCustomerDiscount = parseFloat(res.discount) || 0;
+
+                // Auto-fill only if discount field is empty or zero
+                if (!$('#discount').val() || parseFloat($('#discount').val()) === 0) {
                     $('#discount').val(maxCustomerDiscount);
                 }
             }
         });
+
     } else {
         maxCustomerDiscount = 0;
         $('#discount').val(0);
+        $('#customer_address').val('');
     }
 });
 
-            $('#discount').tooltip({
-                trigger: 'manual',
-                placement: 'top'
-            });
+// Tooltip setup
+$('#discount').tooltip({
+    trigger: 'manual',
+    placement: 'top'
+});
 
-            $('#discount').on('input', function () {
-                let val = parseFloat($(this).val()) || 0;
-                if (val > maxCustomerDiscount) {
-                    $(this).val(maxCustomerDiscount);
+// Restrict discount to max but allow lower values
+$('#discount').on('input', function () {
+    let val = parseFloat($(this).val()) || 0;
 
-                    $(this).attr('data-bs-original-title', 'Unable to increase beyond max discount for this customer').tooltip('show');
+    if (val > maxCustomerDiscount) {
+        $(this).val(maxCustomerDiscount);
+        $(this).attr('data-bs-original-title', 'Cannot exceed max discount for this customer').tooltip('show');
+        setTimeout(() => $(this).tooltip('hide'), 2000);
+    } else {
+        $(this).tooltip('hide');
+    }
+});
 
-                    setTimeout(() => {
-                        $('#discount').tooltip('hide');
-                    }, 2000);
-                } else {
-                    $(this).tooltip('hide');
-                }
-            });
+// When editing existing invoice: just fetch max discount, do not overwrite field
+let existingCustomerId = $('#customer_id').val();
+if (existingCustomerId) {
+    $.ajax({
+        url: '<?= base_url("customer/get_discount") ?>/' + existingCustomerId,
+        type: 'GET',
+        dataType: 'json',
+        success: function (res) {
+            maxCustomerDiscount = parseFloat(res.discount) || 0;
+            // ⚠️ Do not auto-fill #discount here to preserve user's entered value
+        }
+    });
+}
 
         function showAlert(message, type = 'success') {
             $('.alert')
