@@ -15,7 +15,7 @@ class Sales extends BaseController
  public function report()
 {
     $salesModel = new SalesModel();
-    $customerModel = new CustomerModel();
+    $customerModel = new customerModel();
 
     $from = $this->request->getGet('from_date');
     $to = $this->request->getGet('to_date');

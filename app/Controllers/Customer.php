@@ -113,7 +113,7 @@ class Customer extends BaseController
 public function list()
 {
     $session = session();
-    $customerModel = new CustomerModel();
+    $customerModel = new customerModel();
     $company_id = $session->get('company_id');
 
    $data['customers'] = $customerModel
@@ -219,7 +219,7 @@ public function viewByCustomer($customerId)
 }
 public function get_discount($id)
 {
-    $customerModel = new \App\Models\CustomerModel();
+    $customerModel = new \App\Models\customerModel();
     $customer = $customerModel->find($id);
 
     if ($customer) {
