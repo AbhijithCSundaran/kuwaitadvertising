@@ -107,16 +107,16 @@
     </div>
     <div class="container">
       <div class="top-heading" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-        <span style="font-size: 14px; font-weight: bold;">
+        <span style="font-size: 15px; font-weight: bold;">
             <?= esc($company['company_name']) ?>
         </span>
 
         <?php if (!empty($company['company_logo'])): ?>
             <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" 
-                alt="Company Logo" style="max-height: 50px;">
+                alt="Company Logo" style="max-height: 50px; width: 25%;">
         <?php endif; ?>
 
-        <span style="font-size: 14px; font-weight: bold; direction: rtl;">
+        <span style="font-size: 15px; font-weight: bold; direction: rtl;">
             <?= esc($company['company_name_ar'] ?? '') ?>
         </span>
       </div>

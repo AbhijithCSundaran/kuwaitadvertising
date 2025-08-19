@@ -161,12 +161,12 @@ $(document).ready(function () {
                             </a>
 
                            <a
-    href="${isPaidOrPartial ? '#' : '<?= base_url('invoice/edit/') ?>' + id}"
-    title="${isPaidOrPartial ? 'This invoice cannot be edited' : 'Edit Invoice'}"
-    style="color:${isPaidOrPartial ? 'gray' : 'rgb(13, 162, 199)'}; cursor: ${isPaidOrPartial ? 'not-allowed' : 'pointer'};"
-    ${isPaidOrPartial ? 'onclick="event.preventDefault(); showEditAlert();"' : ''}>
-        <i class="bi bi-pencil-fill"></i>
-</a>
+                                href="${isPaidOrPartial ? '#' : '<?= base_url('invoice/edit/') ?>' + id}"
+                                title="${isPaidOrPartial ? 'This invoice cannot be edited' : 'Edit Invoice'}"
+                                style="color:${isPaidOrPartial ? 'gray' : 'rgb(13, 162, 199)'}; cursor: ${isPaidOrPartial ? 'not-allowed' : 'pointer'};"
+                                ${isPaidOrPartial ? 'onclick="event.preventDefault(); showEditAlert();"' : ''}>
+                                    <i class="bi bi-pencil-fill"></i>
+                            </a>
 
 
                             <a href="javascript:void(0);" class="delete-invoice" data-id="${id}" title="Delete" style="color: #dc3545;">

@@ -97,10 +97,17 @@
                     data: "customer_name",
                     render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''
                 },
-                {
+               {
                     data: "customer_address",
-                    render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''
+                    render: data => {
+                        if (!data) return '';
+                        // Convert first letter of each word to uppercase
+                        let formatted = data.replace(/\b\w/g, c => c.toUpperCase());
+                        // Replace newline characters with <br>
+                        return formatted.replace(/\n/g, "<br>");
+                    }
                 },
+
                 {
                     data: "subtotal",
                     render: data => parseFloat(data).toFixed(2) + " KWD"
