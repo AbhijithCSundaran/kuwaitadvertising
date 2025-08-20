@@ -272,19 +272,22 @@
           <?= $status === 'paid' ? 'disabled title="Fully paid invoice cannot be changed"' : 'onclick="toggleStatusOptions()"' ?>>
           <?= $btnLabel ?>
         </button>
-
         <?php if ($status === 'unpaid' || $status === 'partial paid'): ?>
-          <div class="dropdown" style="position: relative;">
-            <div id="statusOptions" class="dropdown-menu p-2"
-              style="position: absolute; top: 100%; right: 0px; z-index: 1050; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: none;">
-              <a href="#" class="dropdown-item text-success fw-semibold" onclick="updateStatus('paid')">
-                <i class="fas fa-check-circle me-2"></i> Mark as Paid
-              </a>
-              <a href="#" class="dropdown-item text-warning fw-semibold" onclick="openPartialPayment()">
-                <i class="fas fa-hourglass-half me-2"></i> Partial Payment
-              </a>
+            <div class="dropdown" style="position: relative;">
+                <div id="statusOptions" class="dropdown-menu p-2"
+                    style="position: absolute; top: 100%; right: 0px; z-index: 1050; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: none;">
+                    
+                    <a href="javascript:void(0);" 
+                        class="dropdown-item text-success fw-semibold" 
+                        onclick="openMarkPaidModal(<?= $invoice['invoice_id']; ?>)">
+                          <i class="fas fa-check-circle me-2"></i> Mark as Paid
+                      </a>
+                    <!-- Partial Payment -->
+                    <a href="#" class="dropdown-item text-warning fw-semibold" onclick="openPartialPayment()">
+                        <i class="fas fa-hourglass-half me-2"></i> Partial Payment
+                    </a>
+                </div>
             </div>
-          </div>
         <?php endif; ?>
       </div>
     </div>
@@ -512,6 +515,36 @@
             <div class="modal-footer border-0">
                 <button class="btn btn-danger px-4" onclick="submitPartialPayment()">Submit</button>
                 <button class="btn btn-secondary px-4" onclick="closePartialModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Mark as Paid Modal -->
+<div id="markPaidModal" class="modal fade" tabindex="-1" aria-labelledby="markPaidModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0 rounded-4 p-4">
+            <div class="modal-header border-0">
+                <h5 class="modal-title text-success fw-bold" id="markPaidModalLabel">Mark Invoice as Paid</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="markPaidPaymentMode" class="form-label">Payment Mode</label>
+                    <select id="markPaidPaymentMode" class="form-control form-control-lg border-success">
+                        <option value="" selected disabled>Select payment mode</option>
+                        <option value="cash">Cash</option>
+                        <option value="bank_transfer">Bank Transfer</option>
+                        <option value="bank_link">Bank Link</option>
+                        <option value="wamd">WAMD</option>
+                    </select>
+                    <small id="markPaidError" style="color:red; display:none;">Please select a payment mode.</small>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0">
+               <button type="button" class="btn btn-success" id="confirmMarkPaid">Submit</button>
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancel</button>
             </div>
         </div>
     </div>
@@ -840,6 +873,49 @@
         console.error("Fetch error:", err);
       });
   }
+
+let selectedInvoiceId = null;
+
+// Open modal and store selected invoice ID
+function openMarkPaidModal(invoiceId) {
+    selectedInvoiceId = invoiceId; // store for use in AJAX
+    $('#invoice_id').val(invoiceId); // optional hidden input
+    $('#markPaidModal').modal('show');
+}
+
+// Submit Mark as Paid
+$('#confirmMarkPaid').on('click', function () {
+    const paymentMode = $('#markPaidPaymentMode').val();
+
+    if (!paymentMode) {
+        $('#markPaidError').show();
+        return;
+    } else {
+        $('#markPaidError').hide();
+    }
+
+    $.ajax({
+        url: "<?= base_url('invoice/update_status') ?>", // matches route
+        type: "POST",
+        contentType: "application/json", // important!
+        data: JSON.stringify({          // convert object to JSON string
+            invoice_id: selectedInvoiceId,
+            status: "paid",
+            payment_mode: paymentMode
+        }),
+        success: function (response) {
+            const modalElement = document.getElementById('markPaidModal');
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            modal.hide();
+
+            location.reload(); // Refresh to show updated status
+        },
+        error: function (xhr, status, error) {
+            console.error("AJAX Error:", status, error, xhr.responseText);
+            alert("Something went wrong. Please try again.");
+        }
+    });
+});
 
   function downloadDeliveryNote() {
     deliveryNoteModal.style.display = 'none';

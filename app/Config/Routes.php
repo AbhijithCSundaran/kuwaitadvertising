@@ -138,7 +138,7 @@ $routes->post('cashreceipt/ajaxListJson', 'CashReceipt::ajaxListJson');
 $routes->post('cashreceipt/delete', 'CashReceipt::delete');
 
 $routes->get('/payment_voucher', 'PaymentVoucher::index');
-$routes->get('invoice/print-cash/(:num)', 'Invoice::printCashReceipt/$1');
+$routes->get('cashreceipt/print/(:num)', 'ReceiptVoucher::index/$1');
 $routes->get('paymentvoucher/print/(:num)', 'PaymentVoucher::index/$1');
 
 
