@@ -112,7 +112,7 @@ $(document).ready(function () {
                 render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''
             },
             {
-                data: "billing_address",
+                data: "customer_address",
                  render: data => {
                         if (!data) return '';
                         let formatted = data.replace(/\b\w/g, c => c.toUpperCase());

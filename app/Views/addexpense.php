@@ -8,6 +8,22 @@ input[type=number].no-spinner::-webkit-outer-spin-button {
 input[type=number].no-spinner {
     -moz-appearance: textfield;
 }
+.select2-container--default .select2-selection--single {
+    height: 47px;
+    padding: 5px 12px;
+    /* border: 1px solid #ced4da; */
+    border-radius: 0px;
+    margin-left: 9px;
+    width:480px;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow b {
+    border-color: #111111ff transparent transparent transparent;
+    border-style: solid;
+    border-width: 5px 4px 0 4px;
+    left: 265%;
+    position: absolute;
+    top: 50%;
+}
 </style>
 <div class="form-control mb-3 right_container">
      <div class="alert d-none text-center position-fixed" role="alert"></div>
@@ -49,7 +65,7 @@ input[type=number].no-spinner {
                             padding-right: 35px; 
                         }
                     </style>
-
+                <div class="row">
                     <div class="form-group col-md-6">
                         <label>Date <span class="text-danger">*</span></label>
                         <div class="calendar-input-wrapper">
@@ -57,7 +73,19 @@ input[type=number].no-spinner {
                             <span class="calendar-icon" id="calendar-icon"><i class="bi bi-calendar"></i></span>
                         </div>
                     </div>
-
+                    <div class="form-group col-6">
+                        <label for="customerId" style="margin-left: 10px;">Customer </label>
+                         <select name="customer_id" id="customer_id" class="form-control select2" required>
+                            <option value="" disabled <?= !isset($expense['customer_id']) ? 'selected' : '' ?>>Select Customer</option>
+                            <?php foreach ($customers ?? [] as $customer): ?>
+                                <option value="<?= $customer['customer_id'] ?>"
+                                    <?= (isset($expense['customer_id']) && $expense['customer_id'] == $customer['customer_id']) ? 'selected' : '' ?>>
+                                    <?= esc($customer['name']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
                 </div>
                 <div class ="row"> 
                     <div class="form-group col-md-6">
@@ -113,6 +141,11 @@ document.getElementById("calendar-icon").addEventListener("click", function () {
 });
 
 $(document).ready(function () {
+      $('#customer_id').select2({
+            placeholder: "Select Customer",
+            width: 'calc(100% - 40px)',
+            minimumResultsForSearch: 0
+        });
     let originalData = $('#expense-form').serialize(); 
 
     $('#expense-form input, #expense-form select, #expense-form textarea').on('input change', function () {
