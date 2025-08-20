@@ -81,7 +81,7 @@ class Invoice extends BaseController
                 'slno' => $slno++,
                 'invoice_id' => $row['invoice_id'],
                 'customer_name' => $row['customer_name'],
-                'customer_address' => $row['customer_address'],
+                'billing_address' => $row['billing_address'],
                 'subtotal' => number_format($subtotal, 2),
                 'discount' => $row['discount'],
                 'total_amount' => round($row['total_amount'], 2),
@@ -192,8 +192,7 @@ public function save()
 
     $invoiceData = [
         'customer_id'      => $customerId,
-        'billing_address'  => $customer['billing_address'] ?? $customer['customer_address'] ?? '',
-        'shipping_address' => $customer['shipping_address'] ?? $request->getPost('shipping_address') ?? '',
+        'billing_address'  => $customer['address'] ?? '',
         'phone_number'     => $customer['phone_number'] ?? $request->getPost('phone_number') ?? '',
         'lpo_no'           => $request->getPost('lpo_no'),
         'total_amount'     => $this->calculateTotal($request),
@@ -276,10 +275,10 @@ public function save()
         $customer = $customerModel->find($invoice['customer_id']);
         if ($customer) {
             $invoice['customer_name'] = $customer['customer_name'] ?? '';
-            $invoice['customer_address'] = $customer['address'] ?? '';
+            $invoice['billing_address']  = $customer['address'] ?? '';
         } else {
             $invoice['customer_name'] = '';
-            $invoice['customer_address'] = '';
+            $invoice['billing_address']  = '';
         }
         $items = $itemModel->where('invoice_id', $id)->findAll();
 
@@ -362,9 +361,7 @@ public function save()
         $customers = $customerModel->where('is_deleted', 0)->findAll();
         $customer = $customerModel->find($estimate['customer_id']);
 
-        $estimate['customer_address'] = $customer['address'] ?? '';
-        $estimate['billing_address'] = $customer['billing_address'] ?? '';
-        $estimate['shipping_address'] = $customer['shipping_address'] ?? '';
+         $estimate['billing_address'] = $customer['address'] ?? '';
         $estimate['phone_number'] = $estimate['phone_number'] ?? '';
 
         foreach ($items as &$item) {
@@ -383,44 +380,50 @@ public function save()
     }
 
     public function update_status()
-    {
-        $request = service('request');
-
-        if (!$request->isAJAX()) {
-            return $this->response->setJSON(['success' => false, 'message' => 'Invalid request']);
-        }
-
-        $data = $request->getJSON(true);
-        $invoiceId = $data['invoice_id'] ?? null;
-        $status = $data['status'] ?? null;
-
-        // Log incoming data
-        log_message('info', 'UpdateStatus INPUT: ' . json_encode($data));
-
-        // Allow 'partial paid' now
-        $allowed = ['paid', 'unpaid', 'partial paid'];
-        if (!$invoiceId || !in_array($status, $allowed)) {
-            log_message('error', 'Invalid invoiceId or status: ' . $invoiceId . ', ' . $status);
-            return $this->response->setJSON(['success' => false, 'message' => 'Invalid data']);
-        }
-
-        $invoiceModel = new InvoiceModel();
-        $updated = $invoiceModel->update($invoiceId, ['status' => $status]);
-
-        if ($updated) {
-            return $this->response->setJSON([
-                'success' => true,
-                'status' => $status // send back the updated status
-            ]);
-        } else {
-            log_message('error', 'DB update failed for invoice ID ' . $invoiceId);
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Failed to update status'
-            ]);
-        }
-
+{
+    $request = service('request');
+ 
+    if (!$request->isAJAX()) {
+        return $this->response->setJSON(['success' => false, 'message' => 'Invalid request']);
     }
+ 
+    $data = $request->getJSON(true);
+    $invoiceId = $data['invoice_id'] ?? null;
+    $status = $data['status'] ?? null;
+    $paymentMode = $data['payment_mode'] ?? null;
+ 
+    log_message('info', 'UpdateStatus INPUT: ' . json_encode($data));
+ 
+    $allowed = ['paid', 'unpaid', 'partial paid'];
+    if (!$invoiceId || !in_array($status, $allowed)) {
+        log_message('error', 'Invalid invoiceId or status: ' . $invoiceId . ', ' . $status);
+        return $this->response->setJSON(['success' => false, 'message' => 'Invalid data']);
+    }
+ 
+    $invoiceModel = new InvoiceModel();
+ 
+    // Save status + payment mode if status = paid
+    $updateData = ['status' => $status];
+    if ($status === 'paid' && $paymentMode) {
+        $updateData['payment_mode'] = $paymentMode;
+    }
+ 
+    $updated = $invoiceModel->update($invoiceId, $updateData);
+ 
+    if ($updated) {
+        return $this->response->setJSON([
+            'success' => true,
+            'status' => $status
+        ]);
+    } else {
+        log_message('error', 'DB update failed for invoice ID ' . $invoiceId);
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'Failed to update status'
+        ]);
+    }
+}
+ 
    public function update_partial_payment()
 {
     $this->response->setContentType('application/json');
