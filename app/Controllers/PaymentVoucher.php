@@ -28,4 +28,5 @@ class PaymentVoucher extends BaseController
             'customer' => $customer,
         ]);
     }
+    
 }
