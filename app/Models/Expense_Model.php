@@ -8,7 +8,7 @@ class Expense_Model extends Model
 {
     protected $table = 'expenses';
     protected $primaryKey = 'id';
-    protected $allowedFields = ['date', 'particular', 'amount', 'payment_mode', 'reference', 'company_id']; 
+    protected $allowedFields = ['date', 'particular', 'amount', 'payment_mode', 'reference', 'company_id', 'customer_id']; 
 
     public function getAllExpenseCount() {
         return $this->db->query("select count(*) as totexpense from expenses")->getRow();

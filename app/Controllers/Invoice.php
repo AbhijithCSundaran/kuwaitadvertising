@@ -16,8 +16,13 @@ class Invoice extends BaseController
 {
     public function add()
     {
-        $customerModel = new customerModel();
-        $data['customers'] = $customerModel->where('is_deleted', 0)->findAll();
+      $customerModel = new customerModel();
+        $companyId = session()->get('company_id');
+        $data['customers'] = $customerModel
+            ->where('is_deleted', 0)
+            ->where('company_id', $companyId)
+            ->findAll();
+ 
         return view('invoice_form', $data);
     }
 
@@ -81,7 +86,7 @@ class Invoice extends BaseController
                 'slno' => $slno++,
                 'invoice_id' => $row['invoice_id'],
                 'customer_name' => $row['customer_name'],
-                'billing_address' => $row['billing_address'],
+                'customer_address' => $row['customer_address'],
                 'subtotal' => number_format($subtotal, 2),
                 'discount' => $row['discount'],
                 'total_amount' => round($row['total_amount'], 2),
@@ -192,7 +197,7 @@ public function save()
 
     $invoiceData = [
         'customer_id'      => $customerId,
-        'billing_address'  => $customer['address'] ?? '',
+       'customer_address' => $customer['address'] ?? $request->getPost('customer_address') ?? '',
         'phone_number'     => $customer['phone_number'] ?? $request->getPost('phone_number') ?? '',
         'lpo_no'           => $request->getPost('lpo_no'),
         'total_amount'     => $this->calculateTotal($request),
@@ -258,12 +263,12 @@ public function save()
         return $subtotal - $discountAmt;
     }
 
-    public function edit($id)
+   public function edit($id)
     {
         $invoiceModel = new InvoiceModel();
         $itemModel = new InvoiceItemModel();
         $customerModel = new customerModel();
-
+ 
         $invoice = $invoiceModel->find($id);
         if (!$invoice) {
             return redirect()->to(base_url('invoicelist'))->with('error', 'Invoice not found.');
@@ -271,26 +276,31 @@ public function save()
         // if (strtolower($invoice['status']) === 'paid') {
         //     return redirect()->to(base_url('invoicelist'))->with('error', 'Cannot edit a paid invoice.');
         // }
-
+ 
         $customer = $customerModel->find($invoice['customer_id']);
         if ($customer) {
             $invoice['customer_name'] = $customer['customer_name'] ?? '';
-            $invoice['billing_address']  = $customer['address'] ?? '';
+            $invoice['customer_address']  = $customer['address'] ?? '';
         } else {
             $invoice['customer_name'] = '';
-            $invoice['billing_address']  = '';
+            $invoice['customer_address']  = '';
         }
         $items = $itemModel->where('invoice_id', $id)->findAll();
-
+ 
+       $companyId = session()->get('company_id');
         $data = [
             'invoice' => $invoice,
             'items' => $items,
-            'customers' => $customerModel->where('is_deleted', 0)->findAll()
+            'customers' => $customerModel
+                ->where('is_deleted', 0)
+                ->where('company_id', $companyId)
+                ->findAll()
         ];
-
+ 
         return view('invoice_form', $data);
     }
-
+ 
+ 
 
 
     public function delete($id = null)
@@ -343,32 +353,36 @@ public function save()
         ]);
 
     }
-    public function convertFromEstimate($estimateId)
+   public function convertFromEstimate($estimateId)
     {
         $estimateModel = new EstimateModel();
         $itemModel = new EstimateItemModel();
         $customerModel = new customerModel();
         $estimate = $estimateModel->find($estimateId);
-
+ 
         if (!$estimate) {
             return redirect()->back()->with('error', 'Estimate not found.');
         }
-        
+       
         $customerModel = new customerModel();
         $customer = $customerModel->find($estimate['customer_id']);
-
+ 
         $items = $itemModel->where('estimate_id', $estimateId)->findAll();
-        $customers = $customerModel->where('is_deleted', 0)->findAll();
+       $companyId = session()->get('company_id');
+        $customers = $customerModel
+            ->where('is_deleted', 0)
+            ->where('company_id', $companyId)
+            ->findAll();
         $customer = $customerModel->find($estimate['customer_id']);
-
-         $estimate['billing_address'] = $customer['address'] ?? '';
+ 
+         $estimate['customer_address'] = $customer['address'] ?? '';
         $estimate['phone_number'] = $estimate['phone_number'] ?? '';
-
+ 
         foreach ($items as &$item) {
             $item['item_name'] = ucfirst($item['description'] ?? '');
             $item['product_id'] = $item['product_id'] ?? '';
         }
-        
+       
         return view('invoice_form', [
             'invoice' => $estimate,
             'items' => $items,
@@ -376,9 +390,9 @@ public function save()
             'customer' => $customer,
             'estimate_id' => $estimateId
         ]);
-
+ 
     }
-
+ 
     public function update_status()
 {
     $request = service('request');
@@ -423,7 +437,6 @@ public function save()
         ]);
     }
 }
- 
    public function update_partial_payment()
 {
     $this->response->setContentType('application/json');
@@ -517,7 +530,7 @@ public function save()
 
     // Update invoice
     $invoiceModel->update($invoiceId, [
-        'paid_amount'  => $paidAmount, // or add to existing amount if multiple partials
+        'paid_amount'  => $paidAmount, 
         'payment_mode' => $paymentMode
     ]);
 

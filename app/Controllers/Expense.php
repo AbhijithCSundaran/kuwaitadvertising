@@ -3,6 +3,8 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use App\Models\Expense_Model;
+use App\Models\customerModel;
+use App\Models\Manageuser_Model;
 
 class Expense extends BaseController
 {
@@ -21,9 +23,13 @@ class Expense extends BaseController
 
     public function create($id = null)
     {
+        $customerModel = new customerModel();
+        $session    = session();
+        $companyId  = $session->get('company_id');
         $data = [
             'isEdit' => !empty($id),
-            'expense' => null
+            'expense' => null,
+            'customers' => $customerModel->where('company_id', $companyId)->findAll() 
         ];
 
         if ($id) {
@@ -48,6 +54,7 @@ class Expense extends BaseController
         $amount       = $this->request->getPost('amount');
         $payment_mode = $this->request->getPost('payment_mode');
         $reference    = $this->request->getPost('reference');
+        $customer_id  = $this->request->getPost('customer_id');
 
         if (empty($date) || empty($particular) || empty($amount) || empty($payment_mode)) {
             return $this->response->setJSON([
@@ -62,7 +69,8 @@ class Expense extends BaseController
             'amount'       => $amount,
             'payment_mode' => $payment_mode,
             'reference'    => $reference,
-            'company_id'   => $companyId
+            'company_id'   => $companyId,
+            'customer_id'  => $customer_id
         ];
 
         if (!empty($id)) {
@@ -107,7 +115,9 @@ class Expense extends BaseController
 
  public function getExpensesAjax()
 {
+     $session = session();
     $model = new Expense_Model();
+    $userModel = new Manageuser_Model();
 
     $draw = $_POST['draw'];
     $fromstart = $_POST['start'];
@@ -125,6 +135,18 @@ class Expense extends BaseController
     }
 
     $condition = "1=1";
+     $user = $userModel->find($session->get('user_id'));
+    $roleId = $user['role_id'];
+    $companyId = $session->get('company_id');
+
+    if ($roleId == 1) { 
+        if (!empty($companyId)) {
+            $condition .= " AND company_id = " . (int) $companyId;
+        }
+    } else {
+         $condition .= " AND company_id = " . (int) $user['company_id'];
+    }
+
     $search = trim(preg_replace('/\s+/', ' ', $search)); 
 
     if (!empty($search)) {

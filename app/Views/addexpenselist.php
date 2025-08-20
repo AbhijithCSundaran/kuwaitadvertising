@@ -110,7 +110,9 @@
                 { targets: 2, width: '450px' }
             ],
             order: [[2, 'desc']], 
-
+             language: {
+        infoFiltered: "" 
+    }
         });
         table.on('order.dt search.dt draw.dt', function () {
             table.column(0, { search: 'applied', order: 'applied' })

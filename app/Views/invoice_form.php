@@ -107,11 +107,11 @@
             <div class="row">
                 <!-- Billing Address -->
                 <div class="col-md-6">
-                    <label for="billing_address" class="form-label">
-                        <strong>Billing Address</strong> <span class="text-danger">*</span>
+                    <label for="customer_address" class="form-label">
+                        <strong>Customer Address</strong> <span class="text-danger">*</span>
                     </label>
-                    <textarea name="billing_address" id="billing_address" class="form-control capitalize"
-                        maxlength="150" style="resize: vertical;" rows="3"><?= isset($invoice['billing_address']) ? trim($invoice['billing_address']) : '' ?></textarea>
+                    <textarea name="customer_address" id="customer_address" class="form-control capitalize"
+                        maxlength="150" style="resize: vertical;" rows="3"><?= isset($invoice['customer_address']) ? trim($invoice['customer_address']) : '' ?></textarea>
                 </div>
             </div>
             <div class="row">
@@ -401,18 +401,18 @@
             });
         });
 
-        $('#customer_id').on('change', function () {
-            let customerId = $(this).val();
+                $('#customer_id').on('change', function () {
+                    let customerId = $(this).val();
 
-            if (customerId) {
-                $.post("<?= site_url('customer/get-address') ?>", { customer_id: customerId }, function (res) {
-                if (res.status === 'success') {
-                    // ✅ Only set address if the field is empty (so manual edits are not lost)
-                    if ($('#billing_address').val().trim() === '') {
-                        $('#billing_address').val(res.customer_address);
-                    }
-                }
-            }, 'json');
+                    if (customerId) {
+                        $.post("<?= site_url('customer/get_address') ?>", { customer_id: customerId }, function (res) {
+                            if (res.status === 'success') {
+                                $('#customer_address').val(res.address);
+                            } else {
+                                $('#customer_address').val('');
+                            }
+                        }, 'json');
+
                  $.ajax({
                     url: '<?= base_url("customer/get_discount") ?>/' + customerId,
                     type: 'GET',
@@ -420,8 +420,6 @@
                     success: function (res) {
                         if (res.discount !== undefined) {
                             maxCustomerDiscount = parseFloat(res.discount) || 0;
-
-                            // ✅ only auto-fill if discount field is empty
                             if (parseFloat($('#discount').val()) === 0) {
                                 $('#discount').val(maxCustomerDiscount);
                             }
@@ -461,10 +459,10 @@
             const $submitBtn = $('#save-invoice-btn');
             $submitBtn.prop('disabled', true).text('Generating...');
             const customerId = $('#customer_id').val();
-            const billingAddress = $('#billing_address').val()?.trim();
+            const customerAddress = $('#customer_address').val()?.trim();
             const phoneNumber = $('#phone_number').val()?.trim();
 
-            if (!customerId || !billingAddress || !phoneNumber) {
+            if (!customerId || !customerAddress || !phoneNumber) {
                 showAlert('Please Fill All Mandatory Fields.', 'danger');
                 $submitBtn.prop('disabled', false).text('Generate Invoice');
                 return;

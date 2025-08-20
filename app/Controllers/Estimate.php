@@ -27,15 +27,21 @@ class Estimate extends BaseController
             header('Location: ' . base_url('/'));
             exit;
         }
-    }
+    } 
  
-    public function add_estimate($id = null)
+   public function add_estimate($id = null)
     {
         $estimateModel = new EstimateModel();
         $estimateItemModel = new EstimateItemModel();
         $customerModel = new customerModel();
  
-        $data['customers'] = $customerModel->where('is_deleted', 0)->orderBy('customer_id', 'DESC')->findAll();
+        $companyId = session()->get('company_id');
+        $data['customers'] = $customerModel
+            ->where('is_deleted', 0)
+            ->where('company_id', $companyId)
+            ->orderBy('customer_id', 'DESC')
+            ->findAll();
+ 
         $data['estimate'] = null;
         $data['items'] = [];
  
@@ -46,6 +52,7 @@ class Estimate extends BaseController
  
         return view('add_estimate', $data);
     }
+ 
  
 public function save()
 {
@@ -97,7 +104,7 @@ public function save()
         'customer_id' => $customerId,
         'customer_address' => $address,
         'discount' => $discount,
-        'total_amount' => $grandTotal,
+      'total_amount'    => number_format($grandTotal, 2, '.', ''),
         'date' => date('Y-m-d'),
         'phone_number' => $phoneNumber, 
         'company_id'       => $companyId
@@ -119,9 +126,9 @@ public function save()
 
         $items[] = [
             'description' => $desc,
-            'price' => (float)$unitPrice,
+            'price' => number_format((float)$unitPrice, 2, '.', ''),
             'quantity' => (float)$qty,
-            'total' => (float)$total[$key]
+            'total' => number_format((float)$total[$key], 2, '.', '')
         ];
     }
 
@@ -253,9 +260,9 @@ public function save()
             'estimate_id'       => $row['estimate_id'],
             'customer_name'     => $row['customer_name'],
             'customer_address'  => $row['customer_address'],
-            'subtotal'          => round($subtotal, 2),
+            'subtotal' => number_format($subtotal, 2, '.', ''),
             'discount'          => $row['discount'],
-            'total_amount'      => round($row['total_amount'], 2),
+            'total_amount' => number_format($row['total_amount'], 2, '.', ''),
             'date'              => $row['date'],
             'description'       => implode(', ', $descList),
             'is_converted'      =>$row['is_converted'],
@@ -304,6 +311,7 @@ public function save()
         return redirect()->to('estimatelist')->with('error', 'Estimate not found.');
     }
     $customer = $customerModel->find($estimate['customer_id']);
+    $companyId = session()->get('company_id'); 
 
     $data = [
         'estimate' => $estimate,
