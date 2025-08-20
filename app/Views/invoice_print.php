@@ -254,17 +254,33 @@
           Edit Invoice
         </button>
       <?php endif; ?>
-      <button id="deliveryNoteBtn"
-    onclick="window.location.href='<?= base_url('invoice/delivery_note/' . $invoice['invoice_id']) ?>'"
-    style="display: <?= in_array(strtolower($invoice['status']), ['paid', 'partial paid']) ? 'inline-block' : 'none' ?>;
-           background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
-    Delivery Note
-</button>
-
+        <button id="deliveryNoteBtn"
+            onclick="window.location.href='<?= base_url('invoice/delivery_note/' . $invoice['invoice_id']) ?>'"
+            style="display: <?= in_array(strtolower($invoice['status']), ['paid', 'partial paid']) ? 'inline-block' : 'none' ?>;
+                  background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
+            Delivery Note
+        </button>
+     <?php
+        $paymentMode = isset($invoice['payment_mode']) && $invoice['payment_mode'] !== '' 
+           ? strtolower($invoice['payment_mode']) 
+             : 'cash'; // default to cash
+              if ($paymentMode === 'cash') {
+                  $btnLabel = ' Receipt';
+                  $btnUrl = base_url('receiptvoucher/' . $invoice['invoice_id']); // ReceiptVoucher controller
+              } else {
+                  $btnLabel = ' Voucher';
+                  $btnUrl = base_url('paymentvoucher/' . $invoice['invoice_id']); // PaymentVoucher controller
+              }
+      ?>
+      <button id="paymentBtn" class="btn" 
+              style="background-color: #991b36; color: white;"
+              onclick="window.location.href='<?= $btnUrl ?>'">
+          <?= $btnLabel ?>
+      </button>
       <?php
-      $status = strtolower($invoice['status'] ?? 'unpaid');
-      $btnLabel = ucfirst($status);
-      $btnColor = $status === 'paid' ? '#28a745' : ($status === 'partial paid' ? '#ffc107' : '#991b36');
+        $status = strtolower($invoice['status'] ?? 'unpaid');
+        $btnLabel = ucfirst($status);
+        $btnColor = $status === 'paid' ? '#28a745' : ($status === 'partial paid' ? '#ffc107' : '#991b36');
       ?>
       <div class="btn-group ml-2 position-relative" style="z-index: 1000; margin-left: 10px;">
         <button id="statusBtn" type="button" class="btn btn-sm"
@@ -276,16 +292,14 @@
             <div class="dropdown" style="position: relative;">
                 <div id="statusOptions" class="dropdown-menu p-2"
                     style="position: absolute; top: 100%; right: 0px; z-index: 1050; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: none;">
-                    
-                    <a href="javascript:void(0);" 
-                        class="dropdown-item text-success fw-semibold" 
-                        onclick="openMarkPaidModal(<?= $invoice['invoice_id']; ?>)">
-                          <i class="fas fa-check-circle me-2"></i> Mark as Paid
+                      <a href="javascript:void(0);" 
+                          class="dropdown-item text-success fw-semibold" 
+                          onclick="openMarkPaidModal(<?= $invoice['invoice_id']; ?>)">
+                            <i class="fas fa-check-circle me-2"></i> Mark as Paid
                       </a>
-                    <!-- Partial Payment -->
-                    <a href="#" class="dropdown-item text-warning fw-semibold" onclick="openPartialPayment()">
-                        <i class="fas fa-hourglass-half me-2"></i> Partial Payment
-                    </a>
+                      <a href="#" class="dropdown-item text-warning fw-semibold" onclick="openPartialPayment()">
+                          <i class="fas fa-hourglass-half me-2"></i> Partial Payment
+                      </a>
                 </div>
             </div>
         <?php endif; ?>
@@ -293,28 +307,23 @@
     </div>
     <div class="container">
       <div class="d-flex align-items-center text-center">
-    <!-- Company Name (English) - Left -->
-    <div class="col-4 text-start">
-        <span style="font-size: 12px; font-weight: bold;">
-            <?= esc(ucwords(strtolower($company['company_name']))) ?>
-        </span>
-    </div>
-
-    <!-- Company Logo - Center -->
-    <div class="col-4">
-        <?php if (!empty($company['company_logo'])): ?>
-            <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" 
-                 alt="Company Logo" style="max-height: 30px;">
-        <?php endif; ?>
-    </div>
-
-    <!-- Company Name (Arabic) - Right -->
-    <div class="col-4 text-end">
-        <span style="font-size: 14px; font-weight: bold; direction: rtl;">
-            <?= esc($company['company_name_ar'] ?? '') ?>
-        </span>
-    </div>
-</div>
+        <div class="col-4 text-start">
+            <span style="font-size: 12px; font-weight: bold;">
+                <?= esc(ucwords(strtolower($company['company_name']))) ?>
+            </span>
+        </div>
+        <div class="col-4">
+            <?php if (!empty($company['company_logo'])): ?>
+                <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" 
+                    alt="Company Logo" style="max-height: 30px;">
+            <?php endif; ?>
+        </div>
+        <div class="col-4 text-end">
+            <span style="font-size: 14px; font-weight: bold; direction: rtl;">
+                <?= esc($company['company_name_ar'] ?? '') ?>
+            </span>
+        </div>
+      </div>
       <hr>
       <div class="row align-items-center" style="margin-bottom: 10px;">
         <div class="col-4 text-start">
@@ -850,7 +859,7 @@
           statusBtn.style.backgroundColor = newStatus === 'paid' ? '#28a745' : '#991b36';
           statusOptions.style.display = 'none';
 
-          if (newStatus === 'paid') {
+          if (newStatus === 'paid' || newStatus === 'partial') {
             statusBtn.disabled = true;
             statusBtn.setAttribute('title', 'Fully paid invoice cannot be changed');
             statusBtn.removeAttribute('onclick');
@@ -895,10 +904,10 @@ $('#confirmMarkPaid').on('click', function () {
     }
 
     $.ajax({
-        url: "<?= base_url('invoice/update_status') ?>", // matches route
+        url: "<?= base_url('invoice/update_status') ?>",
         type: "POST",
-        contentType: "application/json", // important!
-        data: JSON.stringify({          // convert object to JSON string
+        contentType: "application/json",
+        data: JSON.stringify({
             invoice_id: selectedInvoiceId,
             status: "paid",
             payment_mode: paymentMode
@@ -908,13 +917,48 @@ $('#confirmMarkPaid').on('click', function () {
             const modal = bootstrap.Modal.getInstance(modalElement);
             modal.hide();
 
-            location.reload(); // Refresh to show updated status
+            // Dynamically update status button text and color
+            const statusBtn = document.getElementById('statusBtn');
+            if (statusBtn) {
+                statusBtn.innerText = 'Paid';
+                statusBtn.style.backgroundColor = '#28a745';
+                statusBtn.disabled = true;
+                statusBtn.title = 'Fully paid invoice cannot be changed';
+            }
+
+            // Update the payment button text based on payment mode
+            const paymentBtn = document.getElementById('paymentBtn');
+            if (paymentBtn) {
+                if (paymentMode === 'cash') {
+                    paymentBtn.innerText = 'Receipt';
+                    paymentBtn.onclick = () => window.location.href = '<?= base_url('receiptvoucher/' . $invoice['invoice_id']) ?>';
+                } else {
+                    paymentBtn.innerText = 'Voucher';
+                    paymentBtn.onclick = () => window.location.href = '<?= base_url('paymentvoucher/' . $invoice['invoice_id']) ?>';
+                }
+            }
+
+            // Optionally hide edit button
+            const editBtn = document.getElementById('editinvoicebtn');
+            if (editBtn) editBtn.style.display = 'none';
         },
         error: function (xhr, status, error) {
             console.error("AJAX Error:", status, error, xhr.responseText);
             alert("Something went wrong. Please try again.");
         }
     });
+});
+
+document.getElementById('paymentMode').addEventListener('change', function() {
+    const mode = this.value;
+    const paymentBtn = document.getElementById('paymentBtn');
+    if (mode === 'cash') {
+        paymentBtn.innerText = 'Receipt';
+        paymentBtn.onclick = () => window.location.href = '<?= base_url('receiptvoucher/' . $invoice['invoice_id']) ?>';
+    } else {
+        paymentBtn.innerText = 'Voucher';
+        paymentBtn.onclick = () => window.location.href = '<?= base_url('paymentvoucher/' . $invoice['invoice_id']) ?>';
+    }
 });
 
   function downloadDeliveryNote() {

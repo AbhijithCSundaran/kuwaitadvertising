@@ -151,7 +151,7 @@ if ($company_id) {
             <a class="nav-link <?= strpos($currentPath, 'cashlist') !== false ? 'active' : '' ?>" 
               href="<?= base_url('cashlist') ?>">
               <i class="mdi mdi-cash-multiple menu-icon"></i>
-              <span class="menu-title">Cash Receipt</span>
+              <span class="menu-title">Transactions</span>
             </a>
           </li>
         <?php endif; ?>

@@ -16,7 +16,8 @@ class CashReceiptModel extends Model
     {
         $builder = $this->db->table('invoices i')
             ->select('i.*, c.name AS customer_name')
-            ->join('customers c', 'c.customer_id = i.customer_id', 'left');
+            ->join('customers c', 'c.customer_id = i.customer_id', 'left')
+            ->where('i.status !=', 'unpaid');
 
         if($search){
             $builder->groupStart()
@@ -37,18 +38,21 @@ class CashReceiptModel extends Model
         return $this->db->table('invoices')->countAll();
     }
 
-    public function getFilteredCashReceiptsCount($search = '')
-    {
-        $builder = $this->db->table('invoices i')->join('customers c', 'c.customer_id = i.customer_id', 'left');
+  public function getFilteredCashReceiptsCount($search = '')
+{
+    $builder = $this->db->table('invoices i')
+                        ->join('customers c', 'c.customer_id = i.customer_id', 'left')
+                        ->where('i.status !=', 'unpaid'); // <-- exclude unpaid
 
-        if($search){
-            $builder->groupStart()
-                    ->like('REPLACE(LOWER(c.customer_name)," ","")', str_replace(' ', '', strtolower($search)))
-                    ->orLike('i.status', $search)
-                    ->orLike('i.payment_mode', $search)
-                    ->groupEnd();
-        }
-
-        return (object)['filReceipts' => $builder->countAllResults()];
+    if ($search) {
+        $builder->groupStart()
+                ->like('REPLACE(LOWER(c.customer_name)," ","")', str_replace(' ', '', strtolower($search)))
+                ->orLike('i.status', $search)
+                ->orLike('i.payment_mode', $search)
+                ->groupEnd();
     }
+
+    return (object)['filReceipts' => $builder->countAllResults()];
+}
+
 }
