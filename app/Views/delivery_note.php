@@ -364,17 +364,16 @@
 
 <div class="d-flex w-100 position-relative" style="margin-top: 10px;">
     <div class="col-6 ms-auto">
-      <hr>
-      <?php
-$company_name = $company['company_name'] ?? 'Unknown Company';
-?>
-<div class="text-center" style="font-size: 15px;">
-    For <?= esc(ucwords($company_name)) ?> 
+        <hr>
+        <?php
+            $company_name = !empty($company['company_name']) ? $company['company_name'] : 'Unknown Company';
+        ?>
+        <div class="text-center" style="font-size: 15px;">
+            For <?= esc(ucwords(strtolower($company_name))) ?>
+        </div>
+    </div>
 </div>
 
-
-    </div>
-  </div>
  <div class="table-footer">
         <div>Received By/ تم الاستلام بواسطة </div>
         <div style="text-align: right;">Issued By / صادرة عن</div>

@@ -557,7 +557,13 @@ $('#discount').tooltip({
 $('#discount').on('input', function () {
     let val = parseFloat($(this).val()) || 0;
 
-    if (val > maxCustomerDiscount) {
+    if (maxCustomerDiscount === 0) {
+        // Customer has no discount
+        $(this).val(0);
+        $(this).attr('data-bs-original-title', 'No discount is set for the selected customer').tooltip('show');
+        setTimeout(() => $(this).tooltip('hide'), 2000);
+    } else if (val > maxCustomerDiscount) {
+        // Exceeds max discount
         $(this).val(maxCustomerDiscount);
         $(this).attr('data-bs-original-title', 'Cannot exceed max discount for this customer').tooltip('show');
         setTimeout(() => $(this).tooltip('hide'), 2000);
@@ -565,6 +571,7 @@ $('#discount').on('input', function () {
         $(this).tooltip('hide');
     }
 });
+
 
 // When editing existing invoice: just fetch max discount, do not overwrite field
 let existingCustomerId = $('#customer_id').val();

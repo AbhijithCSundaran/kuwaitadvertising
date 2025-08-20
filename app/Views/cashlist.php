@@ -4,6 +4,14 @@
         font-size: 14px;
         vertical-align: middle;
     }
+    .custom-badge {
+    display: inline-block;
+    min-width: 90px;  /* Fixed width for all badges */
+    text-align: center;
+    padding: 5px 8px !important;
+    font-size: 12px;
+    
+
 </style>
 
 <div class="form-control mb-3 right_container">
@@ -85,20 +93,21 @@ $(document).ready(function () {
             { data: 'amount', render: data => parseFloat(data).toFixed(2) },
             { data: 'paid_amount', render: data => parseFloat(data).toFixed(2) },
             { data: 'balance_amount', render: data => parseFloat(data).toFixed(2) },
-            { 
+            {
                 data: 'payment_status',
                 render: function(data) {
                     if (!data) return '';
                     let className = '';
                     switch(data.toLowerCase()) {
-                        case 'paid': className = 'badge bg-success'; break;
-                        case 'unpaid': className = 'badge bg-danger'; break;
-                        case 'partial paid': className = 'badge bg-warning'; break;
-                        default: className = 'badge bg-secondary'; break;
+                        case 'paid': className = 'badge bg-success custom-badge'; break;
+                        case 'unpaid': className = 'badge bg-danger custom-badge'; break;
+                        case 'partial paid': className = 'badge bg-warning custom-badge'; break;
+                        default: className = 'badge bg-secondary custom-badge'; break;
                     }
                     return `<span class="${className}">${data}</span>`;
                 }
             },
+
             {
                 data: 'payment_mode',
                 render: function(data, type, row) {
@@ -121,8 +130,9 @@ $(document).ready(function () {
                     if (row.payment_status.toLowerCase() !== 'unpaid') {
                         if (row.payment_mode === 'cash') {
                             printBtn = `<a href="<?= base_url('cashreceipt/print/') ?>${id}" title="Print" style="color:green;">
-                                            <i class="bi bi-printer-fill"></i>
-                                        </a>`;
+                <i class="bi bi-printer-fill"></i>
+            </a>`;
+
                         } else {
                           printBtn = `<a href="<?= base_url('paymentvoucher/print/') ?>${id}" title="Print" style="color:green;">
                 <i class="bi bi-printer-fill"></i>

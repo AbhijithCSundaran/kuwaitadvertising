@@ -1,3 +1,14 @@
+<?php
+$session = session();
+$company_id = $session->get('company_id');
+
+$company = [];
+if ($company_id) {
+    $companyModel = new \App\Models\Managecompany_Model();
+    $company = $companyModel->find($company_id);
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -39,8 +50,10 @@
     <div class="navbar-brand-wrapper d-flex justify-content-center">
       <div class="navbar-brand-inner-wrapper d-flex justify-content-between align-items-center w-100">
         <a class="navbar-brand brand-logo" href="#">
-          <img src="<?= base_url('public/uploads/' . ($company['company_logo'] ?? 'default.png')) ?>" alt="Logo">
-        </a>
+    <img src="<?= base_url('public/uploads/' . ($company['company_logo'] ?? 'default.png')) ?>" 
+         alt="Logo" style="height: 60px;">
+</a>
+
         <a class="navbar-brand brand-logo-white" href="index.html"><img
             src="<?= ASSET_PATH; ?>assets/images/adminlogo.jpg" alt="logo" /></a>
         <a class="navbar-brand brand-logo-mini" href="index.html"><img
