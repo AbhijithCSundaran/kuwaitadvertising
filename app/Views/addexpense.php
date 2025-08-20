@@ -82,7 +82,7 @@ input[type=number].no-spinner {
                             <option value="">Select</option>
                             <option value="cash" <?= isset($expense['payment_mode']) && strtolower($expense['payment_mode']) == 'cash' ? 'selected' : '' ?>>Cash</option>
                             <option value="bank transfer" <?= isset($expense['payment_mode']) && strtolower($expense['payment_mode']) == 'bank transfer' ? 'selected' : '' ?>>Bank Transfer</option>
-                                        <option value="bank transfer" <?= isset($expense['payment_mode']) && strtolower($expense['payment_mode']) == 'bank transfer' ? 'selected' : '' ?>>Bank Link</option>
+                            <option value="bank link" <?= isset($expense['payment_mode']) && strtolower($expense['payment_mode']) == 'bank link' ? 'selected' : '' ?>>Bank Link</option>
                             <option value="wamd" <?= isset($expense['payment_mode']) && strtolower($expense['payment_mode']) == 'wamd' ? 'selected' : '' ?>>WAMD</option>
                         </select>
                     </div>

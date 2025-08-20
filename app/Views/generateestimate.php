@@ -41,24 +41,34 @@
       padding: 3px;
       margin-top: 0px;
     }
-
-     .total-tab{
-        width: auto; float: right; 
-        border-collapse: collapse;
+    .generate-table {
+      width: 100%;
+      border-collapse: collapse;
     }
-    .totals{
-        padding: 4px 12px; 
-        text-align: right;
+    .generate-table.min_height {
+      /* min-height: 350px; */
     }
-
-     .total-td{
-        background-color: #cfc7c7ff; 
-        color: #131212ff; font-weight: 
-        bold; padding: 6px 12px; 
-        text-align: right;
-        border: 1px solid black;
+    .generate-table td.padding-50 {
+      padding: 50px!important;
     }
-
+    .generate-table.min_height tbody td {
+      vertical-align: top;
+      /* padding: 5px 6px; */
+      /* height: 20px !important; compact rows */
+    }
+    .generate-table th {
+      background-color: #cfc7c7ff;
+      color: black;
+      min-height: 35px;
+      padding: 8px;
+      vertical-align: middle;
+    }
+  .generate-table .summary-row td {
+    padding: 2px 6px;    
+    height: 18px !important;
+    font-weight: bold;
+    background: #cfc7c7ff;
+  }
     @media print {
       * {
         -webkit-print-color-adjust: exact !important;
@@ -113,33 +123,33 @@
 
         <?php if (!empty($company['company_logo'])): ?>
             <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" 
-                alt="Company Logo" style="max-height: 50px; width: 25%;">
+                alt="Company Logo" style="max-height: 50px; width: 30%;">
         <?php endif; ?>
 
         <span style="font-size: 15px; font-weight: bold; direction: rtl;">
             <?= esc($company['company_name_ar'] ?? '') ?>
         </span>
       </div>
-      <hr>
+      <div style="height: 3px; background-color:#a1263a"></div>
       <div class="row align-items-center" style="margin-bottom: 10px;">
-        <div class="col-4 text-start">
+        <div class="col-4 text-start" style="margin-top: 17px;">
           <div>
             <label style="font-weight: bold; margin-right: 4px;">No / رقم :</label>
             <input type="text" readonly value="<?= esc($estimate['estimate_id']) ?>"
-              style="display: inline-block; width: 87px; height: 23px; text-align:left;">
+              style="display: inline-block;  width: 80px; height: 30px; text-align:left; font-size: 14px;">
           </div>
         </div>
         <div class="col-4 text-center">
           <div
-            style="background-color: #991b36; color: white; font-weight: bold; padding: 3px 30px; display: inline-block; border-radius: 4px; font-size: 13px;">
+            style="background-color: #991b36; color: white;  margin-top: 13px; font-weight: bold; padding: 3px 30px; display: inline-block; border-radius: 10px; font-size: 13px;">
             تسعيرة <br>QUOTATION
           </div>
         </div>
-        <div class="col-4 text-end">
+        <div class="col-4 text-end"  style="margin-top: 17px;">
           <div style="white-space: nowrap;">
             <label style="font-weight: bold; margin-right: 6px;">Date / التاريخ:</label>
             <input type="text" readonly value="<?= date('d-m-Y', strtotime($estimate['date'])) ?>"
-              style="width: 90px; height: 23px; text-align: center;">
+              style="width: 80px; height: 30px; text-align: center; font-size: 14px;">
           </div>
         </div>
       </div>
@@ -147,7 +157,8 @@
         <div class=" col-6">
             <p><strong>To/إلى:</strong></p>
             <p><?= esc($estimate['customer_name'] ?? '') ?></p>
-            <p><?= esc($estimate['customer_address'] ?? '') ?></p>
+            <p><?= nl2br(esc($estimate['customer_address'] ?? '')) ?></p>
+            <br>
         </div>
         <div class=" col-6 text-end">
             <p><strong>From/ من:</strong></p>
@@ -155,33 +166,63 @@
             <p><?= ucwords(strtolower(esc($role_name ?? ''))) ?></p>
         </div>
       </div>
-      <table class="generate-table ">
+      <table class="generate-table min_height">
         <thead class="thead-dark">
-            <tr>
-                <th rowspan="2" style="width: 10%;">رقم<br>Sl No</th>
-                <th rowspan="2" style="width: 38%;"> التفاصيل<br>Description</th>
-                <th rowspan="2" style="width: 15%;">سعر الوحدة<br>Unit Price</th>
-                <th rowspan="2" style="width: 10%;">الكمية<br>Quantity</th>
-                <th rowspan="2" style="width: 20%;">المبلغ الإجمالي<br>Total Amount</th>
-            </tr>
+          <tr>
+            <th style="width: 10%;">رقم<br>Sl No</th>
+            <th style="width: 38%;">التفاصيل<br>Description</th>
+            <th style="width: 15%;">سعر الوحدة<br>Unit Price</th>
+            <th style="width: 10%;">الكمية<br>Quantity</th>
+            <th style="width: 20%;">المبلغ الإجمالي<br>Total Amount</th>
+          </tr>
         </thead>
         <tbody>
-            <?php
-            $si = 1;
-            $grandTotal = 0;
-            foreach ($items as $item):
-                $grandTotal += $item['total'];
-                ?>
-                <tr>
-                    <td><?= $si++ ?></td>
-                    <td><?= esc($item['description']) ?></td>
-                    <td><?= number_format($item['price'], 2) ?></td>
-                    <td><?= $item['quantity'] ?></td>
-                    <td><?= number_format($item['total'], 2) ?></td>
-                </tr>
-            <?php endforeach; ?>
+          <?php
+          $si = 1;
+          $grandTotal = 0;
+          $itemCount = count($items); 
+          foreach ($items as $item):
+              $grandTotal += $item['total'];
+          ?>
+            <tr>
+              <td><?= $si++ ?></td>
+              <td><?= esc($item['description']) ?></td>
+              <td><?= number_format($item['price'], 2) ?></td>
+              <td><?= $item['quantity'] ?></td>
+              <td><?= number_format($item['total'], 2) ?></td>
+            </tr>
+          <?php endforeach; ?>
+          <?php if ($itemCount < 3): ?>
+          <tr>
+            <td class="padding-50"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        <?php endif; ?>
+
+          <!-- Subtotal -->
+          <tr class="summary-row">
+            <td colspan="4" style="text-align: right;">SUBTOTAL</td>
+            <td style="text-align: right; font-weight: 100;"><?= number_format($grandTotal, 2) ?> KWD</td>
+          </tr>
+
+          <!-- Discounts -->
+          <tr class="summary-row">
+            <td colspan="4" style="text-align: right;">DISCOUNT</td>
+            <td style="text-align: right; font-weight: 100;"><?= number_format($estimate['discount'])?>%</td>
+          </tr>
+
+          <!-- Total -->
+          <tr class="summary-row">
+            <td colspan="4" style="text-align: right;">TOTAL</td>
+            <td style="text-align: right; font-weight: 100;"><?= number_format($estimate['total_amount'] ?? 0, 2) ?> KWD</td>
+          </tr>
         </tbody>
       </table>
+
+
       <div class=" d-flex">
         <div class="col-6 terms mt-3" style="font-size:11px;">
             <strong>TERMS & CONDITIONS</strong><br>
@@ -192,26 +233,7 @@
         </div>
         <div class="col-6 mt-3" style="font-size:12px;">
           <div class="text-end ">
-            <table class="total-tab">
-              <tbody>
-                <tr>
-                    <td class="totals">SUBTOTAL</td>
-                    <td class="totals"><?= number_format($grandTotal, 2) ?> KWD</td>
-                </tr>
-                <tr>
-                    <td class="totals">DISCOUNTS</td>
-                    <td class="totals"><?= number_format($estimate['discount'] ?? 0, 2) ?> KWD</td>
-                </tr>
-                <tr>
-                    <td class="total-td">
-                        TOTAL   
-                    </td>
-                    <td class="total-td">
-                        <?= number_format($estimate['total_amount'] ?? 0, 2) ?> KWD
-                    </td>
-                </tr>
-              </tbody>
-            </table>
+            
           </div>
         </div>
       </div>

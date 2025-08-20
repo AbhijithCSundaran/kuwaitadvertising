@@ -6,7 +6,6 @@
   <meta charset="UTF-8">
   <title>Cash Estimate</title>
   <style>
-    /* New outer brown container */
     .outer-container {
       width: fit-content;
       margin: auto;
@@ -25,61 +24,32 @@
       background-position: 52% 60%;
       background-color: white;
     }
-    table {
+   .generate-table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
     }
-
-    table,
-    th{
-      border: 1px solid black;
+    .generate-table.min_height {
+      /* min-height: 350px; */
     }
-
-    table.min_height {
-      min-height: 350px;
+     .generate-table td.padding-50 {
+      padding: 50px!important;
     }
-
-    table.min_height tbody td {
+    .generate-table.min_height tbody td {
       vertical-align: top;
-      padding: 5px 6px;
-      height: 20px !important;
-          border: 1px solid black;
     }
-   
-    tbody td {
-      border-top: 1px solid transparent;
-      border-bottom: 1px solid transparent;
-    }
-
-    tbody tr:last-child td {
-      border-bottom: 1px solid black;
+    .generate-table th {
+       background-color: #cfc7c7ff;
+      color: black;
+      min-height: 35px;
+      padding: 8px;
+      vertical-align: middle;
     }
 
-    th {
-      background-color: #cfc7c7ff;
-      text-align: center;
+    .generate-table .summary-row td {
+      padding: 2px 6px;      
+      height: 18px !important;
       font-weight: bold;
-      padding: 2px;
-    }
-
-     td {
-      text-align: center;
-      height: 10px !important;
-      padding: 4px;
-      word-wrap: break-word;
-      word-break: break-word;
-      white-space: normal;
-    } 
-
-    .table-footer {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 30px;
-      font-weight: bold;
-    }
-    .table-footer div {
-      width: 48%;
+      background: #cfc7c7ff;
     }
 
     .bottom-bar {
@@ -90,24 +60,11 @@
       padding: 3px;
       margin-top: 0px;
     }
-    
-
-     /* .total-tab{
-        width: auto; float: right; 
-        border-collapse: collapse;
-    }
-    .totals{
-        padding: 4px 12px; 
-        text-align: right;
-    }
-
-     .total-td{
-        background-color: #cfc7c7ff; 
-        color: #131212ff; font-weight: 
-        bold; padding: 6px 12px; 
-        text-align: right;
-        border: 1px solid black;
-    } */
+    .table-footer { 
+      display: flex; 
+      justify-content: space-between;
+       margin-top: 30px; 
+       font-weight: bold; }
     .table-footer div {
       width: 48%;
     }
@@ -173,30 +130,30 @@
             <?= esc($company['company_name_ar'] ?? '') ?>
         </span>
     </div>
-    <hr>
+    <div style="height: 3px; background-color:#a1263a"></div>
     <div class="row align-items-center" style="margin-bottom: 10px;">
-      <div class="col-4 text-start">
+      <div class="col-4 text-start" style="margin-top: 17px;">
         <div>
           <label style="font-weight: bold; margin-right: 4px;">No / رقم :</label>
           <input type="text" readonly value="<?= esc($estimate['estimate_id']) ?>"
-            style="display: inline-block; width: 87px; height: 23px; text-align:left;">
+            style="display: inline-block; width: 80px; height: 30px; text-align:left; font-size: 14px;">
         </div>
       </div>
       <div class="col-4 text-center">
         <div
-          style="background-color: #991b36; color: white; font-weight: bold; padding: 3px 30px; display: inline-block; border-radius: 4px; font-size: 13px;">
+          style="background-color: #991b36; color: white; margin-top: 13px; font-weight: bold; padding: 3px 30px; display: inline-block; border-radius: 10px; font-size: 13px;">
           تسعيرة <br>QUOTATION
         </div>
       </div>
-      <div class="col-4 text-end">
+      <div class="col-4 text-end" style="margin-top: 17px;">
         <div style="white-space: nowrap;">
           <label style="font-weight: bold; margin-right: 6px;">Date / التاريخ:</label>
           <input type="text" readonly value="<?= date('d-m-Y', strtotime($estimate['date'])) ?>"
-            style="width: 90px; height: 23px; text-align: center;">
+            style="width: 80px; height: 30px; text-align: center;  font-size: 14px;">
         </div>
       </div>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-6" style=" margin-top: 30px;">
         <strong>TO/إلى :M/S.<?= esc($estimate['customer_name'] ?? 'Customer Name') ?></strong><br>
       </div>
       <div style="height: 2px; background-color: #ddd;"></div>
@@ -212,59 +169,59 @@
              <?= esc($estimate['phone_number']) ?>
         </div>
       </div>
-<table class="min_height">
-    <thead class="thead-dark">
-        <tr>
-            <th rowspan="2" style="width: 10%;">رقم<br>SR. No</th>
-            <th rowspan="2" style="width: 40%;">التفاصيل<br>Description</th>
-            <th rowspan="2" style="width: 10%;">الكمية<br>QTY</th>
-            <th rowspan="2" style="width: 20%;">سعر الوحدة<br>Unit Price (KD)</th>
-            <th rowspan="2" style="width: 20%;">المبلغ الإجمالي<br>Total Amount (KD)</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php
-        $si = 1;
-        $grandTotal = 0;
-        foreach ($items as $item):
-            $grandTotal += $item['total'];
-        ?>
-        <tr>
-            <td><?= $si++ ?></td>
-            <td><?= esc($item['description']) ?></td>
-            <td><?= esc($item['quantity']) ?></td>
-            <td><?= number_format($item['price'], 3) ?></td>
-            <td><?= number_format($item['total'], 3) ?></td>
-        </tr>
-        <?php endforeach; ?>
+<table class="generate-table min_height">
+  <thead class="thead-dark">
+    <tr>
+      <th style="width: 10%;">رقم<br>SR. No</th>
+      <th style="width: 40%;">التفاصيل<br>Description</th>
+      <th style="width: 10%;">الكمية<br>QTY</th>
+      <th style="width: 20%;">سعر الوحدة<br>Unit Price (KD)</th>
+      <th style="width: 20%;">المبلغ الإجمالي<br>Total Amount (KD)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <?php
+    $si = 1;
+    $grandTotal = 0;
+    $itemCount = count($items); 
+    foreach ($items as $item):
+        $grandTotal += $item['total'];
+    ?>
+      <tr>
+        <td><?= $si++ ?></td>
+        <td><?= esc($item['description']) ?></td>
+        <td><?= esc($item['quantity']) ?></td>
+        <td><?= number_format($item['price'], 3) ?></td>
+        <td><?= number_format($item['total'], 3) ?></td>
+      </tr>
+    <?php endforeach; ?>
+      <tr><td  class="padding-50"></td> <td></td><td></td><td></td><td></td></tr>
+    <?php
+    $discount = $estimate['discount'] ?? 0;
+    $discountAmount = ($grandTotal * $discount) / 100;
+    $totalAfterDiscount = $grandTotal - $discountAmount;
+    ?>
 
-        <?php
-        $discount = $estimate['discount'] ?? 0;
-        $discountAmount = ($grandTotal * $discount) / 100;
-        $totalAfterDiscount = $grandTotal - $discountAmount;
-        ?>
+    <!-- Subtotal -->
+    <tr class="summary-row">
+      <td colspan="4" style="text-align: right;">Subtotal</td>
+      <td style="text-align: right;    font-weight: 100;"><?= number_format($grandTotal, 2) ?> KD</td>
+    </tr>
 
-        <!-- Subtotal -->
-        <tr>
-            <td colspan="4" style="text-align: right; font-weight: bold; background: #cfc7c7ff;">Subtotal</td>
-            <td colspan="2" style="font-weight: bold; background: #cfc7c7ff;"><?= number_format($grandTotal, 2) ?> KD</td>
-        </tr>
+    <!-- Discount -->
+    <tr class="summary-row">
+      <td colspan="4" style="text-align: right;">Discount</td>
+      <td style="text-align: right;    font-weight: 100;"><?= number_format($discount) ?>%</td>
+    </tr>
 
-        <!-- Discount -->
-        <tr>
-            <td colspan="4" style="text-align: right; font-weight: bold; background: #cfc7c7ff;">Discount</td>
-            <td colspan="2" style="font-weight: bold; background: #cfc7c7ff;"><?= number_format($discount) ?>%</td>
-        </tr>
-
-        <!-- Grand Total -->
-        <tr>
-            <td colspan="4" style="text-align: right; font-weight: bold; background: #cfc7c7ff;">Grand Total</td>
-            <td colspan="2" style="font-weight: bold; background: #cfc7c7ff;">
-                <?= number_format($totalAfterDiscount, 2) ?> KD
-            </td>
-        </tr>
-    </tbody>
+    <!-- Grand Total -->
+    <tr class="summary-row">
+      <td colspan="4" style="text-align: right;">Grand Total</td>
+      <td style="text-align: right;    font-weight: 100;"><?= number_format($totalAfterDiscount, 2) ?> KD</td>
+    </tr>
+  </tbody>
 </table>
+
 
       <div class="mt-2" style="font-size: 13px;">
         <strong>دفعة مقدمة 70% والرصيد 30% بعد التسليم <br>Advance 70% Balance 30% After Delivery</strong>
