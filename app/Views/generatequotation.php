@@ -169,7 +169,7 @@
              <?= esc($estimate['phone_number']) ?>
         </div>
       </div>
-<table class="generate-table min_height">
+<table class="generate-table min_height" style=" font-size: 14px;">
   <thead class="thead-dark">
     <tr>
       <th style="width: 10%;">رقم<br>SR. No</th>

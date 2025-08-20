@@ -104,17 +104,14 @@
                     </div>
                 </div>
             </div>
-            <?php
-            $billingVal = $invoice['customer_address'] ?? $customers['customer_address'] ?? '';
-            ?>
             <div class="row">
                 <!-- Billing Address -->
                 <div class="col-md-6">
-                    <label for="customer_address" class="form-label">
+                    <label for="billing_address" class="form-label">
                         <strong>Billing Address</strong> <span class="text-danger">*</span>
                     </label>
-                    <textarea name="customer_address" id="customer_address" class="form-control capitalize"
-                        maxlength="150" style="resize: vertical;" rows="3"><?= esc($billingVal) ?></textarea>
+                    <textarea name="billing_address" id="billing_address" class="form-control capitalize"
+                        maxlength="150" style="resize: vertical;" rows="3"><?= isset($invoice['billing_address']) ? trim($invoice['billing_address']) : '' ?></textarea>
                 </div>
             </div>
             <div class="row">
@@ -409,13 +406,13 @@
 
             if (customerId) {
                 $.post("<?= site_url('customer/get-address') ?>", { customer_id: customerId }, function (res) {
-                    if (res.status === 'success') {
-                        $('#customer_address').val(res.address);
-                    } else {
-                        $('#customer_address').val('');
+                if (res.status === 'success') {
+                    // ✅ Only set address if the field is empty (so manual edits are not lost)
+                    if ($('#billing_address').val().trim() === '') {
+                        $('#billing_address').val(res.customer_address);
                     }
-                }, 'json');
-
+                }
+            }, 'json');
                  $.ajax({
                     url: '<?= base_url("customer/get_discount") ?>/' + customerId,
                     type: 'GET',
@@ -438,7 +435,6 @@
             }
         });
 
-        // --- when editing existing invoice ---
         let existingCustomerId = $('#customer_id').val();
         if (existingCustomerId) {
             $.ajax({
@@ -465,7 +461,7 @@
             const $submitBtn = $('#save-invoice-btn');
             $submitBtn.prop('disabled', true).text('Generating...');
             const customerId = $('#customer_id').val();
-            const billingAddress = $('#customer_address').val()?.trim();
+            const billingAddress = $('#billing_address').val()?.trim();
             const phoneNumber = $('#phone_number').val()?.trim();
 
             if (!customerId || !billingAddress || !phoneNumber) {
@@ -529,18 +525,27 @@
             placement: 'top'
         });
 
-        $('#discount').on('input', function () {
-            let val = parseFloat($(this).val()) || 0;
-            if (val > maxCustomerDiscount) {
-                $(this).val(maxCustomerDiscount);
-                $(this).attr('data-bs-original-title', 'Unable to increase beyond max discount for this customer').tooltip('show');
-                setTimeout(() => {
-                    $('#discount').tooltip('hide');
-                }, 2000);
-            } else {
-                $(this).tooltip('hide');
-            }
-        });
+ $('#discount').on('input', function () {
+    let val = parseFloat($(this).val()) || 0;
+ 
+    if (maxCustomerDiscount === 0) {
+        $(this).val(0);
+        $(this).attr('data-bs-original-title', 'No discount is set for the selected customer').tooltip('show');
+        setTimeout(() => {
+            $('#discount').tooltip('hide');
+        }, 2000);
+    } else if (val > maxCustomerDiscount) {
+        $(this).val(maxCustomerDiscount);
+        $(this).attr('data-bs-original-title', 'Unable to increase beyond max discount for this customer').tooltip('show');
+        setTimeout(() => {
+            $('#discount').tooltip('hide');
+        }, 2000);
+    } else {
+        $(this).tooltip('hide');
+    }
+});
+ 
+ 
 
         function showAlert(message, type) {
             $('.alert')

@@ -98,15 +98,15 @@
                 { data: "slno" },
                 {
                     data: "company_name",
-                    render: data => {
+                    render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''
+                },
+                {
+                    data: "address",
+                     render: data => {
                         if (!data) return '';
                         let formatted = data.replace(/\b\w/g, c => c.toUpperCase());
                         return formatted.replace(/\n/g, "<br>");
                     }
-                },
-                {
-                    data: "address",
-                    render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''
                 },
                 {
                     data: "tax_number",

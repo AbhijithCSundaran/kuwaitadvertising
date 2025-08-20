@@ -166,7 +166,7 @@
             <p><?= ucwords(strtolower(esc($role_name ?? ''))) ?></p>
         </div>
       </div>
-      <table class="generate-table min_height">
+      <table class="generate-table min_height" style=" font-size: 14px;">
         <thead class="thead-dark">
           <tr>
             <th style="width: 10%;">رقم<br>Sl No</th>
@@ -203,8 +203,8 @@
         <?php endif; ?>
 
           <!-- Subtotal -->
-          <tr class="summary-row">
-            <td colspan="4" style="text-align: right;">SUBTOTAL</td>
+          <tr class="summary-row" >
+            <td colspan="4" style="text-align: right; ">SUBTOTAL</td>
             <td style="text-align: right; font-weight: 100;"><?= number_format($grandTotal, 2) ?> KWD</td>
           </tr>
 

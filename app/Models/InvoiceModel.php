@@ -78,7 +78,7 @@ class InvoiceModel extends Model
    public function getFilteredInvoices($search = '', $start = 0, $length = 10, $orderColumn = 'invoice_id', $orderDir = 'desc', $companyId = null)
 {
     $builder = $this->db->table('invoices')
-        ->select('invoices.invoice_id, invoices.customer_id, invoices.discount, invoices.total_amount, invoices.invoice_date, invoices.phone_number, invoices.lpo_no, invoices.status, customers.name AS customer_name, customers.address AS customer_address')
+        ->select('invoices.invoice_id, invoices.customer_id, invoices.discount, invoices.total_amount, invoices.invoice_date, invoices.phone_number, invoices.lpo_no, invoices.status, customers.name AS customer_name, customers.address AS billing_address')
         ->join('customers', 'customers.customer_id = invoices.customer_id', 'left')
         ->join('user', 'user.user_id = invoices.user_id', 'left')
         ->where('invoices.company_id', $companyId); 
@@ -117,7 +117,7 @@ class InvoiceModel extends Model
          invoices.invoice_date,
          company.company_name AS company_name,
          customers.name AS customer_name, 
-         customers.address AS customer_address'
+         customers.address AS billing_address'
     )
     ->join('customers', 'customers.customer_id = invoices.customer_id', 'left')
     ->join('user', 'user.user_id = invoices.user_id', 'left')
