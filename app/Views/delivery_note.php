@@ -288,10 +288,19 @@
         <?php endif; ?>
       </div>
     </div> -->
-    <div class="no-print" style="text-align: right; margin-bottom: 20px;">
-    <button onclick="window.print()" class="btn btn-sm btn-primary"> Print</button>
-  <button onclick="downloadPDF()" class="btn btn-sm btn-success"> Download PDF</button>
-  </div>
+    <div class="no-print" style="text-align: right; margin-bottom: 20px;"> 
+    <button onclick="window.print()" class="btn btn-sm" 
+            style="background-color: #991b36; color: white;">Print</button>
+    <button onclick="downloadPDF()" class="btn btn-sm" 
+            style="background-color: #991b36; color: white;">Download PDF</button>
+    <button onclick="window.location.href='<?= base_url('invoice/print/' . $invoice['invoice_id']) ?>'" 
+        class="btn btn-sm" style="background-color: #991b36; color: white;">
+    Discard
+</button>
+
+</div>
+
+
     
     <div class="container">
       <div class="top-heading" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
@@ -354,7 +363,7 @@
       <tr>
         <td style="border: 1px solid #000; padding: 8px; text-align: center;"><?= $i++ ?></td>
         <td style="border: 1px solid #000; padding: 8px; text-align: left;"><?= esc($item['item_name'] ?? '-') ?></td>
-        <td style="border: 1px solid #000; padding: 8px; text-align: center;"><?= number_format($item['price'], 3) ?></td>
+        <td style="border: 1px solid #000; padding: 8px; text-align: center;"><?= number_format($item['price'], 2) ?></td>
         <td style="border: 1px solid #000; padding: 8px; text-align: center;"><?= esc($item['quantity']) ?></td>
         <td style="border: 1px solid #000; padding: 8px; text-align: left;">--</td>
       </tr>

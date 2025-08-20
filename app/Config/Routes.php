@@ -131,6 +131,12 @@ $routes->post('invoice/update_status', 'Invoice::update_status');
 $routes->post('invoice/update_partial_payment', 'Invoice::update_partial_payment');
 $routes->post('invoice/getSalesReportAjax', 'Invoice::getSalesReportAjax');
 $routes->get('invoice/report', 'Invoice::report');
+$routes->get('invoice/print/(:num)', 'InvoiceController::printInvoice/$1');
+
+
+
+$routes->get('receiptvoucher/(:num)', 'ReceiptVoucher::index/$1');
+$routes->get('paymentvoucher/(:num)', 'PaymentVoucher::index/$1');
 
 $routes->get('cashlist', 'CashReceipt::index');
 $routes->get('print_receipt', 'ReceiptVoucher::index');

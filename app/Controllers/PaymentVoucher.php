@@ -2,7 +2,7 @@
 
 use App\Models\Managecompany_Model;
 use App\Models\InvoiceModel;
-use App\Models\CustomerModel;
+use App\Models\customerModel;
 
 class PaymentVoucher extends BaseController
 {
@@ -11,7 +11,7 @@ class PaymentVoucher extends BaseController
         // Load models
         $companyModel  = new Managecompany_Model();
         $invoiceModel  = new InvoiceModel();
-        $customerModel = new CustomerModel();
+        $customerModel = new customerModel();
 
         // Fetch details
         $company  = $companyModel->first(); // assuming single company
