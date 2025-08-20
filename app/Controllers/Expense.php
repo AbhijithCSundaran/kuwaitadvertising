@@ -107,27 +107,25 @@ class Expense extends BaseController
 
  public function getExpensesAjax()
 {
-    $model = new \App\Models\Expense_Model();
+    $model = new Expense_Model();
 
     $draw = $_POST['draw'];
     $fromstart = $_POST['start'];
     $tolimit = $_POST['length'];
-    $orderColumnIndex = $_POST['order'][0]['column'] ?? 1; // Default to first sortable column
+    $orderColumnIndex = $_POST['order'][0]['column'] ?? 1; 
     $orderDir = $_POST['order'][0]['dir'] ?? 'desc';
     $search = $_POST['search']['value'];
     $slno = $fromstart + 1;
 
-    // Columns must match order in DataTable (excluding SLNO if not DB column)
     $columns = ['slno', 'date', 'particular', 'amount', 'payment_mode', 'id'];
     $orderBy = $columns[$orderColumnIndex] ?? 'date';
 
-    // Ignore ordering on virtual columns
     if ($orderBy === 'slno' || $orderBy === 'id') {
-        $orderBy = 'date'; // fallback to a sortable DB column
+        $orderBy = 'date';
     }
 
     $condition = "1=1";
-    $search = trim(preg_replace('/\s+/', ' ', $search)); // normalize spaces
+    $search = trim(preg_replace('/\s+/', ' ', $search)); 
 
     if (!empty($search)) {
         $noSpaceSearch = str_replace(' ', '', strtolower($search));
@@ -176,7 +174,7 @@ class Expense extends BaseController
         return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid expense ID']);
     }
 
-    $expenseModel = new \App\Models\Expense_Model();
+    $expenseModel = new Expense_Model();
     $expenseModel->delete($expense_id);
 
     return $this->response->setJSON(['status' => 'success']);
@@ -191,7 +189,7 @@ class Expense extends BaseController
 
    public function getExpenseReportAjax()
 {
-    $model = new \App\Models\Expense_Model();
+    $model = new Expense_Model();
 
     $date     = $this->request->getPost('date');       
     $month    = $this->request->getPost('month');
