@@ -114,7 +114,7 @@
                 },
                 {
                     data: "discount",
-                    render: data => (!data || parseFloat(data) === 0) ? '-N/A-' : parseFloat(data).toFixed(2) + '%'
+                    render: data => (!data || parseFloat(data) === 0) ? '-N/A-' : parseFloat(data).toFixed() + '%'
                 },
                 {
                     data: "total_amount",

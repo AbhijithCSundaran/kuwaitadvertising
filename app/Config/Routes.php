@@ -134,10 +134,14 @@ $routes->get('invoice/report', 'Invoice::report');
 
 $routes->get('cashlist', 'CashReceipt::index');
 $routes->get('print_receipt', 'ReceiptVoucher::index');
-$routes->post('cashlist/ajax', 'CashReceipt::ajaxList');
+$routes->post('cashreceipt/ajaxListJson', 'CashReceipt::ajaxListJson');
+$routes->post('cashreceipt/delete', 'CashReceipt::delete');
+
 $routes->get('/payment_voucher', 'PaymentVoucher::index');
 $routes->get('invoice/print-cash/(:num)', 'Invoice::printCashReceipt/$1');
-$routes->get('invoice/print-bank/(:num)', 'Invoice::printBankReceipt/$1');
+$routes->get('paymentvoucher/print/(:num)', 'PaymentVoucher::index/$1');
+
+
  
 
 
