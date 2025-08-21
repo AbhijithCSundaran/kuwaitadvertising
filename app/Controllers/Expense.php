@@ -155,6 +155,7 @@ class Expense extends BaseController
         $condition .= " AND (
             REPLACE(LOWER(payment_mode), ' ', '') LIKE '%{$noSpaceSearch}%' 
             OR REPLACE(LOWER(particular), ' ', '') LIKE '%{$noSpaceSearch}%' 
+            OR REPLACE(LOWER(c.name), ' ', '') LIKE '%{$noSpaceSearch}%' 
             OR REPLACE(LOWER(amount), ' ', '') LIKE '%{$noSpaceSearch}%' 
             OR DATE_FORMAT(date, '%d-%m-%Y') LIKE '%$search%'
         )";
@@ -171,7 +172,9 @@ class Expense extends BaseController
             'date'         => $formattedDate, 
             'particular'   => $expense->particular,
             'amount'       => (float) $expense->amount,
-            'payment_mode' => $expense->payment_mode 
+            'payment_mode' => $expense->payment_mode ,
+           'customer_name' => $expense->customer_name ?? '-',
+
         ];
     }
 
@@ -248,3 +251,5 @@ class Expense extends BaseController
 }
 
     }
+
+    

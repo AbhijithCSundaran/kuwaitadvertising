@@ -144,13 +144,13 @@
               <div class="amount-field">
                   <span class="amount-label">K.D. دينار</span>
                   <div class="amount-value">
-                      <?= isset($invoice['amount']) ? floor($invoice['amount']) : '-' ?>
+                      <?= isset($invoice['total_amount']) ? floor($invoice['total_amount']) : '-' ?>
                   </div>
               </div>
               <div class="amount-field">
                   <span class="amount-label">Fils فلس</span>
                   <div class="amount-value">
-                      <?= isset($invoice['amount']) ? sprintf("%02d", ($invoice['amount']*100)%100) : '-' ?>
+                      <?= isset($invoice['total_amount']) ? sprintf("%02d", ($invoice['total_amount']*100)%100) : '-' ?>
                   </div>
               </div>
           </div>
@@ -163,11 +163,11 @@
             </div>
             <div class="field">
                 <span class="label">Received From : </span>
-                <span class="dots"><?= esc($customer['customer_name'] ?? '') ?></span>تم الاستلام من:
+                <span class="dots"><?= ucwords(strtolower(esc($user_name ?? ''))) ?></span>تم الاستلام من:
             </div>
             <div class="field">
                 <span class="label">The Sum of K.D.</span>
-                <span class="dots" style="width:73%;"><?= esc($invoice['amount'] ?? '') ?></span>مجموع K.D:
+                <span class="dots" style="width:73%;"><?= esc($invoice['total_amount'] ?? '') ?></span>مجموع K.D:
             </div>
             <div class="field">
                 <span class="label"> Cash / Cheque No.</span>
