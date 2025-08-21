@@ -1,4 +1,4 @@
-<?php include "common/header.php";?>
+<!-- <?php include "common/header.php";?>
         <!-- partial -->
 	
         <div class="content-wrapper right_container">
@@ -20,4 +20,4 @@
 				</div>
 			</div>
 		
-<?php include "common/footer.php";?>
+<?php include "common/footer.php";?> -->

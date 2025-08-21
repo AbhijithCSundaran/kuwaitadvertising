@@ -836,52 +836,76 @@
       });
   }
 
-  function updateStatus(newStatus) {
+ function updateStatus(newStatus) {
     const invoiceId = <?= $invoice['invoice_id'] ?>;
 
     console.log("Updating invoice:", invoiceId, "to status:", newStatus);
 
     fetch("<?= base_url('invoice/update_status') ?>", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Requested-With": "XMLHttpRequest"
-      },
-      body: JSON.stringify({
-        invoice_id: invoiceId,
-        status: newStatus
-      })
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-Requested-With": "XMLHttpRequest"
+        },
+        body: JSON.stringify({
+            invoice_id: invoiceId,
+            status: newStatus
+        })
     })
-      .then(res => res.json())
-      .then(data => {
+    .then(res => res.json())
+    .then(data => {
         if (data.success) {
-          statusBtn.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
-          statusBtn.style.backgroundColor = newStatus === 'paid' ? '#28a745' : '#991b36';
-          statusOptions.style.display = 'none';
-
-          if (newStatus === 'paid' || newStatus === 'partial') {
-            statusBtn.disabled = true;
-            statusBtn.setAttribute('title', 'Fully paid invoice cannot be changed');
-            statusBtn.removeAttribute('onclick');
-
-            document.getElementById('paidAmountRow')?.style.setProperty('display', 'none', 'important');
-            document.getElementById('balanceAmountRow')?.style.setProperty('display', 'none', 'important');
-            document.getElementById('deliveryNoteBtn')?.style.setProperty('display', 'inline-block');
+            statusBtn.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+            if (newStatus === 'paid') {
+                statusBtn.style.backgroundColor = '#28a745'; 
+            } else if (newStatus === 'partial paid') {
+                statusBtn.style.backgroundColor = '#ffc107'; 
+            } else {
+                statusBtn.style.backgroundColor = '#991b36'; 
+            }
+            statusOptions.style.display = 'none';
             const editBtn = document.getElementById('editinvoicebtn');
-            if (editBtn) editBtn.style.display = 'none';
-          }
+            const deliveryBtn = document.getElementById('deliveryNoteBtn');
 
+            if (newStatus === 'paid' || newStatus === 'partial paid') {
+                statusBtn.disabled = true;
+                statusBtn.setAttribute('title', 'This invoice status cannot be changed');
+                statusBtn.removeAttribute('onclick');
 
+                // Hide amount rows
+                document.getElementById('paidAmountRow')?.style.setProperty('display', 'none', 'important');
+                document.getElementById('balanceAmountRow')?.style.setProperty('display', 'none', 'important');
+
+                // Show delivery note button immediately
+                if (deliveryBtn) {
+                    deliveryBtn.style.setProperty('display', 'inline-block', 'important');
+                }
+
+                // Hide edit invoice button immediately
+                if (editBtn) {
+                    editBtn.style.setProperty('display', 'none', 'important');
+                }
+            } else {
+                // For unpaid invoices → show edit, hide delivery note
+                if (editBtn) {
+                    editBtn.style.setProperty('display', 'inline-block', 'important');
+                }
+                if (deliveryBtn) {
+                    deliveryBtn.style.setProperty('display', 'none', 'important');
+                }
+            }
         } else {
-          alert("Status update failed.");
-          console.error("Update status failed:", data);
+            alert("Status update failed.");
+            console.error("Update status failed:", data);
         }
-      })
-      .catch(err => {
+    })
+    .catch(err => {
         alert("Network or server error.");
         console.error("Fetch error:", err);
-      });
-  }
+    });
+}
+
+
 
 let selectedInvoiceId = null;
 

@@ -3,7 +3,7 @@
     <div class="form-control right_container">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h3 class="mb-0"><?= isset($company['company_id']) ? 'Edit Company' : 'Add New Company' ?></h3>
+                <h3 class="mb-0"><?= isset($selectedCompany['company_id']) ? 'Edit Company' : 'Add New Company' ?></h3>
             </div>
             <hr  class="d-none d-md-block">
             <div class="card-body p-3 px-md-4">
@@ -12,24 +12,24 @@
                         <div class="col-12 col-md-6 mb-3 px-2">
                             <label for="company_name" class="form-label">Name <span class="text-danger">*</span></label>
                             <input type="text" name="company_name" id="company_name" class="form-control capitalize" maxlength="50"
-                            value="<?= isset($company['company_name']) ? esc($company['company_name']) : '' ?>" />
+                            value="<?= isset($selectedCompany['company_name']) ? esc($selectedCompany['company_name']) : '' ?>" />
                         </div>
                         
                         <div class="col-12 col-md-6 mb-3 px-2">
                             <label for="email" class="form-label">Email</label>
                             <input type="email" name="email" id="email" class="form-control"
-                            value="<?= isset($company['email']) ? esc($company['email']) : '' ?>" />
+                            value="<?= isset($selectedCompany['email']) ? esc($selectedCompany['email']) : '' ?>" />
                         </div>
                         <!-- address -->
                         <div class="col-12 col-md-6 mb-3 px-2">
                             <label for="address" class="form-label">Company Address</label>
                             <textarea name="address" id="address" class="form-control capitalize" maxlength="150"
-                            style="resize: vertical;" rows="3"><?= isset($company['address']) ? esc($company['address']) : '' ?></textarea>
+                            style="resize: vertical;" rows="3"><?= isset($selectedCompany['address']) ? esc($selectedCompany['address']) : '' ?></textarea>
                         </div>
 
                         <?php
-                            $addressVal = isset($company['address']) ? trim($company['address']) : '';
-                            $billingVal = isset($company['billing_address']) ? trim($company['billing_address']) : '';
+                            $addressVal = isset($selectedCompany['address']) ? trim($selectedCompany['address']) : '';
+                            $billingVal = isset($selectedCompany['billing_address']) ? trim($selectedCompany['billing_address']) : '';
                             $isSame = $addressVal !== '' && $addressVal === $billingVal;
                         ?>
 
@@ -42,7 +42,7 @@
                                 </div>
                             </label>
                             <textarea name="billing_address" id="billing_address" class="form-control capitalize" maxlength="150"
-                                style="resize: vertical;" rows="3"><?= isset($company['billing_address']) ? esc($company['billing_address']) : '' ?></textarea>
+                                style="resize: vertical;" rows="3"><?= isset($selectedCompany['billing_address']) ? esc($selectedCompany['billing_address']) : '' ?></textarea>
                         </div>
 
                         <!-- address -->
@@ -52,44 +52,44 @@
                             <input type="text" name="phone" id="phone" class="form-control" maxlength="20"
                             pattern="^[\+0-9\s\-\(\)]{7,25}$"
                             title="Please enter a valid phone number (digits, +, -, spaces allowed, 7–20 characters)"
-                            value="<?= isset($company['phone']) ? esc($company['phone']) : '' ?>" required>
+                            value="<?= isset($selectedCompany['phone']) ? esc($selectedCompany['phone']) : '' ?>" required>
                         </div>
                         <div class="col-12 col-md-6 mb-3 px-2">
                             <label for="tax_number" class="form-label">Tax Number</label>
                             <input type="text" name="tax_number" id="tax_number" class="form-control" maxlength="15"
-                            value="<?= isset($company['tax_number']) ? esc($company['tax_number']) : '' ?>" />
+                            value="<?= isset($selectedCompany['tax_number']) ? esc($selectedCompany['tax_number']) : '' ?>" />
                         </div>
                         <div class="col-12 col-md-6 mb-3 px-2">
                             <label class="form-label">Company Logo <span class="text-danger">*</span></label>
-                           <?php if (!isset($company['company_id'])): ?>
+                           <?php if (!isset($selectedCompany['company_id'])): ?>
                                 <input type="file" name="company_logo" id="company_logo" class="form-control" accept="image/*" />
                             <?php else: ?>
 
                                 <div class="input-group loggo">
                                     <button type="button" class="btn btn-outline-secondary" id="btn-browse-file">Choose File</button>
                                     <input type="text" id="fake-file-name" class="form-control" readonly />
-                                     <!-- value="<?= esc($company['company_logo']) ?>"   -->
+                                     <!-- value="<?= esc($selectedCompany['company_logo']) ?>"   -->
                                     <input type="file" name="company_logo" id="company_logo" class="d-none" accept="image/*" />
                                 </div>
                            
                                 <div class="mt-2">
                                     <strong>Current Logo Preview:</strong><br>
-                                    <img id="logo-preview" src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" width="100" class="border p-1" />
+                                    <img id="logo-preview" src="<?= base_url('public/uploads/' . $selectedCompany['company_logo']) ?>" width="100" class="border p-1" />
                                 </div>
                             <?php endif; ?>
                                 <div>
                                     <input type="hidden" name="original_logo" id="original_logo"
-                                    value="<?= isset($company['company_logo']) ? esc($company['company_logo']) : '' ?>" />
+                                    value="<?= isset($selectedCompany['company_logo']) ? esc($selectedCompany['company_logo']) : '' ?>" />
                                 </div>
                         </div>
 
                         <input type="hidden" name="uid" id="uid"
-                        value="<?= isset($company['company_id']) ? esc($company['company_id']) : '' ?>" />
+                        value="<?= isset($selectedCompany['company_id']) ? esc($selectedCompany['company_id']) : '' ?>" />
                         <div class="col-12 p-3 d-flex justify-content-end gap-2" >
                             <a href="<?= base_url('companylist') ?>" class="btn btn-secondary">Discard</a>
                             <button type="button" class="btn btn-primary enter-btn"
-                                <?= isset($company['company_id']) ? 'disabled' : '' ?>
-                                style="<?= isset($company['company_id']) ? 'opacity: 0.6;' : '' ?>">
+                                <?= isset($selectedCompany['company_id']) ? 'disabled' : '' ?>
+                                style="<?= isset($selectedCompany['company_id']) ? 'opacity: 0.6;' : '' ?>">
                                 Save
                             </button>
                         </div>
@@ -119,7 +119,7 @@
                 reader.readAsDataURL(file);
 
                 if (isEditMode) {
-                    logoChanged = true; // trigger save enable logic
+                    logoChanged = true; 
                     checkChanges();
                 }
             }
