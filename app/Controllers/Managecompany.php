@@ -34,9 +34,8 @@ class Managecompany extends BaseController
 			if (!$company) {
 				throw PageNotFoundException::forPageNotFound('Company Not Found.');
 			}
-			$data['company'] = $company;
+			$data['selectedCompany'] = $company;
 		}
-
 		return view('addcompany', $data);
 	}
 
