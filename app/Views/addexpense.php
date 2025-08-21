@@ -75,7 +75,7 @@ input[type=number].no-spinner {
                     </div>
                     <div class="form-group col-6">
                         <label for="customerId" style="margin-left: 10px;">Customer </label>
-                         <select name="customer_id" id="customer_id" class="form-control select2" required>
+                         <select name="customer_id" id="customer_id" class="form-control select2">
                             <option value="" disabled <?= !isset($expense['customer_id']) ? 'selected' : '' ?>>Select Customer</option>
                             <?php foreach ($customers ?? [] as $customer): ?>
                                 <option value="<?= $customer['customer_id'] ?>"
@@ -152,15 +152,12 @@ $(document).ready(function () {
         const currentData = $('#expense-form').serialize();
         $('#saveExpenseBtn').prop('disabled', currentData === originalData);
     });
+    $('#amount').on('input', function () {
+        let val = $(this).val();
+        let regex = /^\d{0,8}(\.\d{0,2})?$/;
 
-    // Restrict invalid characters in Amount field
-    $('#amount').on('keypress', function (e) {
-        const key = e.key;
-        const val = $(this).val();
-
-        // Allow: digits and one dot (.)
-        if (!/[0-9.]/.test(key) || (key === '.' && val.includes('.'))) {
-            e.preventDefault();
+        if (!regex.test(val)) {
+            $(this).val(val.slice(0, -1));
         }
     });
 

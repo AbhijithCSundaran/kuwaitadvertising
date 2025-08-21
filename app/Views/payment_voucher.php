@@ -147,11 +147,11 @@
             </div>
             <div class="field">
                 <span class="label">Paid To Mr./Mrs. </span>
-                <span class="dots"><?= esc($customer['customer_name'] ?? '') ?></span>مدفوع للسيد/السيدة:
+                <span class="dots"><?= esc($invoice['customer_name'] ?? '') ?></span>مدفوع للسيد/السيدة:
             </div>
             <div class="field">
                 <span class="label">The Sum of K.D. </span>
-                <span class="dots" style="width:73%;"><?= esc($invoice['amount'] ?? '') ?></span>مجموع K.D:
+                <span class="dots" style="width:73%;"><?= esc($invoice['total_amount'] ?? '') ?></span>مجموع K.D:
             </div>
             <div class="field">
                 <span class="label">Bank / </span>

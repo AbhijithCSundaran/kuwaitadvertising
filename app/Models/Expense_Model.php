@@ -13,16 +13,52 @@ class Expense_Model extends Model
     public function getAllExpenseCount() {
         return $this->db->query("select count(*) as totexpense from expenses")->getRow();
     }
-	public function getAllFilteredRecords($condition, $fromstart, $tolimit, $orderBy = 'id', $orderDir = 'desc') {
-        $orderBy = in_array($orderBy, ['id', 'date', 'particular', 'amount', 'payment_mode']) ? $orderBy : 'id';
-        $orderDir = strtolower($orderDir) === 'asc' ? 'ASC' : 'DESC';
+public function getAllFilteredRecords($condition, $fromstart, $tolimit, $orderBy = 'id', $orderDir = 'desc')
+{
+    $allowedColumns = [
+            'id'            => 'e.id',
+            'date'          => 'e.date',
+            'particular'    => 'e.particular',
+            'amount'        => 'e.amount',
+            'payment_mode'  => 'e.payment_mode',
+            'reference'     => 'e.reference',
+            'customer_id'   => 'e.customer_id',
+            'company_id'    => 'e.company_id',
+            'customer_name' => 'c.name', 
+        ];
 
-        return $this->db->query("SELECT * FROM expenses WHERE $condition ORDER BY $orderBy $orderDir LIMIT $fromstart, $tolimit")->getResult();
-    }
+    $orderBy = in_array($orderBy, $allowedColumns) ? $orderBy : 'id';
+    $orderDir = strtolower($orderDir) === 'asc' ? 'ASC' : 'DESC';
+    
+      $condition = str_replace('company_id', 'e.company_id', $condition);
+        $condition = str_replace('customer_id', 'e.customer_id', $condition);
+
+    $sql = "
+        SELECT e.*, c.name AS customer_name
+        FROM expenses e
+        LEFT JOIN customers c ON c.customer_id = e.customer_id
+        WHERE $condition
+        ORDER BY e.$orderBy $orderDir
+        LIMIT $fromstart, $tolimit
+    ";
+
+    return $this->db->query($sql)->getResult();
+}
+
+
 
 	public function getFilterExpenseCount($condition) {
 		
-		return $this->db->query("select count(*) as filRecords from expenses where ".$condition)->getRow();
+		 $condition = str_replace('company_id', 'e.company_id', $condition);
+        $condition = str_replace('customer_id', 'e.customer_id', $condition);
+
+        $sql = "
+            SELECT COUNT(*) AS filRecords
+            FROM expenses e
+            LEFT JOIN customers c ON c.customer_id = e.customer_id
+            WHERE $condition
+        ";
+         return $this->db->query($sql)->getRow();
 	}
 
     public function getTodayExpenseTotal()

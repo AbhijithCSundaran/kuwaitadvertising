@@ -11,7 +11,7 @@
     padding: 5px 8px !important;
     font-size: 12px;
     
-
+    }
 </style>
 
 <div class="form-control mb-3 right_container">
@@ -126,41 +126,56 @@ $(document).ready(function () {
                 orderable: false,
                 searchable: false,
                 render: function(id, type, row) {
-                    let printBtn = '';
-                    if (row.payment_status.toLowerCase() !== 'unpaid') {
-                        if (row.payment_mode === 'cash') {
-                            printBtn = `<a href="<?= base_url('cashreceipt/print/') ?>${id}" title="Print" style="color:green;">
-                <i class="bi bi-printer-fill"></i>
-            </a>`;
+    let printBtn = '';
+    let viewBtn = '';
 
-                        } else {
-                          printBtn = `<a href="<?= base_url('paymentvoucher/print/') ?>${id}" title="Print" style="color:green;">
-                <i class="bi bi-printer-fill"></i>
-            </a>`;
-                        }
-                    } else {
-                        printBtn = `<a href="javascript:void(0);" title="Unable to print unpaid receipt" style="color:gray;">
-                                        <i class="bi bi-printer-fill"></i>
-                                    </a>`;
-                    }
+    if (row.payment_status.toLowerCase() !== 'unpaid') {
+        if (row.payment_mode === 'cash') {
+            // CASH
+            viewBtn = `<a href="<?= base_url('receiptvoucher/print/') ?>${id}" title="View" style="color: rgb(13, 162, 199);">
+                          <i class="bi bi-eye-fill"></i>
+                       </a>`;
+            printBtn = `<a href="<?= base_url('printreceipt/print/') ?>${id}" title="Print" style="color:green;">
+                          <i class="bi bi-printer-fill"></i>
+                       </a>`;
+        } else {
+            // NON-CASH
+            viewBtn = `<a href="<?= base_url('paymentvoucher/print/') ?>${id}" title="View" style="color: rgb(13, 162, 199);">
+                          <i class="bi bi-eye-fill"></i>
+                       </a>`;
+            printBtn = `<a href="<?= base_url('paymentvoucher/print/') ?>${id}" title="Print" style="color:green;">
+                          <i class="bi bi-printer-fill"></i>
+                       </a>`;
+        }
+    } else {
+        // UNPAID
+        viewBtn = `<a href="javascript:void(0);" title="Unable to view unpaid receipt" style="color:gray;">
+                      <i class="bi bi-eye-fill"></i>
+                   </a>`;
+        printBtn = `<a href="javascript:void(0);" title="Unable to print unpaid receipt" style="color:gray;">
+                      <i class="bi bi-printer-fill"></i>
+                   </a>`;
+    }
 
-                    return `
-                        <div class="d-flex gap-2">
-                            <a href="<?= base_url('cashreceipt/view/') ?>${id}" title="View" style="color: rgb(13, 162, 199);">
-                                <i class="bi bi-eye-fill"></i>
-                            </a>
-                            ${printBtn}
-                            <a href="javascript:void(0);" class="delete-cashreceipt" data-id="${id}" title="Delete" style="color: #dc3545;">
-                                <i class="bi bi-trash-fill"></i>
-                            </a>
-                        </div>
-                    `;
-                }
+    return `
+        <div class="d-flex gap-2">
+            ${viewBtn}
+            ${printBtn}
+            <a href="javascript:void(0);" class="delete-cashreceipt" data-id="${id}" title="Delete" style="color: #dc3545;">
+                <i class="bi bi-trash-fill"></i>
+            </a>
+        </div>
+    `;
+}
+
             }
         ],
         dom: "<'row mb-3'<'col-sm-6'l><'col-sm-6'f>>" +
              "<'row'<'col-sm-12'tr>>" +
-             "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>"
+             "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
+            language: {
+                infoFiltered: ""  
+            }
     });
 
     // Delete handler

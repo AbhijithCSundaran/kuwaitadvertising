@@ -127,7 +127,11 @@ $(document).ready(function () {
             },
             {
                 data: "address",
-                render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : '-N/A-'
+                render: data => {
+                        if (!data) return '';
+                        let formatted = data.replace(/\b\w/g, c => c.toUpperCase());
+                        return formatted.replace(/\n/g, "<br>");
+                    }
             },
             {
                 data: "customer_id",

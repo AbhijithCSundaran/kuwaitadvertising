@@ -17,6 +17,7 @@
                     <th>Sl No</th>
                     <th>Date</th>
                     <th>Particular</th>
+                    <th>Customer Name</th>
                     <th>Amount</th>
                     <th>Payment Mode</th>
                     <th>Action</th>
@@ -80,6 +81,10 @@
                         return data.replace(/\b\w/g, c => c.toUpperCase());
                     }
                 },
+                {
+                    data:"customer_name",
+                     render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''
+                },
 
                 { data: "amount"},
 
@@ -106,8 +111,8 @@
                 }
             ],
            columnDefs: [
-                { searchable: false, orderable: false, targets: [0, 3,5,] }, 
-                { targets: 2, width: '450px' }
+                { searchable: false, orderable: false, targets: [0,4,6,] }, 
+                { targets: 2, width: '300px' }
             ],
             order: [[2, 'desc']], 
              language: {

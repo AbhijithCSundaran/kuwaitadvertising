@@ -191,8 +191,8 @@
         <td><?= $si++ ?></td>
         <td><?= esc($item['description']) ?></td>
         <td><?= esc($item['quantity']) ?></td>
-        <td><?= number_format($item['price'], 3) ?></td>
-        <td><?= number_format($item['total'], 3) ?></td>
+        <td><?= number_format($item['price'], 2) ?></td>
+        <td><?= number_format($item['total'], 2) ?></td>
       </tr>
     <?php endforeach; ?>
       <tr><td  class="padding-50"></td> <td></td><td></td><td></td><td></td></tr>
