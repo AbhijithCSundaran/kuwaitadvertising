@@ -2,7 +2,7 @@
 
 use App\Models\Managecompany_Model;
 use App\Models\InvoiceModel;
-use App\Models\CustomerModel;
+use App\Models\customerModel;
 use App\Models\Manageuser_Model;
 
 class ReceiptVoucher extends BaseController
@@ -12,7 +12,7 @@ class ReceiptVoucher extends BaseController
         // Load models
         $companyModel  = new Managecompany_Model();
         $invoiceModel  = new InvoiceModel();
-        $customerModel = new CustomerModel();
+        $customerModel = new customerModel();
         $userModel     = new Manageuser_Model(); 
 
         // Fetch details
