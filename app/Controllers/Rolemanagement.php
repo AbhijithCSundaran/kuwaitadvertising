@@ -102,9 +102,7 @@ class Rolemanagement extends Controller
     $draw = $_POST['draw'] ?? 1;
     $fromstart = $_POST['start'] ?? 0;
     $tolimit = $_POST['length'] ?? 10;
-    $search = $_POST['search']['value'] ?? '';
-
-    $search = trim($this->db->escapeLikeString($search));
+    $search = $_POST['search']['value'];
     $condition = "1=1";
     $company_id = session()->get('company_id'); // your selected company
 // do NOT append company_id to $condition here
@@ -112,11 +110,14 @@ class Rolemanagement extends Controller
 if (empty($company_id)) {
     die("Company ID missing in session!");
 }
+    $search = trim(preg_replace('/\s+/', ' ', $search)); 
+
     if (!empty($search)) {
+        $noSpaceSearch = str_replace(' ', '', strtolower($search));
+
         $condition .= " AND (
-            role_name LIKE '%{$search}%' 
-            OR DATE_FORMAT(created_at, '%d-%m-%Y') LIKE '%{$search}%' 
-            OR DATE_FORMAT(updated_at, '%d-%m-%Y') LIKE '%{$search}%'
+            REPLACE(LOWER(role_name), ' ', '') LIKE '%{$noSpaceSearch}%'
+            
         )";
     }
 
@@ -135,7 +136,7 @@ if (empty($company_id)) {
     // Pass $company_id to match your model signature
     $totalRec = $this->roleModel->getAllFilteredRecords($condition, $fromstart, $tolimit, $orderBy, $orderDir, $company_id);
     $result = [];
-    $searchLower = strtolower($search);
+    
 
     foreach ($totalRec as $role) {
         $permissions = $this->roleMenuModel

@@ -36,38 +36,24 @@ class InvoiceModel extends Model
                 ->orderBy('invoices.invoice_id', 'desc')
                 ->findAll();
 }
-//    public function getFilteredCount($search = '')
-//     {
-//         $builder = $this->db->table('invoices')
-//             ->join('customers', 'customers.customer_id = invoices.customer_id', 'left');
-
-//         if ($search) {
-//             $search = trim(strtolower($search));
-
-//             $builder->groupStart()
-//                 ->like('LOWER(customers.name)', $search)
-//                 ->orLike('LOWER(customers.address)', $search)
-//                 ->orLike('FORMAT(invoices.discount, 2)', $search)
-//                 ->orLike('DATE_FORMAT(invoices.invoice_date, "%d-%m-%Y")', $search)
-//                 ->groupEnd();
-//         }
-//         return $builder->countAllResults();
-//     }
     public function getFilteredCount($searchValue, $companyId)
     {
+        $searchValue = trim($searchValue);
         $builder = $this->db->table('invoices')
             ->join('customers', 'customers.customer_id = invoices.customer_id', 'left')
             ->where('invoices.company_id', $companyId);
 
         if (!empty($searchValue)) {
-            $searchValue = trim(strtolower($searchValue));
-            $builder->groupStart()
-                ->like('LOWER(customers.name)', $searchValue)
-                ->orLike('LOWER(customers.address)', $searchValue)
-                ->orLike('FORMAT(invoices.discount, 2)', $searchValue)
-                ->orLike('DATE_FORMAT(invoices.invoice_date,"%d-%m-%Y")', $searchValue)
-                ->groupEnd();
-        }
+    $normalizedSearch = preg_replace('/\s+/', '', strtolower($searchValue)); 
+
+    $builder->groupStart()
+        ->like('customers.name', $searchValue)
+        ->orLike('customers.address', $searchValue)
+        ->orLike('invoices.invoice_id', $searchValue)
+        ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.name), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
+        ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.address), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
+    ->groupEnd();
+}
 
         return $builder->countAllResults();
     }
@@ -75,25 +61,25 @@ class InvoiceModel extends Model
 
 
 
-   public function getFilteredInvoices($search = '', $start = 0, $length = 10, $orderColumn = 'invoice_id', $orderDir = 'desc', $companyId = null)
+   public function getFilteredInvoices($searchValue = '', $start = 0, $length = 10, $orderColumn = 'invoice_id', $orderDir = 'desc', $companyId = null)
 {
+    $searchValue = trim($searchValue);
     $builder = $this->db->table('invoices')
         ->select('invoices.invoice_id, invoices.customer_id, invoices.discount, invoices.total_amount, invoices.invoice_date, invoices.phone_number, invoices.lpo_no, invoices.status, customers.name AS customer_name, customers.address AS customer_address')
         ->join('customers', 'customers.customer_id = invoices.customer_id', 'left')
         ->join('user', 'user.user_id = invoices.user_id', 'left')
         ->where('invoices.company_id', $companyId); 
+   if (!empty($searchValue)) {
+        $normalizedSearch = str_replace(' ', '', strtolower($searchValue));
 
-    // if ($companyId) {
-    //     $builder->where('user.company_id', $companyId);
-    // }
-    if ($search) {
-        $search = trim(strtolower($search));
         $builder->groupStart()
-            ->like('LOWER(customers.name)', $search)
-            ->orLike('LOWER(customers.address)', $search)
-            ->orLike('FORMAT(invoices.discount, 2)', $search)
-            ->orLike('DATE_FORMAT(invoices.invoice_date,"%d-%m-%Y")', $search)
-            ->groupEnd();
+            ->like('customers.name', $searchValue)
+            ->orLike('customers.address', $searchValue)
+            ->orLike('invoices.invoice_id', $searchValue)
+
+           ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.name), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
+        ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.address), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
+        ->groupEnd();
     }
 
     return $builder->orderBy($orderColumn, $orderDir)

@@ -135,7 +135,7 @@ public function fetch()
     $start = $request->getPost('start') ?? 0;
     $length = $request->getPost('length') ?? 10;
     $order = $request->getPost('order');
-    $search = $request->getPost('search')['value'] ?? '';
+    $search= trim($request->getPost('search')['value'] ?? '');
 
     $columnIndex = $order[0]['column'] ?? 0;
     $orderDir = $order[0]['dir'] ?? 'desc';

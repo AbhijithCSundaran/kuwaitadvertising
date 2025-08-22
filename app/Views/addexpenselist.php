@@ -17,7 +17,7 @@
                     <th>Sl No</th>
                     <th>Date</th>
                     <th>Particular</th>
-                    <th>Customer Name</th>
+                    <th>Customer</th>
                     <th>Amount</th>
                     <th>Payment Mode</th>
                     <th>Action</th>
@@ -114,7 +114,7 @@
                 { searchable: false, orderable: false, targets: [0,4,6,] }, 
                 { targets: 2, width: '300px' }
             ],
-            order: [[2, 'desc']], 
+            order: [[1, 'desc'], [0, 'desc']], 
              language: {
         infoFiltered: "" 
     }

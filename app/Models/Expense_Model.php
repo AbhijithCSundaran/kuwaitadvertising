@@ -27,7 +27,7 @@ public function getAllFilteredRecords($condition, $fromstart, $tolimit, $orderBy
             'customer_name' => 'c.name', 
         ];
 
-    $orderBy = in_array($orderBy, $allowedColumns) ? $orderBy : 'id';
+    $orderBy = array_key_exists($orderBy, $allowedColumns) ? $allowedColumns[$orderBy] : 'e.id';
     $orderDir = strtolower($orderDir) === 'asc' ? 'ASC' : 'DESC';
     
       $condition = str_replace('company_id', 'e.company_id', $condition);
@@ -38,7 +38,7 @@ public function getAllFilteredRecords($condition, $fromstart, $tolimit, $orderBy
         FROM expenses e
         LEFT JOIN customers c ON c.customer_id = e.customer_id
         WHERE $condition
-        ORDER BY e.$orderBy $orderDir
+       ORDER BY e.date DESC, e.id DESC
         LIMIT $fromstart, $tolimit
     ";
 
