@@ -251,6 +251,26 @@
         initialFormData = $('#invoice-form').serialize();
         $('#save-invoice-btn').prop('disabled', true);
 
+        function updateSaveButtonState() {
+        const currentFormData = $('#invoice-form').serialize();
+        const hasChanged = currentFormData !== initialFormData;
+        $('#save-invoice-btn').prop('disabled', !hasChanged);
+    }
+
+    // Call this on input/change and after adding/removing rows
+    $('#invoice-form input, #invoice-form select, #invoice-form textarea').on('input change', updateSaveButtonState);
+    $(document).on('click', '.remove-item-btn', function () {
+        $(this).closest('tr').remove();
+        calculateTotals();
+        updateSaveButtonState();
+    });
+    $('#add-item').click(function () {
+        // ... append new row ...
+        calculateTotals();
+        updateSaveButtonState();
+    });
+
+
         $('#invoice-form input, #invoice-form select, #invoice-form textarea').on('input change', function () {
             const currentFormData = $('#invoice-form').serialize();
             const hasChanged = currentFormData !== initialFormData;

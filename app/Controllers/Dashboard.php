@@ -107,18 +107,17 @@ public function getTodayRevenueTotal()
     $invoiceModel = new \App\Models\InvoiceModel();
     $session = session();
     $company_id = $session->get('company_id');
-
-    $today = date('Y-m-d'); // only date
+    $today = date('Y-m-d');
 
     $total = $invoiceModel
-        ->selectSum('total_amount')
+        ->selectSum('paid_amount') 
         ->where('invoice_date', $today)
         ->where('company_id', $company_id)
+        ->whereIn('status', ['paid', 'partial paid']) // only include paid & partial
         ->first();
 
-    return $this->response->setJSON(['total' => (float)($total['total_amount'] ?? 0)]);
+    return $this->response->setJSON(['total' => (float)($total['paid_amount'] ?? 0)]);
 }
-
 
 public function getMonthlyRevenueTotal()
 {
@@ -127,13 +126,14 @@ public function getMonthlyRevenueTotal()
     $company_id = $session->get('company_id');
 
     $total = $invoiceModel
-        ->selectSum('total_amount')
+        ->selectSum('paid_amount') 
         ->where('MONTH(invoice_date)', date('m'))
         ->where('YEAR(invoice_date)', date('Y'))
         ->where('company_id', $company_id)
+        ->whereIn('status', ['paid', 'partial paid'])
         ->first();
 
-    return $this->response->setJSON(['total' => (float)($total['total_amount'] ?? 0)]);
+    return $this->response->setJSON(['total' => (float)($total['paid_amount'] ?? 0)]);
 }
 
 

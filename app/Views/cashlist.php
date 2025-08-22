@@ -98,15 +98,27 @@ $(document).ready(function () {
                 render: function(data) {
                     if (!data) return '';
                     let className = '';
-                    switch(data.toLowerCase()) {
-                        case 'paid': className = 'badge bg-success custom-badge'; break;
-                        case 'unpaid': className = 'badge bg-danger custom-badge'; break;
-                        case 'partial paid': className = 'badge bg-warning custom-badge'; break;
-                        default: className = 'badge bg-secondary custom-badge'; break;
+                    let formattedData = data.charAt(0).toUpperCase() + data.slice(1); // ✅ Capitalize first letter
+
+                    switch (data.toLowerCase()) {
+                        case 'paid': 
+                            className = 'badge bg-success custom-badge'; 
+                            break;
+                        case 'unpaid': 
+                            className = 'badge bg-danger custom-badge'; 
+                            break;
+                        case 'partial paid': 
+                            formattedData = 'Partial Paid'; // ✅ Proper capitalization for two words
+                            className = 'badge bg-warning custom-badge'; 
+                            break;
+                        default: 
+                            className = 'badge bg-secondary custom-badge'; 
+                            break;
                     }
-                    return `<span class="${className}">${data}</span>`;
+                    return `<span class="${className}">${formattedData}</span>`;
                 }
             },
+
 
             {
                 data: 'payment_mode',
@@ -130,15 +142,16 @@ $(document).ready(function () {
     let viewBtn = '';
 
     if (row.payment_status.toLowerCase() !== 'unpaid') {
-        if (row.payment_mode === 'cash') {
-            // CASH
-            viewBtn = `<a href="<?= base_url('receiptvoucher/print/') ?>${id}" title="View" style="color: rgb(13, 162, 199);">
-                          <i class="bi bi-eye-fill"></i>
-                       </a>`;
-            printBtn = `<a href="<?= base_url('printreceipt/print/') ?>${id}" title="Print" style="color:green;">
-                          <i class="bi bi-printer-fill"></i>
-                       </a>`;
-        } else {
+       if (row.payment_mode === 'cash') {
+                // CASH
+                viewBtn = `<a href="<?= base_url('receiptvoucher/print/') ?>${id}" title="View" style="color: rgb(13, 162, 199);">
+                            <i class="bi bi-eye-fill"></i>
+                        </a>`;
+                printBtn = `<a href="<?= base_url('receiptvoucher/print/') ?>${id}" title="Print" style="color:green;">
+                            <i class="bi bi-printer-fill"></i>
+                        </a>`;
+            }
+            else {
             // NON-CASH
             viewBtn = `<a href="<?= base_url('paymentvoucher/print/') ?>${id}" title="View" style="color: rgb(13, 162, 199);">
                           <i class="bi bi-eye-fill"></i>
