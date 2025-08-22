@@ -138,10 +138,23 @@
                         <div class="d-flex align-items-center gap-3">
                             <a href="<?= base_url('estimate/generateEstimate/') ?>${id}" title="Print" style="color:green;">
                                 <i class="bi bi-printer-fill"></i>
-                            </a>
-                            <a href="<?= base_url('estimate/edit/') ?>${id}" title="Edit" style="color:rgb(13, 162, 199); ">
+                          ${row.is_converted == 0 ? `
+                            <a 
+                                href="<?= base_url('estimate/edit/') ?>${id}" 
+                                title="Edit Estimate" 
+                                style="color:rgb(13, 162, 199); cursor:pointer;">
                                 <i class="bi bi-pencil-fill"></i>
                             </a>
+                        ` : `
+                            <a 
+                                href="#" 
+                                title="This Estimate Has Already Been Converted To An Invoice And Cannot Be Edited" 
+                                style="color:gray; cursor:not-allowed;" 
+                                onclick="event.preventDefault(); showEstimateEditAlert();">
+                                <i class="bi bi-pencil-fill"></i>
+                            </a>
+                        `}
+
                             
                             <a href="javascript:void(0);" class="delete-estimate" data-id="${id}" title="Delete" style="color: #dc3545;">
                                 <i class="bi bi-trash-fill"></i>

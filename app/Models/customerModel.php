@@ -17,6 +17,7 @@ class customerModel extends Model
 
     public function getFilteredCustomerCount($search = '', $company_id = null)
 {
+     $search = trim($search);
     $builder = $this->db->table($this->table);
     $builder->where('is_deleted', 0);
 
@@ -24,15 +25,17 @@ class customerModel extends Model
         $builder->where('company_id', $company_id);
     }
 
-    if ($search) {
-        $search = strtolower(trim($search));
-        $search = str_replace(' ', '', $search);
+   if (!empty($search)) {
+    $normalizedSearch = str_replace(' ', '', strtolower($search)); 
 
-        $builder->groupStart()
-            ->like("REPLACE(LOWER(name), ' ', '')", $search)
-            ->orLike("REPLACE(LOWER(address), ' ', '')", $search)
-            ->groupEnd();
-    }
+    $builder->groupStart()
+        ->like('customers.name', $search)
+        ->orLike('customers.address', $search)
+        ->orLike('customers.customer_id', $search)
+        ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.name), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
+        ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.address), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
+        ->groupEnd();
+}
 
     $count = $builder->countAllResults();
     return (object)['filCustomers' => $count];
@@ -40,6 +43,7 @@ class customerModel extends Model
 
 public function getAllFilteredRecords($search = '', $fromstart = 0, $tolimit = 10, $orderColumn = 'customer_id', $orderDir = 'DESC', $company_id = null)
 {
+    $search = trim($search);
     $allowedColumns = ['customer_id', 'name', 'address'];
     if (!in_array($orderColumn, $allowedColumns)) {
         $orderColumn = 'customer_id';
@@ -53,15 +57,17 @@ public function getAllFilteredRecords($search = '', $fromstart = 0, $tolimit = 1
         $builder->where('company_id', $company_id);
     }
 
-    if ($search) {
-        $search = strtolower(trim($search));
-        $search = str_replace(' ', '', $search);
+   if (!empty($search)) {
+    $normalizedSearch = str_replace(' ', '', strtolower($search)); 
 
-        $builder->groupStart()
-            ->like("REPLACE(LOWER(name), ' ', '')", $search)
-            ->orLike("REPLACE(LOWER(address), ' ', '')", $search)
-            ->groupEnd();
-    }
+    $builder->groupStart()
+        ->like('customers.name', $search)
+        ->orLike('customers.address', $search)
+        ->orLike('customers.customer_id', $search)
+         ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.name), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
+        ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.address), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
+        ->groupEnd();
+}
 
     $builder->orderBy($orderColumn, $orderDir)
             ->limit($tolimit, $fromstart);

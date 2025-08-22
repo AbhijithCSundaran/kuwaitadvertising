@@ -11,6 +11,7 @@
       margin: auto;
       padding: 15px;
       background-color: #991b36;
+          margin-left: 430px;
     }
 
     .container {

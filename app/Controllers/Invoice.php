@@ -17,13 +17,17 @@ class Invoice extends BaseController
     public function add()
     {
       $customerModel = new customerModel();
+      
         $companyId = session()->get('company_id');
+         $customers = $customerModel->where('company_id', $companyId)->findAll();
         $data['customers'] = $customerModel
             ->where('is_deleted', 0)
             ->where('company_id', $companyId)
             ->findAll();
  
-        return view('invoice_form', $data);
+        return view('invoice_form', [
+         'customers' => $customers,
+        'invoice' => []]);
     }
 
     public function list()
@@ -44,7 +48,7 @@ class Invoice extends BaseController
         $draw = $request->getPost('draw');
         $start = $request->getPost('start');
         $length = $request->getPost('length');
-        $searchValue = $request->getPost('search')['value'];
+        $searchValue = trim($request->getPost('search')['value'] ?? '');
 
         $orderColumnIndex = $request->getPost('order')[0]['column'] ?? 8;
         $orderDir = $request->getPost('order')[0]['dir'] ?? 'desc';
@@ -288,6 +292,7 @@ public function save()
         $items = $itemModel->where('invoice_id', $id)->findAll();
  
        $companyId = session()->get('company_id');
+        $customers = $customerModel->where('company_id', $companyId)->findAll();
         $data = [
             'invoice' => $invoice,
             'items' => $items,
@@ -388,12 +393,13 @@ public function save()
             'items' => $items,
             'customers' => $customers,
             'customer' => $customer,
-            'estimate_id' => $estimateId
+            'estimate_id' => $estimateId,
+            'fromEstimate' => true 
         ]);
  
     }
  
-    public function update_status()
+   public function update_status()
 {
     $request = service('request');
  
@@ -415,10 +421,25 @@ public function save()
     }
  
     $invoiceModel = new InvoiceModel();
+    $invoice = $invoiceModel->find($invoiceId);
  
-    // Save status + payment mode if status = paid
+    if (!$invoice) {
+        return $this->response->setJSON(['success' => false, 'message' => 'Invoice not found']);
+    }
+ 
     $updateData = ['status' => $status];
-    if ($status === 'paid' && $paymentMode) {
+ 
+    if ($status === 'paid') {
+        $updateData['paid_amount'] = $invoice['total_amount'];
+        $updateData['balance_amount'] = 0;
+    } elseif ($status === 'unpaid') {
+        $updateData['paid_amount'] = 0;
+        $updateData['balance_amount'] = $invoice['total_amount'];
+    } else {
+        $updateData['balance_amount'] = $invoice['total_amount'] - $invoice['paid_amount'];
+    }
+ 
+    if ($paymentMode) {
         $updateData['payment_mode'] = $paymentMode;
     }
  
@@ -427,7 +448,9 @@ public function save()
     if ($updated) {
         return $this->response->setJSON([
             'success' => true,
-            'status' => $status
+            'status' => $status,
+            'paid_amount' => $updateData['paid_amount'] ?? $invoice['paid_amount'],
+            'balance_amount' => $updateData['balance_amount']
         ]);
     } else {
         log_message('error', 'DB update failed for invoice ID ' . $invoiceId);

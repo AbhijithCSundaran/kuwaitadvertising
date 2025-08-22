@@ -43,8 +43,8 @@ class Expense extends BaseController
     public function store()
     {
         $expenseModel = new Expense_Model();
-         $session = session(); // <-- get session
-            $companyId = $session->get('company_id'); // <-- logged-in company
+         $session = session();
+            $companyId = $session->get('company_id'); 
 
 
         $id           = $this->request->getPost('id');
@@ -87,7 +87,8 @@ class Expense extends BaseController
                 $existing['particular'] !== $data['particular'] ||
                 $existing['amount'] != $data['amount'] ||
                 $existing['payment_mode'] !== $data['payment_mode'] ||
-                $existing['reference'] !== $data['reference']
+                $existing['reference'] !== $data['reference'] ||
+                $existing['customer_id'] != $data['customer_id']  
             );
 
             if ($hasChanges) {
@@ -127,7 +128,7 @@ class Expense extends BaseController
     $search = $_POST['search']['value'];
     $slno = $fromstart + 1;
 
-    $columns = ['slno', 'date', 'particular', 'amount', 'payment_mode', 'id'];
+    $columns = ['slno', 'date', 'particular','c.name', 'amount', 'payment_mode', 'id'];
     $orderBy = $columns[$orderColumnIndex] ?? 'date';
 
     if ($orderBy === 'slno' || $orderBy === 'id') {
@@ -173,7 +174,7 @@ class Expense extends BaseController
             'particular'   => $expense->particular,
             'amount'       => (float) $expense->amount,
             'payment_mode' => $expense->payment_mode ,
-           'customer_name' => $expense->customer_name ?? '-',
+           'customer_name' => $expense->customer_name ??  'N/A',
 
         ];
     }

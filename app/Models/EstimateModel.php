@@ -39,44 +39,57 @@ class EstimateModel extends Model
         return $this->where('company_id', $companyId)->countAllResults();
     }
 
-    public function getFilteredCount($searchValue, $companyId)
-    {
-        $searchValue = trim($searchValue);
-        $builder = $this->db->table('estimates')
-            ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
-            ->where('estimates.company_id', $companyId);
+   public function getFilteredCount($searchValue, $companyId)
+{
+    $searchValue = trim($searchValue);
 
-        if (!empty($searchValue)) {
-            $builder->groupStart()
-                ->like('customers.name', $searchValue)
-                ->orLike('customers.address', $searchValue)
-                ->orLike('estimates.estimate_id', $searchValue)
-                ->groupEnd();
-        }
+    $builder = $this->db->table('estimates')
+        ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
+        ->where('estimates.company_id', $companyId);
 
-        return $builder->countAllResults();
+    if (!empty($searchValue)) {
+    $normalizedSearch = preg_replace('/\s+/', '', strtolower($searchValue)); 
+
+    $builder->groupStart()
+        ->like('customers.name', $searchValue)
+        ->orLike('customers.address', $searchValue)
+        ->orLike('estimates.estimate_id', $searchValue)
+        ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.name), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
+        ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.address), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
+    ->groupEnd();
+}
+
+    return $builder->countAllResults();
+}
+
+
+public function getFilteredEstimates($searchValue, $start, $length, $orderByColumn, $orderDir, $companyId)
+{
+    $searchValue = trim($searchValue); 
+
+    $builder = $this->db->table('estimates')
+        ->select('estimates.*, customers.name AS customer_name, customers.address AS customer_address')
+        ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
+        ->where('estimates.company_id', $companyId);
+
+    if (!empty($searchValue)) {
+        $normalizedSearch = str_replace(' ', '', strtolower($searchValue));
+
+        $builder->groupStart()
+            ->like('customers.name', $searchValue)
+            ->orLike('customers.address', $searchValue)
+            ->orLike('estimates.estimate_id', $searchValue)
+
+           ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.name), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
+        ->orWhere("REPLACE(REPLACE(REPLACE(LOWER(customers.address), ' ', ''), '\n', ''), '\r', '') LIKE '%{$normalizedSearch}%'", null, false)
+        ->groupEnd();
     }
-    public function getFilteredEstimates($searchValue, $start, $length, $orderByColumn, $orderDir, $companyId)
-    {
-        $searchValue = trim($searchValue); 
-        $builder = $this->db->table('estimates')
-            ->select('estimates.*, customers.name AS customer_name, customers.address AS customer_address')
-            ->join('customers', 'customers.customer_id = estimates.customer_id', 'left')
-            ->where('estimates.company_id', $companyId);
 
-        if (!empty($searchValue)) {
-            $builder->groupStart()
-                ->like('customers.name', $searchValue)
-                ->orLike('customers.address', $searchValue)
-                ->orLike('estimates.estimate_id', $searchValue)
-                ->groupEnd();
-        }
+    $builder->orderBy($orderByColumn, $orderDir)
+            ->limit($length, $start);
 
-        $builder->orderBy($orderByColumn, $orderDir)
-                ->limit($length, $start);
-
-        return $builder->get()->getResultArray();
-    }
+    return $builder->get()->getResultArray();
+}
 
   public function getRecentEstimatesWithCustomer($limit = 5)
 {

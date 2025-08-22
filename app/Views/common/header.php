@@ -69,7 +69,7 @@ if ($company_id) {
       </button>
     </div>
   </nav>
-  <div class="container-fluid page-body-wrapper px-0">
+  <div class="container-fluid page-body-wrapper px-0" style=" padding-top: 70px; padding-bottom: 10px;">
     <?php
     $session = session();
     $allowedMenus = $session->get('allowed_menus') ?? [];
