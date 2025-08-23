@@ -50,21 +50,18 @@
                   $userModel = new Manageuser_Model();
                   $userCount = $userModel->getAllUserCount()->totuser ?? 0;
                   ?>
+                  <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item bg-revenue text-white"
+                    style="cursor: pointer;"
+                    onclick="window.location.href='<?= base_url('companyledger') ?>'">
+                  <div class="icon-box me-4">
+                    <i class="mdi mdi-currency-usd"></i>
+                  </div>
+                  <div class="d-flex flex-column justify-content-around">
+                    <small class="mb-3 text-white"><b>Total Income The Day</b></small>
+                    <h5 id="dailyRevenue" class="me-2 mb-0 text-center">KWD 0.00</h5>
+                  </div>
+                  </div>
 
-                  <div class="d-flex flex-wrap justify-content-xl-between">
-                    <a href="<?= base_url('adduserlist') ?>" class="text-decoration-none text-dark"></a>
-                  </div>
-                  <!-- <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item bg-primary text-white" style="height: 150px;"> -->
-                    <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item bg-revenue" style="height: 150px;">
-                      <div class="icon-box me-4">
-                          <i class="mdi mdi-currency-usd"></i>
-                      </div>
-                      <div class="d-flex flex-column justify-content-around">
-                          <small class="mb-3 text-white"><b>Total Income The Day</b></small>
-                          <h5 id="dailyRevenue" class="me-2 mb-0 text-center">KWD 0.00</h5>
-                          </h5>
-                      </div>
-                  </div>
                   <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item bg-success text-white"
                       style="cursor: pointer;"
                       onclick="window.location.href='<?= base_url('expense/report') ?>'">
@@ -78,16 +75,21 @@
                         <h5 class="me-2 mb-0 text-center" id="dailyExpense">0</h5>
                       </div>
                   </div>
-
-                  <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item bg-info text-white">
-                    <div class="icon-box me-4">
-                      <i class="mdi mdi-download"></i>
-                    </div>
-                    <div class="d-flex flex-column justify-content-around">
-                      <small class="mb-3 text-white"><b>Total Income Of The Month</b></small>
-                     <h5 id="monthlyRevenue" class="me-2 mb-0 text-center">KWD 0.00</h5>
-                    </div>
+                  
+                  <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item bg-info text-white"
+                      style="cursor: pointer;"
+                      onclick="window.location.href='<?= base_url('monthlyledger') ?>'">
+                      
+                      <div class="icon-box me-4">
+                          <i class="mdi mdi-download"></i>
+                      </div>
+                      
+                      <div class="d-flex flex-column justify-content-around">
+                          <small class="mb-3 text-white"><b>Total Income Of The Month</b></small>
+                          <h5 id="monthlyRevenue" class="me-2 mb-0 text-center">KWD 0.00</h5>
+                      </div>
                   </div>
+
                   <div class="d-flex py-3 border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item bg-warning text-white"
                       style="cursor: pointer;"
                       onclick="window.location.href='<?= base_url('expense/report') ?>'">
