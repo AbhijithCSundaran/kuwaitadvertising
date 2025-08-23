@@ -261,22 +261,27 @@
             Delivery Note
         </button>
      <?php
-        $paymentMode = isset($invoice['payment_mode']) && $invoice['payment_mode'] !== '' 
-           ? strtolower($invoice['payment_mode']) 
-             : 'cash'; // default to cash
-              if ($paymentMode === 'cash') {
-                  $btnLabel = ' Receipt';
-                  $btnUrl = base_url('receiptvoucher/' . $invoice['invoice_id']);
-              } else {
-                  $btnLabel = ' Voucher';
-                  $btnUrl = base_url('paymentvoucher/' . $invoice['invoice_id']); 
-              }
-      ?>
-      <button id="paymentBtn" class="btn" 
-              style="background-color: #991b36; color: white;"
-              onclick="window.location.href='<?= $btnUrl ?>'">
-          <?= $btnLabel ?>
-      </button>
+    $paymentMode = isset($invoice['payment_mode']) && $invoice['payment_mode'] !== '' 
+        ? strtolower($invoice['payment_mode']) 
+        : 'cash';
+
+    if ($paymentMode === 'cash') {
+        $btnLabel = ' Receipt';
+        $btnUrl = base_url('receiptvoucher/' . $invoice['invoice_id']);
+    } else {
+        $btnLabel = ' Voucher';
+        $btnUrl = base_url('paymentvoucher/' . $invoice['invoice_id']); 
+    }
+
+    $invoiceStatus = strtolower($invoice['status']);
+?>
+<button id="paymentBtn" class="btn" 
+    style="background-color: #991b36; color: white; <?= $invoiceStatus === 'unpaid' ? 'display:none;' : 'display:inline-block;' ?>"
+    onclick="window.location.href='<?= $btnUrl ?>'">
+    <?= $btnLabel ?>
+</button>
+
+
       <?php
         $status = strtolower($invoice['status'] ?? 'unpaid');
         $btnLabel = ucfirst($status);
@@ -764,7 +769,7 @@
 
 function submitPartialPayment() {
     const paid = parseFloat(document.getElementById('partialPaidInput').value);
-    const paymentMode = document.getElementById('paymentMode').value; // ✅ Added this line
+    const paymentMode = document.getElementById('paymentMode').value; 
     const errorMsg = document.getElementById('partialErrorMsg');
     const paymentModeError = document.getElementById('paymentModeError');
     errorMsg.style.display = 'none';
@@ -846,7 +851,7 @@ function submitPartialPayment() {
                 console.error("Partial update error:", data);
             }
 
-            // ✅ Update first partial payment label
+            
             if (isFirstPartialPayment) {
                 document.querySelector('#paidAmountRow .partial').innerText = "Advance Amount";
                 localStorage.setItem('firstPartialDone_<?= $invoice['invoice_id'] ?>', 'true');
@@ -862,10 +867,12 @@ function submitPartialPayment() {
 }
 
 
- function updateStatus(newStatus) {
+function updateStatus(newStatus) {
     const invoiceId = <?= $invoice['invoice_id'] ?>;
-
-    console.log("Updating invoice:", invoiceId, "to status:", newStatus);
+    const paymentBtn = document.getElementById("paymentBtn");
+    const statusBtn = document.getElementById("statusBtn");
+    const editBtn = document.getElementById("editInvoiceBtn");
+    const deliveryBtn = document.getElementById("deliveryNoteBtn");
 
     fetch("<?= base_url('invoice/update_status') ?>", {
         method: "POST",
@@ -878,55 +885,59 @@ function submitPartialPayment() {
             status: newStatus
         })
     })
-    .then(res => res.json())
+    .then(response => response.json())
     .then(data => {
         if (data.success) {
-            statusBtn.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
-            if (newStatus === 'paid') {
-                statusBtn.style.backgroundColor = '#28a745'; 
-            } else if (newStatus === 'partial paid') {
-                statusBtn.style.backgroundColor = '#ffc107'; 
-            } else {
-                statusBtn.style.backgroundColor = '#991b36'; 
-            }
-            statusOptions.style.display = 'none';
-            const editBtn = document.getElementById('editinvoicebtn');
-            const deliveryBtn = document.getElementById('deliveryNoteBtn');
-
+            // ✅ If status is "paid" OR "partial paid"
             if (newStatus === 'paid' || newStatus === 'partial paid') {
-                // Disable status change for paid & partial
-                statusBtn.disabled = true;
-                statusBtn.setAttribute('title', 'This invoice status cannot be changed');
-                statusBtn.removeAttribute('onclick');
+                // Disable status change
+                if (statusBtn) {
+                    statusBtn.disabled = true;
+                    statusBtn.setAttribute('title', 'This invoice status cannot be changed');
+                    statusBtn.removeAttribute('onclick');
+                }
 
                 // Hide amount rows
                 document.getElementById('paidAmountRow')?.style.setProperty('display', 'none', 'important');
                 document.getElementById('balanceAmountRow')?.style.setProperty('display', 'none', 'important');
 
-                // Show delivery note button immediately
+                // ✅ Show delivery note button immediately
                 if (deliveryBtn) {
+                    deliveryBtn.style.removeProperty('display');
                     deliveryBtn.style.setProperty('display', 'inline-block', 'important');
                 }
 
+                // ✅ Show payment button immediately
+                if (paymentBtn) {
+                    paymentBtn.style.removeProperty('display');
+                    paymentBtn.style.setProperty('display', 'inline-block', 'important');
+                }
+
+                // ✅ Hide edit invoice button immediately
                 if (editBtn) {
                     editBtn.style.setProperty('display', 'none', 'important');
                 }
-            } else {
+            }
+            // ✅ If status is "unpaid"
+            else if (newStatus === 'unpaid') {
                 if (editBtn) {
                     editBtn.style.setProperty('display', 'inline-block', 'important');
                 }
                 if (deliveryBtn) {
                     deliveryBtn.style.setProperty('display', 'none', 'important');
                 }
+                if (paymentBtn) {
+                    paymentBtn.style.setProperty('display', 'none', 'important');
+                }
             }
         } else {
-            alert("Status update failed.");
+            alert("Status update failed!");
             console.error("Update status failed:", data);
         }
     })
-    .catch(err => {
-        alert("Network or server error.");
-        console.error("Fetch error:", err);
+    .catch(error => {
+        console.error("Error updating status:", error);
+        alert("An error occurred while updating status.");
     });
 }
 
