@@ -226,7 +226,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="submit" id="saveCustomerBtn" class="btn btn-primary" disabled>Save</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 </div>
             </div>
@@ -563,6 +563,85 @@
     }
 });
  
+function toggleCustomerSaveButton() {
+    const name = $('#popup_name').val().trim();
+    const address = $('#popup_address').val().trim();
+
+   
+    if (name && address) {
+        $('#saveCustomerBtn').prop('disabled', false).removeClass('btn-secondary').addClass('btn-primary');
+    } else {
+        $('#saveCustomerBtn').prop('disabled', true).removeClass('btn-primary').addClass('btn-primary');
+    }
+}
+
+// Trigger on input
+$('#popup_name, #popup_address').on('input', toggleCustomerSaveButton);
+
+// ===== Handle Form Submission =====
+$('#customerForm').submit(function (e) {
+    e.preventDefault();
+
+    const $submitBtn = $('#saveCustomerBtn');
+    $submitBtn.prop('disabled', true).text();
+
+    const name = $('#popup_name').val().trim();
+    const address = $('#popup_address').val().trim();
+    const max_discount = $('#max_discount').val().trim();
+
+    if (!name || !address) {
+        $('#customerError').removeClass('d-none').text('Name and address are required.');
+        $submitBtn.prop('disabled', false).text('Save');
+        return;
+    }
+
+    $.ajax({
+        url: "<?= base_url('customer/create') ?>",
+        type: "POST",
+        data: { name, address, max_discount },
+        dataType: "json",
+        success: function (res) {
+            if (res.status === 'success') {
+                const newOption = new Option(res.customer.name, res.customer.customer_id, true, true);
+                $('#customer_id').append(newOption).trigger('change');
+
+                $('#popup_name').val('');
+                $('#popup_address').val('');
+                $('#max_discount').val('');
+                $('#customerModal').modal('hide');
+                toggleCustomerSaveButton(); // Reset button state
+
+                $('.alert')
+                    .removeClass('d-none alert-danger')
+                    .addClass('alert-success')
+                    .text('Customer Created Successfully.')
+                    .fadeIn()
+                    .delay(3000)
+                    .fadeOut();
+            } else {
+                $('.alert')
+                    .removeClass('d-none alert-success')
+                    .addClass('alert-danger')
+                    .text(res.message || 'Failed To Create Customer.')
+                    .fadeIn()
+                    .delay(3000)
+                    .fadeOut();
+                $submitBtn.prop('disabled', false).text('Save');
+            }
+        },
+        error: function () {
+            $('.alert')
+                .removeClass('d-none alert-success')
+                .addClass('alert-danger')
+                .text('Server Error Occurred While Creating Customer.')
+                .fadeIn()
+                .delay(3000)
+                .fadeOut();
+            $submitBtn.prop('disabled', false).text('Save');
+        }
+    });
+});
+
  
 
         function showAlert(message, type) {
