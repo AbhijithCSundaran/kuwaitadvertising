@@ -306,7 +306,7 @@
       </div>
     </div>
     <div class="container">
-      <div class="d-flex align-items-center text-center">
+      <div class="d-flex align-items-center text-center" style="margin-bottom: 5px;">
         <div class="col-4 text-start">
             <span style="font-size: 12px; font-weight: bold;">
                 <?= esc(ucwords(strtolower($company['company_name']))) ?>
@@ -315,7 +315,7 @@
         <div class="col-4">
             <?php if (!empty($company['company_logo'])): ?>
                 <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" 
-                    alt="Company Logo" style="max-height: 30px;">
+                    alt="Company Logo" style="max-height: 50px;">
             <?php endif; ?>
         </div>
         <div class="col-4 text-end">
@@ -324,13 +324,13 @@
             </span>
         </div>
       </div>
-      <hr>
-      <div class="row align-items-center" style="margin-bottom: 10px;">
+      <div style="height: 3px; background-color:#a1263a"></div>
+      <div class="row align-items-center">
         <div class="col-4 text-start">
           <div>
-            <label style="font-weight: bold; margin-right: 4px;">No / رقم :</label>
+            <label style="font-weight: bold; margin-right: 4px; margin-top: 17px;">No / رقم :</label>
             <input type="text" readonly value="<?= esc($invoice['invoice_id']) ?>"
-              style="display: inline-block; width: 87px; height: 23px; text-align:left;">
+              style="display: inline-block; width: 87px; height: 23px; text-align:left; ">
           </div>
           <div style="margin-top: 4px;">
             <label style="font-weight: bold; margin-right: 4px;">LPO No :</label>
@@ -345,7 +345,7 @@
         </div>
         <div class="col-4 text-end">
           <div style="white-space: nowrap;">
-            <label style="font-weight: bold; margin-right: 6px;">Date / التاريخ:</label>
+            <label style="font-weight: bold; margin-right: 6px; margin-top: 17px;">Date / التاريخ:</label>
             <input type="text" readonly value="<?= date('d-m-Y', strtotime($invoice['invoice_date'])) ?>"
               style="width: 87px; height: 23px; text-align: center;">
           </div>
