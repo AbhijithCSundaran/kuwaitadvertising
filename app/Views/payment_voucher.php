@@ -11,12 +11,14 @@
             .voucher-container { 
                 width: 800px; 
                 margin-left: 25%; 
-                padding: 20px;
+                /* padding: 20px; */
                 position: relative;
                 background: url('<?= ASSET_PATH ?>assets/images/invoice-bg.png') no-repeat;
                 background-size: 44%;
                 background-position: 52% 50%;
                 background-color: white;
+                border: 3px solid #a1263a;
+                border-radius: 10px;
             }
             .header { 
                 text-align: center; 
@@ -56,17 +58,18 @@
                 width: 100%;
                 border-collapse: collapse;
             }
-            .amount-box th, .amount-box td {
+            .amount-box td {
                 border: 1px solid #000;
-                padding: 10px;
+                padding: 4px 6px 35px; 
             }
             .amount-box th {
+                border: 1px solid #000;
                 font-size: 13px;
                 background: #f9f9f9;
             }
 
             .field { 
-                margin:25px 3px; 
+                margin:25px 20px; 
                 font-weight: bold; 
             }
             .label { 
@@ -81,7 +84,8 @@
             .voucher-no{  
                 position: absolute;
                 top: 16%;
-                left: 75%;
+                left: 78%;
+                font-weight: bold;
             }
             .voucher-meta {
                 text-align: right; 
@@ -120,7 +124,7 @@
             <div class="header">
                 <?php if (!empty($company['company_logo'])): ?>
                     <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" 
-                        alt="Company Logo" style=" max-height: 55px; width: 40%;">
+                        alt="Company Logo" style=" max-height: 55px; width: 40%; margin-top: 8px;">
                 <?php endif; ?>
             </div>
             <div class="amount-box">
@@ -130,37 +134,37 @@
                         <th>Fils فلس</th>
                     </tr>
                     <tr>
-                        <td><?= isset($invoice['amount']) ? sprintf("%02d", ($invoice['amount']*100)%100) : '-' ?></td>
-                        <td><?= isset($invoice['amount']) ? floor($invoice['amount']) : '-' ?></td>
+                        <td><?= isset($invoice['amount']) ? sprintf("%02d", ($invoice['amount']*100)%100) : '' ?></td>
+                        <td><?= isset($invoice['amount']) ? floor($invoice['amount']) : '' ?></td>
                     </tr>
                 </table>
             </div>
             <div class="voucher-title"><strong>سند صرف</strong></div>
             <div class="voucher-sub"><strong>PAYMENT VOUCHER</strong></div>
             <div class=" col-6 voucher-no">
-                <span class="label">No.</span> 
-                <span class="dots" style=" width: 24%;"> <?= esc($invoice['invoice_no'] ?? '-') ?></span>/ رقم:
+                <span class="label">No.:</span> 
+                <span style="display:inline-block; width:22%;">&nbsp;</span> <?= esc($invoice['invoice_no'] ?? '') ?>: رقم  
             </div> 
             <div class="voucher-meta">
             
-                Date /<span class="dots" style=" width: 20%; text-align: center;"> <?= date('d-m-Y') ?></span> التاريخ:
+                Date<span class="dots" style=" width: 20%; text-align: center;"> <?= date('d-m-Y') ?></span>: التاريخ
             </div>
             <div class="field">
-                <span class="label">Paid To Mr./Mrs. </span>
-                <span class="dots"><?= esc($invoice['customer_name'] ?? '') ?></span>مدفوع للسيد/السيدة:
+                <span class="label">Paid To Mr./Mrs.: </span>
+                <span class="dots"><?= esc($invoice['customer_name'] ?? '') ?></span> :مدفوع للسيد/السيدة   
             </div>
             <div class="field">
-                <span class="label">The Sum of K.D. </span>
-                <span class="dots" style="width:73%;"><?= esc($invoice['total_amount'] ?? '') ?></span>مجموع K.D:
+                <span class="label">The Sum of K.D.:</span>
+                <span class="dots" style="width:74%;"><?= esc($invoice['total_amount'] ?? '') ?></span> :مجموع K.D
             </div>
             <div class="field">
-                <span class="label">Bank / </span>
-                <span class="dots" style=" width: 32%;"><?= esc($invoice['bank'] ?? '') ?></span>بنك:Cash / Cheque No. / 
-                <span class="dots" style=" width: 28%;"><?= esc($invoice['cheque_no'] ?? '') ?></span>بموجب شيك رقم:
+                <span class="label">Bank: </span>
+                <span class="dots" style=" width: 33%;"><?= esc($invoice['bank'] ?? '') ?></span> :بنك Cash / Cheque No. / 
+                <span class="dots" style=" width: 27%;"><?= esc($invoice['cheque_no'] ?? '') ?></span> :بموجب شيك رقم
             </div>
             <div class="field">
-                <span class="label">Details /</span>
-                <span class="dots" style="width: 85%;"><?= esc($invoice['details'] ?? '') ?></span>تفاصيل:
+                <span class="label">Details:</span>
+                <span class="dots" style="width: 86%;"><?= esc($invoice['details'] ?? '') ?></span> :تفاصيل
             </div>
             <div class="signatures">
                 <div class="sign-box">Accountant Sig. / توقيع المحاسب
