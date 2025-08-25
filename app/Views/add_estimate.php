@@ -514,13 +514,10 @@
         });
 
        let maxCustomerDiscount = 0;
-
-// When customer changes
 $('#customer_id').on('change', function () {
     let customerId = $(this).val();
     if (customerId) {
 
-        // Fetch address
         $.post("<?= site_url('customer/get-address') ?>", { customer_id: customerId }, function (res) {
             $('#customer_address').val(res.status === 'success' ? res.address : '');
         }, 'json');
@@ -533,7 +530,6 @@ $('#customer_id').on('change', function () {
             success: function (res) {
                 maxCustomerDiscount = parseFloat(res.discount) || 0;
 
-                // Auto-fill only if discount field is empty or zero
                 if (!$('#discount').val() || parseFloat($('#discount').val()) === 0) {
                     $('#discount').val(maxCustomerDiscount);
                 }

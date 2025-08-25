@@ -339,7 +339,7 @@
         </div>
         <div class="col-4 text-center">
           <div
-            style="background-color: #991b36; color: white; font-weight: bold; padding: 3px 15px; display: inline-block; border-radius: 4px; font-size: 13px;">
+            style="background-color: #991b36; color: white; font-weight: bold; padding: 3px 15px; display: inline-block; border-radius: 4px; font-size: 13px; margin-top: 11px;">
             فاتورة / نقداً / بالحساب<br>CASH / CREDIT INVOICE
           </div>
         </div>
@@ -347,7 +347,7 @@
           <div style="white-space: nowrap;">
             <label style="font-weight: bold; margin-right: 6px; margin-top: 17px;">Date / التاريخ:</label>
             <input type="text" readonly value="<?= date('d-m-Y', strtotime($invoice['invoice_date'])) ?>"
-              style="width: 87px; height: 23px; text-align: center;">
+              style="width: 80px; height: 23px; text-align: center;">
           </div>
           <div style="margin-top: 4px; white-space: nowrap;">
             <label style="font-weight: bold; margin-right: 6px;">Delivery Date :</label>

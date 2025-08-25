@@ -77,7 +77,7 @@
                         <?php elseif ($sale['status'] === 'unpaid'): ?>
                             <span class="badge bg-danger">Unpaid</span>
                         <?php elseif ($sale['status'] === 'partial paid'): ?>
-                            <span class="badge bg-warning text-dark">Partial Paid</span>
+                            <span class="badge bg-warning text-white">Partial Paid</span>
                         <?php else: ?>
                             <span class="badge bg-secondary">Unknown</span>
                         <?php endif; ?>
@@ -143,7 +143,7 @@
 
                         const badgeClass = item.status === 'paid' ? 'bg-success w-100' : 
                                         (item.status === 'unpaid' ? 'bg-danger w-100' : 
-                                        (item.status === 'partial paid' ? 'bg-warning text-dark w-100' : 'bg-secondary'));
+                                        (item.status === 'partial paid' ? 'bg-warning text-white w-100' : 'bg-secondary'));
 
                         const totalAmount = parseFloat(item.total_amount);
                         grandTotal += totalAmount;

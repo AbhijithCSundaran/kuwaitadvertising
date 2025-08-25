@@ -198,13 +198,16 @@
             value="<?= isset($invoice['invoice_id']) ? $invoice['invoice_id'] : '' ?>">
         <input type="hidden" name="original_status"
             value="<?= isset($invoice['status']) ? esc($invoice['status']) : 'unpaid' ?>">
+        <input type="hidden" id="is_converted" value="<?= !empty($is_converted) ? 1 : 0 ?>">
         <div class="text-end">
             <a href="<?= base_url('invoicelist') ?>" class="btn btn-secondary">Discard</a>
-            <button type="submit" id="save-invoice-btn" class="btn btn-primary">Generate Invoice</button>
+            <button type="submit" id="save-invoice-btn" class="btn btn-primary"
+                <?= (!empty($invoice) && empty($is_converted)) ? 'disabled' : '' ?>>
+                Generate Invoice
+            </button>
         </div>
     </form>
 </div>
-
 <!-- Customer Modal -->
 <div class="modal fade" id="customerModal" tabindex="-1" aria-labelledby="customerModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -249,34 +252,31 @@
         });
 
         initialFormData = $('#invoice-form').serialize();
-        $('#save-invoice-btn').prop('disabled', true);
-
+        if ($('#is_converted').val() === "1") {
+            $('#save-invoice-btn').prop('disabled', false);
+        } else {
+            $('#save-invoice-btn').prop('disabled', true);
+        }
         function updateSaveButtonState() {
-        const currentFormData = $('#invoice-form').serialize();
-        const hasChanged = currentFormData !== initialFormData;
-        $('#save-invoice-btn').prop('disabled', !hasChanged);
-    }
-
-    // Call this on input/change and after adding/removing rows
-    $('#invoice-form input, #invoice-form select, #invoice-form textarea').on('input change', updateSaveButtonState);
-    $(document).on('click', '.remove-item-btn', function () {
-        $(this).closest('tr').remove();
-        calculateTotals();
-        updateSaveButtonState();
-    });
-    $('#add-item').click(function () {
-        // ... append new row ...
-        calculateTotals();
-        updateSaveButtonState();
-    });
-
-
-        $('#invoice-form input, #invoice-form select, #invoice-form textarea').on('input change', function () {
+            if ($('#is_converted').val() === "1") {
+                $('#save-invoice-btn').prop('disabled', false);
+                return;
+            }
             const currentFormData = $('#invoice-form').serialize();
             const hasChanged = currentFormData !== initialFormData;
             $('#save-invoice-btn').prop('disabled', !hasChanged);
+        }
+        updateSaveButtonState();
+        $('#invoice-form input, #invoice-form select, #invoice-form textarea').on('input change', updateSaveButtonState);
+        $(document).on('click', '.remove-item-btn', function () {
+            $(this).closest('tr').remove();
+            calculateTotals();
+            updateSaveButtonState();
         });
-
+        $('#add-item').click(function () {
+            calculateTotals();
+            updateSaveButtonState();
+        });
         function calculateTotals() {
             let subtotal = 0;
             $('.item-row').each(function () {
@@ -380,7 +380,7 @@
             }
 
             $.ajax({
-                url: "<?= base_url('customer/create') ?>",
+                url: "<?= base_url('customer/get-address') ?>",
                 type: "POST",
                 data: { name, address, max_discount },
                 dataType: "json",
@@ -421,17 +421,17 @@
             });
         });
 
-                $('#customer_id').on('change', function () {
-                    let customerId = $(this).val();
+        $('#customer_id').on('change', function () {
+            let customerId = $(this).val();
 
-                    if (customerId) {
-                        $.post("<?= site_url('customer/get_address') ?>", { customer_id: customerId }, function (res) {
-                            if (res.status === 'success') {
-                                $('#customer_address').val(res.address);
-                            } else {
-                                $('#customer_address').val('');
-                            }
-                        }, 'json');
+            if (customerId) {
+                $.post("<?= site_url('customer/get_address') ?>", { customer_id: customerId }, function (res) {
+                    if (res.status === 'success') {
+                        $('#customer_address').val(res.address);
+                    } else {
+                        $('#customer_address').val('');
+                    }
+                }, 'json');
 
                  $.ajax({
                     url: '<?= base_url("customer/get_discount") ?>/' + customerId,
@@ -462,13 +462,11 @@
                 success: function (res) {
                     if (res.discount !== undefined) {
                         maxCustomerDiscount = parseFloat(res.discount) || 0;
-                        // ⚠️ do NOT overwrite #discount here
+                        
                     }
                 }
             });
         }
-
-
         $('#invoice-form').submit(function (e) {
             e.preventDefault();
             const currentFormData = $('#invoice-form').serialize();
@@ -537,113 +535,105 @@
                 }
             });
         });
-
         $('#discount').tooltip({
             trigger: 'manual',
             placement: 'top'
         });
 
- $('#discount').on('input', function () {
-    let val = parseFloat($(this).val()) || 0;
- 
-    if (maxCustomerDiscount === 0) {
-        $(this).val(0);
-        $(this).attr('data-bs-original-title', 'No discount is set for the selected customer').tooltip('show');
-        setTimeout(() => {
-            $('#discount').tooltip('hide');
-        }, 2000);
-    } else if (val > maxCustomerDiscount) {
-        $(this).val(maxCustomerDiscount);
-        $(this).attr('data-bs-original-title', 'Unable to increase beyond max discount for this customer').tooltip('show');
-        setTimeout(() => {
-            $('#discount').tooltip('hide');
-        }, 2000);
-    } else {
-        $(this).tooltip('hide');
-    }
-});
- 
-function toggleCustomerSaveButton() {
-    const name = $('#popup_name').val().trim();
-    const address = $('#popup_address').val().trim();
-
-   
-    if (name && address) {
-        $('#saveCustomerBtn').prop('disabled', false).removeClass('btn-secondary').addClass('btn-primary');
-    } else {
-        $('#saveCustomerBtn').prop('disabled', true).removeClass('btn-primary').addClass('btn-primary');
-    }
-}
-
-// Trigger on input
-$('#popup_name, #popup_address').on('input', toggleCustomerSaveButton);
-
-// ===== Handle Form Submission =====
-$('#customerForm').submit(function (e) {
-    e.preventDefault();
-
-    const $submitBtn = $('#saveCustomerBtn');
-    $submitBtn.prop('disabled', true).text();
-
-    const name = $('#popup_name').val().trim();
-    const address = $('#popup_address').val().trim();
-    const max_discount = $('#max_discount').val().trim();
-
-    if (!name || !address) {
-        $('#customerError').removeClass('d-none').text('Name and address are required.');
-        $submitBtn.prop('disabled', false).text('Save');
-        return;
-    }
-
-    $.ajax({
-        url: "<?= base_url('customer/create') ?>",
-        type: "POST",
-        data: { name, address, max_discount },
-        dataType: "json",
-        success: function (res) {
-            if (res.status === 'success') {
-                const newOption = new Option(res.customer.name, res.customer.customer_id, true, true);
-                $('#customer_id').append(newOption).trigger('change');
-
-                $('#popup_name').val('');
-                $('#popup_address').val('');
-                $('#max_discount').val('');
-                $('#customerModal').modal('hide');
-                toggleCustomerSaveButton(); // Reset button state
-
-                $('.alert')
-                    .removeClass('d-none alert-danger')
-                    .addClass('alert-success')
-                    .text('Customer Created Successfully.')
-                    .fadeIn()
-                    .delay(3000)
-                    .fadeOut();
+        $('#discount').on('input', function () {
+            let val = parseFloat($(this).val()) || 0;
+        
+            if (maxCustomerDiscount === 0) {
+                $(this).val(0);
+                $(this).attr('data-bs-original-title', 'No discount is set for the selected customer').tooltip('show');
+                setTimeout(() => {
+                    $('#discount').tooltip('hide');
+                }, 2000);
+            } else if (val > maxCustomerDiscount) {
+                $(this).val(maxCustomerDiscount);
+                $(this).attr('data-bs-original-title', 'Unable to increase beyond max discount for this customer').tooltip('show');
+                setTimeout(() => {
+                    $('#discount').tooltip('hide');
+                }, 2000);
             } else {
-                $('.alert')
-                    .removeClass('d-none alert-success')
-                    .addClass('alert-danger')
-                    .text(res.message || 'Failed To Create Customer.')
-                    .fadeIn()
-                    .delay(3000)
-                    .fadeOut();
-                $submitBtn.prop('disabled', false).text('Save');
+                $(this).tooltip('hide');
             }
-        },
-        error: function () {
-            $('.alert')
-                .removeClass('d-none alert-success')
-                .addClass('alert-danger')
-                .text('Server Error Occurred While Creating Customer.')
-                .fadeIn()
-                .delay(3000)
-                .fadeOut();
-            $submitBtn.prop('disabled', false).text('Save');
-        }
-    });
-});
-
+        });
  
+        function toggleCustomerSaveButton() {
+            const name = $('#popup_name').val().trim();
+            const address = $('#popup_address').val().trim();
 
+        
+            if (name && address) {
+                $('#saveCustomerBtn').prop('disabled', false).removeClass('btn-secondary').addClass('btn-primary');
+            } else {
+                $('#saveCustomerBtn').prop('disabled', true).removeClass('btn-primary').addClass('btn-primary');
+            }
+        }
+        $('#popup_name, #popup_address').on('input', toggleCustomerSaveButton);
+        $('#customerForm').submit(function (e) {
+            e.preventDefault();
+
+            const $submitBtn = $('#saveCustomerBtn');
+            $submitBtn.prop('disabled', true).text();
+
+            const name = $('#popup_name').val().trim();
+            const address = $('#popup_address').val().trim();
+            const max_discount = $('#max_discount').val().trim();
+
+            if (!name || !address) {
+                $('#customerError').removeClass('d-none').text('Name and address are required.');
+                $submitBtn.prop('disabled', false).text('Save');
+                return;
+            }
+
+            $.ajax({
+                url: "<?= base_url('customer/create') ?>",
+                type: "POST",
+                data: { name, address, max_discount },
+                dataType: "json",
+                success: function (res) {
+                    if (res.status === 'success') {
+                        const newOption = new Option(res.customer.name, res.customer.customer_id, true, true);
+                        $('#customer_id').append(newOption).trigger('change');
+
+                        $('#popup_name').val('');
+                        $('#popup_address').val('');
+                        $('#max_discount').val('');
+                        $('#customerModal').modal('hide');
+                        toggleCustomerSaveButton(); // Reset button state
+
+                        $('.alert')
+                            .removeClass('d-none alert-danger')
+                            .addClass('alert-success')
+                            .text('Customer Created Successfully.')
+                            .fadeIn()
+                            .delay(3000)
+                            .fadeOut();
+                    } else {
+                        $('.alert')
+                            .removeClass('d-none alert-success')
+                            .addClass('alert-danger')
+                            .text(res.message || 'Failed To Create Customer.')
+                            .fadeIn()
+                            .delay(3000)
+                            .fadeOut();
+                        $submitBtn.prop('disabled', false).text('Save');
+                    }
+                },
+                error: function () {
+                    $('.alert')
+                        .removeClass('d-none alert-success')
+                        .addClass('alert-danger')
+                        .text('Server Error Occurred While Creating Customer.')
+                        .fadeIn()
+                        .delay(3000)
+                        .fadeOut();
+                    $submitBtn.prop('disabled', false).text('Save');
+                }
+            });
+        });
         function showAlert(message, type) {
             $('.alert')
                 .removeClass('d-none alert-success alert-danger')
@@ -651,5 +641,16 @@ $('#customerForm').submit(function (e) {
                 .text(message)
                 .fadeIn().delay(3000).fadeOut();
         }
+         $(window).on('keydown', function (e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                $('#save-invoice-btn').trigger('click');
+            }
+
+            if (e.ctrlKey && e.key.toLowerCase() === 'f') {
+                e.preventDefault();
+                $('#add-item').trigger('click');
+            }
+        });
     });
 </script>
