@@ -71,8 +71,13 @@
             processing: true,
             serverSide: true,
             dom: "<'row mb-3'<'col-sm-6'l><'col-sm-6'f>>" +
-                "<'row'<'col-sm-12'tr>>" +
-                "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
+                    "<'row'<'col-sm-12'tr>>" +
+                    "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
+
+                drawCallback: function () {
+                    let info = $('.dataTables_info');
+                    info.text(info.text().replace(/\(filtered.*\)/, '').trim());
+                },
             columns: [
                 {
                     data: "slno",
@@ -129,10 +134,14 @@
                 },
                 { data: "role_id", visible: false }
             ],
+            
             order: [[6, 'desc']],
             columnDefs: [
                 { searchable: false, orderable: false, targets: [0, 2, 5] } 
-            ]
+            ],
+            language: {
+        infoFiltered: "", // ✅ Hides "(filtered from X total entries)"
+    }
         });
 
 
