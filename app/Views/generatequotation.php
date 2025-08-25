@@ -11,7 +11,7 @@
       margin: auto;
       padding: 15px;
       background-color: #991b36;
-          margin-left: 430px;
+      /* margin-left: 430px; */
     }
 
     .container {
@@ -101,8 +101,8 @@
         Print
       </button>
       <button onclick="window.location.href='<?= base_url('estimate/edit/' . $estimate['estimate_id']) ?>'"
-            style="background-color: #a1263a; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
-            Discard
+            style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
+            Edit Estimate
         </button>
       <?php if (isset($estimate['is_converted']) && $estimate['is_converted'] == 1): ?>
         <button disabled
@@ -111,7 +111,7 @@
         </button>
         <?php else: ?>
         <button onclick="window.location.href='<?= base_url('invoice/convertFromEstimate/' . $estimate['estimate_id']) ?>'"
-            style="background-color: #a1263a; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
+            style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
             Convert Invoice
         </button>
         <?php endif; ?>
@@ -124,7 +124,7 @@
 
         <?php if (!empty($company['company_logo'])): ?>
             <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" 
-                alt="Company Logo" style="max-height: 55px; width: 30%;">
+                alt="Company Logo" style="max-height: 55px; width: 30%; margin-bottom: 2px;">
         <?php endif; ?>
 
         <span style="font-size: 15px; font-weight: bold; direction: rtl;">

@@ -11,7 +11,7 @@
       margin: auto;
       padding: 15px;
       background-color: #991b36;
-          margin-left: 430px;
+          /* margin-left: 430px; */
     }
 
     .container {
@@ -102,7 +102,7 @@
       </button>
       <button onclick="window.location.href='<?= base_url('estimate/edit/' . $estimate['estimate_id']) ?>'"
             style="background-color:#991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
-            Discard
+            Edit Estimate
         </button>
       <?php if (isset($estimate['is_converted']) && $estimate['is_converted'] == 1): ?>
         <button disabled

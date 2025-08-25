@@ -393,8 +393,7 @@ public function save()
             'items' => $items,
             'customers' => $customers,
             'customer' => $customer,
-            'estimate_id' => $estimateId,
-            'fromEstimate' => true 
+            'is_converted'    => true,   
         ]);
  
     }

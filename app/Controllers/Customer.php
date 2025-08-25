@@ -33,7 +33,7 @@ class Customer extends BaseController
     $data = [
         'name' => $name,
         'address' => $address,
-        'company_id'    => $session->get('company_id'),
+         'company_id' => $session->get('company_id'), 
         'max_discount'=> $max_discount ?? 0
     ];
 

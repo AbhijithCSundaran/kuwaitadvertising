@@ -141,17 +141,17 @@ $(document).ready(function () {
             render: function (data, type, row) {
                 if (!data) return '';
 
-        let className = '';
-        let text = data.toUpperCase();
+                    let className = '';
+                    let text = data.toUpperCase();
 
-        if (data.toLowerCase() === 'paid') className = 'status-badge status-paid';
-        else if (data.toLowerCase() === 'unpaid') className = 'status-badge status-unpaid';
-        else if (data.toLowerCase() === 'pending') className = 'status-badge status-pending';
-        else className = 'status-badge bg-warning';
+                    if (data.toLowerCase() === 'paid') className = 'status-badge status-paid';
+                    else if (data.toLowerCase() === 'unpaid') className = 'status-badge status-unpaid';
+                    else if (data.toLowerCase() === 'pending') className = 'status-badge status-pending';
+                    else className = 'status-badge bg-warning';
 
-        return `<span class="${className}">${text}</span>`;
-    }
-},
+                    return `<span class="${className}">${text}</span>`;
+                }
+            },
            {
                 data: "invoice_id",
                 render: function (id, type, row) {

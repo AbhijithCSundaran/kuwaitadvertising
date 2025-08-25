@@ -8,9 +8,15 @@
                 font-family: Arial, sans-serif; 
                 font-size: 14px; 
             }
-            .voucher-container { 
+            .outer-container {
+                width: 100%;         
+                max-width: 900px;    
+                margin: 0 auto;       
+                padding: 0 15px;     
+            }
+           .voucher-container { 
                 width: 800px; 
-                margin-left: 25%; 
+                margin: 0 auto;
                 /* padding: 20px; */
                 position: relative;
                 background: url('<?= ASSET_PATH ?>assets/images/invoice-bg.png') no-repeat;
@@ -19,6 +25,8 @@
                 background-color: white;
                 border: 3px solid #a1263a;
                 border-radius: 10px;
+                margin-top: 2px;
+                margin-left: 18%;
             }
             .header { 
                 text-align: center; 
@@ -61,7 +69,6 @@
                 display: block;
                 margin-bottom: 5px;
             }
-
             .amount-value {
                 border: 2px solid black;
                 border-radius: 12px;
@@ -71,8 +78,10 @@
                 font-weight: bold;
             }
             .field { 
-                margin:25px 20px; 
+                margin:25px; 
                 font-weight: bold; 
+                margin-left: 21px;
+                margin-right: 21px;
             }
             .label { 
                 width: 200px; 
@@ -80,7 +89,7 @@
             .dots { 
                 border-bottom: 2px dotted #000; 
                 display: inline-block; 
-                width: 60%; 
+                width: 56%; 
                 vertical-align: middle; 
             }
             .voucher-no{  
@@ -93,7 +102,7 @@
                 margin-bottom: 45px; 
                 font-weight: bold; 
                 position: relative;
-                right: 35px;
+                right: 45px;
             }
             .signatures { 
                 margin-top: 25px; 
@@ -115,8 +124,8 @@
             .sign-cash{
                  display: flex;
                 justify-content: right;
-                gap: 130px; 
-                margin-right: 56px;
+                gap: 95px; 
+                margin-right: 65px;
             }
             .bottom-footer { 
                 text-align: center; 
@@ -130,86 +139,138 @@
             .label{
                 font-size:15px;
             }
+            @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+                font-size: 14px;
+                line-height: 1.4;
+            }
+
+            .no-print,
+            .header button,
+            .footer,
+            .sidebar,
+            .navbar {
+                display: none !important;
+            }
+
+            .outer-container {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+            }
+
+            .voucher-container {
+                margin: 0 auto !important;   
+                width: 100% !important;    
+                max-width: 800px;         
+                border: 3px solid #a1263a;
+                page-break-inside: avoid;  
+            }
+
+            .voucher-container * {
+                box-sizing: border-box;
+            }
+        }
+
         </style>
     </head>
     <body>
-        <div class="voucher-container">
-            <div class="header">
-                <?php if (!empty($company['company_logo'])): ?>
-                    <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" 
-                        alt="Company Logo" style=" max-height: 70px; width: 45%; margin-top: 8px;">
-                <?php endif; ?>
-            </div>
-            <div class="voucher-title"><strong> سند قبض</strong></div>
-            <div class="voucher-sub"><strong>Receipt Voucher</strong></div>
-            <div class="amount-box">
-             <div class="amount-field">
-                <span class="amount-label">K.D. دينار</span>
-                <div class="amount-value">
-                    <!-- left blank intentionally -->
+        <div class="outer-container" >
+            <button class="no-print" onclick="window.print()"
+                style="background-color: #991b36; color: white; padding: 8px 16px;     margin-left: 82%; border: none; border-radius: 5px;">
+                Print
+            </button>
+            <button class="no-print" onclick="window.location.href='<?= base_url('cashlist') ?>'"
+                style="background-color: #a1263a; color: white; padding: 8px 16px;     margin-left: 82%; border: none; border-radius: 5px; margin-left: 10px;">
+                Discard
+            </button>
+    
+            <div class="voucher-container">
+                
+                <div class="header">
+                    <?php if (!empty($company['company_logo'])): ?>
+                        <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" 
+                            alt="Company Logo" style=" max-height: 70px; width: 45%; margin-top: 8px;">
+                    <?php endif; ?>
                 </div>
-            </div>
+                <div class="voucher-title"><strong> سند قبض</strong></div>
+                <div class="voucher-sub"><strong>Receipt Voucher</strong></div>
+                <div class="amount-box">
+                <div class="amount-field">
+                    <span class="amount-label">K.D. دينار</span>
+                    <div class="amount-value">
+                        
+                    </div>
+                </div>
 
-            <div class="amount-field">
-                <span class="amount-label">Fils فلس</span>
-                <div class="amount-value" style="padding: 20px 33px ;">
-                    <!-- left blank intentionally -->
+                <div class="amount-field">
+                    <span class="amount-label">Fils فلس</span>
+                    <div class="amount-value" style="padding: 20px 33px ;">
+                        
+                    </div>
                 </div>
-            </div>
 
-          </div>
-            <div class=" col-6 voucher-no">
-                <span class="label" style="font-size: 20px;"><strong>No:</strong></span> 
-            </div> 
-            <div class="voucher-meta">
-            
-                Date:<span class="dots" style=" width: 20%; text-align: center;"> <?= date('d-m-Y') ?></span> التاريخ:
             </div>
-            <div class="field">
-                <span class="label">Received From Mr/Ms: </span>
-                <span class="dots"></span> استلمت من السيد/الآنسة 
-            </div>
-            <div class="field">
-                <span class="label">The Sum of K.D.</span>
-                <span class="dots" style="width:67%;"></span> مجموع الدينار الكويتي 
-            </div>
-            <div class="field">
-                <span class="label"> Cash / Cheque No. / K-Net</span>
-                <span class="dots" style=" width: 56%;"></span> كي-نت  /رقم النقد / الشيك
-            </div>
-            <div class="field">
-                <span class="label">Being Of:</span>
-                <span class="dots" style="width: 83%;"></span>كونه من
-            </div>
-            <div class="col-12 signatures">
-                <div class="col-6 sign-box">
-                  <div class="sign-label">
-                      <span>Receiver</span>
-                      <span>المتلقي</span>
-                  </div>
-                    <span class="dots" style="width: 70%; margin-top: 50px;"></span>
+                <div class=" col-6 voucher-no">
+                    <span class="label" style="font-size: 20px;"><strong>No:</strong></span> 
+                </div> 
+                <div class="voucher-meta">
+                
+                    Date:<span class="dots" style=" width: 20%; text-align: center;"> <?= date('d-m-Y') ?></span> التاريخ:
                 </div>
-                <div class="col-6 sign-box">
-                   <div class="sign-cash">
-                       <span>Cashier </span>
-                      <span> أمين الصندوق</span>
-                   </div>  
-                    <span class="dots" style="width: 83%; margin-top: 50px;"></span>
+                <div class="field">
+                    <span class="label">Received From Mr/Ms: </span>
+                    <span class="dots"></span> استلمت من السيد/الآنسة 
+                </div>
+                <div class="field">
+                    <span class="label">The Sum of K.D.</span>
+                    <span class="dots" style="width:64%;"></span> مجموع الدينار الكويتي 
+                </div>
+                <div class="field">
+                    <span class="label"> Cash / Cheque No. / K-Net</span>
+                    <span class="dots" style=" width: 52%;"></span> كي-نت  /رقم النقد / الشيك
+                </div>
+                <div class="field">
+                    <span class="label">Being Of:</span>
+                    <span class="dots" style="width: 81%;"></span>كونه من
+                </div>
+                <div class="col-12 signatures">
+                    <div class="col-6 sign-box">
+                    <div class="sign-label">
+                        <span>Receiver</span>
+                        <span>المتلقي</span>
+                    </div>
+                        <span class="dots" style="width: 70%; margin-top: 50px;"></span>
+                    </div>
+                    <div class="col-6 sign-box">
+                    <div class="sign-cash">
+                        <span>Cashier </span>
+                        <span> أمين الصندوق</span>
+                    </div>  
+                        <span class="dots" style="width: 79%; margin-top: 50px;"></span>
+                    </div>
+                </div>
+                <!-- Footer -->
+                <div class="bottom-footer">
+                <div style="direction: rtl; text-align: center;"><?= esc($company['address_ar'] ?? '') ?></div>
+                <div style="direction: ltr; text-align: center;"><?= esc($company['address'] ?? '') ?></div>
+                <div style="margin-top: 5px;">
+                    📞 <?= esc($company['phone'] ?? '') ?> &nbsp;&nbsp; | &nbsp;&nbsp;
+                    📧 <a href="mailto:<?= esc($company['email'] ?? '') ?>" style="color: white; text-decoration: none;">
+                        <?= esc($company['email'] ?? '') ?>
+                        </a>
+                </div>
                 </div>
             </div>
-            <!-- Footer -->
-            <div class="bottom-footer">
-            <div style="direction: rtl; text-align: center;"><?= esc($company['address_ar'] ?? '') ?></div>
-            <div style="direction: ltr; text-align: center;"><?= esc($company['address'] ?? '') ?></div>
-            <div style="margin-top: 5px;">
-                📞 <?= esc($company['phone'] ?? '') ?> &nbsp;&nbsp; | &nbsp;&nbsp;
-                📧 <a href="mailto:<?= esc($company['email'] ?? '') ?>" style="color: white; text-decoration: none;">
-                    <?= esc($company['email'] ?? '') ?>
-                    </a>
             </div>
-            </div>
-        </div>
-        </div>
+        </div> 
     </body>
 </html>
 <?php include "common/footer.php"; ?>
