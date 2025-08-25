@@ -45,50 +45,43 @@ class Rolemanagement extends Controller
         ]);
     }
 
-    public function store()
-    {
-        $role_name_raw = $this->request->getPost('role_name');
-        $access_data = $this->request->getPost('access');
+public function store()
+{
+    $role_name_raw = $this->request->getPost('role_name');
+    $access_data = $this->request->getPost('access');
 
-        $normalized_role_name = trim(preg_replace('/\s+/', ' ', strtolower($role_name_raw)));
+    $normalized_role_name = trim(preg_replace('/\s+/', ' ', strtolower($role_name_raw)));
 
-        $duplicate = $this->roleModel
-            ->where('REPLACE(LOWER(TRIM(role_name)), " ", "") =', str_replace(' ', '', $normalized_role_name))
-            ->first();
+    $duplicate = $this->roleModel
+        ->where('REPLACE(LOWER(TRIM(role_name)), " ", "") =', str_replace(' ', '', $normalized_role_name))
+        ->where('company_id', session()->get('company_id')) // ✅ Check duplicate within the same company
+        ->first();
 
-        if ($duplicate) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Role Already Exists.']);
-        }
-
-        $this->roleModel->insert([
-            'role_name' => ucwords($normalized_role_name),
-        ]);
-
-         $company_id = session()->get('company_id');
-    if (empty($company_id)) {
-        return $this->response->setJSON(['status' => 'error', 'message' => 'Company ID missing.']);
+    if ($duplicate) {
+        return $this->response->setJSON(['status' => 'error', 'message' => 'Role Already Exists.']);
     }
 
-    // Insert role with company_id
     $this->roleModel->insert([
-        'role_name'  => ucwords($normalized_role_name),
-        'company_id' => $company_id
+        'role_name'   => ucwords($normalized_role_name),
+        'company_id'  => session()->get('company_id'),   // ✅ Save company_id
+        'created_at'  => date('Y-m-d H:i:s'),
+        'updated_at'  => date('Y-m-d H:i:s')
     ]);
 
-        $role_id = $this->roleModel->getInsertID();
+    $role_id = $this->roleModel->getInsertID();
 
-        if (!empty($access_data)) {
-            foreach ($access_data as $menu => $value) {
-                $this->roleMenuModel->insert([
-                    'role_id' => $role_id,
-                    'menu_name' => $menu,
-                    'access' => 1
-                ]);
-            }
+    if (!empty($access_data)) {
+        foreach ($access_data as $menu => $value) {
+            $this->roleMenuModel->insert([
+                'role_id'   => $role_id,
+                'menu_name' => $menu,
+                'access'    => 1
+            ]);
         }
-
-        return $this->response->setJSON(['status' => 'success', 'message' => 'Role Created Successfully.']);
     }
+
+    return $this->response->setJSON(['status' => 'success', 'message' => 'Role Created Successfully.']);
+}
 
     public function rolelist()
     {
@@ -104,9 +97,9 @@ class Rolemanagement extends Controller
     $tolimit = $_POST['length'] ?? 10;
     $search = $_POST['search']['value'];
     $condition = "1=1";
-    $company_id = session()->get('company_id'); // your selected company
-// do NOT append company_id to $condition here
+    $company_id = session()->get('company_id');
 
+    
 if (empty($company_id)) {
     die("Company ID missing in session!");
 }
@@ -175,9 +168,9 @@ if (empty($company_id)) {
 
     // Also pass $company_id to these methods
    $totalRec = $this->roleModel->getAllFilteredRecords($condition, $fromstart, $tolimit, $orderBy, $orderDir, $company_id);
-$totalCount = $this->roleModel->getAllRoleCount($company_id);
-$filteredCountObj = $this->roleModel->getFilterRoleCount($condition, $company_id);
-$filteredCount = $filteredCountObj->filRecords ?? 0;
+    $totalCount = $this->roleModel->getAllRoleCount($company_id);
+    $filteredCountObj = $this->roleModel->getFilterRoleCount($condition, $company_id);
+    $filteredCount = $filteredCountObj->filRecords ?? 0;
 
     echo json_encode([
         "draw" => intval($draw),
@@ -188,20 +181,28 @@ $filteredCount = $filteredCountObj->filRecords ?? 0;
 }
 
     public function delete()
-    {
-        $role_id = $this->request->getPost('role_id');
+{
+    $role_id = $this->request->getPost('role_id');
 
-        if (!$role_id) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid Role ID']);
-        }
-
-        $this->roleModel->delete($role_id);
-        $this->roleMenuModel->where('role_id', $role_id)->delete();
-
-        return $this->response->setJSON(['status' => 'success']);
+    if (!$role_id) {
+        return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid Role ID']);
     }
 
-    public function edit($id)
+    try {
+        $deleted = $this->roleModel->delete($role_id); // now a soft delete
+        $this->roleMenuModel->where('role_id', $role_id)->delete();
+
+        if ($deleted) {
+            return $this->response->setJSON(['status' => 'success']);
+        } else {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Delete failed.']);
+        }
+    } catch (\Exception $e) {
+        return $this->response->setJSON(['status' => 'error', 'message' => $e->getMessage()]);
+    }
+}
+
+ public function edit($id)
     {
         $role = $this->roleModel->find($id);
         $permissions = $this->roleMenuModel->where('role_id', $id)->findAll();
@@ -217,63 +218,84 @@ $filteredCount = $filteredCountObj->filRecords ?? 0;
             'menus' => $this->menus,
         ]);
     }
+public function update($id)
+{
+    $role_name_raw = $this->request->getPost('role_name');
+    $access_data = $this->request->getPost('access') ?? [];
 
-    public function update($id)
-    {
-        $role_name_raw = $this->request->getPost('role_name');
-        $access_data = $this->request->getPost('access') ?? [];
+    $normalized_role_name = trim(preg_replace('/\s+/', ' ', strtolower($role_name_raw)));
 
-        $normalized_role_name = trim(preg_replace('/\s+/', ' ', strtolower($role_name_raw)));
+    // Normalize new access permissions
+    $normalizedAccess = [];
+    foreach (array_keys($this->menus) as $menu) {
+        $normalizedAccess[$menu] = isset($access_data[$menu]) ? 1 : 0;
+    }
 
-        $normalizedAccess = [];
-        foreach (array_keys($this->menus) as $menu) {
-            $normalizedAccess[$menu] = isset($access_data[$menu]) ? 1 : 0;
-        }
+    // Fetch existing role and permissions
+    $existingRole = $this->roleModel->find($id);
+    $existingPermissions = $this->roleMenuModel->where('role_id', $id)->findAll();
 
-        $existingRole = $this->roleModel->find($id);
-        $existingPermissions = $this->roleMenuModel->where('role_id', $id)->findAll();
+    // Build old access array
+    $oldAccess = [];
+    foreach (array_keys($this->menus) as $menu) {
+        $oldAccess[$menu] = 0;
+    }
+    foreach ($existingPermissions as $perm) {
+        $oldAccess[$perm['menu_name']] = (int) $perm['access'];
+    }
 
-        $oldAccess = [];
-        foreach (array_keys($this->menus) as $menu) {
-            $oldAccess[$menu] = 0;
-        }
-        foreach ($existingPermissions as $perm) {
-            $oldAccess[$perm['menu_name']] = (int) $perm['access'];
-        }
+    // Check if role name is changed
+    $currentRoleNameNormalized = strtolower(trim(preg_replace('/\s+/', ' ', $existingRole['role_name'])));
+    $isNameChanged = $currentRoleNameNormalized !== $normalized_role_name;
+    $isAccessChanged = $normalizedAccess !== $oldAccess;
 
+    // ✅ Perform duplicate check only if the name has changed
+    if ($isNameChanged) {
         $duplicate = $this->roleModel
             ->where('REPLACE(LOWER(TRIM(role_name)), " ", "") =', str_replace(' ', '', $normalized_role_name))
             ->where('role_id !=', $id)
             ->first();
 
         if ($duplicate) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Role Name Already Exists.']);
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Role Name Already Exists.'
+            ]);
         }
+    }
 
-        $currentRoleNameNormalized = strtolower(trim(preg_replace('/\s+/', ' ', $existingRole['role_name'])));
-        $isNameChanged = $currentRoleNameNormalized !== $normalized_role_name;
-        $isAccessChanged = $normalizedAccess !== $oldAccess;
+    // If no changes were made, return info message
+    if (!$isNameChanged && !$isAccessChanged) {
+        return $this->response->setJSON([
+            'status' => 'info',
+            'message' => 'No Changes Detected To Update.'
+        ]);
+    }
 
-        if (!$isNameChanged && !$isAccessChanged) {
-            return $this->response->setJSON(['status' => 'info', 'message' => 'No Changes Detected To Update.']);
-        }
-
+    // Update role name only if it's changed
+    if ($isNameChanged) {
         $this->roleModel->update($id, [
             'role_name' => ucwords($normalized_role_name),
             'updated_at' => date('Y-m-d H:i:s'),
         ]);
-
-        $this->roleMenuModel->where('role_id', $id)->delete();
-        foreach ($normalizedAccess as $menu => $value) {
-            if ($value == 1) {
-                $this->roleMenuModel->insert([
-                    'role_id' => $id,
-                    'menu_name' => $menu,
-                    'access' => 1
-                ]);
-            }
-        }
-
-        return $this->response->setJSON(['status' => 'success', 'message' => 'Role Updated Successfully.']);
     }
+
+    // Update permissions
+    $this->roleMenuModel->where('role_id', $id)->delete();
+    foreach ($normalizedAccess as $menu => $value) {
+        if ($value == 1) {
+            $this->roleMenuModel->insert([
+                'role_id' => $id,
+                'menu_name' => $menu,
+                'access' => 1
+            ]);
+        }
+    }
+
+    return $this->response->setJSON([
+        'status' => 'success',
+        'message' => 'Role Updated Successfully.'
+    ]);
+}
+
 }

@@ -96,7 +96,9 @@
                 <th><strong>Invoice ID</strong></th>
                 <th><strong>Date</strong></th>
                 <th><strong>Customer</strong></th>
-                <th><strong>Amount</strong></th>
+                <th><strong>Total Amount</strong></th>
+                <th><strong>Paid Amount</strong></th>
+                <th><strong>Balance Amount</strong></th>
                 <th><strong>Payment Mode</strong></th>
                 <th><strong>Status</strong></th>
             </tr>
@@ -166,37 +168,42 @@ $(document).ready(function () {
 
                 if (res.length > 0) {
                     res.forEach((invoice, index) => {
-                        total += parseFloat(invoice.total_amount);
+                        const totalAmount = parseFloat(invoice.total_amount) || 0;
+                        const paidAmount = parseFloat(invoice.paid_amount) || 0;
+                        const balanceAmount = totalAmount - paidAmount;
+                        total += totalAmount;
+
+                        // Payment mode formatting
+                        const paymentMode = invoice.payment_mode 
+                            ? invoice.payment_mode
+                                .replace('_', ' ')
+                                .toLowerCase()
+                                .replace(/\b\w/g, c => c.toUpperCase()) 
+                            : '-';
+
+                        // Status badge
+                        const statusBadge = invoice.status === 'paid'
+                            ? '<span class="badge bg-success w-100">Paid</span>'
+                            : (invoice.status === 'partial paid'
+                                ? '<span class="badge bg-warning text-white w-100">Partial Paid</span>'
+                                : '<span class="badge bg-secondary w-100">Unknown</span>');
+
                         rows += `
                             <tr>
                                 <td class="text-center">${index + 1}</td>
                                 <td>${invoice.invoice_id}</td>
                                 <td>${formatDate(invoice.invoice_date)}</td>
                                 <td>${invoice.customer_name}</td>
-                                <td class="text-end">₹${parseFloat(invoice.total_amount).toFixed(2)}</td>
-                                <td class="text-center">
-    ${invoice.payment_mode 
-        ? invoice.payment_mode
-            .replace('_', ' ')
-            .toLowerCase()
-            .replace(/\b\w/g, c => c.toUpperCase()) 
-        : '-'}
-</td>
-
-                                        <td class="text-center">
-    ${invoice.status === 'paid' 
-        ? '<span class="badge bg-success w-100">Paid</span>' 
-        : (invoice.status === 'partial paid' 
-            ? '<span class="badge bg-warning text-dark w-100">Partial Paid</span>' 
-            : '<span class="badge bg-secondary w-100">Unknown</span>')}
-</td>
-
+                                <td class="text-end">₹${totalAmount.toFixed(2)}</td>
+                                <td class="text-end">₹${paidAmount.toFixed(2)}</td>
+                                <td class="text-end">₹${balanceAmount.toFixed(2)}</td>
+                                <td class="text-center">${paymentMode}</td>
+                                <td class="text-center">${statusBadge}</td>
                             </tr>
                         `;
                     });
                 } else {
-                  rows = `<tr><td colspan="5" class="text-center">No paid or partial paid invoices found.</td></tr>`;
-
+                    rows = `<tr><td colspan="9" class="text-center">No paid or partial paid invoices found.</td></tr>`;
                 }
 
                 $('#plainExpenseTable tbody').html(rows);
@@ -234,28 +241,6 @@ $(document).ready(function () {
         loadPaidInvoices();
     });
 
-    loadPaidInvoices();{
-       res.forEach((invoice, index) => {
-    total += parseFloat(invoice.total_amount);
-
-    const statusBadge = invoice.status === 'paid'
-        ? '<span class="status-badge status-paid w-100">Paid</span>'
-        : (invoice.status === 'partial paid'
-            ? '<span class="status-badge status-partial w-100">Partial Paid</span>'
-            : '<span class="status-badge status-unknown w-100">Unknown</span>');
-
-    rows += `
-        <tr>
-            <td class="text-center">${index + 1}</td>
-            <td>${invoice.invoice_id}</td>
-            <td>${formatDate(invoice.invoice_date)}</td>
-            <td>${invoice.customer_name}</td>
-            <td class="text-end">₹${parseFloat(invoice.total_amount).toFixed(2)}</td>
-            <td class="text-center">${statusBadge}</td>
-        </tr>
-    `;
-});
-
-    }
+    loadPaidInvoices();
 });
 </script>

@@ -107,7 +107,7 @@
       padding: 5px 6px;
       height: 20px !important;
     }
-   
+
     tbody td {
       border-top: 1px solid transparent;
       border-bottom: 1px solid transparent;
@@ -222,24 +222,28 @@
         white-space: normal;
       }
 
-     
+
       tr {
         page-break-inside: avoid;
       }
 
-    
+
       body,
       table {
         background: none !important;
       }
-/* 
-       .container {
-        min-width: 690px;
-        min-height: 900px;
-      }   */
+
+      .col-4,
+      {
+      flex: 0 0 auto !important;
+      width: auto !important;
+      max-width: none !important;
+    }
+
     }
   </style>
 </head>
+
 <body>
   <div class="outer-container">
     <div class="no-print" style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
@@ -247,45 +251,42 @@
         style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px;">
         Print
       </button>
-      <?php if (!in_array(strtolower($invoice['status']), ['paid', 'partial paid'])): ?>
-        <button id="editinvoicebtn"
-          onclick="window.location.href='<?= base_url('invoice/edit/' . $invoice['invoice_id']) ?>'"
-          style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px; cursor: pointer;">
-          Edit Invoice
+      <!-- Edit Invoice Button -->
+      <button id="editInvoiceBtn"
+        onclick="window.location.href='<?= base_url('invoice/edit/' . $invoice['invoice_id']) ?>'"
+        style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px; cursor: pointer;
+              display: <?= in_array(strtolower($invoice['status']), ['paid', 'partial paid']) ? 'none' : 'inline-block' ?>;">
+        Edit Invoice
+      </button>
+
+      <!-- Delivery Note Button -->
+      <button id="deliveryNoteBtn"
+        onclick="window.location.href='<?= base_url('invoice/delivery_note/' . $invoice['invoice_id']) ?>'"
+        style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;
+              display: <?= in_array(strtolower($invoice['status']), ['paid', 'partial paid']) ? 'inline-block' : 'none' ?>;">
+        Delivery Note
+      </button>
+
+      <!-- Payment Button -->
+        <?php
+        $paymentMode = isset($invoice['payment_mode']) && $invoice['payment_mode'] !== '' ? strtolower($invoice['payment_mode']) : 'cash';
+        $btnLabel = ($paymentMode === 'cash') ? 'Receipt' : 'Voucher';
+        $btnUrl   = ($paymentMode === 'cash')
+            ? base_url('receiptvoucher/' . $invoice['invoice_id'])
+            : base_url('paymentvoucher/' . $invoice['invoice_id']);
+        $invoiceStatus = strtolower($invoice['status']);
+        ?>
+        <button id="paymentBtn"
+          style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;
+                display: <?= $invoiceStatus === 'unpaid' ? 'none' : 'inline-block' ?>;"
+          onclick="window.location.href='<?= $btnUrl ?>'">
+          <?= $btnLabel ?>
         </button>
-      <?php endif; ?>
-        <button id="deliveryNoteBtn"
-            onclick="window.location.href='<?= base_url('invoice/delivery_note/' . $invoice['invoice_id']) ?>'"
-            style="display: <?= in_array(strtolower($invoice['status']), ['paid', 'partial paid']) ? 'inline-block' : 'none' ?>;
-                  background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
-            Delivery Note
-        </button>
-     <?php
-    $paymentMode = isset($invoice['payment_mode']) && $invoice['payment_mode'] !== '' 
-        ? strtolower($invoice['payment_mode']) 
-        : 'cash';
-
-    if ($paymentMode === 'cash') {
-        $btnLabel = ' Receipt';
-        $btnUrl = base_url('receiptvoucher/' . $invoice['invoice_id']);
-    } else {
-        $btnLabel = ' Voucher';
-        $btnUrl = base_url('paymentvoucher/' . $invoice['invoice_id']); 
-    }
-
-    $invoiceStatus = strtolower($invoice['status']);
-?>
-<button id="paymentBtn" class="btn" 
-    style="background-color: #991b36; color: white; <?= $invoiceStatus === 'unpaid' ? 'display:none;' : 'display:inline-block;' ?>"
-    onclick="window.location.href='<?= $btnUrl ?>'">
-    <?= $btnLabel ?>
-</button>
-
 
       <?php
-        $status = strtolower($invoice['status'] ?? 'unpaid');
-        $btnLabel = ucfirst($status);
-        $btnColor = $status === 'paid' ? '#28a745' : ($status === 'partial paid' ? '#ffc107' : '#991b36');
+      $status = strtolower($invoice['status'] ?? 'unpaid');
+      $btnLabel = ucfirst($status);
+      $btnColor = $status === 'paid' ? '#28a745' : ($status === 'partial paid' ? '#ffc107' : '#991b36');
       ?>
       <div class="btn-group ml-2 position-relative" style="z-index: 1000; margin-left: 10px;">
         <button id="statusBtn" type="button" class="btn btn-sm"
@@ -294,39 +295,38 @@
           <?= $btnLabel ?>
         </button>
         <?php if ($status === 'unpaid' || $status === 'partial paid'): ?>
-            <div class="dropdown" style="position: relative;">
-                <div id="statusOptions" class="dropdown-menu p-2"
-                    style="position: absolute; top: 100%; right: 0px; z-index: 1050; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: none;">
-                      <a href="javascript:void(0);" 
-                          class="dropdown-item text-success fw-semibold" 
-                          onclick="openMarkPaidModal(<?= $invoice['invoice_id']; ?>)">
-                            <i class="fas fa-check-circle me-2"></i> Mark as Paid
-                      </a>
-                      <a href="#" class="dropdown-item text-warning fw-semibold" onclick="openPartialPayment()">
-                          <i class="fas fa-hourglass-half me-2"></i> Partial Payment
-                      </a>
-                </div>
+          <div class="dropdown" style="position: relative;">
+            <div id="statusOptions" class="dropdown-menu p-2"
+              style="position: absolute; top: 100%; right: 0px; z-index: 1050; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: none;">
+              <a href="javascript:void(0);" class="dropdown-item text-success fw-semibold"
+                onclick="openMarkPaidModal(<?= $invoice['invoice_id']; ?>)">
+                <i class="fas fa-check-circle me-2"></i> Mark as Paid
+              </a>
+              <a href="#" class="dropdown-item text-warning fw-semibold" onclick="openPartialPayment()">
+                <i class="fas fa-hourglass-half me-2"></i> Partial Payment
+              </a>
             </div>
+          </div>
         <?php endif; ?>
       </div>
     </div>
     <div class="container">
       <div class="d-flex align-items-center text-center" style="margin-bottom: 5px;">
         <div class="col-4 text-start">
-            <span style="font-size: 12px; font-weight: bold;">
-                <?= esc(ucwords(strtolower($company['company_name']))) ?>
-            </span>
+          <span style="font-size: 12px; font-weight: bold;">
+            <?= esc(ucwords(strtolower($company['company_name']))) ?>
+          </span>
         </div>
         <div class="col-4">
-            <?php if (!empty($company['company_logo'])): ?>
-                <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" 
-                    alt="Company Logo" style="max-height: 30px;">
-            <?php endif; ?>
+          <?php if (!empty($company['company_logo'])): ?>
+            <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" alt="Company Logo"
+              style="max-height: 30px;">
+          <?php endif; ?>
         </div>
         <div class="col-4 text-end">
-            <span style="font-size: 14px; font-weight: bold; direction: rtl;">
-                <?= esc($company['company_name_ar'] ?? '') ?>
-            </span>
+          <span style="font-size: 14px; font-weight: bold; direction: rtl;">
+            <?= esc($company['company_name_ar'] ?? '') ?>
+          </span>
         </div>
       </div>
       <div style="height: 3px; background-color:#a1263a"></div>
@@ -344,7 +344,7 @@
         </div>
         <div class="col-4 text-center">
           <div
-            style="background-color: #991b36; color: white; font-weight: bold; padding: 3px 15px; display: inline-block; border-radius: 4px; font-size: 13px;">
+            style="background-color: #991b36; color: white; font-weight: bold; padding: 3px 15px; display: inline-block; border-radius: 4px; font-size: 13px; margin-top: 11px;">
             فاتورة / نقداً / بالحساب<br>CASH / CREDIT INVOICE
           </div>
         </div>
@@ -481,89 +481,90 @@
     </div> <!-- /.container -->
     <!-- Bottom Bar -->
     <div class="bottom-bar">
-       <div style="direction: rtl; text-align: center;">
-          <?= esc($company['address_ar'] ?? '') ?>
+      <div style="direction: rtl; text-align: center;">
+        <?= esc($company['address_ar'] ?? '') ?>
       </div>
       <div style="direction: ltr; text-align: center;">
-          <?= esc($company['address'] ?? '') ?>
+        <?= esc($company['address'] ?? '') ?>
       </div>
       <div style="margin-top: 5px;">
-          📞 <?= esc($company['phone'] ?? '') ?> &nbsp;&nbsp; | &nbsp;&nbsp;
-          📧 <a href="mailto:<?= esc($company['email'] ?? '') ?>" style="color: white; text-decoration: none;">
-              <?= esc($company['email'] ?? '') ?>
-          </a>
+        📞 <?= esc($company['phone'] ?? '') ?> &nbsp;&nbsp; | &nbsp;&nbsp;
+        📧 <a href="mailto:<?= esc($company['email'] ?? '') ?>" style="color: white; text-decoration: none;">
+          <?= esc($company['email'] ?? '') ?>
+        </a>
       </div>
     </div>
   </div>
 
   <!-- Partial Payment Modal -->
- <div id="partialPaymentModal" class="modal fade show" style="display: none; background-color: rgba(235, 170, 71, 0.7);
+  <div id="partialPaymentModal" class="modal fade show" style="display: none; background-color: rgba(235, 170, 71, 0.7);
     position: fixed; inset: 0; z-index: 1055; align-items: center; justify-content: center;">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content shadow-lg border-0 rounded-4 p-4">
-            <div class="modal-header border-0">
-                <h5 class="modal-title text-primary fw-bold">Partial Payment</h5>
-                <button type="button" class="btn-close" onclick="closePartialModal()"></button>
-            </div>
-            <div class="modal-body">
-                <label for="partialPaidInput" class="form-label">Enter Amount</label>
-                <input type="number" id="partialPaidInput" class="form-control form-control-lg border-primary" min="1"
-                    placeholder="Enter partial amount">
-                <small id="partialErrorMsg" style="color:red; display:none;">Entered amount exceeds balance.</small>
-                <div class="mt-3">
-                    <label for="paymentMode" class="form-label">Payment Mode <span style="color:red;">*</span></label>
-                    <select id="paymentMode" class="form-control form-control-lg border-primary">
-                        <option value="" selected disabled>Select payment mode</option>
-                        <option value="cash">Cash</option>
-                        <option value="bank_transfer">Bank Transfer</option>
-                        <option value="bank_link">Bank Link</option>
-                        <option value="wamd">WAMD</option>
-                    </select>
-                    <small id="paymentModeError" style="color:red; display:none;">Please select a payment mode.</small>
-                </div>
-            </div>
-
-            <div class="modal-footer border-0">
-                <button class="btn btn-danger px-4" onclick="submitPartialPayment()">Submit</button>
-                <button class="btn btn-secondary px-4" onclick="closePartialModal()">Cancel</button>
-            </div>
+      <div class="modal-content shadow-lg border-0 rounded-4 p-4">
+        <div class="modal-header border-0">
+          <h5 class="modal-title text-primary fw-bold">Partial Payment</h5>
+          <button type="button" class="btn-close" onclick="closePartialModal()"></button>
         </div>
+        <div class="modal-body">
+          <label for="partialPaidInput" class="form-label">Enter Amount</label>
+          <input type="number" id="partialPaidInput" class="form-control form-control-lg border-primary" min="1"
+            placeholder="Enter partial amount">
+          <small id="partialErrorMsg" style="color:red; display:none;">Entered amount exceeds balance.</small>
+          <div class="mt-3">
+            <label for="paymentMode" class="form-label">Payment Mode <span style="color:red;">*</span></label>
+            <select id="paymentMode" class="form-control form-control-lg border-primary">
+              <option value="" selected disabled>Select payment mode</option>
+              <option value="cash">Cash</option>
+              <option value="bank_transfer">Bank Transfer</option>
+              <option value="bank_link">Bank Link</option>
+              <option value="wamd">WAMD</option>
+            </select>
+            <small id="paymentModeError" style="color:red; display:none;">Please select a payment mode.</small>
+          </div>
+        </div>
+
+        <div class="modal-footer border-0">
+          <button class="btn btn-danger px-4" onclick="submitPartialPayment()">Submit</button>
+          <button class="btn btn-secondary px-4" onclick="closePartialModal()">Cancel</button>
+        </div>
+      </div>
     </div>
-</div>
-<!-- Mark as Paid Modal -->
-<div id="markPaidModal" class="modal fade" tabindex="-1" aria-labelledby="markPaidModalLabel" aria-hidden="true">
+  </div>
+  <!-- Mark as Paid Modal -->
+  <div id="markPaidModal" class="modal fade" tabindex="-1" aria-labelledby="markPaidModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content shadow-lg border-0 rounded-4 p-4">
-            <div class="modal-header border-0">
-                <h5 class="modal-title text-success fw-bold" id="markPaidModalLabel">Mark Invoice as Paid</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label for="markPaidPaymentMode" class="form-label">
-                        Payment Mode <span style="color:red;">*</span>
-                    </label>
-                    <select id="markPaidPaymentMode" class="form-control form-control-lg border-success">
-                        <option value="" selected disabled>Select payment mode</option>
-                        <option value="cash">Cash</option>
-                        <option value="bank_transfer">Bank Transfer</option>
-                        <option value="bank_link">Bank Link</option>
-                        <option value="wamd">WAMD</option>
-                    </select>
-                    <small id="markPaidError" style="color:red; display:none;">Please select a payment mode.</small>
-                </div>
-            </div>
-
-            <div class="modal-footer border-0">
-                <button type="button" class="btn btn-success" id="confirmMarkPaid">Submit</button>
-                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancel</button>
-            </div>
+      <div class="modal-content shadow-lg border-0 rounded-4 p-4">
+        <div class="modal-header border-0">
+          <h5 class="modal-title text-success fw-bold" id="markPaidModalLabel">Mark Invoice as Paid</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
+
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="markPaidPaymentMode" class="form-label">
+              Payment Mode <span style="color:red;">*</span>
+            </label>
+            <select id="markPaidPaymentMode" class="form-control form-control-lg border-success">
+              <option value="" selected disabled>Select payment mode</option>
+              <option value="cash">Cash</option>
+              <option value="bank_transfer">Bank Transfer</option>
+              <option value="bank_link">Bank Link</option>
+              <option value="wamd">WAMD</option>
+            </select>
+            <small id="markPaidError" style="color:red; display:none;">Please select a payment mode.</small>
+          </div>
+        </div>
+
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-success" id="confirmMarkPaid">Submit</button>
+          <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
 
 </body>
+
 </html>
 </div>
 <?php include "common/footer.php"; ?>
@@ -739,37 +740,37 @@
       }
     });
   }
-  
+
   let isFirstPartialPayment = localStorage.getItem('firstPartialDone_<?= $invoice['invoice_id'] ?>') !== 'true';
 
- function openPartialPayment() {
-  const modalTitle = document.querySelector('#partialPaymentModal .modal-title');
-  const inputLabel = document.querySelector('label[for="partialPaidInput"]');
-  const partialPaidInput = document.getElementById('partialPaidInput');
-  const paymentModeSelect = document.getElementById('paymentMode'); 
-  
-  if (partialPaidInput) partialPaidInput.value = '';
-  if (paymentModeSelect) paymentModeSelect.value = ''; 
+  function openPartialPayment() {
+    const modalTitle = document.querySelector('#partialPaymentModal .modal-title');
+    const inputLabel = document.querySelector('label[for="partialPaidInput"]');
+    const partialPaidInput = document.getElementById('partialPaidInput');
+    const paymentModeSelect = document.getElementById('paymentMode');
 
-  if (isFirstPartialPayment) {
-    modalTitle.innerText = "Advance Payment";
-    inputLabel.innerText = "Enter Amount";
-  } else {
-    modalTitle.innerText = "Partial Payment";
-    inputLabel.innerText = "Enter Amount";
+    if (partialPaidInput) partialPaidInput.value = '';
+    if (paymentModeSelect) paymentModeSelect.value = '';
+
+    if (isFirstPartialPayment) {
+      modalTitle.innerText = "Advance Payment";
+      inputLabel.innerText = "Enter Amount";
+    } else {
+      modalTitle.innerText = "Partial Payment";
+      inputLabel.innerText = "Enter Amount";
+    }
+
+    // Finally, show modal
+    document.getElementById('partialPaymentModal').style.display = 'block';
   }
-
-  // Finally, show modal
-  document.getElementById('partialPaymentModal').style.display = 'block';
-}
 
   function closePartialModal() {
     document.getElementById('partialPaymentModal').style.display = 'none';
   }
 
-function submitPartialPayment() {
+  function submitPartialPayment() {
     const paid = parseFloat(document.getElementById('partialPaidInput').value);
-    const paymentMode = document.getElementById('paymentMode').value; 
+    const paymentMode = document.getElementById('paymentMode').value;
     const errorMsg = document.getElementById('partialErrorMsg');
     const paymentModeError = document.getElementById('paymentModeError');
     errorMsg.style.display = 'none';
@@ -777,94 +778,97 @@ function submitPartialPayment() {
 
     //  Validate amount
     if (isNaN(paid) || paid <= 0 || paid > grandTotal) {
-        errorMsg.innerText = 'Entered Amount Exceeds Balance.';
-        errorMsg.style.display = 'block';
-        return;
+      errorMsg.innerText = 'Entered Amount Exceeds Balance.';
+      errorMsg.style.display = 'block';
+      return;
     }
 
     //Validate payment mode
     if (!paymentMode) {
-        if (!paymentModeError) {
-            const error = document.createElement("small");
-            error.id = "paymentModeError";
-            error.style.color = "red";
-            error.innerText = "Please select a payment mode.";
-            document.getElementById("paymentMode").insertAdjacentElement("afterend", error);
-        } else {
-            paymentModeError.style.display = "block";
-        }
-        document.getElementById("paymentMode").focus();
-        return;
+      if (!paymentModeError) {
+        const error = document.createElement("small");
+        error.id = "paymentModeError";
+        error.style.color = "red";
+        error.innerText = "Please select a payment mode.";
+        document.getElementById("paymentMode").insertAdjacentElement("afterend", error);
+      } else {
+        paymentModeError.style.display = "block";
+      }
+      document.getElementById("paymentMode").focus();
+      return;
     }
 
     const alreadyPaid = parseFloat(document.getElementById('paidAmountValue')?.innerText || 0);
     const balanceRemaining = grandTotal - alreadyPaid;
 
     if (paid > balanceRemaining) {
-        errorMsg.innerText = 'Entered Amount Exceeds Balance.';
-        errorMsg.style.display = 'block';
-        return;
+      errorMsg.innerText = 'Entered Amount Exceeds Balance.';
+      errorMsg.style.display = 'block';
+      return;
     } else {
-        errorMsg.style.display = 'none';
+      errorMsg.style.display = 'none';
     }
 
-   
+
     fetch("<?= base_url('invoice/update_partial_payment') ?>", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-Requested-With": "XMLHttpRequest"
-        },
-        body: JSON.stringify({
-            invoice_id: <?= $invoice['invoice_id'] ?>,
-            paid_amount: paid,
-            payment_mode: paymentMode 
-        })
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Requested-With": "XMLHttpRequest"
+      },
+      body: JSON.stringify({
+        invoice_id: <?= $invoice['invoice_id'] ?>,
+        paid_amount: paid,
+        payment_mode: paymentMode
+      })
     })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                const paidRow = document.getElementById('paidAmountRow');
-                const balanceRow = document.getElementById('balanceAmountRow');
-                const paidVal = document.getElementById('paidAmountValue');
-                const balanceVal = document.getElementById('balanceAmountValue');
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+       setTimeout(function () {
+          window.location.reload();
+           }, 200);
+          const paidRow = document.getElementById('paidAmountRow');
+          const balanceRow = document.getElementById('balanceAmountRow');
+          const paidVal = document.getElementById('paidAmountValue');
+          const balanceVal = document.getElementById('balanceAmountValue');
 
-                if (paidRow && paidVal) {
-                    paidRow.style.display = 'flex';
-                    paidVal.innerText = parseFloat(data.paid_amount).toFixed(2);
-                }
+          if (paidRow && paidVal) {
+            paidRow.style.display = 'flex';
+            paidVal.innerText = parseFloat(data.paid_amount).toFixed(2);
+          }
 
-                if (balanceRow && balanceVal) {
-                    if (parseFloat(data.balance_amount) > 0) {
-                        balanceRow.style.display = 'flex';
-                        balanceVal.innerText = parseFloat(data.balance_amount).toFixed(2);
-                    } else {
-                        balanceRow.style.display = 'none';
-                    }
-                }
-
-                statusBtn.innerText = 'Partial Paid';
-                statusBtn.style.backgroundColor = '#ffc107';
-                closePartialModal();
+          if (balanceRow && balanceVal) {
+            if (parseFloat(data.balance_amount) > 0) {
+              balanceRow.style.display = 'flex';
+              balanceVal.innerText = parseFloat(data.balance_amount).toFixed(2);
             } else {
-                alert("Failed to update.");
-                console.error("Partial update error:", data);
+              balanceRow.style.display = 'none';
             }
+          }
 
-            
-            if (isFirstPartialPayment) {
-                document.querySelector('#paidAmountRow .partial').innerText = "Advance Amount";
-                localStorage.setItem('firstPartialDone_<?= $invoice['invoice_id'] ?>', 'true');
-                isFirstPartialPayment = false;
-            } else {
-                document.querySelector('#paidAmountRow .partial').innerText = "Paid Amount";
-            }
-        })
-        .catch(err => {
-            alert("Network or server error.");
-            console.error("Fetch failed:", err);
-        });
-}
+          statusBtn.innerText = 'Partial Paid';
+          statusBtn.style.backgroundColor = '#ffc107';
+          closePartialModal();
+        } else {
+          alert("Failed to update.");
+          console.error("Partial update error:", data);
+        }
+
+
+        if (isFirstPartialPayment) {
+          document.querySelector('#paidAmountRow .partial').innerText = "Advance Amount";
+          localStorage.setItem('firstPartialDone_<?= $invoice['invoice_id'] ?>', 'true');
+          isFirstPartialPayment = false;
+        } else {
+          document.querySelector('#paidAmountRow .partial').innerText = "Paid Amount";
+        }
+      })
+      .catch(err => {
+        alert("Network or server error.");
+        console.error("Fetch failed:", err);
+      });
+  }
 
 
 function updateStatus(newStatus) {
@@ -888,52 +892,34 @@ function updateStatus(newStatus) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // ✅ If status is "paid" OR "partial paid"
+            // ✅ Update the status button instantly
+            statusBtn.innerText = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+
+            // ✅ If Paid or Partial Paid → Show Delivery + Payment, Hide Edit
             if (newStatus === 'paid' || newStatus === 'partial paid') {
-                // Disable status change
-                if (statusBtn) {
-                    statusBtn.disabled = true;
-                    statusBtn.setAttribute('title', 'This invoice status cannot be changed');
-                    statusBtn.removeAttribute('onclick');
-                }
-
-                // Hide amount rows
-                document.getElementById('paidAmountRow')?.style.setProperty('display', 'none', 'important');
-                document.getElementById('balanceAmountRow')?.style.setProperty('display', 'none', 'important');
-
-                // ✅ Show delivery note button immediately
-                if (deliveryBtn) {
-                    deliveryBtn.style.removeProperty('display');
-                    deliveryBtn.style.setProperty('display', 'inline-block', 'important');
-                }
-
-                // ✅ Show payment button immediately
-                if (paymentBtn) {
-                    paymentBtn.style.removeProperty('display');
-                    paymentBtn.style.setProperty('display', 'inline-block', 'important');
-                }
-
-                // ✅ Hide edit invoice button immediately
-                if (editBtn) {
-                    editBtn.style.setProperty('display', 'none', 'important');
-                }
-            }
-            // ✅ If status is "unpaid"
+                if (editBtn) editBtn.classList.add("d-none");
+                if (deliveryBtn) deliveryBtn.classList.remove("d-none");
+                if (paymentBtn) paymentBtn.classList.remove("d-none");
+            } 
+            // ✅ If Unpaid → Show Edit, Hide Delivery + Payment
             else if (newStatus === 'unpaid') {
-                if (editBtn) {
-                    editBtn.style.setProperty('display', 'inline-block', 'important');
-                }
-                if (deliveryBtn) {
-                    deliveryBtn.style.setProperty('display', 'none', 'important');
-                }
-                if (paymentBtn) {
-                    paymentBtn.style.setProperty('display', 'none', 'important');
-                }
+                if (editBtn) editBtn.classList.remove("d-none");
+                if (deliveryBtn) deliveryBtn.classList.add("d-none");
+                if (paymentBtn) paymentBtn.classList.add("d-none");
             }
         } else {
             alert("Status update failed!");
             console.error("Update status failed:", data);
         }
+        if (data.success) {
+    statusBtn.innerText = 'Partial Paid';
+    statusBtn.style.backgroundColor = '#ffc107';
+
+    // ✅ Instantly show Delivery + Payment buttons, hide Edit
+    document.getElementById("editInvoiceBtn")?.classList.add("d-none");
+    document.getElementById("deliveryNoteBtn")?.classList.remove("d-none");
+    document.getElementById("paymentBtn")?.classList.remove("d-none");
+}
     })
     .catch(error => {
         console.error("Error updating status:", error);
@@ -943,88 +929,88 @@ function updateStatus(newStatus) {
 
 
 
-let selectedInvoiceId = null;
+  let selectedInvoiceId = null;
 
-function openMarkPaidModal(invoiceId) {
-    selectedInvoiceId = invoiceId; 
-    $('#invoice_id').val(invoiceId); 
+  function openMarkPaidModal(invoiceId) {
+    selectedInvoiceId = invoiceId;
+    $('#invoice_id').val(invoiceId);
     $('#markPaidModal').modal('show');
-}
+  }
 
-$('#confirmMarkPaid').on('click', function () {
+  $('#confirmMarkPaid').on('click', function () {
     const paymentMode = $('#markPaidPaymentMode').val();
     const errorMsg = $('#markPaidError');
 
     if (!paymentMode || paymentMode.trim() === '') {
-        errorMsg.show();
-        $('#markPaidPaymentMode').focus();
-        return;
+      errorMsg.show();
+      $('#markPaidPaymentMode').focus();
+      return;
     } else {
-        errorMsg.hide();
+      errorMsg.hide();
     }
 
     $('#confirmMarkPaid').prop('disabled', true).text('Processing...');
 
     $.ajax({
-        url: "<?= base_url('invoice/update_status') ?>",
-        type: "POST",
-        contentType: "application/json",
-        data: JSON.stringify({
-            invoice_id: selectedInvoiceId,
-            status: "paid",
-            payment_mode: paymentMode
-        }),
-        success: function (response) {
-            const modalElement = document.getElementById('markPaidModal');
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            modal.hide();
+      url: "<?= base_url('invoice/update_status') ?>",
+      type: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({
+        invoice_id: selectedInvoiceId,
+        status: "paid",
+        payment_mode: paymentMode
+      }),
+      success: function (response) {
+        const modalElement = document.getElementById('markPaidModal');
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        modal.hide();
 
-            const statusBtn = $('#statusBtn');
-            if (statusBtn.length) {
-                statusBtn.text('Paid');
-                statusBtn.css('background-color', '#28a745');
-                statusBtn.prop('disabled', true);
-                statusBtn.attr('title', 'Fully paid invoice cannot be changed');
-            }
-
-            
-            const paymentBtn = $('#paymentBtn');
-            if (paymentBtn.length) {
-                if (paymentMode === 'cash') {
-                    paymentBtn.text('Receipt');
-                    paymentBtn.off('click').on('click', function () {
-                        window.location.href = "<?= base_url('receiptvoucher/' . $invoice['invoice_id']) ?>";
-                    });
-                } else {
-                    paymentBtn.text('Voucher');
-                    paymentBtn.off('click').on('click', function () {
-                        window.location.href = "<?= base_url('paymentvoucher/' . $invoice['invoice_id']) ?>";
-                    });
-                }
-            }
-            $('#editinvoicebtn').hide();
-        },
-        error: function (xhr, status, error) {
-            console.error("AJAX Error:", status, error, xhr.responseText);
-            alert("Something went wrong. Please try again.");
-        },
-        complete: function () {
-            $('#confirmMarkPaid').prop('disabled', false).text('Submit');
+        const statusBtn = $('#statusBtn');
+        if (statusBtn.length) {
+          statusBtn.text('Paid');
+          statusBtn.css('background-color', '#28a745');
+          statusBtn.prop('disabled', true);
+          statusBtn.attr('title', 'Fully paid invoice cannot be changed');
         }
-    });
-});
 
-document.getElementById('paymentMode').addEventListener('change', function() {
+
+        const paymentBtn = $('#paymentBtn');
+        if (paymentBtn.length) {
+          if (paymentMode === 'cash') {
+            paymentBtn.text('Receipt');
+            paymentBtn.off('click').on('click', function () {
+              window.location.href = "<?= base_url('receiptvoucher/' . $invoice['invoice_id']) ?>";
+            });
+          } else {
+            paymentBtn.text('Voucher');
+            paymentBtn.off('click').on('click', function () {
+              window.location.href = "<?= base_url('paymentvoucher/' . $invoice['invoice_id']) ?>";
+            });
+          }
+        }
+        $('#editinvoicebtn').hide();
+      },
+      error: function (xhr, status, error) {
+        console.error("AJAX Error:", status, error, xhr.responseText);
+        alert("Something went wrong. Please try again.");
+      },
+      complete: function () {
+        $('#confirmMarkPaid').prop('disabled', false).text('Submit');
+      }
+    });
+  });
+
+  document.getElementById('paymentMode').addEventListener('change', function () {
     const mode = this.value;
     const paymentBtn = document.getElementById('paymentBtn');
     if (mode === 'cash') {
-        paymentBtn.innerText = 'Receipt';
-        paymentBtn.onclick = () => window.location.href = '<?= base_url('receiptvoucher/' . $invoice['invoice_id']) ?>';
+      paymentBtn.innerText = 'Receipt';
+      paymentBtn.onclick = () => window.location.href = '<?= base_url('receiptvoucher/' . $invoice['invoice_id']) ?>';
     } else {
-        paymentBtn.innerText = 'Voucher';
-        paymentBtn.onclick = () => window.location.href = '<?= base_url('paymentvoucher/' . $invoice['invoice_id']) ?>';
+      paymentBtn.innerText = 'Voucher';
+      paymentBtn.onclick = () => window.location.href = '<?= base_url('paymentvoucher/' . $invoice['invoice_id']) ?>';
     }
-});
+  });
 
   function downloadDeliveryNote() {
     deliveryNoteModal.style.display = 'none';
