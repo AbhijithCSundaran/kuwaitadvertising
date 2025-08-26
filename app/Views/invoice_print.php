@@ -98,7 +98,7 @@
       border: 1px solid black;
     }
 
-    table.min_height {
+    /* table.min_height {
       min-height: 350px;
     }
 
@@ -106,7 +106,35 @@
       vertical-align: top;
       padding: 5px 6px;
       height: 20px !important;
-    }
+    } */
+
+   table.min_height {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    min-height: 350px;
+}
+
+/* Table cells */
+table.min_height tbody td {
+    vertical-align: top;
+    padding: 5px 6px;
+    height: auto !important;
+    border-top: none;    
+    border-bottom: none;
+    border-left:  1px solid black;             /* ❌ Remove vertical line */
+    border-right:  1px solid black;            /* ❌ Remove vertical line */
+}
+
+/* Empty rows styling */
+table.min_height .empty-row td {
+    height: 28px; /* Keeps blank rows evenly spaced */
+    border-top: none;
+    border-bottom: none;
+    border-left:  1px solid black;
+    border-right:  1px solid black;
+}
+
 
     tbody td {
       border-top: 1px solid transparent;
@@ -373,6 +401,7 @@
       </div>
 
       <!-- Invoice Table -->
+   
       <table class="min_height">
         <thead>
           <tr>
@@ -412,6 +441,24 @@
               <td><?= $lineFils ?></td>
             </tr>
           <?php endforeach; ?>
+          <?php
+$minRows = 8; // Minimum total rows visible in the table
+$currentRows = is_array($items) ? count($items) : 0; // Safe counting
+$emptyRows = max(0, $minRows - $currentRows);
+
+for ($i = 0; $i < $emptyRows; $i++) {
+    echo '<tr class="empty-row">
+        <td>&nbsp;</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>';
+
+}
+?>
         </tbody>
         <?php $grandTotal = $totalAmount; ?>
         <?php
@@ -448,6 +495,7 @@
           </tr>
         </tfoot>
       </table>
+      
 
       <div class="amount-words">
         المبلغ (بالكلمات): <span id="amount-words"></span>
