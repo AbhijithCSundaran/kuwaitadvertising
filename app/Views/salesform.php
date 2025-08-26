@@ -13,6 +13,7 @@
     <div class="alert d-none text-center position-fixed" role="alert"></div>
 
     <h3>Sales Report</h3>
+
     <form method="get" class="row g-3 mb-4">
         <div class="col-md-3 filter-date p-3 position-relative">
             <div class="input-group-prepend">
