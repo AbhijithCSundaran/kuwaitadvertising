@@ -21,33 +21,25 @@ public function index($uid = null)
     $session = session();
     $isEdit = !empty($uid);
 
-    $userModel         = new Manageuser_Model();
-    $roleModel         = new RoleModel();
+    $userModel           = new Manageuser_Model();
+    $roleModel           = new RoleModel();
     $managecompany_Model = new Managecompany_Model();
 
     $userData = $isEdit ? $userModel->find($uid) : [];
-    $roles    = $roleModel->findAll();
 
     $loggedInCompanyId = $session->get('company_id');
-    $loggedInRoleId    = $session->get('role_Id');
-
-   if ($loggedInRoleId == 1 && $session->get('user_status') == 1) {
+    // fetch only roles for the logged-in company
+    $roles = $roleModel->where('company_id', $loggedInCompanyId)->findAll();
     $companies = $managecompany_Model->where('company_id', $loggedInCompanyId)->findAll();
-    } else {
-        $companies = $managecompany_Model->where('company_id', $loggedInCompanyId)->findAll();
-    }
-
 
     return view('adduser', [
-        'uid'        => $uid,
-        'isEdit'     => $isEdit,
-        'userData'   => $userData,
-        'roles'      => $roles,
-        'companies'  => $companies,
-        // 'loggedInRoleId'   => $loggedInRoleId
+        'uid'       => $uid,
+        'isEdit'    => $isEdit,
+        'userData'  => $userData,
+        'roles'     => $roles,
+        'companies' => $companies
     ]);
 }
-
     public function add(){
         return view('adduserlist');
     }

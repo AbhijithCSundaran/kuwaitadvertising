@@ -469,11 +469,11 @@
         }
         $('#invoice-form').submit(function (e) {
             e.preventDefault();
-            const currentFormData = $('#invoice-form').serialize();
-            if (currentFormData === initialFormData) {
-                showAlert('No Changes Made.', 'info');
-                return;
-            }
+            // const currentFormData = $('#invoice-form').serialize();
+            // if (currentFormData === initialFormData) {
+            //     showAlert('No Changes Made.', 'info');
+            //     return;
+            // }
             const $submitBtn = $('#save-invoice-btn');
             $submitBtn.prop('disabled', true).text('Generating...');
             const customerId = $('#customer_id').val();

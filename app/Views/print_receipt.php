@@ -139,6 +139,10 @@
             .label{
                 font-size:15px;
             }
+            .no-print{
+                position:relative;
+                left:80px;
+            }
             @media print {
             * {
                 -webkit-print-color-adjust: exact !important;
@@ -183,15 +187,16 @@
     </head>
     <body>
         <div class="outer-container" >
-            <button class="no-print" onclick="window.print()"
-                style="background-color: #991b36; color: white; padding: 8px 16px;     margin-left: 82%; border: none; border-radius: 5px;">
-                Print
-            </button>
-            <button class="no-print" onclick="window.location.href='<?= base_url('cashlist') ?>'"
-                style="background-color: #a1263a; color: white; padding: 8px 16px;     margin-left: 82%; border: none; border-radius: 5px; margin-left: 10px;">
-                Discard
-            </button>
-    
+            <div class="no-print">
+                <button  onclick="window.print()"
+                    style="background-color: #991b36; color: white; padding: 8px 16px;     margin-left: 82%; border: none; border-radius: 5px;">
+                    Print
+                </button>
+                <button  onclick="window.location.href='<?= base_url('cashlist') ?>'"
+                    style="background-color: #a1263a; color: white; padding: 8px 16px;     margin-left: 82%; border: none; border-radius: 5px; margin-left: 10px;">
+                    Discard
+                </button>
+            </div>
             <div class="voucher-container">
                 
                 <div class="header">

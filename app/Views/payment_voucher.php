@@ -125,6 +125,10 @@
             .label{
                 font-size:15px;
             }
+             .no-print{
+                position:relative;
+                left:90px;
+            }
                       @media print {
             * {
                 -webkit-print-color-adjust: exact !important;
