@@ -206,7 +206,9 @@ if (!empty($companyId)) {
             'name'        => $user->name,
             'role_name'   => $user->role_name ?? '',
             'email'       => $user->email,
-            'phonenumber' => $user->phonenumber
+             'phonenumber' => (isset($user->phonenumber) && trim($user->phonenumber) !== '') 
+                         ? $user->phonenumber 
+                         : 'N/A',
         ];
     }
 

@@ -369,10 +369,10 @@ class Invoice extends BaseController
         if (!$estimate) {
             return redirect()->back()->with('error', 'Estimate not found.');
         }
-         if ($estimate['is_converted'] == 0) {
-            $estimateModel->update($estimateId, ['is_converted' => 1]);
-            $estimate['is_converted'] = 1; // also update local array
-        }
+        //  if ($estimate['is_converted'] == 0) {
+        //     $estimateModel->update($estimateId, ['is_converted' => 1]);
+        //     $estimate['is_converted'] = 1; // also update local array
+        // }
 
         $customerModel = new customerModel();
         $customer = $customerModel->find($estimate['customer_id']);

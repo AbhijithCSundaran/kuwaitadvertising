@@ -241,165 +241,167 @@
   </style>
 </head>
 <body>
-  <div class="outer-container">
-    <!-- <div class="no-print" style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
-      <button onclick="window.print()"
-        style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px;">
-        Print
-      </button>
-      <?php if (!in_array(strtolower($invoice['status']), ['paid', 'partial paid'])): ?>
-        <button id="editinvoicebtn"
-          onclick="window.location.href='<?= base_url('invoice/edit/' . $invoice['invoice_id']) ?>'"
-          style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px; cursor: pointer;">
-          Edit Invoice
+  <div class="right_container">
+    <div class="outer-container">
+      <!-- <div class="no-print" style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+        <button onclick="window.print()"
+          style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px;">
+          Print
         </button>
-      <?php endif; ?>
-      <button id="deliveryNoteBtn"
-        onclick="window.location.href='<?= base_url('invoice/delivery_note/' . $invoice['invoice_id']) ?>'"
-        style="display: <?= in_array(strtolower($invoice['status']), ['paid', 'partial paid']) ? 'inline-block' : 'none' ?>;
-              background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
-        Delivery Note
-      </button>
-
-      <?php
-      $status = strtolower($invoice['status'] ?? 'unpaid');
-      $btnLabel = ucfirst($status);
-      $btnColor = $status === 'paid' ? '#28a745' : ($status === 'partial paid' ? '#ffc107' : '#991b36');
-      ?>
-      <div class="btn-group ml-2 position-relative" style="z-index: 1000; margin-left: 10px;">
-        <button id="statusBtn" type="button" class="btn btn-sm"
-          style="background-color: <?= $btnColor ?>; color: white; padding: 8px 16px; border-radius: 5px;"
-          <?= $status === 'paid' ? 'disabled title="Fully paid invoice cannot be changed"' : 'onclick="toggleStatusOptions()"' ?>>
-          <?= $btnLabel ?>
+        <?php if (!in_array(strtolower($invoice['status']), ['paid', 'partial paid'])): ?>
+          <button id="editinvoicebtn"
+            onclick="window.location.href='<?= base_url('invoice/edit/' . $invoice['invoice_id']) ?>'"
+            style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px; cursor: pointer;">
+            Edit Invoice
+          </button>
+        <?php endif; ?>
+        <button id="deliveryNoteBtn"
+          onclick="window.location.href='<?= base_url('invoice/delivery_note/' . $invoice['invoice_id']) ?>'"
+          style="display: <?= in_array(strtolower($invoice['status']), ['paid', 'partial paid']) ? 'inline-block' : 'none' ?>;
+                background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
+          Delivery Note
         </button>
 
-        <?php if ($status === 'unpaid' || $status === 'partial paid'): ?>
-          <div class="dropdown" style="position: relative;">
-            <div id="statusOptions" class="dropdown-menu p-2"
-              style="position: absolute; top: 100%; right: 0px; z-index: 1050; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: none;">
-              <a href="#" class="dropdown-item text-success fw-semibold" onclick="updateStatus('paid')">
-                <i class="fas fa-check-circle me-2"></i> Mark as Paid
-              </a>
-              <a href="#" class="dropdown-item text-warning fw-semibold" onclick="openPartialPayment()">
-                <i class="fas fa-hourglass-half me-2"></i> Partial Payment
-              </a>
+        <?php
+        $status = strtolower($invoice['status'] ?? 'unpaid');
+        $btnLabel = ucfirst($status);
+        $btnColor = $status === 'paid' ? '#28a745' : ($status === 'partial paid' ? '#ffc107' : '#991b36');
+        ?>
+        <div class="btn-group ml-2 position-relative" style="z-index: 1000; margin-left: 10px;">
+          <button id="statusBtn" type="button" class="btn btn-sm"
+            style="background-color: <?= $btnColor ?>; color: white; padding: 8px 16px; border-radius: 5px;"
+            <?= $status === 'paid' ? 'disabled title="Fully paid invoice cannot be changed"' : 'onclick="toggleStatusOptions()"' ?>>
+            <?= $btnLabel ?>
+          </button>
+
+          <?php if ($status === 'unpaid' || $status === 'partial paid'): ?>
+            <div class="dropdown" style="position: relative;">
+              <div id="statusOptions" class="dropdown-menu p-2"
+                style="position: absolute; top: 100%; right: 0px; z-index: 1050; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: none;">
+                <a href="#" class="dropdown-item text-success fw-semibold" onclick="updateStatus('paid')">
+                  <i class="fas fa-check-circle me-2"></i> Mark as Paid
+                </a>
+                <a href="#" class="dropdown-item text-warning fw-semibold" onclick="openPartialPayment()">
+                  <i class="fas fa-hourglass-half me-2"></i> Partial Payment
+                </a>
+              </div>
+            </div>
+          <?php endif; ?>
+        </div>
+      </div> -->
+      <div class="no-print" style="text-align: right; margin-bottom: 20px;"> 
+      <button onclick="window.print()" class="btn btn-sm" 
+              style="background-color: #991b36; color: white;">Print</button>
+      <button onclick="downloadPDF()" class="btn btn-sm" 
+              style="background-color: #991b36; color: white;">Download PDF</button>
+      <button onclick="window.location.href='<?= base_url('invoice/print/' . $invoice['invoice_id']) ?>'" 
+          class="btn btn-sm" style="background-color: #991b36; color: white;">
+      Discard
+  </button>
+
+  </div>
+
+
+      
+      <div class="container">
+        <div class="top-heading" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+          <span style="font-size: 14px; font-weight: bold;">Al Rai Printing Press</span>
+          <img src="<?php echo ASSET_PATH; ?>assets/images/invoice-heading.png" alt="Invoice Heading"
+            style="max-height: 50px;">
+          <span style="font-size: 14px; font-weight: bold; direction: rtl;">مطبعة الري الأعمال الطباعة</span>
+        </div>
+        <hr>
+        <div class="row align-items-center" style="margin-bottom: 10px;">
+          <div class="col-4 text-start">
+            <div>
+    <label style="font-weight: bold; margin-right: 4px;">Invoice No :</label>
+    <span style="display: inline-block; width: 87px; height: 23px; line-height: 23px; text-align: left; color: black;">
+      <?= esc($invoice['invoice_id']) ?>
+    </span>
+  </div>
+
+          </div>
+          <div class="col-4 text-center">
+            <div
+              style="background-color: #991b36; color: white; font-weight: bold; padding: 3px 15px; display: inline-block; border-radius: 4px; font-size: 13px;">
+            ملاحظة التسليم<br> DELIVERY NOTE
             </div>
           </div>
-        <?php endif; ?>
-      </div>
-    </div> -->
-    <div class="no-print" style="text-align: right; margin-bottom: 20px;"> 
-    <button onclick="window.print()" class="btn btn-sm" 
-            style="background-color: #991b36; color: white;">Print</button>
-    <button onclick="downloadPDF()" class="btn btn-sm" 
-            style="background-color: #991b36; color: white;">Download PDF</button>
-    <button onclick="window.location.href='<?= base_url('invoice/print/' . $invoice['invoice_id']) ?>'" 
-        class="btn btn-sm" style="background-color: #991b36; color: white;">
-    Discard
-</button>
+          <div class="col-4 text-end">
+            <div class="delivery-date">
+              <strong>Delivery Date:</strong> 
+                <span id="deliveryDate" class="delivery-value" style="color: black;">
+                  <?= !empty($invoice['delivery_date']) ? date('d-m-Y', strtotime($invoice['delivery_date'])) : '' ?>
+                </span>
+            </div>
 
-</div>
-
-
-    
-    <div class="container">
-      <div class="top-heading" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-        <span style="font-size: 14px; font-weight: bold;">Al Rai Printing Press</span>
-        <img src="<?php echo ASSET_PATH; ?>assets/images/invoice-heading.png" alt="Invoice Heading"
-          style="max-height: 50px;">
-        <span style="font-size: 14px; font-weight: bold; direction: rtl;">مطبعة الري الأعمال الطباعة</span>
-      </div>
-      <hr>
-      <div class="row align-items-center" style="margin-bottom: 10px;">
-        <div class="col-4 text-start">
-          <div>
-  <label style="font-weight: bold; margin-right: 4px;">Invoice No :</label>
-  <span style="display: inline-block; width: 87px; height: 23px; line-height: 23px; text-align: left; color: black;">
-    <?= esc($invoice['invoice_id']) ?>
-  </span>
-</div>
-
-        </div>
-        <div class="col-4 text-center">
-          <div
-            style="background-color: #991b36; color: white; font-weight: bold; padding: 3px 15px; display: inline-block; border-radius: 4px; font-size: 13px;">
-           ملاحظة التسليم<br> DELIVERY NOTE
           </div>
         </div>
-        <div class="col-4 text-end">
-          <div class="delivery-date">
-            <strong>Delivery Date:</strong> 
-              <span id="deliveryDate" class="delivery-value" style="color: black;">
-                <?= !empty($invoice['delivery_date']) ? date('d-m-Y', strtotime($invoice['delivery_date'])) : '' ?>
-              </span>
+
+        <div class="invoice-header">
+          <div class="col-12">
+            Address: <span><?= esc($customer['address'] ?? '') ?>
+  </span>:عنوان
           </div>
-
         </div>
-      </div>
 
-      <div class="invoice-header">
-        <div class="col-12">
-          Address: <span><?= esc($customer['address'] ?? '') ?>
-</span>:عنوان
-        </div>
-      </div>
-
-      <!-- Invoice Table -->
-       <table class="min_height" style="width:100%; border-collapse: collapse; font-size: 14px;">
-  <thead>
-    <tr>
-      <th style="width: 10%; border: 1px solid #000; padding: 8px;">SR. NO</th>
-      <th style="width: 37%; border: 1px solid #000; padding: 8px; text-align: left;">DESCRIPTION</th>
-      <th style="width: 10%; border: 1px solid #000; padding: 8px;">Unit</th>
-      <th style="width: 10%; border: 1px solid #000; padding: 8px;">Qty</th>
-      <th style="width: 33%; border: 1px solid #000; padding: 8px;">LOCATION</th>
-    </tr>
-  </thead>
-  <tbody>
-    <?php
-    $i = 1;
-    foreach ($items as $item):
-    ?>
+        <!-- Invoice Table -->
+        <table class="min_height" style="width:100%; border-collapse: collapse; font-size: 14px;">
+    <thead>
       <tr>
-        <td style="border: 1px solid #000; padding: 8px; text-align: center;"><?= $i++ ?></td>
-        <td style="border: 1px solid #000; padding: 8px; text-align: left;"><?= esc($item['item_name'] ?? '-') ?></td>
-        <td style="border: 1px solid #000; padding: 8px; text-align: center;"><?= number_format($item['price'], 2) ?></td>
-        <td style="border: 1px solid #000; padding: 8px; text-align: center;"><?= esc($item['quantity']) ?></td>
-        <td style="border: 1px solid #000; padding: 8px; text-align: left;">--</td>
+        <th style="width: 10%; border: 1px solid #000; padding: 8px;">SR. NO</th>
+        <th style="width: 37%; border: 1px solid #000; padding: 8px; text-align: left;">DESCRIPTION</th>
+        <th style="width: 10%; border: 1px solid #000; padding: 8px;">Unit</th>
+        <th style="width: 10%; border: 1px solid #000; padding: 8px;">Qty</th>
+        <th style="width: 33%; border: 1px solid #000; padding: 8px;">LOCATION</th>
       </tr>
-    <?php endforeach; ?>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      <?php
+      $i = 1;
+      foreach ($items as $item):
+      ?>
+        <tr>
+          <td style="border: 1px solid #000; padding: 8px; text-align: center;"><?= $i++ ?></td>
+          <td style="border: 1px solid #000; padding: 8px; text-align: left;"><?= esc($item['item_name'] ?? '-') ?></td>
+          <td style="border: 1px solid #000; padding: 8px; text-align: center;"><?= number_format($item['price'], 2) ?></td>
+          <td style="border: 1px solid #000; padding: 8px; text-align: center;"><?= esc($item['quantity']) ?></td>
+          <td style="border: 1px solid #000; padding: 8px; text-align: left;">--</td>
+        </tr>
+      <?php endforeach; ?>
+    </tbody>
+  </table>
 
-<div class="d-flex w-100 position-relative" style="margin-top: 10px;">
-    <div class="col-6 ms-auto">
-        <hr>
-        <?php
-            $company_name = !empty($company['company_name']) ? $company['company_name'] : 'Unknown Company';
-        ?>
-        <div class="text-center" style="font-size: 15px;">
-            For <?= esc(ucwords(strtolower($company_name))) ?>
+  <div class="d-flex w-100 position-relative" style="margin-top: 10px;">
+      <div class="col-6 ms-auto">
+          <hr>
+          <?php
+              $company_name = !empty($company['company_name']) ? $company['company_name'] : 'Unknown Company';
+          ?>
+          <div class="text-center" style="font-size: 15px;">
+              For <?= esc(ucwords(strtolower($company_name))) ?>
+          </div>
+      </div>
+  </div>
+
+  <div class="table-footer">
+          <div>Received By/ تم الاستلام بواسطة </div>
+          <div style="text-align: right;">Issued By / صادرة عن</div>
         </div>
-    </div>
-</div>
-
- <div class="table-footer">
-        <div>Received By/ تم الاستلام بواسطة </div>
-        <div style="text-align: right;">Issued By / صادرة عن</div>
+  <div class="table-footer">
+          <div> Signature / إمضاء</div>
+          <div style="text-align: right;">Signature / إمضاء</div>
+        </div>
+      </div> <!-- /.container -->
+      <!-- Bottom Bar -->
+      <div class="bottom-bar">
+        الراي ، قطعة ٣ ، شارع ٣٢ ، مبنى رقم ٤٣٧ ، محل رقم ٤ ، بالقرب من زجاج الروان ، الشويخ - الكويت<br>
+        Al-Rai, Block 3, Street 32, Build No. 437, Shop No. 4, Near Al Rawan Glass, Shuwaik - Kuwait<br>
+        📞 +965 6006 0102 &nbsp;&nbsp; | &nbsp;&nbsp;
+        📧 <a href="mailto:alraiprintpress@gmail.com" style="color: white; text-decoration: none;">
+          alraiprintpress@gmail.com
+        </a>
       </div>
-<div class="table-footer">
-        <div> Signature / إمضاء</div>
-        <div style="text-align: right;">Signature / إمضاء</div>
-      </div>
-    </div> <!-- /.container -->
-    <!-- Bottom Bar -->
-    <div class="bottom-bar">
-      الراي ، قطعة ٣ ، شارع ٣٢ ، مبنى رقم ٤٣٧ ، محل رقم ٤ ، بالقرب من زجاج الروان ، الشويخ - الكويت<br>
-      Al-Rai, Block 3, Street 32, Build No. 437, Shop No. 4, Near Al Rawan Glass, Shuwaik - Kuwait<br>
-      📞 +965 6006 0102 &nbsp;&nbsp; | &nbsp;&nbsp;
-      📧 <a href="mailto:alraiprintpress@gmail.com" style="color: white; text-decoration: none;">
-        alraiprintpress@gmail.com
-      </a>
     </div>
   </div>
 

@@ -44,11 +44,11 @@
             }
             .voucher-title { 
                 text-align: center;
-                font-size: 40px;  
+                font-size: 38px;  
             }
             .voucher-sub { 
                 text-align: center;    
-                font-size: 25px; 
+                font-size: 24px; 
                 margin-bottom: 25px; 
             }    
             .amount-box {
@@ -78,13 +78,13 @@
 
             .field { 
                 margin:25px 20px; 
-                font-weight: bold; 
+                /* font-weight: bold;  */
             }
             .label { 
                 width: 200px; 
             }
             .dots { 
-                border-bottom: 2px dotted #000; 
+                border-bottom: 1px dotted #000; 
                 display: inline-block; 
                 width: 68%; 
                 vertical-align: middle; 
@@ -92,15 +92,15 @@
             .voucher-no{  
                 position: absolute;
                 top: 16%;
-                left: 78%;
-                font-weight: bold;
+                left: 76%;
+                /* font-weight: bold; */
             }
             .voucher-meta {
                 text-align: right; 
                 margin-bottom: 45px; 
-                font-weight: bold; 
+                /* font-weight: bold;  */
                 position: relative;
-                right: 25px;
+                right: 40px;
             }
             .signatures { 
                 margin-top: 50px; 
@@ -111,7 +111,7 @@
                 width: 45%; 
                 text-align: center; 
                 padding-top: 10px; 
-                font-weight: bold; 
+                /* font-weight: bold;  */
             }
             .bottom-footer { 
                 text-align: center; 
@@ -187,7 +187,7 @@
                 <div class="header">
                     <?php if (!empty($company['company_logo'])): ?>
                         <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" 
-                            alt="Company Logo" style=" max-height: 55px; width: 40%; margin-top: 8px;">
+                            alt="Company Logo" style=" max-height: 55px; width: 35%; margin-top: 8px;">
                     <?php endif; ?>
                 </div>
                 <div class="amount-box">
@@ -222,19 +222,19 @@
                 </div>
                 <div class="field">
                     <span class="label">Bank: </span>
-                    <span class="dots" style=" width: 26%;"><?= esc($invoice['bank'] ?? '') ?></span> :بنك Cash / Cheque No. / K-Net 
-                    <span class="dots" style=" width: 20%;"><?= esc($invoice['cheque_no'] ?? '') ?></span> كي-نت  /رقم النقد / الشيك
+                    <span class="dots" style=" width: 25%;"><?= esc($invoice['bank'] ?? '') ?></span> :بنك Cash / Cheque No. / K-Net 
+                    <span class="dots" style=" width: 22%;"><?= esc($invoice['cheque_no'] ?? '') ?></span> كي-نت  /رقم النقد / الشيك
                 </div>
                 <div class="field">
                     <span class="label">Details:</span>
-                    <span class="dots" style="width: 84%;"><?= esc($invoice['details'] ?? '') ?></span> :تفاصيل
+                    <span class="dots" style="width: 83%;"><?= esc($invoice['details'] ?? '') ?></span> :تفاصيل
                 </div>
                 <div class="signatures">
                     <div class="sign-box">Accountant Sig. / توقيع المحاسب
-                        <span class="dots" style="width: 85%; margin-top: 45px;"></span>
+                        <span class="dots" style="width: 75%; margin-top: 35px;"></span>
                     </div>
                     <div class="sign-box">Receiver Sig. / توقيع المستلم
-                        <span class="dots" style="width: 85%; margin-top: 45px;"></span>
+                        <span class="dots" style="width: 75%; margin-top: 35px;"></span>
                     </div>
                 </div>
                 <!-- Footer -->

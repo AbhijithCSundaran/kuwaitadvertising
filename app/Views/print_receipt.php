@@ -65,7 +65,7 @@
             }
 
             .amount-label {
-                font-weight: bold;
+                /* font-weight: bold; */
                 display: block;
                 margin-bottom: 5px;
             }
@@ -79,7 +79,7 @@
             }
             .field { 
                 margin:25px; 
-                font-weight: bold; 
+                /* font-weight: bold;  */
                 margin-left: 21px;
                 margin-right: 21px;
             }
@@ -87,9 +87,9 @@
                 width: 200px; 
             }
             .dots { 
-                border-bottom: 2px dotted #000; 
+                border-bottom: 1px dotted #000; 
                 display: inline-block; 
-                width: 56%; 
+                width: 59%; 
                 vertical-align: middle; 
             }
             .voucher-no{  
@@ -100,9 +100,9 @@
             .voucher-meta {
                 text-align: right; 
                 margin-bottom: 45px; 
-                font-weight: bold; 
+                /* font-weight: bold;  */
                 position: relative;
-                right: 45px;
+                right: 46px;
             }
             .signatures { 
                 margin-top: 25px; 
@@ -114,7 +114,7 @@
                 width: 40%; 
                 text-align: left; 
                 padding-top: 10px; 
-                font-weight: bold; 
+                /* font-weight: bold;  */
             }
             .sign-label {
                 display: flex;
@@ -125,7 +125,7 @@
                  display: flex;
                 justify-content: right;
                 gap: 95px; 
-                margin-right: 65px;
+                margin-right: 76px;
             }
             .bottom-footer { 
                 text-align: center; 
@@ -202,7 +202,7 @@
                 <div class="header">
                     <?php if (!empty($company['company_logo'])): ?>
                         <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" 
-                            alt="Company Logo" style=" max-height: 70px; width: 45%; margin-top: 8px;">
+                            alt="Company Logo" style=" max-height: 70px; width: 35%; margin-top: 8px;">
                     <?php endif; ?>
                 </div>
                 <div class="voucher-title"><strong> سند قبض</strong></div>
@@ -236,11 +236,11 @@
                 </div>
                 <div class="field">
                     <span class="label">The Sum of K.D.</span>
-                    <span class="dots" style="width:64%;"></span> مجموع الدينار الكويتي 
+                    <span class="dots" style="width:65%;"></span> مجموع الدينار الكويتي 
                 </div>
                 <div class="field">
                     <span class="label"> Cash / Cheque No. / K-Net</span>
-                    <span class="dots" style=" width: 52%;"></span> كي-نت  /رقم النقد / الشيك
+                    <span class="dots" style=" width: 54%;"></span> كي-نت  /رقم النقد / الشيك
                 </div>
                 <div class="field">
                     <span class="label">Being Of:</span>
@@ -252,14 +252,14 @@
                         <span>Receiver</span>
                         <span>المتلقي</span>
                     </div>
-                        <span class="dots" style="width: 70%; margin-top: 50px;"></span>
+                        <span class="dots" style="width: 70%; margin-top: 40px;"></span>
                     </div>
                     <div class="col-6 sign-box">
                     <div class="sign-cash">
                         <span>Cashier </span>
                         <span> أمين الصندوق</span>
                     </div>  
-                        <span class="dots" style="width: 79%; margin-top: 50px;"></span>
+                        <span class="dots" style="width: 76%; margin-top: 40px;"></span>
                     </div>
                 </div>
                 <!-- Footer -->
