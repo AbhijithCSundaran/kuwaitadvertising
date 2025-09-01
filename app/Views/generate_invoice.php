@@ -98,7 +98,7 @@
       border: 1px solid black;
     }
 
-    table.min_height {
+    /* table.min_height {
       min-height: 350px;
     }
 
@@ -108,6 +108,57 @@
       height: 20px !important;
     }
    
+    tbody td {
+      border-top: 1px solid transparent;
+      border-bottom: 1px solid transparent;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 1px solid black;
+    }
+
+    th {
+      background-color: #cfc7c7ff;
+      text-align: center;
+      font-weight: bold;
+      padding: 2px;
+    }
+
+    td {
+      text-align: center;
+      height: 25px;
+      padding: 4px;
+      word-wrap: break-word;
+      word-break: break-word;
+      white-space: normal;
+    } */
+    table.min_height {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    min-height: 350px;
+}
+
+/* Table cells */
+table.min_height tbody td {
+    vertical-align: top;
+    padding: 5px 6px;
+    height: auto !important;
+    border-top: none;    
+    border-bottom: none;
+    border-left:  1px solid black;             /*  Remove vertical line */
+    border-right:  1px solid black;            /* Remove vertical line */
+}
+
+table.min_height .empty-row td {
+    height: 28px; /* Keeps blank rows evenly spaced */
+    border-top: none;
+    border-bottom: none;
+    border-left:  1px solid black;
+    border-right:  1px solid black;
+}
+
+
     tbody td {
       border-top: 1px solid transparent;
       border-bottom: 1px solid transparent;
@@ -241,253 +292,273 @@
   </style>
 </head>
 <body>
-  <div class="outer-container">
-    <div class="no-print" style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
-      <button onclick="window.print()"
-        style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px;">
-        Print
-      </button>
-      <?php if (!in_array(strtolower($invoice['status']), ['paid', 'partial paid'])): ?>
-        <button id="editinvoicebtn"
-          onclick="window.location.href='<?= base_url('invoice/edit/' . $invoice['invoice_id']) ?>'"
-          style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px; cursor: pointer;">
-          Edit Invoice
+  <div class="right_container">
+    <div class="outer-container">
+      <div class="no-print" style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+        <button onclick="window.print()"
+          style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px;">
+          Print
         </button>
-      <?php endif; ?>
-        <button id="deliveryNoteBtn"
-            onclick="window.location.href='<?= base_url('invoice/delivery_note/' . $invoice['invoice_id']) ?>'"
-            style="display: <?= in_array(strtolower($invoice['status']), ['paid', 'partial paid']) ? 'inline-block' : 'none' ?>;
-                  background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
-            Delivery Note
-        </button>
-     <?php
-        $paymentMode = isset($invoice['payment_mode']) && $invoice['payment_mode'] !== '' 
-           ? strtolower($invoice['payment_mode']) 
-             : 'cash'; // default to cash
-              if ($paymentMode === 'cash') {
-                  $btnLabel = ' Receipt';
-                  $btnUrl = base_url('receiptvoucher/' . $invoice['invoice_id']); // ReceiptVoucher controller
-              } else {
-                  $btnLabel = ' Voucher';
-                  $btnUrl = base_url('paymentvoucher/' . $invoice['invoice_id']); // PaymentVoucher controller
-              }
-      ?>
-      <button id="paymentBtn" class="btn" 
-              style="background-color: #991b36; color: white;"
-              onclick="window.location.href='<?= $btnUrl ?>'">
-          <?= $btnLabel ?>
-      </button>
-      <?php
-        $status = strtolower($invoice['status'] ?? 'unpaid');
-        $btnLabel = ucfirst($status);
-        $btnColor = $status === 'paid' ? '#28a745' : ($status === 'partial paid' ? '#ffc107' : '#991b36');
-      ?>
-      <div class="btn-group ml-2 position-relative" style="z-index: 1000; margin-left: 10px;">
-        <button id="statusBtn" type="button" class="btn btn-sm"
-          style="background-color: <?= $btnColor ?>; color: white; padding: 8px 16px; border-radius: 5px;"
-          <?= $status === 'paid' ? 'disabled title="Fully paid invoice cannot be changed"' : 'onclick="toggleStatusOptions()"' ?>>
-          <?= $btnLabel ?>
-        </button>
-        <?php if ($status === 'unpaid' || $status === 'partial paid'): ?>
-            <div class="dropdown" style="position: relative;">
-                <div id="statusOptions" class="dropdown-menu p-2"
-                    style="position: absolute; top: 100%; right: 0px; z-index: 1050; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: none;">
-                      <a href="javascript:void(0);" 
-                          class="dropdown-item text-success fw-semibold" 
-                          onclick="openMarkPaidModal(<?= $invoice['invoice_id']; ?>)">
-                            <i class="fas fa-check-circle me-2"></i> Mark as Paid
-                      </a>
-                      <a href="#" class="dropdown-item text-warning fw-semibold" onclick="openPartialPayment()">
-                          <i class="fas fa-hourglass-half me-2"></i> Partial Payment
-                      </a>
-                </div>
-            </div>
+        <?php if (!in_array(strtolower($invoice['status']), ['paid', 'partial paid'])): ?>
+          <button id="editinvoicebtn"
+            onclick="window.location.href='<?= base_url('invoice/edit/' . $invoice['invoice_id']) ?>'"
+            style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px; cursor: pointer;">
+            Edit Invoice
+          </button>
         <?php endif; ?>
-      </div>
-    </div>
-    <div class="container">
-      <div class="d-flex align-items-center text-center" style="margin-bottom: 5px;">
-        <div class="col-4 text-start">
-            <span style="font-size: 12px; font-weight: bold;">
-                <?= esc(ucwords(strtolower($company['company_name']))) ?>
-            </span>
-        </div>
-        <div class="col-4">
-            <?php if (!empty($company['company_logo'])): ?>
-                <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" 
-                    alt="Company Logo" style="max-height: 50px;">
-            <?php endif; ?>
-        </div>
-        <div class="col-4 text-end">
-            <span style="font-size: 14px; font-weight: bold; direction: rtl;">
-                <?= esc($company['company_name_ar'] ?? '') ?>
-            </span>
-        </div>
-      </div>
-      <div style="height: 3px; background-color:#a1263a"></div>
-      <div class="row align-items-center">
-        <div class="col-4 text-start">
-          <div>
-            <label style="font-weight: bold; margin-right: 4px; margin-top: 17px;">No / رقم :</label>
-            <input type="text" readonly value="<?= esc($invoice['invoice_id']) ?>"
-              style="display: inline-block; width: 87px; height: 23px; text-align:left; ">
-          </div>
-          <div style="margin-top: 4px;">
-            <label style="font-weight: bold; margin-right: 4px;">LPO No :</label>
-            <span><?= esc($invoice['lpo_no']) ?></span>
-          </div>
-        </div>
-        <div class="col-4 text-center">
-          <div
-            style="background-color: #991b36; color: white; font-weight: bold; padding: 3px 15px; display: inline-block; border-radius: 4px; font-size: 13px; margin-top: 11px;">
-            فاتورة / نقداً / بالحساب<br>CASH / CREDIT INVOICE
-          </div>
-        </div>
-        <div class="col-4 text-end">
-          <div style="white-space: nowrap;">
-            <label style="font-weight: bold; margin-right: 6px; margin-top: 17px;">Date / التاريخ:</label>
-            <input type="text" readonly value="<?= date('d-m-Y', strtotime($invoice['invoice_date'])) ?>"
-              style="width: 80px; height: 23px; text-align: center;">
-          </div>
-          <div style="margin-top: 4px; white-space: nowrap;">
-            <label style="font-weight: bold; margin-right: 6px;">Delivery Date :</label>
-            <span id="deliveryDateCell">
-              <?= !empty($invoice['delivery_date']) ? date('d-m-Y', strtotime($invoice['delivery_date'])) : '' ?>
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div class="invoice-header">
-        <div class="col-12">
-          Mr./Mrs: <span><?= esc($invoice['customer_name'] ?? '') ?></span>:السيد
-        </div>
-        <div class="col-12">
-          Address: <span> <?= esc($invoice['customer_address'] ?? '') ?></span>:عنوان
-        </div>
-      </div>
-
-      <!-- Invoice Table -->
-      <table class="min_height">
-        <thead>
-          <tr>
-            <th rowspan="2" style="width: 6%;">رقم<br>No.</th>
-            <th rowspan="2" style="width: 38%;"> التفاصيل<br>Description</th>
-            <th rowspan="2" style="width: 8%;">الكمية<br>Qty.</th>
-            <th colspan="2" style="width: 24%;">سعر الوحدة<br>Unit Price</th>
-            <th colspan="2" style="width: 24%;">المبلغ الإجمالي<br>Total Amount</th>
-          </tr>
-          <tr>
-            <th style="width: 12%;">دينار<br>K.D</th>
-            <th style="width: 12%;">فلس<br>Fils</th>
-            <th style="width: 12%;">دينار<br>K.D</th>
-            <th style="width: 12%;">فلس<br>Fils</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php
-          $totalAmount = 0;
-          foreach ($items as $index => $item):
-            $lineTotal = $item['quantity'] * $item['price']; // NO DISCOUNT
-            $kd = floor($item['price']);
-            $fils = str_pad(number_format(($item['price'] - $kd) * 100, 0), 2, '0', STR_PAD_LEFT);
-
-            $lineKd = floor($lineTotal);
-            $lineFils = str_pad(number_format(($lineTotal - $lineKd) * 100, 0), 2, '0', STR_PAD_LEFT);
-
-            $totalAmount += $lineTotal; // this can remain
-            ?>
-            <tr>
-              <td><?= $index + 1 ?></td>
-              <td style="text-align: left;"><?= esc($item['item_name'] ?? '-') ?></td>
-              <td><?= $item['quantity'] ?></td>
-              <td><?= $kd ?></td>
-              <td><?= $fils ?></td>
-              <td><?= $lineKd ?></td> <!-- shows quantity * price -->
-              <td><?= $lineFils ?></td>
-            </tr>
-          <?php endforeach; ?>
-        </tbody>
-        <?php $grandTotal = $totalAmount; ?>
-        <?php
-        $subtotal = 0;
-        foreach ($items as $item) {
-          $lineTotal = $item['quantity'] * $item['price'];
-          $subtotal += $lineTotal;
-        }
-        $discountPercent = isset($invoice['discount']) ? floatval($invoice['discount']) : 0;
-        $totalDiscount = ($subtotal * $discountPercent) / 100;
-        $grandTotal = $subtotal - $totalDiscount;
-        ?>
-        <tfoot class="tfoot">
-          <?php if ($discountPercent > 0): ?>
-            <tr>
-              <td colspan="5" style="text-align: right; font-weight: bold;">Subtotal</td>
-              <td colspan="2" style="text-align: right;"> <?= number_format($subtotal, 2) ?> KD</td>
-            </tr>
-            <tr>
-              <td colspan="5" style="text-align: right; font-weight: bold;">
-                Discount
-              </td>
-              <td colspan="2" style="text-align: right;">
-                <?= $discountPercent ?>%
-              </td>
-
-            </tr>
-          <?php endif; ?>
-          <tr>
-            <td colspan="5" style="text-align: right; font-weight: bold;">Total Amount</td>
-            <td colspan="2" style="text-align: right;" id="total-amount">
-              <?= number_format($grandTotal, 2) ?> KD
-            </td>
-          </tr>
-        </tfoot>
-      </table>
-
-      <div class="amount-words">
-        المبلغ (بالكلمات): <span id="amount-words"></span>
-      </div>
-
+          <button id="deliveryNoteBtn"
+              onclick="window.location.href='<?= base_url('invoice/delivery_note/' . $invoice['invoice_id']) ?>'"
+              style="display: <?= in_array(strtolower($invoice['status']), ['paid', 'partial paid']) ? 'inline-block' : 'none' ?>;
+                    background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
+              Delivery Note
+          </button>
       <?php
-      $paidAmount = floatval($invoice['paid_amount'] ?? 0);
-      // $grandTotal = $subtotal - $totalDiscountAmount;
-      $balanceAmount = $grandTotal - $paidAmount;
-      $status = strtolower($invoice['status'] ?? 'unpaid');
-      ?>
-
-      <div style="display: flex; flex-direction: column; align-items: flex-end; margin-top: 10px;">
-        <div class="partial-row" id="paidAmountRow"
-          style="display: <?= ($status === 'partial paid' && $paidAmount > 0) ? 'flex' : 'none' ?>;">
-          <div class="partial">Paid Amount</div>
-          <div class="value" id="paidAmountValue"><?= number_format($paidAmount, 2) ?></div>
+          $paymentMode = isset($invoice['payment_mode']) && $invoice['payment_mode'] !== '' 
+            ? strtolower($invoice['payment_mode']) 
+              : 'cash'; // default to cash
+                if ($paymentMode === 'cash') {
+                    $btnLabel = ' Receipt';
+                    $btnUrl = base_url('receiptvoucher/' . $invoice['invoice_id']); // ReceiptVoucher controller
+                } else {
+                    $btnLabel = ' Voucher';
+                    $btnUrl = base_url('paymentvoucher/' . $invoice['invoice_id']); // PaymentVoucher controller
+                }
+        ?>
+        <button id="paymentBtn" class="btn" 
+                style="background-color: #991b36; color: white;"
+                onclick="window.location.href='<?= $btnUrl ?>'">
+            <?= $btnLabel ?>
+        </button>
+        <?php
+          $status = strtolower($invoice['status'] ?? 'unpaid');
+          $btnLabel = ucfirst($status);
+          $btnColor = $status === 'paid' ? '#28a745' : ($status === 'partial paid' ? '#ffc107' : '#991b36');
+        ?>
+        <div class="btn-group ml-2 position-relative" style="z-index: 1000; margin-left: 10px;">
+          <button id="statusBtn" type="button" class="btn btn-sm"
+            style="background-color: <?= $btnColor ?>; color: white; padding: 8px 16px; border-radius: 5px;"
+            <?= $status === 'paid' ? 'disabled title="Fully paid invoice cannot be changed"' : 'onclick="toggleStatusOptions()"' ?>>
+            <?= $btnLabel ?>
+          </button>
+          <?php if ($status === 'unpaid' || $status === 'partial paid'): ?>
+              <div class="dropdown" style="position: relative;">
+                  <div id="statusOptions" class="dropdown-menu p-2"
+                      style="position: absolute; top: 100%; right: 0px; z-index: 1050; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: none;">
+                        <a href="javascript:void(0);" 
+                            class="dropdown-item text-success fw-semibold" 
+                            onclick="openMarkPaidModal(<?= $invoice['invoice_id']; ?>)">
+                              <i class="fas fa-check-circle me-2"></i> Mark as Paid
+                        </a>
+                        <a href="#" class="dropdown-item text-warning fw-semibold" onclick="openPartialPayment()">
+                            <i class="fas fa-hourglass-half me-2"></i> Partial Payment
+                        </a>
+                  </div>
+              </div>
+          <?php endif; ?>
         </div>
-        <div class="partial-row" id="balanceAmountRow"
-          style="display: <?= ($status === 'partial paid' && $paidAmount > 0) ? 'flex' : 'none' ?>;">
-          <div class="partial">Balance</div>
-          <div class="value" id="balanceAmountValue"><?= number_format($balanceAmount, 2) ?></div>
+      </div>
+      <div class="container">
+        <div class="d-flex align-items-center text-center" style="margin-bottom: 5px;">
+          <div class="col-4 text-start">
+              <span style="font-size: 12px; font-weight: bold;">
+                  <?= esc(ucwords(strtolower($company['company_name']))) ?>
+              </span>
+          </div>
+          <div class="col-4">
+              <?php if (!empty($company['company_logo'])): ?>
+                  <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" 
+                      alt="Company Logo" style="max-height: 50px;">
+              <?php endif; ?>
+          </div>
+          <div class="col-4 text-end">
+              <span style="font-size: 14px; font-weight: bold; direction: rtl;">
+                  <?= esc($company['company_name_ar'] ?? '') ?>
+              </span>
+          </div>
         </div>
-      </div>
+        <div style="height: 3px; background-color:#a1263a"></div>
+        <div class="row align-items-center">
+          <div class="col-4 text-start">
+            <div>
+              <label style="font-weight: bold; margin-right: 4px; margin-top: 17px;">No / رقم :</label>
+              <input type="text" readonly value="<?= esc($invoice['invoice_id']) ?>"
+                style="display: inline-block; width: 87px; height: 23px; text-align:left; ">
+            </div>
+            <div style="margin-top: 4px;">
+              <label style="font-weight: bold; margin-right: 4px;">LPO No :</label>
+              <span><?= esc($invoice['lpo_no']) ?></span>
+            </div>
+          </div>
+          <div class="col-4 text-center">
+            <div
+              style="background-color: #991b36; color: white; font-weight: bold; padding: 3px 15px; display: inline-block; border-radius: 4px; font-size: 13px; margin-top: 11px;">
+              فاتورة / نقداً / بالحساب<br>CASH / CREDIT INVOICE
+            </div>
+          </div>
+          <div class="col-4 text-end">
+            <div style="white-space: nowrap;">
+              <label style="font-weight: bold; margin-right: 6px; margin-top: 17px;">Date / التاريخ:</label>
+              <input type="text" readonly value="<?= date('d-m-Y', strtotime($invoice['invoice_date'])) ?>"
+                style="width: 80px; height: 23px; text-align: center;">
+            </div>
+            <div style="margin-top: 4px; white-space: nowrap;">
+              <label style="font-weight: bold; margin-right: 6px;">Delivery Date :</label>
+              <span id="deliveryDateCell">
+                <?= !empty($invoice['delivery_date']) ? date('d-m-Y', strtotime($invoice['delivery_date'])) : '' ?>
+              </span>
+            </div>
+          </div>
+        </div>
 
-      <div class="table-footer">
-        <div>Receivers Name & Signature / اسم المستلمين والتوقيع</div>
-        <div style="text-align: right;">Accountant Name & Signature / اسم المحاسب والتوقيع</div>
-      </div>
+        <div class="invoice-header">
+          <div class="col-12">
+            Mr./Mrs: <span><?= esc($invoice['customer_name'] ?? '') ?></span>:السيد
+          </div>
+          <div class="col-12">
+            Address: <span> <?= esc($invoice['customer_address'] ?? '') ?></span>:عنوان
+          </div>
+        </div>
+
+        <!-- Invoice Table -->
+        <table class="min_height">
+          <thead>
+            <tr>
+              <th rowspan="2" style="width: 6%;">رقم<br>No.</th>
+              <th rowspan="2" style="width: 38%;"> التفاصيل<br>Description</th>
+              <th rowspan="2" style="width: 8%;">الكمية<br>Qty.</th>
+              <th colspan="2" style="width: 24%;">سعر الوحدة<br>Unit Price</th>
+              <th colspan="2" style="width: 24%;">المبلغ الإجمالي<br>Total Amount</th>
+            </tr>
+            <tr>
+              <th style="width: 12%;">دينار<br>K.D</th>
+              <th style="width: 12%;">فلس<br>Fils</th>
+              <th style="width: 12%;">دينار<br>K.D</th>
+              <th style="width: 12%;">فلس<br>Fils</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php
+            $totalAmount = 0;
+            foreach ($items as $index => $item):
+              $lineTotal = $item['quantity'] * $item['price']; // NO DISCOUNT
+              $kd = floor($item['price']);
+              $fils = str_pad(number_format(($item['price'] - $kd) * 100, 0), 2, '0', STR_PAD_LEFT);
+
+              $lineKd = floor($lineTotal);
+              $lineFils = str_pad(number_format(($lineTotal - $lineKd) * 100, 0), 2, '0', STR_PAD_LEFT);
+
+              $totalAmount += $lineTotal;
+              ?>
+              <tr>
+                <td><?= $index + 1 ?></td>
+                <td style="text-align: left;"><?= esc($item['item_name'] ?? '-') ?></td>
+                <td><?= $item['quantity'] ?></td>
+                <td><?= $kd ?></td>
+                <td><?= $fils ?></td>
+                <td><?= $lineKd ?></td> 
+                <td><?= $lineFils ?></td>
+              </tr>
+            <?php endforeach; ?>
+            <?php
+                $minRows = 8; 
+                $currentRows = is_array($items) ? count($items) : 0; 
+                $emptyRows = max(0, $minRows - $currentRows);
+
+                for ($i = 0; $i < $emptyRows; $i++) {
+                    echo '<tr class="empty-row">
+                        <td>&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                      </tr>';
+
+                }
+              ?>
+          </tbody>
+          <?php $grandTotal = $totalAmount; ?>
+          <?php
+          $subtotal = 0;
+          foreach ($items as $item) {
+            $lineTotal = $item['quantity'] * $item['price'];
+            $subtotal += $lineTotal;
+          }
+          $discountPercent = isset($invoice['discount']) ? floatval($invoice['discount']) : 0;
+          $totalDiscount = ($subtotal * $discountPercent) / 100;
+          $grandTotal = $subtotal - $totalDiscount;
+          ?>
+          <tfoot class="tfoot">
+            <?php if ($discountPercent > 0): ?>
+              <tr>
+                <td colspan="5" style="text-align: right; font-weight: bold;">Subtotal</td>
+                <td colspan="2" style="text-align: right;"> <?= number_format($subtotal, 2) ?> KD</td>
+              </tr>
+              <tr>
+                <td colspan="5" style="text-align: right; font-weight: bold;">
+                  Discount
+                </td>
+                <td colspan="2" style="text-align: right;">
+                  <?= $discountPercent ?>%
+                </td>
+
+              </tr>
+            <?php endif; ?>
+            <tr>
+              <td colspan="5" style="text-align: right; font-weight: bold;">Total Amount</td>
+              <td colspan="2" style="text-align: right;" id="total-amount">
+                <?= number_format($grandTotal, 2) ?> KD
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <div class="amount-words">
+          المبلغ (بالكلمات): <span id="amount-words"></span>
+        </div>
+
+        <?php
+        $paidAmount = floatval($invoice['paid_amount'] ?? 0);
+        // $grandTotal = $subtotal - $totalDiscountAmount;
+        $balanceAmount = $grandTotal - $paidAmount;
+        $status = strtolower($invoice['status'] ?? 'unpaid');
+        ?>
+
+        <div style="display: flex; flex-direction: column; align-items: flex-end; margin-top: 10px;">
+          <div class="partial-row" id="paidAmountRow"
+            style="display: <?= ($status === 'partial paid' && $paidAmount > 0) ? 'flex' : 'none' ?>;">
+            <div class="partial">Paid Amount</div>
+            <div class="value" id="paidAmountValue"><?= number_format($paidAmount, 2) ?></div>
+          </div>
+          <div class="partial-row" id="balanceAmountRow"
+            style="display: <?= ($status === 'partial paid' && $paidAmount > 0) ? 'flex' : 'none' ?>;">
+            <div class="partial">Balance</div>
+            <div class="value" id="balanceAmountValue"><?= number_format($balanceAmount, 2) ?></div>
+          </div>
+        </div>
+
+        <div class="table-footer">
+          <div>Receivers Name & Signature / اسم المستلمين والتوقيع</div>
+          <div style="text-align: right;">Accountant Name & Signature / اسم المحاسب والتوقيع</div>
+        </div>
 
 
-    </div> <!-- /.container -->
-    <!-- Bottom Bar -->
-    <div class="bottom-bar">
-       <div style="direction: rtl; text-align: center;">
-          <?= esc($company['address_ar'] ?? '') ?>
-      </div>
-      <div style="direction: ltr; text-align: center;">
-          <?= esc($company['address'] ?? '') ?>
-      </div>
-      <div style="margin-top: 5px;">
-          📞 <?= esc($company['phone'] ?? '') ?> &nbsp;&nbsp; | &nbsp;&nbsp;
-          📧 <a href="mailto:<?= esc($company['email'] ?? '') ?>" style="color: white; text-decoration: none;">
-              <?= esc($company['email'] ?? '') ?>
-          </a>
+      </div> <!-- /.container -->
+      <!-- Bottom Bar -->
+      <div class="bottom-bar">
+        <div style="direction: rtl; text-align: center;">
+            <?= esc($company['address_ar'] ?? '') ?>
+        </div>
+        <div style="direction: ltr; text-align: center;">
+            <?= esc($company['address'] ?? '') ?>
+        </div>
+        <div style="margin-top: 5px;">
+            📞 <?= esc($company['phone'] ?? '') ?> &nbsp;&nbsp; | &nbsp;&nbsp;
+            📧 <a href="mailto:<?= esc($company['email'] ?? '') ?>" style="color: white; text-decoration: none;">
+                <?= esc($company['email'] ?? '') ?>
+            </a>
+        </div>
       </div>
     </div>
   </div>

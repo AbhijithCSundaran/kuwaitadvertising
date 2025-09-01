@@ -193,7 +193,7 @@
                 <td><strong><span id="total_display">0.00</span> KWD</strong></td>
             </tr>
         </table>
-    <input type="hidden" name="estimate_id" value="<?= esc($estimate_id ?? '') ?>">
+    <input type="hidden" name="estimate_id" value="<?= $invoice['estimate_id'] ?? '' ?>">
         <input type="hidden" name="invoice_id"
             value="<?= isset($invoice['invoice_id']) ? $invoice['invoice_id'] : '' ?>">
         <input type="hidden" name="original_status"

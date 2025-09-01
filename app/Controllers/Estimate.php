@@ -265,7 +265,7 @@ public function save()
             'total_amount' => number_format($row['total_amount'], 2, '.', ''),
             'date'              => $row['date'],
             'description'       => implode(', ', $descList),
-            'is_converted'      =>$row['is_converted'],
+            'is_converted'  => $row['is_converted'],
         
         ];
     }

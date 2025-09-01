@@ -98,22 +98,23 @@ if ($company_id) {
 
           </li>
         <?php endif; ?>
-        <?php if (in_array('adduserlist', $allowedMenus)): ?>
-          <li class="nav-item">
-            <a class="nav-link <?= strpos($currentPath, 'adduser') !== false || strpos($currentPath, 'manageuser') !== false ? 'active' : '' ?>"
-              href="<?= base_url('adduserlist') ?>">
-              <i class="mdi mdi-bi bi-person menu-icon"></i>
-              <span class="menu-title">Manage User</span>
-            </a>
-
-          </li>
-        <?php endif; ?>
+       
         <?php if (in_array('rolemanagement', $allowedMenus)): ?>
           <li class="nav-item">
             <a class="nav-link <?= strpos($currentPath, 'rolemanagement') !== false ? 'active' : '' ?>"
               href="<?= base_url('rolemanagement/rolelist') ?>">
               <i class="mdi mdi-chart-pie menu-icon"></i>
               <span class="menu-title">Role Management</span>
+            </a>
+
+          </li>
+        <?php endif; ?>
+         <?php if (in_array('adduserlist', $allowedMenus)): ?>
+          <li class="nav-item">
+            <a class="nav-link <?= strpos($currentPath, 'adduser') !== false || strpos($currentPath, 'manageuser') !== false ? 'active' : '' ?>"
+              href="<?= base_url('adduserlist') ?>">
+              <i class="mdi mdi-bi bi-person menu-icon"></i>
+              <span class="menu-title">Manage User</span>
             </a>
 
           </li>
