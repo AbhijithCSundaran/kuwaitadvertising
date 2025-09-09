@@ -10,8 +10,8 @@ $routes->get('dashboard','Dashboard::index');
 
 $routes->get('logout', 'Auth::logout');
 
-$routes->post('login/authenticate', 'Login::authenticate');
-$routes->get('login','Login::index');
+$routes->post('admin/login/authenticate', 'Login::authenticate');
+$routes->get('admin/login','Login::index');
 
 $routes->post('manageuser/userlistajax', 'Manageuser::userlistajax');
 $routes->get('manageuser', 'Manageuser::index');

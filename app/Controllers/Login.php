@@ -15,7 +15,9 @@ class Login extends BaseController
     }
     public function index()
 {
-    $isAdminLogin = $this->request->getGet('admin') == 1;
+   $uri = service('uri');
+    $isAdminLogin = ($uri->getSegment(1) === 'admin');
+
     $data['isAdminLogin'] = $isAdminLogin;
 
     if ($isAdminLogin) {

@@ -78,10 +78,10 @@
                   
                   <div class="d-flex border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item bg-info text-white"
                       style="cursor: pointer;"
-                      onclick="window.location.href='<?= base_url('monthlyledger') ?>'">
+                      onclick="window.location.href='<?= base_url('companyledger') ?>'">
                       
                       <div class="icon-box me-4">
-                          <i class="mdi mdi-download"></i>
+                          <i class="bi bi-cash"></i>
                       </div>
                       
                       <div class="d-flex flex-column justify-content-around">
@@ -90,7 +90,7 @@
                       </div>
                   </div>
 
-                  <div class="d-flex py-3 border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item bg-warning text-white"
+                  <div class="d-flex py-3 border-md-right flex-grow-1 align-items-center justify-content-left justify-content-md-center px-4 px-md-0 mx-1 mx-md-0 p-3 item bg-info text-white"
                       style="cursor: pointer;"
                       onclick="window.location.href='<?= base_url('expense/report') ?>'">
                       
