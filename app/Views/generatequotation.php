@@ -151,7 +151,7 @@
           <div class="col-4 text-start" style="margin-top: 17px;">
             <div>
               <label style="font-weight: bold; margin-right: 4px;">No / رقم :</label>
-              <input type="text" readonly value="<?= esc($estimate['estimate_id']) ?>"
+              <input type="text" readonly value="<?= esc($estimate['estimate_no']) ?>"
                 style="display: inline-block; width: 80px; height: 30px; text-align:left; font-size: 14px;">
             </div>
           </div>

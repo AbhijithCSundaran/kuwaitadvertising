@@ -157,6 +157,12 @@ $(document).ready(function () {
                 render: function (id, type, row) {
                     const status = row.status.toLowerCase();
                     const isPaidOrPartial = status === 'paid' || status === 'partial paid';
+                    const paymentMode = (row.payment_mode || '').toLowerCase();
+
+                    const voucherLabel = paymentMode === 'cash' ? 'Receipt' : 'Voucher';
+                    const voucherUrl = paymentMode === 'cash'
+                        ? "<?= base_url('receiptvoucher/') ?>" + id
+                        : "<?= base_url('paymentvoucher/') ?>" + id;
 
                     return `
                         <div class="d-flex gap-2">

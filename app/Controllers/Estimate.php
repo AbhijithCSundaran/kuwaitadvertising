@@ -56,7 +56,6 @@ class Estimate extends BaseController
  
 public function save()
 {
-    
     $estimateId = $this->request->getPost('estimate_id');
     $customerId = $this->request->getPost('customer_id');
     $address = trim($this->request->getPost('customer_address'));
@@ -68,7 +67,6 @@ public function save()
     $customerName = trim($this->request->getPost('customer_name'));
     $phoneNumber = trim($this->request->getPost('phone_number'));
 
-
     if (empty($customerId) || empty($address)) {
         return $this->response->setJSON([
             'status' => 'error',
@@ -77,12 +75,11 @@ public function save()
     }
 
     $validItems = 0;
-    foreach ($description as $key => $desc) {
+    foreach ($description as $desc) {
         if (!empty(trim($desc))) {
             $validItems++;
         }
     }
-
     if ($validItems === 0) {
         return $this->response->setJSON([
             'status' => 'error',
@@ -95,7 +92,6 @@ public function save()
     foreach ($total as $t) {
         $subtotal += (float)$t;
     }
-
     $discountAmount = ($subtotal * $discount) / 100;
     $grandTotal = $subtotal - $discountAmount;
 
@@ -104,10 +100,10 @@ public function save()
         'customer_id' => $customerId,
         'customer_address' => $address,
         'discount' => $discount,
-      'total_amount'    => number_format($grandTotal, 2, '.', ''),
+        'total_amount' => number_format($grandTotal, 2, '.', ''),
         'date' => date('Y-m-d'),
-        'phone_number' => $phoneNumber, 
-        'company_id'       => $companyId
+        'phone_number' => $phoneNumber,
+        'company_id' => $companyId
     ];
 
     // Build items array
@@ -136,27 +132,26 @@ public function save()
     $estimateItemModel = new EstimateItemModel();
     $customerModel = new customerModel();
     $customer = $customerModel->find($customerId);
-        if ($customer) {
-            // Update customer info if changed
-            if ($customer['name'] !== $customerName || $customer['address'] !== $address) {
-                $customerModel->update($customerId, [
-                    'name' => $customerName,
-                    'address' => $address
-                ]);
-            }
 
-            // Fix: Allow discounts lower than fixed_discount, only block if exceeding max
-            $maxDiscount = isset($customer['fixed_discount']) ? (float)$customer['fixed_discount'] : 100; // default 100%
-            if ($discount > $maxDiscount) {
-                return $this->response->setJSON([
-                    'status' => 'error',
-                    'message' => "Discount cannot exceed maximum allowed value of $maxDiscount%"
-                ]);
-            }
-
+    if ($customer) {
+        if ($customer['name'] !== $customerName || $customer['address'] !== $address) {
+            $customerModel->update($customerId, [
+                'name' => $customerName,
+                'address' => $address
+            ]);
         }
 
+        $maxDiscount = isset($customer['fixed_discount']) ? (float)$customer['fixed_discount'] : 100;
+        if ($discount > $maxDiscount) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => "Discount cannot exceed maximum allowed value of $maxDiscount%"
+            ]);
+        }
+    }
+
     if (!empty($estimateId)) {
+        // Existing estimate: update
         $existing = $estimateModel->find($estimateId);
         if (!$existing) {
             return $this->response->setJSON([
@@ -165,7 +160,7 @@ public function save()
             ]);
         }
 
-       $hasChanges = (
+        $hasChanges = (
             $existing['customer_id'] != $customerId ||
             $existing['customer_address'] !== $address ||
             $existing['discount'] != $discount ||
@@ -192,8 +187,16 @@ public function save()
                 'estimate_id' => $estimateId
             ]);
         }
-
     } else {
+        // NEW estimate: generate company-specific estimate_no
+        $lastEstimate = $estimateModel
+            ->where('company_id', $companyId)
+            ->orderBy('estimate_no', 'DESC')
+            ->first();
+
+        $nextEstimateNo = $lastEstimate ? $lastEstimate['estimate_no'] + 1 : 1;
+        $estimateData['estimate_no'] = $nextEstimateNo;
+
         $estimateId = $estimateModel->insert($estimateData);
         foreach ($items as &$item) {
             $item['estimate_id'] = $estimateId;
@@ -203,10 +206,12 @@ public function save()
         return $this->response->setJSON([
             'status' => 'success',
             'message' => 'Generating Estimate.',
-            'estimate_id' => $estimateId
+            'estimate_id' => $estimateId,
+            'estimate_no' => $nextEstimateNo
         ]);
     }
 }
+
 
  
  public function estimatelistajax()
@@ -258,6 +263,7 @@ public function save()
         $data[] = [
             'slno'              => $slno++,
             'estimate_id'       => $row['estimate_id'],
+            'estimate_no'       => $row['estimate_no'],
             'customer_name'     => $row['customer_name'],
             'customer_address'  => $row['customer_address'],
             'subtotal' => number_format($subtotal, 2, '.', ''),

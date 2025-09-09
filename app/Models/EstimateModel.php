@@ -6,20 +6,24 @@ class EstimateModel extends Model
 {
     protected $table = 'estimates';
     protected $primaryKey = 'estimate_id';
-    protected $allowedFields = ['customer_id','discount', 'total_amount', 'sub_total','date','phone_number', 'is_converted', 'company_id'];
+    protected $allowedFields = ['customer_id','discount', 'total_amount', 'sub_total','date','phone_number', 'is_converted', 'company_id', 'estimate_no' ];
 
-    public function insertEstimateWithItems($estimateData, $items)
-    {
-        $estimateId = $this->insert($estimateData);
-        $itemModel = new \App\Models\EstimateItemModel();
-
-        foreach ($items as $item) {
-            $item['estimate_id'] = $estimateId;
-            $itemModel->insert($item);
-        }
-
-        return $estimateId;
+   public function insertEstimateWithItems($estimateData, $items)
+{
+    if (!isset($estimateData['estimate_no']) && isset($estimateData['company_id'])) {
+        $estimateData['estimate_no'] = $this->getLastEstimateNoByCompany($estimateData['company_id']) + 1;
     }
+
+    $estimateId = $this->insert($estimateData);
+    $itemModel = new \App\Models\EstimateItemModel();
+
+    foreach ($items as $item) {
+        $item['estimate_id'] = $estimateId;
+        $itemModel->insert($item);
+    }
+
+    return $estimateId;
+}
 
     public function updateEstimateWithItems($estimateId, $estimateData, $items)
     {
@@ -38,6 +42,7 @@ class EstimateModel extends Model
     {
         return $this->where('company_id', $companyId)->countAllResults();
     }
+    
 
    public function getFilteredCount($searchValue, $companyId)
 {
@@ -102,6 +107,14 @@ public function getFilteredEstimates($searchValue, $start, $length, $orderByColu
         ->limit($limit)
         ->get()
         ->getResultArray();
+}
+
+public function getLastEstimateIdByCompany($companyId)
+{
+    return $this->select('estimate_id')
+                ->where('company_id', $companyId)
+                ->orderBy('estimate_no', 'DESC')
+                ->first();
 }
 
 }
