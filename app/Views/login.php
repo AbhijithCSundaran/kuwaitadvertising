@@ -82,7 +82,7 @@
                 </div>
                <?php if (empty($isAdminLogin) || !$isAdminLogin): ?>
                 <div class="my-2 d-flex justify-content-between align-items-center">
-                  <a href="<?= base_url('login?admin=1') ?>" class="auth-link text-black">Login As Admin</a>
+                  <a href="<?= base_url('admin/login') ?>" class="auth-link text-black">Login As Admin</a>
                 </div>
               <?php endif; ?>
 
@@ -113,7 +113,7 @@
 
     $('.enter-btn').click(function () {
       const body = $('#login-form').serialize();
-      const url = '<?= base_url("login/authenticate") ?>';
+      const url = '<?= base_url("admin/login/authenticate") ?>';
 
       $.post(url, body, function (response) {
         if (response.status === 1) {

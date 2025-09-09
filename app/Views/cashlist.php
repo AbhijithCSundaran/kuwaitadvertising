@@ -12,6 +12,18 @@
     font-size: 12px;
     
     }
+   .custom-paid-badge {
+    display: inline-block;
+    min-width: 90px;   /* same width */
+    text-align: center;
+    padding: 5px 8px !important;
+    font-size: 12px;
+
+    background-color: #28a745 !important;
+    color: #fff !important;
+}
+
+ 
 </style>
 
 <div class="form-control mb-3 right_container">
@@ -101,8 +113,8 @@ $(document).ready(function () {
                     let formattedData = data.charAt(0).toUpperCase() + data.slice(1); // ✅ Capitalize first letter
 
                     switch (data.toLowerCase()) {
-                        case 'paid': 
-                            className = 'badge bg-success custom-badge'; 
+                        case 'paid':
+                            className = 'badge custom-paid-badge';
                             break;
                         case 'unpaid': 
                             className = 'badge bg-danger custom-badge'; 
