@@ -106,33 +106,60 @@
       vertical-align: top;
       padding: 5px 6px;
       height: 20px !important;
+    }
+   
+    tbody td {
+      border-top: 1px solid transparent;
+      border-bottom: 1px solid transparent;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 1px solid black;
+    }
+
+    th {
+      background-color: #cfc7c7ff;
+      text-align: center;
+      font-weight: bold;
+      padding: 2px;
+    }
+
+    td {
+      text-align: center;
+      height: 25px;
+      padding: 4px;
+      word-wrap: break-word;
+      word-break: break-word;
+      white-space: normal;
     } */
+    table.min_height {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      min-height: 350px;
+    }
 
-   table.min_height {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-    min-height: 350px;
-}
+    /* Table cells */
+    table.min_height tbody td {
+      vertical-align: top;
+      padding: 5px 6px;
+      height: auto !important;
+      border-top: none;
+      border-bottom: none;
+      border-left: 1px solid black;
+      /*  Remove vertical line */
+      border-right: 1px solid black;
+      /* Remove vertical line */
+    }
 
-/* Table cells */
-table.min_height tbody td {
-    vertical-align: top;
-    padding: 5px 6px;
-    height: auto !important;
-    border-top: none;    
-    border-bottom: none;
-    border-left:  1px solid black;             /*  Remove vertical line */
-    border-right:  1px solid black;            /* Remove vertical line */
-}
-
-table.min_height .empty-row td {
-    height: 28px; /* Keeps blank rows evenly spaced */
-    border-top: none;
-    border-bottom: none;
-    border-left:  1px solid black;
-    border-right:  1px solid black;
-}
+    table.min_height .empty-row td {
+      height: 28px;
+      /* Keeps blank rows evenly spaced */
+      border-top: none;
+      border-bottom: none;
+      border-left: 1px solid black;
+      border-right: 1px solid black;
+    }
 
 
     tbody td {
@@ -260,13 +287,11 @@ table.min_height .empty-row td {
         background: none !important;
       }
 
-      .col-4,
-      {
-      flex: 0 0 auto !important;
-      width: auto !important;
-      max-width: none !important;
-    }
-
+      /* 
+       .container {
+        min-width: 690px;
+        min-height: 900px;
+      }   */
     }
   </style>
 </head>
@@ -279,48 +304,51 @@ table.min_height .empty-row td {
           style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px;">
           Print
         </button>
-        <!-- Edit Invoice Button -->
-        <button id="editInvoiceBtn"
-          onclick="window.location.href='<?= base_url('invoice/edit/' . $invoice['invoice_id']) ?>'"
-          style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px; cursor: pointer;
-                display: <?= in_array(strtolower($invoice['status']), ['paid', 'partial paid']) ? 'none' : 'inline-block' ?>;">
-          Edit Invoice
-        </button>
-
-        <!-- Delivery Note Button -->
+        <?php if (!in_array(strtolower($invoice['status']), ['paid', 'partial paid'])): ?>
+          <button id="editinvoicebtn"
+            onclick="window.location.href='<?= base_url('invoice/edit/' . $invoice['invoice_id']) ?>'"
+            style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px; cursor: pointer;">
+            Edit Invoice
+          </button>
+        <?php endif; ?>
         <button id="deliveryNoteBtn"
           onclick="window.location.href='<?= base_url('invoice/delivery_note/' . $invoice['invoice_id']) ?>'"
-          style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;
-                display: <?= in_array(strtolower($invoice['status']), ['paid', 'partial paid']) ? 'inline-block' : 'none' ?>;">
+          style="display: <?= in_array(strtolower($invoice['status']), ['paid', 'partial paid']) ? 'inline-block' : 'none' ?>;
+                    background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
           Delivery Note
         </button>
+        <?php
+          $paymentMode = isset($invoice['payment_mode']) ? strtolower($invoice['payment_mode']) : '';
 
-        <!-- Payment Button -->
-          <?php
-          $paymentMode = isset($invoice['payment_mode']) && $invoice['payment_mode'] !== '' ? strtolower($invoice['payment_mode']) : 'cash';
-          $btnLabel = ($paymentMode === 'cash') ? 'Receipt' : 'Voucher';
-          $btnUrl   = ($paymentMode === 'cash')
-              ? base_url('receiptvoucher/' . $invoice['invoice_id'])
-              : base_url('paymentvoucher/' . $invoice['invoice_id']);
-          $invoiceStatus = strtolower($invoice['status']);
+          if ($paymentMode === 'cash') {
+              $btnPaymentLabel = 'Receipt Voucher';
+              $btnUrl = base_url('receiptvoucher/' . $invoice['invoice_id']);
+          } elseif ($paymentMode === 'bank' || $paymentMode === 'bank transfer') {
+              $btnPaymentLabel = ' Payment Voucher';
+              $btnUrl = base_url('paymentvoucher/' . $invoice['invoice_id']);
+          } else {
+              // fallback for other modes
+              $btnPaymentLabel = 'Payment Voucher';
+              $btnUrl = base_url('paymentvoucher/' . $invoice['invoice_id']);
+          }
+
+          // Status button settings
+          $status = strtolower($invoice['status'] ?? 'unpaid');
+          $btnStatusLabel = ucfirst($status);
+          $btnColor = $status === 'paid' ? '#28a745' : ($status === 'partial paid' ? '#ffc107' : '#991b36');
+          $btnShow = in_array($status, ['paid', 'partial paid']) ? 'd-inline-block' : 'd-none';
           ?>
-          <button id="paymentBtn"
-            style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;
-                  display: <?= $invoiceStatus === 'unpaid' ? 'none' : 'inline-block' ?>;"
+          <button id="paymentBtn" class="btn <?= $btnShow ?>" style="background-color: #991b36 ; color: white;"
             onclick="window.location.href='<?= $btnUrl ?>'">
-            <?= $btnLabel ?>
+            <?= $btnPaymentLabel ?>
           </button>
 
-        <?php
-        $status = strtolower($invoice['status'] ?? 'unpaid');
-        $btnLabel = ucfirst($status);
-        $btnColor = $status === 'paid' ? '#28a745' : ($status === 'partial paid' ? '#ffc107' : '#991b36');
-        ?>
+
         <div class="btn-group ml-2 position-relative" style="z-index: 1000; margin-left: 10px;">
           <button id="statusBtn" type="button" class="btn btn-sm"
             style="background-color: <?= $btnColor ?>; color: white; padding: 8px 16px; border-radius: 5px;"
             <?= $status === 'paid' ? 'disabled title="Fully paid invoice cannot be changed"' : 'onclick="toggleStatusOptions()"' ?>>
-            <?= $btnLabel ?>
+            <?= $btnStatusLabel ?>
           </button>
           <?php if ($status === 'unpaid' || $status === 'partial paid'): ?>
             <div class="dropdown" style="position: relative;">
@@ -348,7 +376,7 @@ table.min_height .empty-row td {
           <div class="col-4">
             <?php if (!empty($company['company_logo'])): ?>
               <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" alt="Company Logo"
-                style="max-height: 30px;">
+                style="max-height: 50px;">
             <?php endif; ?>
           </div>
           <div class="col-4 text-end">
@@ -358,12 +386,12 @@ table.min_height .empty-row td {
           </div>
         </div>
         <div style="height: 3px; background-color:#a1263a"></div>
-        <div class="row align-items-center" style="margin-bottom: 10px;">
+        <div class="row align-items-center">
           <div class="col-4 text-start">
             <div>
               <label style="font-weight: bold; margin-right: 4px; margin-top: 17px;">No / رقم :</label>
               <input type="text" readonly value="<?= esc($invoice['invoice_id']) ?>"
-                style="display: inline-block; width: 87px; height: 23px; text-align:left;">
+                style="display: inline-block; width: 87px; height: 23px; text-align:left; ">
             </div>
             <div style="margin-top: 4px;">
               <label style="font-weight: bold; margin-right: 4px;">LPO No :</label>
@@ -380,7 +408,7 @@ table.min_height .empty-row td {
             <div style="white-space: nowrap;">
               <label style="font-weight: bold; margin-right: 6px; margin-top: 17px;">Date / التاريخ:</label>
               <input type="text" readonly value="<?= date('d-m-Y', strtotime($invoice['invoice_date'])) ?>"
-                style="width: 87px; height: 23px; text-align: center;">
+                style="width: 80px; height: 23px; text-align: center;">
             </div>
             <div style="margin-top: 4px; white-space: nowrap;">
               <label style="font-weight: bold; margin-right: 6px;">Delivery Date :</label>
@@ -401,7 +429,6 @@ table.min_height .empty-row td {
         </div>
 
         <!-- Invoice Table -->
-    
         <table class="min_height">
           <thead>
             <tr>
@@ -422,14 +449,14 @@ table.min_height .empty-row td {
             <?php
             $totalAmount = 0;
             foreach ($items as $index => $item):
-              $lineTotal = $item['quantity'] * $item['price']; // NO DISCOUNT
+              $lineTotal = $item['quantity'] * $item['price'];
               $kd = floor($item['price']);
               $fils = str_pad(number_format(($item['price'] - $kd) * 100, 0), 2, '0', STR_PAD_LEFT);
 
               $lineKd = floor($lineTotal);
               $lineFils = str_pad(number_format(($lineTotal - $lineKd) * 100, 0), 2, '0', STR_PAD_LEFT);
 
-              $totalAmount += $lineTotal; // this can remain
+              $totalAmount += $lineTotal;
               ?>
               <tr>
                 <td><?= $index + 1 ?></td>
@@ -437,27 +464,27 @@ table.min_height .empty-row td {
                 <td><?= $item['quantity'] ?></td>
                 <td><?= $kd ?></td>
                 <td><?= $fils ?></td>
-                <td><?= $lineKd ?></td> <!-- shows quantity * price -->
+                <td><?= $lineKd ?></td>
                 <td><?= $lineFils ?></td>
               </tr>
             <?php endforeach; ?>
             <?php
-              $minRows = 8;
-              $currentRows = is_array($items) ? count($items) : 0;
-              $emptyRows = max(0, $minRows - $currentRows);
+            $minRows = 8;
+            $currentRows = is_array($items) ? count($items) : 0;
+            $emptyRows = max(0, $minRows - $currentRows);
 
-              for ($i = 0; $i < $emptyRows; $i++) {
-                  echo '<tr class="empty-row">
-                      <td>&nbsp;</td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                    </tr>';
+            for ($i = 0; $i < $emptyRows; $i++) {
+              echo '<tr class="empty-row">
+                        <td>&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                      </tr>';
 
-              }
+            }
             ?>
           </tbody>
           <?php $grandTotal = $totalAmount; ?>
@@ -495,7 +522,6 @@ table.min_height .empty-row td {
             </tr>
           </tfoot>
         </table>
-        
 
         <div class="amount-words">
           المبلغ (بالكلمات): <span id="amount-words"></span>
@@ -555,10 +581,13 @@ table.min_height .empty-row td {
           <button type="button" class="btn-close" onclick="closePartialModal()"></button>
         </div>
         <div class="modal-body">
+          <!-- Amount Input -->
           <label for="partialPaidInput" class="form-label">Enter Amount</label>
           <input type="number" id="partialPaidInput" class="form-control form-control-lg border-primary" min="1"
             placeholder="Enter partial amount">
           <small id="partialErrorMsg" style="color:red; display:none;">Entered amount exceeds balance.</small>
+
+          <!-- Payment Mode -->
           <div class="mt-3">
             <label for="paymentMode" class="form-label">Payment Mode <span style="color:red;">*</span></label>
             <select id="paymentMode" class="form-control form-control-lg border-primary">
@@ -630,7 +659,7 @@ table.min_height .empty-row td {
 
     if (dinars.length > 9) return 'overflow';
     dinars = parseInt(dinars, 10);
-    fils = parseInt((fils || '0').padEnd(3, '0').slice(0, 2)); // Handle fils up to 2 decimal places
+    fils = parseInt((fils || '0').padEnd(3, '0').slice(0, 2));
 
     const convert = (n) => {
       if (n < 20) return a[n];
@@ -809,7 +838,6 @@ table.min_height .empty-row td {
       inputLabel.innerText = "Enter Amount";
     }
 
-    // Finally, show modal
     document.getElementById('partialPaymentModal').style.display = 'block';
   }
 
@@ -825,37 +853,52 @@ table.min_height .empty-row td {
     errorMsg.style.display = 'none';
     if (paymentModeError) paymentModeError.style.display = 'none';
 
-    //  Validate amount
-    if (isNaN(paid) || paid <= 0 || paid > grandTotal) {
-      errorMsg.innerText = 'Entered Amount Exceeds Balance.';
-      errorMsg.style.display = 'block';
-      return;
+    
+    if (isNaN(paid)) {
+        errorMsg.innerText = 'Please enter an amount.';
+        errorMsg.style.display = 'block';
+        return;
     }
 
-    //Validate payment mode
+    
+    if (paid <= 0) {
+        errorMsg.innerText = 'Amount must be greater than zero.';
+        errorMsg.style.display = 'block';
+        return;
+    }
+
+   
+    if (paid > grandTotal) {
+        errorMsg.innerText = 'Entered amount exceeds total balance.';
+        errorMsg.style.display = 'block';
+        return;
+    }
+
+    
     if (!paymentMode) {
-      if (!paymentModeError) {
-        const error = document.createElement("small");
-        error.id = "paymentModeError";
-        error.style.color = "red";
-        error.innerText = "Please select a payment mode.";
-        document.getElementById("paymentMode").insertAdjacentElement("afterend", error);
-      } else {
-        paymentModeError.style.display = "block";
-      }
-      document.getElementById("paymentMode").focus();
-      return;
+        if (!paymentModeError) {
+            const error = document.createElement("small");
+            error.id = "paymentModeError";
+            error.style.color = "red";
+            error.innerText = "Please select a payment mode.";
+            document.getElementById("paymentMode").insertAdjacentElement("afterend", error);
+        } else {
+            paymentModeError.style.display = "block";
+        }
+        document.getElementById("paymentMode").focus();
+        return;
     }
 
+    
     const alreadyPaid = parseFloat(document.getElementById('paidAmountValue')?.innerText || 0);
     const balanceRemaining = grandTotal - alreadyPaid;
 
     if (paid > balanceRemaining) {
-      errorMsg.innerText = 'Entered Amount Exceeds Balance.';
-      errorMsg.style.display = 'block';
-      return;
+        errorMsg.innerText = 'Entered amount exceeds remaining balance.';
+        errorMsg.style.display = 'block';
+        return;
     } else {
-      errorMsg.style.display = 'none';
+        errorMsg.style.display = 'none';
     }
 
 
@@ -874,14 +917,19 @@ table.min_height .empty-row td {
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-       setTimeout(function () {
-          window.location.reload();
-           }, 200);
           const paidRow = document.getElementById('paidAmountRow');
           const balanceRow = document.getElementById('balanceAmountRow');
           const paidVal = document.getElementById('paidAmountValue');
           const balanceVal = document.getElementById('balanceAmountValue');
+          
+          const deliveryBtn = $('#deliveryNoteBtn');  
+          deliveryBtn.removeClass('d-none').addClass('d-inline-block');
 
+          const editinvoicebtn = $('#editinvoicebtn');   
+          editinvoicebtn.addClass('d-none');  
+
+          const paymentBtn = $('#paymentBtn');
+          paymentBtn.removeClass('d-none').addClass('d-inline-block')
           if (paidRow && paidVal) {
             paidRow.style.display = 'flex';
             paidVal.innerText = parseFloat(data.paid_amount).toFixed(2);
@@ -904,7 +952,6 @@ table.min_height .empty-row td {
           console.error("Partial update error:", data);
         }
 
-
         if (isFirstPartialPayment) {
           document.querySelector('#paidAmountRow .partial').innerText = "Advance Amount";
           localStorage.setItem('firstPartialDone_<?= $invoice['invoice_id'] ?>', 'true');
@@ -920,75 +967,93 @@ table.min_height .empty-row td {
   }
 
 
-function updateStatus(newStatus) {
+  function updateStatus(newStatus) {
+    // debugger;
     const invoiceId = <?= $invoice['invoice_id'] ?>;
-    const paymentBtn = document.getElementById("paymentBtn");
-    const statusBtn = document.getElementById("statusBtn");
-    const editBtn = document.getElementById("editInvoiceBtn");
-    const deliveryBtn = document.getElementById("deliveryNoteBtn");
+
+    console.log("Updating invoice:", invoiceId, "to status:", newStatus);
 
     fetch("<?= base_url('invoice/update_status') ?>", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-Requested-With": "XMLHttpRequest"
-        },
-        body: JSON.stringify({
-            invoice_id: invoiceId,
-            status: newStatus
-        })
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Requested-With": "XMLHttpRequest"
+      },
+      body: JSON.stringify({
+        invoice_id: invoiceId,
+        status: newStatus
+      })
     })
-    .then(response => response.json())
-    .then(data => {
+      .then(res => res.json())
+      .then(data => {
         if (data.success) {
-            // ✅ Update the status button instantly
-            statusBtn.innerText = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+          statusBtn.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+          if (newStatus === 'paid') {
+            statusBtn.style.backgroundColor = '#28a745';
+          } else if (newStatus === 'partial paid') {
+            statusBtn.style.backgroundColor = '#ffc107';
+          } else {
+            statusBtn.style.backgroundColor = '#991b36';
+          }
+          statusOptions.style.display = 'none';
+          const editBtn = document.getElementById('editinvoicebtn');
+          const deliveryBtn = document.getElementById('deliveryNoteBtn');
 
-            // ✅ If Paid or Partial Paid → Show Delivery + Payment, Hide Edit
-            if (newStatus === 'paid' || newStatus === 'partial paid') {
-                if (editBtn) editBtn.classList.add("d-none");
-                if (deliveryBtn) deliveryBtn.classList.remove("d-none");
-                if (paymentBtn) paymentBtn.classList.remove("d-none");
-            } 
-            // ✅ If Unpaid → Show Edit, Hide Delivery + Payment
-            else if (newStatus === 'unpaid') {
-                if (editBtn) editBtn.classList.remove("d-none");
-                if (deliveryBtn) deliveryBtn.classList.add("d-none");
-                if (paymentBtn) paymentBtn.classList.add("d-none");
+
+          if (newStatus === 'paid' || newStatus === 'partial paid') {
+            // Disable status change for paid & partial
+            statusBtn.disabled = true;
+            statusBtn.setAttribute('title', 'This invoice status cannot be changed');
+            statusBtn.removeAttribute('onclick');
+
+            // Hide amount rows
+            document.getElementById('paidAmountRow')?.style.setProperty('display', 'none', 'important');
+            document.getElementById('balanceAmountRow')?.style.setProperty('display', 'none', 'important');
+
+            // Show delivery note button immediately
+            if (deliveryBtn) {
+              deliveryBtn.style.setProperty('display', 'inline-block', 'important');
             }
-        } else {
-            alert("Status update failed!");
-            console.error("Update status failed:", data);
-        }
-        if (data.success) {
-    statusBtn.innerText = 'Partial Paid';
-    statusBtn.style.backgroundColor = '#ffc107';
 
-    // ✅ Instantly show Delivery + Payment buttons, hide Edit
-    document.getElementById("editInvoiceBtn")?.classList.add("d-none");
-    document.getElementById("deliveryNoteBtn")?.classList.remove("d-none");
-    document.getElementById("paymentBtn")?.classList.remove("d-none");
-}
-    })
-    .catch(error => {
-        console.error("Error updating status:", error);
-        alert("An error occurred while updating status.");
-    });
-}
+            // Hide edit invoice button immediately
+            if (editBtn) {
+              editBtn.style.setProperty('display', 'none', 'important');
+            }
+          } else {
+            // For unpaid invoices → show edit, hide delivery note
+            if (editBtn) {
+              editBtn.style.setProperty('display', 'inline-block', 'important');
+            }
+            if (deliveryBtn) {
+              deliveryBtn.style.setProperty('display', 'none', 'important');
+            }
+          }
+        } else {
+          alert("Status update failed.");
+          console.error("Update status failed:", data);
+        }
+      })
+      .catch(err => {
+        alert("Network or server error.");
+        console.error("Fetch error:", err);
+      });
+  }
 
 
 
   let selectedInvoiceId = null;
-
   function openMarkPaidModal(invoiceId) {
     selectedInvoiceId = invoiceId;
     $('#invoice_id').val(invoiceId);
     $('#markPaidModal').modal('show');
   }
 
+
   $('#confirmMarkPaid').on('click', function () {
+    // debugger;
     const paymentMode = $('#markPaidPaymentMode').val();
     const errorMsg = $('#markPaidError');
+
 
     if (!paymentMode || paymentMode.trim() === '') {
       errorMsg.show();
@@ -998,7 +1063,7 @@ function updateStatus(newStatus) {
       errorMsg.hide();
     }
 
-    $('#confirmMarkPaid').prop('disabled', true).text('Processing...');
+    $('#confirmMarkPaid').prop('disabled', true).text('Submit');
 
     $.ajax({
       url: "<?= base_url('invoice/update_status') ?>",
@@ -1013,7 +1078,12 @@ function updateStatus(newStatus) {
         const modalElement = document.getElementById('markPaidModal');
         const modal = bootstrap.Modal.getInstance(modalElement);
         modal.hide();
+        // alert('success');
 
+        const deliveryNoteBtn = $('#deliveryNoteBtn');
+    if (deliveryNoteBtn.length) {
+      deliveryNoteBtn.removeClass('d-none').addClass('d-inline-block');
+    }
         const statusBtn = $('#statusBtn');
         if (statusBtn.length) {
           statusBtn.text('Paid');
@@ -1021,22 +1091,25 @@ function updateStatus(newStatus) {
           statusBtn.prop('disabled', true);
           statusBtn.attr('title', 'Fully paid invoice cannot be changed');
         }
-
-
+        // debugger;
         const paymentBtn = $('#paymentBtn');
         if (paymentBtn.length) {
+          paymentBtn.removeClass('d-none').addClass('d-inline-block')
           if (paymentMode === 'cash') {
-            paymentBtn.text('Receipt');
+            paymentBtn.text('Receipt Voucher');
             paymentBtn.off('click').on('click', function () {
               window.location.href = "<?= base_url('receiptvoucher/' . $invoice['invoice_id']) ?>";
             });
           } else {
-            paymentBtn.text('Voucher');
+            paymentBtn.text('Payment Voucher');
             paymentBtn.off('click').on('click', function () {
               window.location.href = "<?= base_url('paymentvoucher/' . $invoice['invoice_id']) ?>";
             });
           }
         }
+
+ $('#paidAmountRow').hide();
+      $('#balanceAmountRow').hide();
         $('#editinvoicebtn').hide();
       },
       error: function (xhr, status, error) {
@@ -1053,10 +1126,10 @@ function updateStatus(newStatus) {
     const mode = this.value;
     const paymentBtn = document.getElementById('paymentBtn');
     if (mode === 'cash') {
-      paymentBtn.innerText = 'Receipt';
+      paymentBtn.innerText = 'Receipt Voucher';
       paymentBtn.onclick = () => window.location.href = '<?= base_url('receiptvoucher/' . $invoice['invoice_id']) ?>';
     } else {
-      paymentBtn.innerText = 'Voucher';
+      paymentBtn.innerText = 'Payment Voucher';
       paymentBtn.onclick = () => window.location.href = '<?= base_url('paymentvoucher/' . $invoice['invoice_id']) ?>';
     }
   });

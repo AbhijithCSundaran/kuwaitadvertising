@@ -98,6 +98,8 @@ class Invoice extends BaseController
                 'status' => $row['status'] ?? 'unpaid',
                 'company_id' => $companyId,
                 'invoice_date' => date('d-m-Y', strtotime($row['invoice_date'])),
+                'payment_mode' => !empty($row['payment_mode']) ? strtolower($row['payment_mode']) : '',
+
 
 
             ];
@@ -148,6 +150,8 @@ class Invoice extends BaseController
 
         $companyId = session()->get('company_id');
         $company = $companyModel->find($companyId);
+
+        $invoice['payment_mode'] = strtolower($invoice['payment_mode'] ?? '');
 
         $viewData = [
             'invoice' => $invoice,
@@ -335,6 +339,8 @@ class Invoice extends BaseController
         $userModel = new Manageuser_Model();
         $user = $userModel->find($user_id);
         $user_name = $user['name'] ?? 'N/A';
+
+        $invoice['payment_mode'] = strtolower($invoice['payment_mode'] ?? '');
 
         return view('invoice/invoice_print', [
             'invoice' => $invoice,
