@@ -78,7 +78,7 @@
             <div class="estimate-title">INVOICE</div>
             <div class="estimate-details">
                 <p class="mb-1">Invoice No:
-                    <?= isset($invoice['invoice_id']) ? $invoice['invoice_id'] : '' ?>
+                    <?= isset($invoice['invoice_no']) ? $invoice['invoice_no'] : '' ?>
                 </p>
                 <p>Date: <?= date('d-m-Y') ?></p>
             </div>

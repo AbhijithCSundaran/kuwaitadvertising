@@ -206,7 +206,8 @@
                 <div class="voucher-sub"><strong>PAYMENT VOUCHER</strong></div>
                 <div class=" col-6 voucher-no">
                     <span class="label">No.:</span> 
-                    <span style="display:inline-block; width:22%;">&nbsp;</span> <?= esc($invoice['invoice_no'] ?? '') ?>: رقم  
+                    <span style="display:inline-block; ">&nbsp;</span>
+                    <span style="display: inline-block; width: 85px; text-align: center;"> <?= esc($invoice['invoice_no'] ?? '') ?></span>: رقم  
                 </div> 
                 <div class="voucher-meta">
                 

@@ -224,7 +224,7 @@
 
             </div>
                 <div class=" col-6 voucher-no">
-                    <span class="label" style="font-size: 20px;"><strong>No:</strong></span> 
+                    <span class="label" style="font-size: 20px;"><strong>No:</strong> <?= esc($invoice['invoice_no'] ?? '') ?></span> 
                 </div> 
                 <div class="voucher-meta">
                 

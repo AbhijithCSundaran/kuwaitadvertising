@@ -390,7 +390,7 @@
           <div class="col-4 text-start">
             <div>
               <label style="font-weight: bold; margin-right: 4px; margin-top: 17px;">No / رقم :</label>
-              <input type="text" readonly value="<?= esc($invoice['invoice_id']) ?>"
+              <input type="text" readonly value="<?= esc($invoice['invoice_no']) ?>"
                 style="display: inline-block; width: 87px; height: 23px; text-align:left; ">
             </div>
             <div style="margin-top: 4px;">
