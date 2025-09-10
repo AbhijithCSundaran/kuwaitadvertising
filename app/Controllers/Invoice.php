@@ -90,6 +90,7 @@ class Invoice extends BaseController
             $data[] = [
                 'slno' => $slno++,
                 'invoice_id' => $row['invoice_id'],
+                'invoice_no' => isset($row['invoice_no']) ? $row['invoice_no'] : '',
                 'customer_name' => $row['customer_name'],
                 'customer_address' => $row['customer_address'],
                 'subtotal' => number_format($subtotal, 2),
@@ -222,7 +223,17 @@ class Invoice extends BaseController
             $itemModel->where('invoice_id', $invoiceId)->delete();
             $message = 'Invoice Updated Successfully';
         } else {
-            if (!empty($estimateId)) {
+                    // ✅ Generate company-specific invoice_no
+        $lastInvoice = $invoiceModel
+            ->where('company_id', $companyId)
+            ->orderBy('invoice_no', 'DESC')
+            ->first();
+
+        $nextInvoiceNo = $lastInvoice ? $lastInvoice['invoice_no'] + 1 : 1;
+        $invoiceData['invoice_no'] = $nextInvoiceNo;
+
+        // Mark estimate as converted if applicable
+         if (!empty($estimateId)) {
                 $db = \Config\Database::connect();
                 $db->table('estimates')->where('estimate_id', $estimateId)->update(['is_converted' => 1]);
             }
@@ -232,6 +243,7 @@ class Invoice extends BaseController
             $message = 'Generating Invoice';
         }
 
+          
         // Save items
         $descriptions = $request->getPost('description');
         $quantities = $request->getPost('quantity');
@@ -253,6 +265,8 @@ class Invoice extends BaseController
         return $this->response->setJSON([
             'status' => 'success',
             'message' => $message,
+            'invoice_id'  => $invoiceId,
+             'invoice_no'  => $invoiceData['invoice_no'] ?? null,
             'redirect' => site_url('invoice/print/' . $invoiceId)
         ]);
     }

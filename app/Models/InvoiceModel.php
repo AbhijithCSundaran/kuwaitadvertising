@@ -22,9 +22,10 @@ class InvoiceModel extends Model
     'balance_amount',
     'user_id',
     'company_id',
-    'payment_mode'];
+    'payment_mode',
+    'invoice_no'];
     protected $returnType = 'array';
-
+    
      public function getInvoiceCount($companyId)
     {
           return $this->where('company_id', $companyId)->countAllResults();
@@ -65,7 +66,7 @@ class InvoiceModel extends Model
 {
     $searchValue = trim($searchValue);
     $builder = $this->db->table('invoices')
-        ->select('invoices.invoice_id, invoices.customer_id, invoices.discount, invoices.total_amount, invoices.invoice_date, invoices.phone_number, invoices.lpo_no, invoices.status, customers.name AS customer_name, customers.address AS customer_address')
+        ->select('invoices.invoice_id, invoices.invoice_no,invoices.customer_id, invoices.discount, invoices.total_amount, invoices.invoice_date, invoices.phone_number, invoices.lpo_no, invoices.status, customers.name AS customer_name, customers.address AS customer_address')
         ->join('customers', 'customers.customer_id = invoices.customer_id', 'left')
         ->join('user', 'user.user_id = invoices.user_id', 'left')
         ->where('invoices.company_id', $companyId); 
@@ -91,6 +92,7 @@ class InvoiceModel extends Model
 {
     $invoice = $this->select(
         'invoices.invoice_id,
+        invoices.invoice_no,
          invoices.customer_id,
          invoices.phone_number,
          invoices.customer_address,
@@ -152,5 +154,13 @@ public function getMonthlyRevenue($companyId)
                     ->join('customers', 'customers.customer_id = invoices.customer_id', 'left')
                     ->findAll();
     }
+public function getLastInvoiceIdByCompany($companyId)
+{
+    return $this->select('invoice_id')
+                ->where('company_id', $companyId)
+                ->orderBy('invoice_no', 'DESC')
+                ->first();
+}
+
 
 }

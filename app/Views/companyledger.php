@@ -3,7 +3,7 @@
     #plainExpenseTable th,
     #plainExpenseTable td {
         vertical-align: middle;
-        padding: 16px 30px;
+        padding: 16px 16px;
         font-size: 14px;
     }
 
@@ -21,13 +21,17 @@
 
     #plainExpenseTable th:nth-child(3),
     #plainExpenseTable td:nth-child(3) {
-        width: 20% !important;
+        width: 15% !important;
         text-align: center !important;
     }
-
+     #plainExpenseTable th:nth-child(4),
+    #plainExpenseTable td:nth-child(4) {
+        width: 15% !important;
+        text-align: center !important;
+    }
     #plainExpenseTable th:nth-child(5),
     #plainExpenseTable td:nth-child(5) {
-        width: 20% !important;
+        width: 15% !important;
         text-align: center !important;
     }
     #plainExpenseTable th:nth-child(6),
@@ -93,7 +97,7 @@
         <thead>
             <tr>
                 <th><strong>SI No</strong></th>
-                <th><strong>Invoice ID</strong></th>
+                <!-- <th><strong>Invoice ID</strong></th> -->
                 <th><strong>Date</strong></th>
                 <th><strong>Customer</strong></th>
                 <th><strong>Total Amount</strong></th>
@@ -191,7 +195,6 @@ $(document).ready(function () {
                         rows += `
                             <tr>
                                 <td class="text-center">${index + 1}</td>
-                                <td>${invoice.invoice_id}</td>
                                 <td>${formatDate(invoice.invoice_date)}</td>
                                 <td>${invoice.customer_name}</td>
                                 <td class="text-end">₹${totalAmount.toFixed(2)}</td>
@@ -244,3 +247,5 @@ $(document).ready(function () {
     loadPaidInvoices();
 });
 </script>
+
+<!-- <td>${invoice.invoice_id}</td> -->
