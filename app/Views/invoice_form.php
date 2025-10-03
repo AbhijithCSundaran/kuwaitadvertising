@@ -146,12 +146,12 @@
                         <tr class="item-row">
                             <td><input type="text" name="description[]" class="form-control"
                                     value="<?= esc($item['description'] ?? $item['item_name'] ?? '') ?>"></td>
-                            <td><input type="number" class="form-control price" step="0.01" min="0" inputmode="decimal"
+                            <td><input type="number" class="form-control price" step="0.001" min="0" inputmode="decimal"
                                     name="price[]" value="<?= $item['price'] ?>">
                             </td>
                             <td><input type="number" class="form-control quantity" name="quantity[]"
                                     value="<?= $item['quantity'] ?>"></td>
-                            <td><input type="number" class="form-control total" name="total[]" step="0.01"
+                            <td><input type="number" class="form-control total" name="total[]" step="0.001"
                                     value="<?= $item['total'] ?>" readonly></td>
                             <td class="text-center">
                                 <span class="remove-item-btn" title="Remove"><i class="fas fa-trash text-danger"></i></span>
@@ -161,7 +161,7 @@
                 <?php else: ?>
                     <tr class="item-row">
                         <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
-                        <td><input type="number" name="price[]" class="form-control price" step="0.01" min="0"
+                        <td><input type="number" name="price[]" class="form-control price" step="0.001" min="0"
                                 inputmode="decimal"></td>
                         <td><input type="number" name="quantity[]" class="form-control quantity"></td>
                         <td><input type="number" name="total[]" class="form-control total" readonly></td>
@@ -179,7 +179,7 @@
         <table class="table totals">
             <tr>
                 <td><strong>Sub Total:</strong></td>
-                <td><span id="sub_total_display">0.00</span> KWD</td>
+                <td><span id="sub_total_display">0.000</span> KWD</td>
             </tr>
             <tr>
                 <td><strong>Discount:</strong></td>
@@ -190,7 +190,7 @@
             </tr>
             <tr>
                 <td><strong>Total:</strong></td>
-                <td><strong><span id="total_display">0.00</span> KWD</strong></td>
+                <td><strong><span id="total_display">0.000</span> KWD</strong></td>
             </tr>
         </table>
     <input type="hidden" name="estimate_id" value="<?= $invoice['estimate_id'] ?? '' ?>">
@@ -283,22 +283,22 @@
                 let qty = parseFloat($(this).find('.quantity').val()) || 0;
                 let price = parseFloat($(this).find('.price').val()) || 0;
                 let total = qty * price;
-                $(this).find('.total').val(total.toFixed(2));
+                $(this).find('.total').val(total.toFixed(3));
                 subtotal += total;
             });
-            $('#sub_total_display').text(subtotal.toFixed(2));
+            $('#sub_total_display').text(subtotal.toFixed(3));
             let discount = parseFloat($('#discount').val()) || 0;
             let finalTotal = subtotal - (subtotal * discount / 100);
-            $('#total_display').text(finalTotal.toFixed(2));
+            $('#total_display').text(finalTotal.toFixed(3));
         }
 
         $('#add-item').click(function () {
             const row = `
             <tr class="item-row">
                 <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
-                <td><input type="text" name="price[]" class="form-control price" step="0.01"></td>
+                <td><input type="text" name="price[]" class="form-control price" step="0.001"></td>
                 <td><input type="number" name="quantity[]" class="form-control quantity" step="0.01"></td>
-                <td><input type="number" name="total[]" class="form-control total" step="0.01" readonly></td>
+                <td><input type="number" name="total[]" class="form-control total" step="0.001" readonly></td>
                 <td class="text-center"><span class="remove-item-btn" title="Remove"><i class="fas fa-trash text-danger"></i></span></td>
             </tr>`;
             $('#item-container').append(row);
@@ -345,7 +345,7 @@
             let input = this;
             let val = input.value;
             if (val === '' || val === '.') return;
-            let match = val.match(/^(\d{0,8})(\.(\d{0,2})?)?/);
+            let match = val.match(/^(\d{0,8})(\.(\d{0,3})?)?/);
             if (match) {
                 let newVal = (match[1] || '') + (match[2] || '');
                 if (newVal !== val) {
@@ -368,58 +368,58 @@
             $('#customerModal').modal('show');
         });
 
-        $('#customerForm').submit(function (e) {
-            e.preventDefault();
-            const name = $('#popup_name').val().trim();
-            const address = $('#popup_address').val().trim();
-            const max_discount = $('#max_discount').val().trim();
+        // $('#customerForm').submit(function (e) {
+        //     e.preventDefault();
+        //     const name = $('#popup_name').val().trim();
+        //     const address = $('#popup_address').val().trim();
+        //     const max_discount = $('#max_discount').val().trim();
 
-            if (!name || !address) {
-                $('#customerError').removeClass('d-none').text('Name and address are required.');
-                return;
-            }
+        //     if (!name || !address) {
+        //         $('#customerError').removeClass('d-none').text('Name and address are required.');
+        //         return;
+        //     }
 
-            $.ajax({
-                url: "<?= base_url('customer/get-address') ?>",
-                type: "POST",
-                data: { name, address, max_discount },
-                dataType: "json",
-                success: function (res) {
-                    if (res.status === 'success') {
-                        const newOption = new Option(res.customer.name, res.customer.customer_id, true, true);
-                        $('#customer_id').append(newOption).trigger('change');
-                        $('#popup_name').val('');
-                        $('#popup_address').val('');
-                        $('#max_discount').val('');
-                        $('#customerModal').modal('hide');
-                        $('.alert')
-                            .removeClass('d-none alert-danger')
-                            .addClass('alert-success')
-                            .text('Customer Created Successfully.')
-                            .fadeIn()
-                            .delay(3000)
-                            .fadeOut();
-                    } else {
-                        $('.alert')
-                            .removeClass('d-none alert-success')
-                            .addClass('alert-danger')
-                            .text(res.message || 'Failed To Create Customer.')
-                            .fadeIn()
-                            .delay(3000)
-                            .fadeOut();
-                    }
-                },
-                error: function () {
-                    $('.alert')
-                        .removeClass('d-none alert-success')
-                        .addClass('alert-danger')
-                        .text('Server Error Occurred While Creating Customer.')
-                        .fadeIn()
-                        .delay(3000)
-                        .fadeOut();
-                }
-            });
-        });
+        //     $.ajax({
+        //         url: "<?= base_url('customer/get-address') ?>",
+        //         type: "POST",
+        //         data: { name, address, max_discount },
+        //         dataType: "json",
+        //         success: function (res) {
+        //             if (res.status === 'success') {
+        //                 const newOption = new Option(res.customer.name, res.customer.customer_id, true, true);
+        //                 $('#customer_id').append(newOption).trigger('change');
+        //                 $('#popup_name').val('');
+        //                 $('#popup_address').val('');
+        //                 $('#max_discount').val('');
+        //                 $('#customerModal').modal('hide');
+        //                 $('.alert')
+        //                     .removeClass('d-none alert-danger')
+        //                     .addClass('alert-success')
+        //                     .text('Customer Created Successfully.')
+        //                     .fadeIn()
+        //                     .delay(3000)
+        //                     .fadeOut();
+        //             } else {
+        //                 $('.alert')
+        //                     .removeClass('d-none alert-success')
+        //                     .addClass('alert-danger')
+        //                     .text(res.message || 'Failed To Create Customer.')
+        //                     .fadeIn()
+        //                     .delay(3000)
+        //                     .fadeOut();
+        //             }
+        //         },
+        //         error: function () {
+        //             $('.alert')
+        //                 .removeClass('d-none alert-success')
+        //                 .addClass('alert-danger')
+        //                 .text('Server Error Occurred While Creating Customer.')
+        //                 .fadeIn()
+        //                 .delay(3000)
+        //                 .fadeOut();
+        //         }
+        //     });
+        // });
 
         $('#customer_id').on('change', function () {
             let customerId = $(this).val();
@@ -634,6 +634,7 @@
                 }
             });
         });
+        
         function showAlert(message, type) {
             $('.alert')
                 .removeClass('d-none alert-success alert-danger')

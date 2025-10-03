@@ -88,45 +88,55 @@ public function save()
     }
 
     // Recalculate totals
-    $subtotal = 0;
-    foreach ($total as $t) {
-        $subtotal += (float)$t;
-    }
-    $discountAmount = ($subtotal * $discount) / 100;
-    $grandTotal = $subtotal - $discountAmount;
+   $subtotal = '0.000';
+foreach ($total as $t) {
+    // Use bcadd to avoid floating-point rounding
+    $subtotal = bcadd($subtotal, (string)$t, 3);
+}
 
-    $companyId = session()->get('company_id');
-    $estimateData = [
-        'customer_id' => $customerId,
-        'customer_address' => $address,
-        'discount' => $discount,
-        'total_amount' => number_format($grandTotal, 2, '.', ''),
-        'date' => date('Y-m-d'),
-        'phone_number' => $phoneNumber,
-        'company_id' => $companyId
-    ];
+// Calculate discount
+$discountAmount = bcmul($subtotal, bcdiv((string)$discount, '100', 3), 3);
+
+// Grand total without rounding
+$grandTotal = bcsub($subtotal, $discountAmount, 3);
+
+$companyId = session()->get('company_id');
+$estimateData = [
+    'customer_id' => $customerId,
+    'customer_address' => $address,
+    'discount' => $discount,
+    'total_amount' => $grandTotal, // Already 3 decimals, no rounding
+    'date' => date('Y-m-d'),
+    'phone_number' => $phoneNumber,
+    'company_id' => $companyId
+];
+
 
     // Build items array
     $items = [];
     foreach ($description as $key => $desc) {
-        $desc = trim($desc);
-        $unitPrice = trim($price[$key]);
-        $qty = trim($quantity[$key]);
+    $desc = trim($desc);
+    $unitPrice = trim($price[$key]);
+    $qty = trim($quantity[$key]);
 
-        if ($desc === '' || $unitPrice === '' || $qty === '') {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'Each Item Must Have Description, Unit Price, And Quantity Filled.'
-            ]);
-        }
-
-        $items[] = [
-            'description' => $desc,
-            'price' => number_format((float)$unitPrice, 2, '.', ''),
-            'quantity' => (float)$qty,
-            'total' => number_format((float)$total[$key], 2, '.', '')
-        ];
+    if ($desc === '' || $unitPrice === '' || $qty === '') {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Each Item Must Have Description, Unit Price, And Quantity Filled.'
+        ]);
     }
+
+    // Calculate total using BCMath to avoid rounding issues
+    $lineTotal = bcmul((string)$unitPrice, (string)$qty, 3);
+
+    $items[] = [
+        'description' => $desc,
+        'price' => bcadd((string)$unitPrice, '0', 3),   // ensures 3 decimals
+        'quantity' => bcadd((string)$qty, '0', 3),
+        'total' => $lineTotal
+    ];
+}
+
 
     $estimateModel = new EstimateModel();
     $estimateItemModel = new EstimateItemModel();
@@ -255,9 +265,9 @@ public function save()
         $items = $itemModel->where('estimate_id', $row['estimate_id'])->findAll();
         $descList = array_column($items, 'description');
  
-        $subtotal = 0;
+        $subtotal = '0.000';
         foreach ($items as $item) {
-            $subtotal += (float)$item['total'];
+            $subtotal = bcadd((string)$subtotal, (string)$item['total'], 3);
         }
  
         $data[] = [
@@ -266,9 +276,9 @@ public function save()
             'estimate_no'       => $row['estimate_no'],
             'customer_name'     => $row['customer_name'],
             'customer_address'  => $row['customer_address'],
-            'subtotal' => number_format($subtotal, 2, '.', ''),
+            'subtotal'         => $subtotal,
             'discount'          => $row['discount'],
-            'total_amount' => number_format($row['total_amount'], 2, '.', ''),
+            'total_amount'     => bcadd((string)$row['total_amount'], '0', 3), // 3 decimals
             'date'              => $row['date'],
             'description'       => implode(', ', $descList),
             'is_converted'  => $row['is_converted'],
@@ -432,53 +442,57 @@ private function translateToArabic($text)
 
         // dashboardlisting
     public function recentEstimates()
-        {
-            $estimateModel = new EstimateModel();
-            $itemModel = new EstimateItemModel();
-    
-            $estimates = $estimateModel->getRecentEstimatesWithCustomer(10); 
- 
-        foreach ($estimates as &$est) {
-            $items = $itemModel->where('estimate_id', $est['estimate_id'])->findAll();
- 
-            $subtotal = 0;
-            foreach ($items as $item) {
-                $subtotal += (float)$item['total'];
-            }
- 
-            $est['sub_total'] = round($subtotal, 2);
+{
+    $estimateModel = new EstimateModel();
+    $itemModel = new EstimateItemModel();
+
+    $estimates = $estimateModel->getRecentEstimatesWithCustomer(10); 
+
+    foreach ($estimates as &$est) {
+        $items = $itemModel->where('estimate_id', $est['estimate_id'])->findAll();
+
+        $subtotal = '0.000';
+        foreach ($items as $item) {
+            $subtotal = bcadd((string)$subtotal, (string)$item['total'], 3);
         }
- 
-        return $this->response->setJSON($estimates);
+
+        $est['sub_total'] = $subtotal; // 3 decimals, no rounding
     }
+
+    return $this->response->setJSON($estimates);
+}
+
  
     public function viewByCustomer($customerId)
-    {
-        $estimateModel = new EstimateModel();
-        $itemModel = new EstimateItemModel();
-        $customerModel = new customerModel();
+{
+    $estimateModel = new EstimateModel();
+    $itemModel = new EstimateItemModel();
+    $customerModel = new customerModel();
 
-        $estimates = $estimateModel
-            ->where('customer_id', $customerId)
-            ->orderBy('date', 'desc')
-            ->findAll();
+    $estimates = $estimateModel
+        ->where('customer_id', $customerId)
+        ->orderBy('date', 'desc')
+        ->findAll();
 
-        foreach ($estimates as &$est) {
-            $items = $itemModel->where('estimate_id', $est['estimate_id'])->findAll();
-            $subtotal = 0;
-            foreach ($items as $item) {
-                $subtotal += (float)$item['total'];
-            }
-            $est['items'] = $items;
-            $est['subtotal'] = round($subtotal, 2);
+    foreach ($estimates as &$est) {
+        $items = $itemModel->where('estimate_id', $est['estimate_id'])->findAll();
+
+        // Calculate subtotal with 3 decimals
+        $subtotal = '0.000';
+        foreach ($items as $item) {
+            $subtotal = bcadd((string)$subtotal, (string)$item['total'], 3);
         }
 
-        $customer = $customerModel->find($customerId);
-
-        return view('customer_estimates', [
-            'estimates' => $estimates,
-            'customer' => $customer
-        ]);
-
+        $est['items'] = $items;
+        $est['subtotal'] = $subtotal; // 3 decimals, no rounding
     }
+
+    $customer = $customerModel->find($customerId);
+
+    return view('customer_estimates', [
+        'estimates' => $estimates,
+        'customer' => $customer
+    ]);
+}
+
 }

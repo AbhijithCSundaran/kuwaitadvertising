@@ -12,10 +12,10 @@
 
     <div class="row align-items-center mb-2">
         <div class="col-md-6">
-            <h3 class="mb-0">Manage Customers</h3>
+            <h3 class="mb-0">Manage Suppliers</h3>
         </div>
         <div class="col-md-6 text-end">
-            <button class="btn btn-secondary" id="addCustomerBtn">Add New Customer</button>
+            <button class="btn btn-secondary" id="addSupplierBtn">Add New Supplier</button>
         </div>
     </div>
     <hr>
@@ -35,32 +35,28 @@
 </div>
 </div>
 
-<!-- Modal: Add/Edit Customer -->
-<div class="modal fade" id="customerModal" tabindex="-1">
+<!-- Modal: Add/Edit supplier -->
+<div class="modal fade" id="supplierModal" tabindex="-1">
     <div class="modal-dialog">
-        <form id="customerForm">
+        <form id="supplierForm">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="customerModalLabel">Add Customer</h5>
+                    <h5 class="modal-title" id="supplierModalLabel">Add Supplier</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" name="customer_id" id="customer_id">
+                    <input type="hidden" name="supplier_id" id="supplier_id">
                     <div class="mb-3">
-                        <label>Customer Name</label>
+                        <label>Supplier Name</label>
                         <input type="text" name="name" id="name" class="form-control" required style="text-transform: capitalize;">
                     </div>
                     <div class="mb-3">
                         <label>Address</label>
                         <textarea name="address" id="address" class="form-control" required style="text-transform: capitalize;"></textarea>
                     </div>
-                    <div class="mb-3">
-                        <label>Maximum Discount (%)</label>
-                        <input type="number" name="max_discount" id="max_discount" class="form-control" min="0" max="100" step="0.01" placeholder="Enter discount percentage">
-                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" id="saveCustomerBtn" class="btn btn-primary" disabled>Save</button>
+                    <button type="submit" id="saveSupplierBtn" class="btn btn-primary" disabled>Save</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 </div>
             </div>
@@ -76,7 +72,7 @@
                 <h5 class="modal-title">Confirm Delete</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">Are You Sure You Want To Delete This Customer?</div>
+            <div class="modal-body">Are You Sure You Want To Delete This Supplier?</div>
             <div class="modal-footer">
                 <button type="button" id="confirm-delete-btn" class="btn btn-danger">Delete</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -91,7 +87,7 @@
 let table;
 let deleteId = null;
 const alertBox = $('.alert');
-const customerModal = new bootstrap.Modal(document.getElementById('customerModal'));
+const supplierModal = new bootstrap.Modal(document.getElementById('supplierModal'));
 const deleteModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
 
 let originalName = '';
@@ -101,7 +97,7 @@ $(document).ready(function () {
     // Load DataTable
     table = $('#customersTable').DataTable({
         ajax: {
-            url: "<?= base_url('customer/fetch') ?>",
+            url: "<?= base_url('supplier/fetch') ?>",
             type: "POST",
             dataSrc: "data"
         },
@@ -119,7 +115,7 @@ $(document).ready(function () {
                 "<'row'<'col-sm-12'tr>>" +
                 "<'row mt-3'<'col-sm-5'i><'col-sm-7'p>>",
         columns: [
-            { data: "customer_id" },
+            { data: "supplier_id" },
             { data: "slno" },
             {
                 data: "name",
@@ -134,16 +130,13 @@ $(document).ready(function () {
                     }
             },
             {
-                data: "customer_id",
+                data: "supplier_id",
                 render: data => `
                     <div class="d-flex gap-2">
-                        <a href="javascript:void(0);" class="view-estimate" data-id="${data}" title="View Estimates" style="color:green;">
-                            <i class="bi bi-eye-fill"></i>
-                        </a>
-                        <a href="javascript:void(0);" class="edit-customer" data-id="${data}" title="Edit" style="color:rgb(13, 162, 199);">
+                        <a href="javascript:void(0);" class="edit-supplier" data-id="${data}" title="Edit" style="color:rgb(13, 162, 199);">
                             <i class="bi bi-pencil-fill"></i>
                         </a>
-                        <a href="javascript:void(0);" class="delete-customer" data-id="${data}" title="Delete" style="color: #dc3545;">
+                        <a href="javascript:void(0);" class="delete-supplier" data-id="${data}" title="Delete" style="color: #dc3545;">
                             <i class="bi bi-trash-fill"></i>
                         </a>
                     </div>`
@@ -151,36 +144,35 @@ $(document).ready(function () {
         ]
     });
 
-    // Add Customer
-    $('#addCustomerBtn').click(() => {
-        $('#customerForm')[0].reset();
-        $('#customer_id').val('');
-        $('#customerModalLabel').text('Add Customer');
-        $('#saveCustomerBtn').prop('disabled', false);
-        customerModal.show();
+    // Add Supplier
+    $('#addSupplierBtn').click(() => {
+        $('#supplierForm')[0].reset();
+        $('#supplier_id').val('');
+        $('#supplierModalLabel').text('Add Supplier');
+        $('#saveSupplierBtn').prop('disabled', false);
+        supplierModal.show();
 
         originalName = '';
         originalAddress = '';
         originalMaxDiscount = '';
     });
 
-    // Edit Customer
-    $(document).on('click', '.edit-customer', function () {
+    // Edit Supplier
+    $(document).on('click', '.edit-supplier', function () {
         const id = $(this).data('id');
-        $.get("<?= base_url('customer/getCustomer/') ?>" + id, function (data) {
+        $.get("<?= base_url('supplier/getSupplier/') ?>" + id, function (data) {
             if (data.status !== 'error') {
-                $('#customer_id').val(data.customer_id);
+                $('#supplier_id').val(data.supplier_id);
                 $('#name').val(data.name);
                 $('#address').val(data.address);
-                 $('#max_discount').val(data.max_discount || '');
-                $('#customerModalLabel').text('Edit Customer');
+                $('#supplierModalLabel').text('Edit Customer');
 
                 originalName = data.name.trim();
                 originalAddress = data.address.trim();
-                originalMaxDiscount = data.max_discount ? data.max_discount.toString() : '';
+                
 
-                $('#saveCustomerBtn').prop('disabled', true);
-                customerModal.show();
+                $('#saveSupplierBtn').prop('disabled', true);
+                supplierModal.show();
             } else {
                 showAlert('danger', data.message);
             }
@@ -188,23 +180,23 @@ $(document).ready(function () {
     });
 
     // Check if input values changed from original (only in Edit)
-    $('#name, #address, #max_discount').on('input', function () {
-    const isEdit = $('#customer_id').val() !== '';
+    $('#name, #address').on('input', function () {
+    const isEdit = $('#supplier_id').val() !== '';
     if (!isEdit) return;
 
     const currentName = $('#name').val().trim();
     const currentAddress = $('#address').val().trim();
-    const currentMaxDiscount = $('#max_discount').val().trim();
+    
 
     const hasChanged = currentName !== originalName || currentAddress !== originalAddress || currentMaxDiscount !== originalMaxDiscount;
-    $('#saveCustomerBtn').prop('disabled', !hasChanged);
+    $('#saveSupplierBtn').prop('disabled', !hasChanged);
 });
 
 
     // Submit Form
-    $('#customerForm').submit(function (e) {
+    $('#supplierForm').submit(function (e) {
         e.preventDefault();
-        const $btn = $('#saveCustomerBtn');
+        const $btn = $('#saveSupplierBtn');
         $btn.prop('disabled', true);
 
         // Capitalize before sending
@@ -213,11 +205,11 @@ $(document).ready(function () {
         $('#name').val(name);
         $('#address').val(address);
 
-        $.post("<?= base_url('customer/create') ?>", $(this).serialize(), function (res) {
+        $.post("<?= base_url('supplier/create') ?>", $(this).serialize(), function (res) {
             if (res.status === 'success') {
                 showAlert('success', res.message);
                 table.ajax.reload(null, false);
-                customerModal.hide();
+                supplierModal.hide();
             } else {
                 showAlert('danger', res.message);
                 $btn.prop('disabled', false);
@@ -229,20 +221,20 @@ $(document).ready(function () {
     });
 
     // Reset button on modal close
-    $('#customerModal').on('hidden.bs.modal', function () {
-        $('#saveCustomerBtn').prop('disabled', true);
+    $('#supplierModal').on('hidden.bs.modal', function () {
+        $('#saveSupplierBtn').prop('disabled', true);
         originalName = '';
         originalAddress = '';
     });
 
     // View Estimate
     $(document).on('click', '.view-estimate', function () {
-        const customerId = $(this).data('id');
-        window.location.href = "<?= base_url('estimate/customer/') ?>" + customerId;
+        const supplier_id  = $(this).data('id');
+        window.location.href = "<?= base_url('estimate/supplier/') ?>" + supplier_id ;
     });
 
     // Delete
-    $(document).on('click', '.delete-customer', function () {
+    $(document).on('click', '.delete-supplier', function () {
         deleteId = $(this).data('id');
         deleteModal.show();
     });
@@ -250,7 +242,7 @@ $(document).ready(function () {
     $('#confirm-delete-btn').click(function () {
         if (!deleteId) return;
 
-        $.post("<?= base_url('customer/delete') ?>", {
+        $.post("<?= base_url('supplier/delete') ?>", {
             id: deleteId,
             '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
         }, function (res) {

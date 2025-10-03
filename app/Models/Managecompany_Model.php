@@ -6,21 +6,30 @@ use CodeIgniter\Model;
 
 class Managecompany_Model extends Model
 {
-    protected $table = 'company';
-    protected $primaryKey = 'company_id';
-    protected $allowedFields = ['company_name', 'company_name_ar','address', 'address_ar','billing_address','tax_number', 'company_logo', 'email', 'phone','company_status'];
+    protected $table = 'company'; // DB table name
+    protected $primaryKey = 'company_id'; // primary key
+    protected $allowedFields = ['company_name', 'company_name_ar','address', 'address_ar','billing_address','tax_number', 'company_logo', 'email', 'phone','company_status']; // fields allowed for insert/update
 
     
-    
+    /**
+     * Get total count of active companies (company_status = 1) 
+     * @return object Contains property 'totcompanies'
+     */
     public function getAllCompanyCount()
 {
     return $this->db
         ->table($this->table)
-        ->where('company_status', 1)
-        ->selectCount('*', 'totcompanies')
+        ->where('company_status', 1) // only active companies
+        ->selectCount('*', 'totcompanies')  // count all records 
         ->get()
-        ->getRow();
+        ->getRow(); // return single row object
 }    
+
+/**
+     * Get total count of filtered companies based on search
+     * @param string $search Search string
+     * @return object Contains property 'filCompanies'
+     */
       public function getFilteredCompanyCount($search = '')
 {
     $builder = $this->db->table($this->table);

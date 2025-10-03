@@ -145,7 +145,7 @@
       type: "POST",
       dataType: "json",
       success: function (res) {
-        $('#dailyExpense').text('KWD ' + parseFloat(res.total).toFixed(2));
+        $('#dailyExpense').text('KWD ' + parseFloat(res.total).toFixed(3));
       },
       error: function () {
         $('#dailyExpense').text('KWD 0.00');
@@ -159,7 +159,7 @@
       type: "POST",
       dataType: "json",
       success: function (res) {
-        $('#monthlyExpense').text('KWD ' + parseFloat(res.total).toFixed(2));
+        $('#monthlyExpense').text('KWD ' + parseFloat(res.total).toFixed(3));
       },
       error: function () {
         $('#monthlyExpense').text('KWD 0.00');
@@ -173,7 +173,7 @@
       type: "GET",
       dataType: "json",
       success: function (res) {
-        $('#dailyRevenue').text('KWD ' + parseFloat(res.total).toFixed(2));
+        $('#dailyRevenue').text('KWD ' + parseFloat(res.total).toFixed(3));
       },
       error: function () {
         $('#dailyRevenue').text('KWD 0.00');
@@ -187,7 +187,7 @@
       type: "GET",
       dataType: "json",
       success: function (res) {
-        $('#monthlyRevenue').text('KWD ' + parseFloat(res.total).toFixed(2));
+        $('#monthlyRevenue').text('KWD ' + parseFloat(res.total).toFixed(3));
       },
       error: function () {
         $('#monthlyRevenue').text('KWD 0.00');
@@ -210,8 +210,8 @@
                 <td>${formatDate(est.date)}</td>
                 <td>${capitalizeWords(est.customer_name ?? '-')}</td>
                 <td>${capitalizeWords(est.customer_address ?? '-')}</td>
-                <td>${parseFloat(est.sub_total || 0).toFixed(2)} KWD</td>
-                <td>${parseFloat(est.total_amount || 0).toFixed(2)} KWD</td>
+                <td>${parseFloat(est.sub_total || 0).toFixed(3)} KWD</td>
+                <td>${parseFloat(est.total_amount || 0).toFixed(3)} KWD</td>
               </tr>
             `;
           });

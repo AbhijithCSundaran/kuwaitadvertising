@@ -128,6 +128,18 @@ if ($company_id) {
             </a>
           </li>
         <?php endif; ?>
+       
+
+          <?php if (in_array('supplier', $allowedMenus)): ?>
+            <li class="nav-item">
+              <a class="nav-link <?= strpos($currentPath, 'supplier') !== false ? 'active' : '' ?>"
+                href="<?= base_url('supplier/list') ?>">
+                <i class="mdi mdi-truck menu-icon"></i>
+                <span class="menu-title">Supplier List</span>
+              </a>
+            </li>
+          <?php endif; ?>
+
 
         <?php if (in_array('estimatelist', $allowedMenus)): ?>
           <li class="nav-item">
@@ -168,20 +180,23 @@ if ($company_id) {
         <?php endif; ?>
 
         <?php if (in_array('reports', $allowedMenus)): ?>
-          <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
-              <i class="mdi mdi-clipboard menu-icon"></i>
-              <span class="menu-title">Reports</span>
-            </a>
-            <div class="collapse" id="auth">
-              <ul class="nav flex-column sub-menu">
-                <li class="nav-item"><a class="nav-link" href="<?= base_url('expense/report') ?>">Expense Report</a></li>
-                <li class="nav-item"><a class="nav-link" href="<?= base_url('invoice/report') ?>">Sales Report</a></li>
-                <li class="nav-item"><a class="nav-link" href="<?= base_url('companyledger') ?>">Company Ledger</a></li>
-              </ul>
-            </div>
-          </li>
-        <?php endif; ?>
+  <li class="nav-item">
+    <a class="nav-link" data-bs-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
+      <i class="mdi mdi-clipboard menu-icon"></i>
+      <span class="menu-title">Reports</span>
+    </a>
+    <div class="collapse" id="auth">
+      <ul class="nav flex-column sub-menu">
+        <li class="nav-item"><a class="nav-link" href="<?= base_url('expense/report') ?>">Expense Report</a></li>
+        <li class="nav-item"><a class="nav-link" href="<?= base_url('invoice/report') ?>">Sales Report</a></li>
+        <li class="nav-item"><a class="nav-link" href="<?= base_url('companyledger') ?>">Company Ledger</a></li>
+        <li class="nav-item"><a class="nav-link" href="<?= base_url('customerreport') ?>">Customer Report</a></li> <!-- ✅ new link -->
+      </ul>
+    </div>
+  </li>
+<?php endif; ?>
+
+
         <li class="nav-item">
           <a href="#" id="logoutLink" class="nav-link">
             <i class="mdi mdi-logout menu-icon"></i>

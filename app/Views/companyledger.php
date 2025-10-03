@@ -1,5 +1,8 @@
 <?php include "common/header.php"; ?>
 <style>
+      .input-group-text {
+    color: #000 !important;
+}
     #plainExpenseTable th,
     #plainExpenseTable td {
         vertical-align: middle;
@@ -8,41 +11,62 @@
     }
 
     #plainExpenseTable th:nth-child(1),
-    #plainExpenseTable td:nth-child(1) {
+    {
         width: 10%;
         text-align: center;
     }
 
+    #plainExpenseTable td:nth-child(1) {
+        text-align: left !important;
+    }
+
     #plainExpenseTable th:nth-child(2),
-    #plainExpenseTable td:nth-child(2) {
+     {
         width: 15%;
          text-align: center !important;
     }
-
+    #plainExpenseTable td:nth-child(2){
+        text-align: left !important;
+    }
     #plainExpenseTable th:nth-child(3),
-    #plainExpenseTable td:nth-child(3) {
+    {
         width: 15% !important;
         text-align: center !important;
+    }
+    #plainExpenseTable td:nth-child(3){
+        text-align: left !important;
     }
      #plainExpenseTable th:nth-child(4),
-    #plainExpenseTable td:nth-child(4) {
+     {
         width: 15% !important;
         text-align: center !important;
+    }
+    #plainExpenseTable td:nth-child(4){
+         text-align: left !important;
     }
     #plainExpenseTable th:nth-child(5),
-    #plainExpenseTable td:nth-child(5) {
+    {
         width: 15% !important;
         text-align: center !important;
+    }
+    #plainExpenseTable td:nth-child(5){
+        text-align: left !important;
     }
     #plainExpenseTable th:nth-child(6),
-    #plainExpenseTable td:nth-child(6) {
+    {
         width: 15% !important;
         text-align: center !important;
     }
+    #plainExpenseTable td:nth-child(6) {
+         text-align: left !important;
+    }
     #plainExpenseTable th:nth-child(7),
-    #plainExpenseTable td:nth-child(7) {
+    {
         width: 15% !important;
         text-align: center !important;
+    }
+    #plainExpenseTable td:nth-child(7){
+        text-align: left !important;
     }
 
 .bg-success {
@@ -109,11 +133,15 @@
         </thead>
         <tbody></tbody>
         <tfoot>
-            <tr>
-                <th colspan="4" class="text-end">Total:</th>
-                <th id="totalAmount">₹0.00</th>
-            </tr>
-        </tfoot>
+    <tr>
+        <th colspan="3" class="text-end">Total:</th>
+        <th id="totalAmount">₹0.000</th>
+        <th id="totalPaid">₹0.000</th>
+        <th id="totalBalance">₹0.000</th>
+        <th colspan="2"></th>
+    </tr>
+</tfoot>
+
     </table>
 </div>
 </div>
@@ -143,12 +171,14 @@ $(document).ready(function () {
         const from = $('#fromDate').val();
         const to = $('#toDate').val();
         const month = $('#filterMonth').val();
-        const year = $('#filterYear').val();
+const year = $('#filterYear').val();
 
-        if (month && !year) {
-            showAlert('danger', 'Select Both Month And Year.');
-            return;
-        }
+// Check if only one of month/year is selected
+if ((month && !year) || (!month && year)) {
+    showAlert('danger', 'Select Both Month And Year.');
+    return;
+}
+
 
         if ((from && !to) || (!from && to)) {
             showAlert('danger', 'Please Select Both From and To dates For Report.');
@@ -168,14 +198,19 @@ $(document).ready(function () {
 
                 const res = response.data;
                 let rows = '';
-                let total = 0;
+                let totalAmountSum = 0;
+                let totalPaidSum = 0;
+                let totalBalanceSum = 0;
 
                 if (res.length > 0) {
                     res.forEach((invoice, index) => {
                         const totalAmount = parseFloat(invoice.total_amount) || 0;
                         const paidAmount = parseFloat(invoice.paid_amount) || 0;
                         const balanceAmount = totalAmount - paidAmount;
-                        total += totalAmount;
+
+                        totalAmountSum += totalAmount;
+                        totalPaidSum += paidAmount;
+                        totalBalanceSum += balanceAmount;
 
                         // Payment mode formatting
                         const paymentMode = invoice.payment_mode 
@@ -197,9 +232,9 @@ $(document).ready(function () {
                                 <td class="text-center">${index + 1}</td>
                                 <td>${formatDate(invoice.invoice_date)}</td>
                                 <td>${invoice.customer_name}</td>
-                                <td class="text-end">₹${totalAmount.toFixed(2)}</td>
-                                <td class="text-end">₹${paidAmount.toFixed(2)}</td>
-                                <td class="text-end">₹${balanceAmount.toFixed(2)}</td>
+                                <td class="text-end">₹${totalAmount.toFixed(3)}</td>
+                                <td class="text-end">₹${paidAmount.toFixed(3)}</td>
+                                <td class="text-end">₹${balanceAmount.toFixed(3)}</td>
                                 <td class="text-center">${paymentMode}</td>
                                 <td class="text-center">${statusBadge}</td>
                             </tr>
@@ -210,7 +245,11 @@ $(document).ready(function () {
                 }
 
                 $('#plainExpenseTable tbody').html(rows);
-                $('#totalAmount').text('₹' + total.toFixed(2));
+
+                // Update totals in footer
+                $('#totalAmount').text('₹' + totalAmountSum.toFixed(3));
+                $('#totalPaid').text('₹' + totalPaidSum.toFixed(3));
+                $('#totalBalance').text('₹' + totalBalanceSum.toFixed(3));
             }
         });
     }
@@ -247,5 +286,6 @@ $(document).ready(function () {
     loadPaidInvoices();
 });
 </script>
+
 
 <!-- <td>${invoice.invoice_id}</td> -->

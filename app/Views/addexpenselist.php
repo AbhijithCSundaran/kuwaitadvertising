@@ -16,8 +16,8 @@
                 <tr>
                     <th>Sl No</th>
                     <th>Date</th>
+                    <th>Suppliers</th>
                     <th>Particular</th>
-                    <th>Customer</th>
                     <th>Amount</th>
                     <th>Payment Mode</th>
                     <th>Action</th>
@@ -76,18 +76,34 @@
                     data: "date" ,
                 },
                 {
+                    data:"supplier_name",
+                    render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''
+                },
+                {
                     data: "particular",
                     render: function (data) {
                         return data.replace(/\b\w/g, c => c.toUpperCase());
                     }
                 },
+                
+
+
                 {
-                    data:"customer_name",
-                     render: data => data ? data.replace(/\b\w/g, c => c.toUpperCase()) : ''
-                },
-
-                { data: "amount"},
-
+    data: "amount",
+    render: function (data) {
+        if (data === null || data === '') return '0.000';
+        let str = data.toString();
+        // ensure at least 3 decimal places without rounding
+        if (str.indexOf('.') === -1) {
+            str += '.000';
+        } else {
+            let parts = str.split('.');
+            parts[1] = (parts[1] + '000').slice(0, 3); 
+            str = parts[0] + '.' + parts[1];
+        }
+        return str;
+    }
+},
                 {
                     data: "payment_mode",
                     render: function (data) {
@@ -112,9 +128,9 @@
             ],
            columnDefs: [
                 { searchable: false, orderable: false, targets: [0,4,6,] }, 
-                { targets: 2, width: '300px' }
+                { targets: 3, width: '300px' }
             ],
-            order: [[1, 'desc'], [0, 'desc']], 
+            order: [[1, 'desc']], 
              language: {
         infoFiltered: "" 
     }

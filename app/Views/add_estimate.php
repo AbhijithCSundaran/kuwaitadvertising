@@ -116,7 +116,7 @@
                                 <tr class="item-row">
                                     <td><input type="text" name="description[]" class="form-control"
                                             value="<?= $item['description'] ?>"></td>
-                                    <td><input type="number" class="form-control price" step="0.01" min="0" inputmode="decimal" name="price[]" value="<?= $item['price'] ?>">
+                                    <td><input type="number" class="form-control price" step="0.001" min="0" inputmode="decimal" name="price[]" value="<?= $item['price'] ?>">
                             </td>
                                     <td><input type="number" name="quantity[]" class="form-control quantity"
                                             value="<?= $item['quantity'] ?>"></td>
@@ -132,7 +132,7 @@
                         <?php else: ?>
                             <tr class="item-row">
                                 <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
-                                <td><input type="number" name="price[]" class="form-control price" step="0.01" min="0" inputmode="decimal"></td>
+                                <td><input type="number" name="price[]" class="form-control price" step="0.001" min="0" inputmode="decimal"></td>
                                 <td><input type="number" name="quantity[]" class="form-control quantity"></td>
                                 <td><input type="number" name="total[]" class="form-control total" readonly></td>
                                 <td class="text-center">
@@ -149,7 +149,7 @@
             <table class="table totals">
                 <tr>
                     <td><strong>Sub Total:</strong></td>
-                    <td><span id="sub_total_display">0.00</span> KWD</td>
+                    <td><span id="sub_total_display">0.000</span> KWD</td>
                 </tr>
                 <tr>
                     <td><strong>Discount:</strong></td>
@@ -161,7 +161,7 @@
                 </tr>
                 <tr>
                     <td><strong>Total:</strong></td>
-                    <td><strong><span id="total_display">0.00</span> KWD</strong></td>
+                    <td><strong><span id="total_display">0.000</span> KWD</strong></td>
                 </tr>
             </table>
             <input type="hidden" id="estimate_id" value="<?= $estimate['estimate_id'] ?? '' ?>">
@@ -254,7 +254,7 @@
             let input = this;
             let val = input.value;
             if (val === '' || val === '.') return;
-            let match = val.match(/^(\d{0,8})(\.(\d{0,2})?)?/);
+            let match = val.match(/^(\d{0,8})(\.(\d{0,3})?)?/);
             if (match) {
                 let newVal = (match[1] || '') + (match[2] || '');
                 if (newVal !== val) {
@@ -273,20 +273,23 @@
         });
 
         function calculateTotals() {
-            let subtotal = 0;
-            $('.item-row').each(function () {
-                let qty = parseFloat($(this).find('.quantity').val()) || 0;
-                let price = parseFloat($(this).find('.price').val()) || 0;
-                let total = qty * price;
-                $(this).find('.total').val(total.toFixed(2));
-                subtotal += total;
-            });
-            $('#sub_total_display').text(subtotal.toFixed(2));
-            let discount = parseFloat($('#discount').val()) || 0;
-            let discountAmt = (subtotal * discount) / 100;
-            let total = subtotal - discountAmt;
-            $('#total_display').text(total.toFixed(2));
-        }
+    let subtotal = 0;
+    $('.item-row').each(function () {
+        let qty = parseFloat($(this).find('.quantity').val()) || 0;
+        let price = parseFloat($(this).find('.price').val()) || 0;
+        let total = Number((qty * price).toFixed(3)); // fix decimals here
+        $(this).find('.total').val(total.toFixed(3));
+        subtotal = Number((subtotal + total).toFixed(3)); // accumulate with 3 decimals
+    });
+
+    $('#sub_total_display').text(subtotal.toFixed(3));
+
+    let discount = parseFloat($('#discount').val()) || 0;
+    let discountAmt = Number(((subtotal * discount) / 100).toFixed(3));
+    let finalTotal = Number((subtotal - discountAmt).toFixed(3));
+    $('#total_display').text(finalTotal.toFixed(3));
+}
+
 
         $('#add-item').click(function () {
             const newRow = $(` 
@@ -349,62 +352,6 @@
                 }
             });
         });
-
-        // $('#customerForm').submit(function (e) {
-        //     e.preventDefault();
-        //     let name = $('#popup_name').val().trim();
-        //     let address = $('#popup_address').val().trim();
-        //     let max_discount = $('#max_discount').val().trim();
-        //     name = name.replace(/\b\w/g, char => char.toUpperCase());
-        //     address = address.replace(/(^\s*\w|[.!?]\s*\w)/g, char => char.toUpperCase());
-
-
-        //     if (!name || !address) {
-        //         $('#customerError').removeClass('d-none').text('Please Enter Valid Name And Address');
-        //         return;
-        //     }
-
-        //     $.ajax({
-        //         url: "<?= site_url('customer/create') ?>",
-        //         type: "POST",
-        //         data: { name, address, max_discount },
-        //         dataType: "json",
-        //         success: function (res) {
-        //             if (res.status === 'success') {
-        //                 const newOption = new Option(res.customer.name, res.customer.customer_id, true, true);
-        //                 $('#customer_id').append(newOption).trigger('change');
-        //                 $('#popup_name').val('');
-        //                 $('#popup_address').val('');
-        //                 $('#max_discount').val(''); 
-        //                 $('#customerModal').modal('hide');
-        //                 $('.alert')
-        //                     .removeClass('d-none alert-danger')
-        //                     .addClass('alert-success')
-        //                     .text('Customer Created Successfully.')
-        //                     .fadeIn()
-        //                     .delay(3000)
-        //                     .fadeOut();
-        //             } else {
-        //                 $('.alert')
-        //                     .removeClass('d-none alert-success')
-        //                     .addClass('alert-danger')
-        //                     .text(res.message || 'Failed To Create Customer.')
-        //                     .fadeIn()
-        //                     .delay(3000)
-        //                     .fadeOut();
-        //             }
-        //         },
-        //         error: function () {
-        //             $('.alert')
-        //                 .removeClass('d-none alert-success')
-        //                 .addClass('alert-danger')
-        //                 .text('Server Error Occurred While Creating Customer.')
-        //                 .fadeIn()
-        //                 .delay(3000)
-        //                 .fadeOut();
-        //         }
-        //     });
-        // });
 
         const saveCustomerBtn = $('#saveCustomerBtn');
 

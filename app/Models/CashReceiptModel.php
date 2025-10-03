@@ -26,11 +26,11 @@ class CashReceiptModel extends Model
             $searchWithUnderscore = str_replace(' ', '_', $search);
 
             $builder->groupStart()
-                // ✅ Customer name search (ignore spaces)
+                //  Customer name search (ignore spaces)
                 ->where("REPLACE(LOWER(c.name),' ','') LIKE '%{$searchNoSpace}%'", null, false)
-                // ✅ Status search
+                //  Status search
                 ->orWhere("LOWER(i.status) LIKE '%{$search}%'", null, false)
-                // ✅ Payment mode search (matches: bank link, bank_link, banklink)
+                //  Payment mode search (matches: bank link, bank_link, banklink)
                 ->orWhere("LOWER(i.payment_mode) LIKE '%{$searchWithUnderscore}%'", null, false)
                 ->orWhere("REPLACE(LOWER(i.payment_mode),'_','') LIKE '%{$searchNoSpace}%'", null, false)
             ->groupEnd();

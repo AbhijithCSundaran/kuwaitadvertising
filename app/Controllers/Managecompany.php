@@ -8,61 +8,68 @@ use CodeIgniter\Exceptions\PageNotFoundException;
 
 class Managecompany extends BaseController
 {
-	protected $companyModel;
+	protected $companyModel; // instance of Managecompany_Model
 
 	public function __construct()
 	{
-		$this->companyModel = new Managecompany_Model();
+		$this->companyModel = new Managecompany_Model(); // initialize company model
 		$session = \Config\Services::session();
-		if (!$session->get('logged_in')) {
-			header('Location: ' . base_url('/'));
+		if (!$session->get('logged_in')) {  // check if user is logged in
+			header('Location: ' . base_url('/')); // redirect to login/home
 			exit;
 		}
 	}
 
 	public function index()
 	{
-		return view('addcompany');
+		return view('addcompany'); // load company add/edit main page
 	}
 
+	  // Load add or edit company page with optional $id for edit
 	public function add($id = null)
 	{
 		$data = [];
 
 		if ($id) {
-			$company = $this->companyModel->find($id);
+			$company = $this->companyModel->find($id); // get company data by ID
+
 			if (!$company) {
 				throw PageNotFoundException::forPageNotFound('Company Not Found.');
 			}
 			$data['selectedCompany'] = $company;
 		}
-		return view('addcompany', $data);
+		return view('addcompany', $data);  // pass company data to view
 	}
 
+	// Handle saving company data (add or edit)
 	public function save()
 	{
 		helper(['form']);
-		$validation = \Config\Services::validation();
+		$validation = \Config\Services::validation();  // validation service
 
-		$uid = $this->request->getPost('uid');
-		$logoFile = $this->request->getFile('company_logo');
-
-		$rules = [
+		$uid = $this->request->getPost('uid');  // company ID (for edit)
+		$logoFile = $this->request->getFile('company_logo'); // uploaded logo file
+ 		 
+		// validation rules
+		
+		 $rules = [
 			'company_name' => 'required',
 			'address' => 'permit_empty',
 			'tax_number' => 'permit_empty',
 			'email' => 'permit_empty|valid_email',
 			'phone' => 'required',
 		];
-
+      
+		// logo validation for new/add vs edit
 		if (!$uid) {
 			$rules['company_logo'] = 'uploaded[company_logo]|is_image[company_logo]|mime_in[company_logo,image/jpg,image/jpeg,image/png,image/gif]';
-		} else {
+		} else { // editing existing
 			if ($logoFile && $logoFile->isValid() && !$logoFile->hasMoved()) {
 				$rules['company_logo'] = 'is_image[company_logo]|mime_in[company_logo,image/jpg,image/jpeg,image/png,image/gif]';
 			}
 		}
-
+        
+		// validate input
 		if (!$this->validate($rules)) {
 			return $this->response->setJSON([
 				'status' => 'error',
@@ -70,12 +77,13 @@ class Managecompany extends BaseController
 			]);
 		}
 
-		$logoName = null;
+		$logoName = null;  // initialize logo file name
 		if ($logoFile && $logoFile->isValid() && !$logoFile->hasMoved()) {
-			$logoName = $logoFile->getRandomName();
-			$logoFile->move(ROOTPATH . 'public/uploads', $logoName);
+			$logoName = $logoFile->getRandomName(); // generate random file name
+			$logoFile->move(ROOTPATH . 'public/uploads', $logoName); // move file to uploads
 		}
-
+        
+		// prepare data array for DB
 		$rawAddress = trim($this->request->getPost('address'));
 		$newData = [
 			'company_name' => $this->request->getPost('company_name'),
@@ -86,8 +94,8 @@ class Managecompany extends BaseController
 			'phone' => $this->request->getPost('phone'),
 		];
 
-
-		if ($uid) {
+        
+		if ($uid) { // update existing company
 			$existing = $this->companyModel->find($uid);
 			if (!$existing) {
 				return $this->response->setJSON([
@@ -96,6 +104,7 @@ class Managecompany extends BaseController
 				]);
 			}
 
+            // check duplicate company name and tax number
 			$duplicate = $this->companyModel
 				->where('company_name', $newData['company_name'])
 				->where('company_id !=', $uid);
@@ -118,13 +127,14 @@ class Managecompany extends BaseController
 				return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid Phone Number']);
 			}
 
-
+			// if logo uploaded, replace existing logo
 			if ($logoName) {
 				$newData['company_logo'] = $logoName;
 			} else {
 				$newData['company_logo'] = $existing['company_logo'];
 			}
 
+			// check if any changes made
 			$hasChanges = (
 				$newData['company_name'] !== $existing['company_name'] ||
 				$newData['address'] !== $existing['address'] ||
@@ -142,14 +152,14 @@ class Managecompany extends BaseController
 				]);
 			}
 
-
+			// delete old logo file
 			if ($logoName && !empty($existing['company_logo']) && file_exists(ROOTPATH . 'public/uploads/' . $existing['company_logo'])) {
 				unlink(ROOTPATH . 'public/uploads/' . $existing['company_logo']);
 			}
 
 			$this->companyModel->update($uid, $newData);
 			return $this->response->setJSON(['status' => 'success', 'message' => 'Company Updated Successfully']);
-		} else {
+		} else {  // insert new company
 
 
 			$existing = $this->companyModel
@@ -182,19 +192,19 @@ class Managecompany extends BaseController
 
 	public function companyList()
 	{
-		$data['companies'] = $this->companyModel->findAll();
+		$data['companies'] = $this->companyModel->findAll(); // get all companies
 		return view('companylist', $data);
 	}
 
 	public function getCompany($id)
 	{
 		$company = $this->companyModel->find($id);
-		return $this->response->setJSON($company);
+		return $this->response->setJSON($company); // fetch company by ID
 	}
 
 	public function delete()
 	{
-		$id = $this->request->getPost('id');
+		$id = $this->request->getPost('id'); // company ID
 
 		if (!$id) {
 			return $this->response->setJSON([

@@ -18,7 +18,7 @@
                 <th>Role Name</th>
                 <th>Permissions</th>
                 <th style="width: 110px;">Created Date</th>
-                <th  style="width: 110px;">Updated Date</th>
+                <th  style="width: 110px;">Last Updated On</th>
                 <th style="width: 160px;">Action</th>
                 <th class="d-none">ID</th>
             </tr>

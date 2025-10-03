@@ -2,12 +2,23 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <style>
+        .-success{
+            background-color:#198754; !important;
+        }
+        
         #salesTable th,
         #salesTable td{
             vertical-align: middle;
             padding: 14px 25px;
             font-size: 15px;
         }
+        .input-group-text {
+    color: #000 !important;
+}
+.bg-success {
+    background-color: #28a745!important;
+    color: #ffffff !important;
+}
     </style>
 <div class="form-control mb-3 right_container">
     <div class="alert d-none text-center position-fixed" role="alert"></div>
@@ -71,7 +82,7 @@
                     <td><?= $i + 1 ?></td>
                     <td><?= date('d/m/Y', strtotime($sale['invoice_date'])) ?></td>
                     <td><?= esc($sale['customer_name']) ?></td>
-                    <td><?= number_format($sale['total_amount'], 2) ?> KWD</td>
+                    <td><?= number_format($sale['total_amount'], 3) ?> KWD</td>
                     <td>
                         <?php if ($sale['status'] === 'paid'): ?>
                             <span class="badge bg-success">Paid</span>
@@ -90,7 +101,7 @@
         <tfoot>
             <tr>
                 <th colspan="3" class="text-end">Grand Total:</th>
-                <th id="totalAmount">0.00 KWD</th>
+                <th id="totalAmount">0.000 KWD</th>
                 <th></th>
             </tr>
         </tfoot>
@@ -154,7 +165,7 @@
                                 <td>${index + 1}</td>
                                 <td>${formatDate(item.invoice_date)}</td>
                                 <td>${item.customer_name}</td>
-                                <td>${totalAmount.toFixed(2)} KWD</td>
+                                <td>${totalAmount.toFixed(3)} KWD</td>
                                 <td><span class="badge ${badgeClass}">${statusLabel}</span></td>
                             </tr>
                         `;
@@ -164,12 +175,12 @@
                 }
 
                 $('#salesTable tbody').html(rows);
-                $('#totalAmount').text(`${grandTotal.toFixed(2)} KWD`);
+                $('#totalAmount').text(`${grandTotal.toFixed(3)} KWD`);
             },
             error: function (xhr, status, error) {
                 console.error("AJAX error:", status, error);
                 $('#salesTable tbody').html('<tr><td colspan="5" class="text-center text-danger">Error loading data.</td></tr>');
-                $('#totalAmount').text(`0.00 KWD`);
+                $('#totalAmount').text(`0.000 KWD`);
             }
         });
     }

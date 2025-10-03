@@ -53,7 +53,7 @@
                 <th>Customer</th>
                 <th>Address</th>
                 <th>Subtotal</th>
-                <th>Discount(%)</th>
+                <th>Discount</th>
                 <th>Total(KWD)</th>
                 <th>Date</th>
                 <th>Status</th>
@@ -120,11 +120,12 @@ $(document).ready(function () {
                     }
             },
             {
-                 data: "subtotal",
-                    render: function(data, type, row) {
-                        return data ? data + ' KWD' : '0.00 KWD';
-                    }
-            },
+    data: "subtotal",
+    render: function(data, type, row) {
+        return data ? parseFloat(data).toFixed(3) + ' KWD' : '0.000 KWD';
+    }
+},
+
             {
                 data: 'discount',
                 render: function (data) {
@@ -133,7 +134,7 @@ $(document).ready(function () {
             },
             {
                 data: "total_amount",
-                render: data => parseFloat(data).toFixed(2) + " KWD"
+                render: data => parseFloat(data).toFixed(3) + " KWD"
             },
             { data: 'invoice_date' },
             {
@@ -190,7 +191,7 @@ $(document).ready(function () {
             { data: "invoice_id", visible: false } 
         ],
         columnDefs: [
-            { targets: 2, width: '350px' },
+            { targets: 2, width: '250px' },
             { searchable: false, orderable: false, targets: [0,4,8] }
         ]
     });
@@ -239,6 +240,7 @@ function showEditAlert() {
         alertBox.classList.add('d-none');
     }, 3000);
 }
+
 
 });
 </script>

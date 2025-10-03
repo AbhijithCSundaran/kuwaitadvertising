@@ -94,11 +94,17 @@
 
     table,
     th,
-    td {
+     {
       border: 1px solid black;
     }
 
-    table.min_height {
+    /* table.min_height {
+      min-height: 350px;
+    } */
+table.min_height {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
       min-height: 350px;
     }
 
@@ -116,7 +122,20 @@
     tbody tr:last-child td {
       border-bottom: 1px solid black;
     }
+/* Remove inner cell borders inside tbody */
+tbody td {
+  border-top: none !important;
+  border-bottom: none !important;
+  border-left: 1px solid #000;
+  border-right: 1px solid #000;
+}
 
+
+
+/* Ensure the last row still has a bottom border */
+tbody tr:last-child {
+  border-bottom: 1px solid #000;
+}
     th {
       background-color: #cfc7c7ff;
       text-align: center;
@@ -187,6 +206,7 @@
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
+      
 
       .no-print,
       .header,
@@ -316,7 +336,7 @@
             <div>
     <label style="font-weight: bold; margin-right: 4px;">Invoice No :</label>
     <span style="display: inline-block; width: 87px; height: 23px; line-height: 23px; text-align: left; color: black;">
-      <?= esc($invoice['invoice_id']) ?>
+      <?= esc($invoice['invoice_no']) ?>
     </span>
   </div>
 
@@ -346,14 +366,14 @@
         </div>
 
         <!-- Invoice Table -->
-        <table class="min_height" style="width:100%; border-collapse: collapse; font-size: 14px;">
+        <table class="min_height">
     <thead>
       <tr>
         <th style="width: 10%; border: 1px solid #000; padding: 8px;">SR. NO</th>
-        <th style="width: 37%; border: 1px solid #000; padding: 8px; text-align: left;">DESCRIPTION</th>
-        <th style="width: 10%; border: 1px solid #000; padding: 8px;">Unit</th>
+        <th style="width: 37%; border: 1px solid #000; padding: 8px;">DESCRIPTION</th>
+        <th style="width: 14%; border: 1px solid #000; padding: 8px;">Unit</th>
         <th style="width: 10%; border: 1px solid #000; padding: 8px;">Qty</th>
-        <th style="width: 33%; border: 1px solid #000; padding: 8px;">LOCATION</th>
+        <th style="width: 29%; border: 1px solid #000; padding: 8px;">LOCATION</th>
       </tr>
     </thead>
     <tbody>
@@ -362,11 +382,11 @@
       foreach ($items as $item):
       ?>
         <tr>
-          <td style="border: 1px solid #000; padding: 8px; text-align: center;"><?= $i++ ?></td>
-          <td style="border: 1px solid #000; padding: 8px; text-align: left;"><?= esc($item['item_name'] ?? '-') ?></td>
-          <td style="border: 1px solid #000; padding: 8px; text-align: center;"><?= number_format($item['price'], 2) ?></td>
-          <td style="border: 1px solid #000; padding: 8px; text-align: center;"><?= esc($item['quantity']) ?></td>
-          <td style="border: 1px solid #000; padding: 8px; text-align: left;">--</td>
+          <td style="border: 1px solid #000;  text-align: center;"><?= $i++ ?></td>
+          <td style="border: 1px solid #000; text-align: left;"><?= esc($item['item_name'] ?? '-') ?></td>
+          <td style="border: 1px solid #000; text-align: center;"><?= number_format($item['price'], 2) ?></td>
+          <td style="border: 1px solid #000; text-align: center;"><?= esc($item['quantity']) ?></td>
+          <td style="border: 1px solid #000; text-align: left;">--</td>
         </tr>
       <?php endforeach; ?>
     </tbody>
@@ -414,17 +434,27 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
   function downloadPDF() {
-    const element = document.querySelector('.invoice-container');
+    const element = document.querySelector('.outer-container');
+
+    // Clone the element so we can modify it without affecting the page
+    const clone = element.cloneNode(true);
+
+    // Remove buttons in the clone only
+    clone.querySelectorAll('.no-print').forEach(el => el.remove());
+
     const opt = {
-      margin: [0.5, 0.5, 0.5, 0.5],
-      filename: 'DeliveryNote-<?= $invoice['invoice_id'] ?>.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+        margin: [0.5, 0.5, 0.5, 0.5],
+        filename: 'DeliveryNote-<?= $invoice['invoice_id'] ?>.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
     };
 
-    html2pdf().set(opt).from(element).save();
-  }
+    // Generate PDF from the clone
+    html2pdf().set(opt).from(clone).save();
+}
+
 
   function formatDateToDDMMYYYY(date) {
     const d = new Date(date);

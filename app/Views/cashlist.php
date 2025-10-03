@@ -102,9 +102,9 @@ $(document).ready(function () {
             { data: 'slno' },
             { data: 'customer_name' },
             { data: 'payment_date' },
-            { data: 'amount', render: data => parseFloat(data).toFixed(2) },
-            { data: 'paid_amount', render: data => parseFloat(data).toFixed(2) },
-            { data: 'balance_amount', render: data => parseFloat(data).toFixed(2) },
+            { data: 'amount', render: data => parseFloat(data).toFixed(3) },
+            { data: 'paid_amount', render: data => parseFloat(data).toFixed(3) },
+            { data: 'balance_amount', render: data => parseFloat(data).toFixed(3) },
             {
                 data: 'payment_status',
                 render: function(data) {

@@ -1,5 +1,8 @@
 <?php include "common/header.php"; ?>
 <style>
+    .input-group-text {
+    color: #000 !important;
+}
     #plainExpenseTable th,
     #plainExpenseTable td {
         vertical-align: middle;
@@ -10,7 +13,7 @@
     #plainExpenseTable th:nth-child(1),
     #plainExpenseTable td:nth-child(1) {
         width: 10%;
-        text-align: center;
+        text-align: left;
     }
 
     #plainExpenseTable th:nth-child(2),
@@ -32,7 +35,10 @@
     .filter_item {
         width: 50%;
     }
-    
+   table#plainExpenseTable tbody tr td {
+    text-align: left !important;
+}
+
 </style>
 
 <div class="form-control mb-3 right_container">
@@ -88,7 +94,7 @@
         <tfoot>
             <tr>
                 <th colspan="4" class="text-end">Total:</th>
-                <th id="totalAmount">₹0.00</th>
+                <th id="totalAmount">₹0.000</th>
             </tr>
         </tfoot>
     </table>
@@ -164,7 +170,7 @@
                                     <td>${formatDate(item.date)}</td>
                                     <td>${capitalizeFirst(item.particular)}</td>
                                     <td>${capitalizeFirst(item.payment_mode)}</td>
-                                    <td>₹${parseFloat(item.amount).toFixed(2)}</td>
+                                    <td>₹${parseFloat(item.amount).toFixed(3)}</td>
                                 </tr>
                             `;
                         });
@@ -173,7 +179,7 @@
                     }
 
                     $('#plainExpenseTable tbody').html(rows);
-                    $('#totalAmount').text('₹' + total.toFixed(2));
+                    $('#totalAmount').text('₹' + total.toFixed(3));
                 }
             });
         }
