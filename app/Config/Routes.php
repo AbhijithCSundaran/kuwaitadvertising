@@ -22,21 +22,21 @@ $routes->post('manageuser/save', 'Manageuser::save');
 $routes->get('manageuser/getUser/(:num)', 'Manageuser::getUser/$1');
 $routes->post('manageuser/delete', 'Manageuser::delete');
 $routes->post('manageuser/userlist', 'Manageuser::userlist');
-// $routes->get('adduserlist', 'Manageuser::add'); 
 
 
 
 
-$routes->get('managecompany', 'Managecompany::index'); 
-$routes->post('managecompany/save', 'Managecompany::save'); 
-$routes->get('managecompany/list', 'Managecompany::companyList');
-$routes->get('companylist', 'Managecompany::companyList'); 
-$routes->get('managecompany/getCompany/(:num)', 'Managecompany::getCompany/$1');
-$routes->get('addcompany', 'Managecompany::add');           
-$routes->get('addcompany/(:num)', 'Managecompany::add/$1');  
-$routes->post('managecompany/delete', 'Managecompany::delete');
-$routes->get('managecompany/getAllCompanies', 'Managecompany::getAllCompanies'); 
-$routes->post('managecompany/companylistjson', 'Managecompany::companylistjson');
+
+$routes->get('managecompany', 'Managecompany::index'); // load company management main page
+$routes->post('managecompany/save', 'Managecompany::save');  // save (add/update) company
+$routes->get('managecompany/list', 'Managecompany::companyList');// show company list page
+$routes->get('companylist', 'Managecompany::companyList'); // alias for company list
+$routes->get('managecompany/getCompany/(:num)', 'Managecompany::getCompany/$1');  // get company details by ID
+$routes->get('addcompany', 'Managecompany::add'); // load add company form          
+$routes->get('addcompany/(:num)', 'Managecompany::add/$1');  // load edit form by company ID
+$routes->post('managecompany/delete', 'Managecompany::delete'); // delete company by ID
+$routes->get('managecompany/getAllCompanies', 'Managecompany::getAllCompanies'); // fetch all companies (JSON)
+$routes->post('managecompany/companylistjson', 'Managecompany::companylistjson'); // datatable AJAX company list
 
 
 
@@ -112,6 +112,25 @@ $routes->get('customer/getCustomer/(:num)', 'Customer::getCustomer/$1');
 $routes->get('estimate/customer/(:num)', 'Estimate::viewByCustomer/$1');
 $routes->get('customer', 'Customer::index'); 
 $routes->get('customer/get_discount/(:num)', 'Customer::get_discount/$1');
+
+
+$routes->get('customerreport', 'CustomerReport::index');
+// In app/Config/Routes.php
+$routes->post('customerreport/getReport', 'CustomerReport::getReport');
+
+
+
+
+
+$routes->get('supplier/list', 'Supplier::list');
+$routes->post('supplier/fetch', 'Supplier::fetch');
+$routes->post('supplier/create', 'Supplier::create');
+$routes->post('supplier/delete', 'Supplier::delete');
+$routes->post('supplier/get_address', 'Supplier::get_address');
+$routes->get('supplier/edit/(:num)', 'Supplier::edit/$1'); 
+$routes->get('supplier/getSupplier/(:num)', 'Supplier::getSupplier/$1');
+$routes->get('supplier', 'Supplier::index'); 
+
 
 
 

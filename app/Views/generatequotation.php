@@ -197,20 +197,21 @@
           </thead>
           <tbody>
             <?php
-            $si = 1;
-            $grandTotal = 0;
-            $itemCount = count($items);
-            foreach ($items as $item):
-              $grandTotal += $item['total'];
-              ?>
-              <tr>
-                <td><?= $si++ ?></td>
-                <td><?= esc($item['description']) ?></td>
-                <td><?= esc($item['quantity']) ?></td>
-                <td><?= number_format($item['price'], 2) ?></td>
-                <td><?= number_format($item['total'], 2) ?></td>
-              </tr>
-            <?php endforeach; ?>
+$si = 1;
+$grandTotal = '0.000';
+foreach ($items as $item):
+    // Ensure $item['total'] and $item['price'] are strings for BCMath
+    $grandTotal = bcadd($grandTotal, (string)$item['total'], 3);
+?>
+<tr>
+    <td><?= $si++ ?></td>
+    <td><?= esc($item['description']) ?></td>
+    <td><?= esc($item['quantity']) ?></td>
+    <td><?= number_format((float)$item['price'], 3, '.', '') ?></td>
+    <td><?= bcadd('0', (string)$item['total'], 3) ?></td>
+</tr>
+<?php endforeach; ?>
+
             <?php
             $minRows = 8;
             $currentRows = is_array($items) ? count($items) : 0;
@@ -235,24 +236,31 @@
             ?>
 
             <!-- Subtotal -->
-            <tfoot class="summary-row" >
-              <tr>
-                <td colspan="4" style="text-align: right;">Subtotal</td>
-                <td style="text-align: right;    font-weight: 100;"><?= number_format($grandTotal, 2) ?> KD</td>
-              </tr>
+            <tfoot class="summary-row">
+    <tr>
+        <td colspan="4" style="text-align: right;">Subtotal</td>
+        <td style="text-align: right; font-weight: 100;">
+            <?= bcadd('0', (string)$grandTotal, 3) ?> KD
+        </td>
+    </tr>
 
-              <!-- Discount -->
-              <tr>
-                <td colspan="4" style="text-align: right;">Discount</td>
-                <td style="text-align: right;    font-weight: 100;"><?= number_format($discount) ?>%</td>
-              </tr>
+    <!-- Discount -->
+    <tr>
+        <td colspan="4" style="text-align: right;">Discount</td>
+        <td style="text-align: right; font-weight: 100;">
+            <?= sprintf("%.3f", $discount) ?>%
+        </td>
+    </tr>
 
-              <!-- Grand Total -->
-              <tr>
-                <td colspan="4" style="text-align: right;">Grand Total</td>
-                <td style="text-align: right;    font-weight: 100;"><?= number_format($totalAfterDiscount, 2) ?> KD</td>
-              </tr>
-            </tfoot>
+    <!-- Grand Total -->
+    <tr>
+        <td colspan="4" style="text-align: right;">Grand Total</td>
+        <td style="text-align: right; font-weight: 100;">
+            <?= bcadd('0', (string)$totalAfterDiscount, 3) ?> KD
+        </td>
+    </tr>
+</tfoot>
+
           </tbody>
         </table>
 
@@ -305,7 +313,7 @@
 
     if (dinars.length > 9) return 'overflow';
     dinars = parseInt(dinars, 10);
-    fils = parseInt((fils || '0').padEnd(3, '0').slice(0, 2));
+    fils = parseInt((fils || '0').padEnd(3, '0').slice(0, 3));
 
     const convert = (n) => {
       if (n < 20) return a[n];
@@ -393,7 +401,7 @@
     num = num.toString().replace(/,/g, '');
     let [dinars, fils] = num.split('.');
     dinars = parseInt(dinars || '0', 10);
-    fils = parseInt((fils || '0').padEnd(3, '0').slice(0, 2));
+    fils = parseInt((fils || '0').padEnd(3, '0').slice(0, 3));
 
     let words = '';
     if (dinars > 0) words += convertNumber(dinars) + ' دينار';
@@ -401,7 +409,12 @@
     return words || 'صفر';
   }
 
-  const grandTotal = <?= json_encode(number_format($estimate['total_amount'] ?? 0, 3, '.', '')) ?>;
+  <?php
+$totalAmount = $estimate['total_amount'] ?? '0.000';
+$grandTotal = bcadd((string)$totalAmount, '0', 3); // exact 3 decimals, no rounding
+?>
+const grandTotal = <?= json_encode($grandTotal) ?>;
+  // const grandTotal = <?= json_encode(number_format($estimate['total_amount'] ?? 0, 3, '.', '')) ?>;
 
   let englishWords = numberToWords(grandTotal);
   englishWords = englishWords.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());

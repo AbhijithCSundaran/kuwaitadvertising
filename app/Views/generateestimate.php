@@ -11,7 +11,7 @@
       margin: auto;
       padding: 15px;
       background-color: #991b36;
-          /* margin-left: 430px; */
+      /* margin-left: 430px; */
     }
 
     .container {
@@ -34,6 +34,7 @@
     .top-heading img {
       width: 138px;
     }
+
     .bottom-bar {
       text-align: center;
       font-size: 12px;
@@ -42,27 +43,31 @@
       padding: 3px;
       margin-top: 0px;
     }
+
     .generate-table {
       width: 100%;
       border-collapse: collapse;
     }
+
     .generate-table td.padding-50 {
-      height: 28px; 
+      height: 28px;
       border-top: none;
       border-bottom: none;
-      border-left:  1px solid black;
-      border-right:  1px solid black;
+      border-left: 1px solid black;
+      border-right: 1px solid black;
     }
+
     .generate-table.min_height tbody td {
-       vertical-align: top;
-        padding: 5px 6px;
-        height: auto !important;
-        border-top: none;    
-        border-bottom: none;
-        border-left:  1px solid black;           
-        border-right:  1px solid black;  
+      vertical-align: top;
+      padding: 5px 6px;
+      height: auto !important;
+      border-top: none;
+      border-bottom: none;
+      border-left: 1px solid black;
+      border-right: 1px solid black;
 
     }
+
     .generate-table th {
       background-color: #cfc7c7ff;
       color: black;
@@ -70,12 +75,14 @@
       padding: 8px;
       vertical-align: middle;
     }
-  .summary-row td {
-    padding: 2px 6px;    
-    height: 18px !important;
-    font-weight: bold;
-    background: #cfc7c7ff;
-  }
+
+    .summary-row td {
+      padding: 2px 6px;
+      height: 18px !important;
+      font-weight: bold;
+      background: #cfc7c7ff;
+    }
+
     @media print {
       * {
         -webkit-print-color-adjust: exact !important;
@@ -99,6 +106,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="right_container">
     <div class="outer-container">
@@ -107,36 +115,38 @@
           style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px;">
           Print
         </button>
-        
+
         <?php if (isset($estimate['is_converted']) && $estimate['is_converted'] == 1): ?>
           <button disabled
-              style="background-color:white; color: black; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
-              Converted
+            style="background-color:white; color: black; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
+            Converted
           </button>
-          <?php else: ?>
-          <button onclick="window.location.href='<?= base_url('invoice/convertFromEstimate/' . $estimate['estimate_id']) ?>'"
-              style="background-color:#991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
-              Convert Invoice
+        <?php else: ?>
+          <button
+            onclick="window.location.href='<?= base_url('invoice/convertFromEstimate/' . $estimate['estimate_id']) ?>'"
+            style="background-color:#991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
+            Convert Invoice
           </button>
-           <button onclick="window.location.href='<?= base_url('estimate/edit/' . $estimate['estimate_id']) ?>'"
-                style="background-color:#991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
-                Edit Estimate
-            </button>
+          <button onclick="window.location.href='<?= base_url('estimate/edit/' . $estimate['estimate_id']) ?>'"
+            style="background-color:#991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
+            Edit Estimate
+          </button>
         <?php endif; ?>
       </div>
       <div class="container">
-        <div class="top-heading" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+        <div class="top-heading"
+          style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
           <span style="font-size: 15px; font-weight: bold;">
-              <?= esc($company['company_name']) ?>
+            <?= esc($company['company_name']) ?>
           </span>
 
           <?php if (!empty($company['company_logo'])): ?>
-              <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" 
-                  alt="Company Logo" style="max-height: 50px; width: 30%;">
+            <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" alt="Company Logo"
+              style="max-height: 50px; width: 30%;">
           <?php endif; ?>
 
           <span style="font-size: 15px; font-weight: bold; direction: rtl;">
-              <?= esc($company['company_name_ar'] ?? '') ?>
+            <?= esc($company['company_name_ar'] ?? '') ?>
           </span>
         </div>
         <div style="height: 3px; background-color:#a1263a"></div>
@@ -154,7 +164,7 @@
               تسعيرة <br>QUOTATION
             </div>
           </div>
-          <div class="col-4 text-end"  style="margin-top: 17px;">
+          <div class="col-4 text-end" style="margin-top: 17px;">
             <div style="white-space: nowrap;">
               <label style="font-weight: bold; margin-right: 6px;">Date / التاريخ:</label>
               <input type="text" readonly value="<?= date('d-m-Y', strtotime($estimate['date'])) ?>"
@@ -164,15 +174,15 @@
         </div>
         <div class="row mt-3">
           <div class=" col-6">
-              <p><strong>To/إلى:</strong></p>
-              <p><?= esc($estimate['customer_name'] ?? '') ?></p>
-              <p><?= nl2br(esc($estimate['customer_address'] ?? '')) ?></p>
-              <br>
+            <p><strong>To/إلى:</strong></p>
+            <p><?= esc($estimate['customer_name'] ?? '') ?></p>
+            <p><?= nl2br(esc($estimate['customer_address'] ?? '')) ?></p>
+            <br>
           </div>
           <div class=" col-6 text-end">
-              <p><strong>From/ من:</strong></p>
-              <p><?= ucwords(strtolower(esc($user_name ?? ''))) ?></p>
-              <p><?= ucwords(strtolower(esc($role_name ?? ''))) ?></p>
+            <p><strong>From/ من:</strong></p>
+            <p><?= ucwords(strtolower(esc($user_name ?? ''))) ?></p>
+            <p><?= ucwords(strtolower(esc($role_name ?? ''))) ?></p>
           </div>
         </div>
         <table class="generate-table min_height" style=" font-size: 14px;">
@@ -188,19 +198,20 @@
           <tbody>
             <?php
             $si = 1;
-            $grandTotal = 0;
-            // $itemCount = count($items); 
+            $grandTotal = 0.000;
+
             foreach ($items as $item):
-                $grandTotal += $item['total'];
-            ?>
+              $grandTotal = bcadd((string) $grandTotal, (string) $item['total'], 3); // 3 decimals
+              ?>
               <tr>
                 <td><?= $si++ ?></td>
                 <td><?= esc($item['description']) ?></td>
-                <td><?= number_format($item['price'], 2) ?></td>
+                <td><?= number_format($item['price'], 3, '.', '') ?></td>
                 <td><?= $item['quantity'] ?></td>
-                <td><?= number_format($item['total'], 2) ?></td>
+                <td><?= number_format($item['total'], 3, '.', '') ?></td>
               </tr>
             <?php endforeach; ?>
+
             <?php
             $minRows = 8;
             $currentRows = is_array($items) ? count($items) : 0;
@@ -219,47 +230,54 @@
             ?>
 
             <!-- Subtotal -->
-            <tfoot class="summary-row" >
-              <tr >
-                <td colspan="4" style="text-align: right; ">SUBTOTAL</td>
-                <td style="text-align: right; font-weight: 100;"><?= number_format($grandTotal, 2) ?> KWD</td>
-              </tr>
+          <tfoot class="summary-row">
+            <tr>
+              <td colspan="4" style="text-align: right;">SUBTOTAL</td>
+              <td style="text-align: right; font-weight: 100;">
+                <?= sprintf('%.3f', $grandTotal) ?> KWD
+              </td>
+            </tr>
 
-              <!-- Discounts -->
-              <tr >
-                <td colspan="4" style="text-align: right;">DISCOUNT</td>
-                <td style="text-align: right; font-weight: 100;"><?= number_format($estimate['discount'])?>%</td>
-              </tr>
+            <!-- Discounts -->
+            <tr>
+              <td colspan="4" style="text-align: right;">DISCOUNT</td>
+              <td style="text-align: right; font-weight: 100;">
+                <?= $estimate['discount'] ?>%
+              </td>
+            </tr>
 
-              <!-- Total -->
-              <tr>
-                <td colspan="4" style="text-align: right;">TOTAL</td>
-                <td style="text-align: right; font-weight: 100;"><?= number_format($estimate['total_amount'] ?? 0, 2) ?> KWD</td>
-              </tr>
-            </tfoot>
+            <!-- Total -->
+            <tr>
+              <td colspan="4" style="text-align: right;">TOTAL</td>
+              <td style="text-align: right; font-weight: 100;">
+                <?= sprintf('%.3f', $estimate['total_amount'] ?? 0) ?> KWD
+              </td>
+            </tr>
+          </tfoot>
+
           </tbody>
         </table>
 
 
         <div class=" d-flex">
           <div class="col-6 terms mt-3" style="font-size:11px;">
-              <strong>TERMS & CONDITIONS</strong><br>
-              1. This estimate is valid for 60 days.<br>
-              2. Additional amount will be added according to the requirements.<br>
-              3. Full payment is required to process the order.<br>
-              4. Cancellation of processed order will not be accepted.
+            <strong>TERMS & CONDITIONS</strong><br>
+            1. This estimate is valid for 60 days.<br>
+            2. Additional amount will be added according to the requirements.<br>
+            3. Full payment is required to process the order.<br>
+            4. Cancellation of processed order will not be accepted.
           </div>
           <div class="col-6 mt-3" style="font-size:12px;">
             <div class="text-end ">
-              
+
             </div>
           </div>
         </div>
         <div class="footer-f">
           If you have any queries about this estimate, please contact<br>
-              (<?= esc($company['company_name']) ?>,
-              <?= esc($company['email']) ?>,
-              <?= esc($company['phone']) ?>)<br>
+          (<?= esc($company['company_name']) ?>,
+          <?= esc($company['email']) ?>,
+          <?= esc($company['phone']) ?>)<br>
           <strong>Thank You For Your Business!</strong>
         </div>
       </div>
@@ -270,8 +288,8 @@
         <div style="margin-top: 5px;">
           📞 <?= esc($company['phone'] ?? '') ?> &nbsp;&nbsp; | &nbsp;&nbsp;
           📧 <a href="mailto:<?= esc($company['email'] ?? '') ?>" style="color: white; text-decoration: none;">
-                <?= esc($company['email'] ?? '') ?>
-              </a>
+            <?= esc($company['email'] ?? '') ?>
+          </a>
         </div>
       </div>
     </div>

@@ -110,7 +110,7 @@
 
                 {
                     data: "subtotal",
-                    render: data => parseFloat(data).toFixed(2) + " KWD"
+                    render: data => parseFloat(data).toFixed(3) + " KWD"
                 },
                 {
                     data: "discount",
@@ -118,7 +118,7 @@
                 },
                 {
                     data: "total_amount",
-                    render: data => parseFloat(data).toFixed(2) + " KWD"
+                    render: data => parseFloat(data).toFixed(3) + " KWD"
                 },
                 {
                     data: "date",

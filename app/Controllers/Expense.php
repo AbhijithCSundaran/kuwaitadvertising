@@ -3,7 +3,7 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use App\Models\Expense_Model;
-use App\Models\customerModel;
+use App\Models\SupplierModel;
 use App\Models\Manageuser_Model;
 
 class Expense extends BaseController
@@ -23,13 +23,17 @@ class Expense extends BaseController
 
     public function create($id = null)
     {
-        $customerModel = new customerModel();
+        $SupplierModel = new SupplierModel();
         $session    = session();
         $companyId  = $session->get('company_id');
         $data = [
             'isEdit' => !empty($id),
             'expense' => null,
-            'customers' => $customerModel->where('company_id', $companyId)->findAll() 
+           'suppliers' => $SupplierModel
+            ->where('company_id', $companyId)
+            ->where('is_deleted', 0)   // exclude deleted
+            ->findAll()
+        
         ];
 
         if ($id) {
@@ -54,7 +58,7 @@ class Expense extends BaseController
         $amount       = $this->request->getPost('amount');
         $payment_mode = $this->request->getPost('payment_mode');
         $reference    = $this->request->getPost('reference');
-        $customer_id  = $this->request->getPost('customer_id');
+        $supplier_id  = $this->request->getPost('supplier_id');
 
         if (empty($date) || empty($particular) || empty($amount) || empty($payment_mode)) {
             return $this->response->setJSON([
@@ -70,7 +74,7 @@ class Expense extends BaseController
             'payment_mode' => $payment_mode,
             'reference'    => $reference,
             'company_id'   => $companyId,
-            'customer_id'  => $customer_id
+            'supplier_id'  => $supplier_id
         ];
 
         if (!empty($id)) {
@@ -88,7 +92,7 @@ class Expense extends BaseController
                 $existing['amount'] != $data['amount'] ||
                 $existing['payment_mode'] !== $data['payment_mode'] ||
                 $existing['reference'] !== $data['reference'] ||
-                $existing['customer_id'] != $data['customer_id']  
+                $existing['supplier_id'] != $data['supplier_id']  
             );
 
             if ($hasChanges) {
@@ -128,7 +132,7 @@ class Expense extends BaseController
     $search = $_POST['search']['value'];
     $slno = $fromstart + 1;
 
-    $columns = ['slno', 'date', 'particular','c.name', 'amount', 'payment_mode', 'id'];
+    $columns = ['slno', 'date', 'particular','s.name', 'amount', 'payment_mode', 'id'];
     $orderBy = $columns[$orderColumnIndex] ?? 'date';
 
     if ($orderBy === 'slno' || $orderBy === 'id') {
@@ -156,7 +160,7 @@ class Expense extends BaseController
         $condition .= " AND (
             REPLACE(LOWER(payment_mode), ' ', '') LIKE '%{$noSpaceSearch}%' 
             OR REPLACE(LOWER(particular), ' ', '') LIKE '%{$noSpaceSearch}%' 
-            OR REPLACE(LOWER(c.name), ' ', '') LIKE '%{$noSpaceSearch}%' 
+           OR REPLACE(LOWER(s.name), ' ', '') LIKE '%{$noSpaceSearch}%'
             OR REPLACE(LOWER(amount), ' ', '') LIKE '%{$noSpaceSearch}%' 
             OR DATE_FORMAT(date, '%d-%m-%Y') LIKE '%$search%'
         )";
@@ -174,7 +178,7 @@ class Expense extends BaseController
             'particular'   => $expense->particular,
             'amount'       => (float) $expense->amount,
             'payment_mode' => $expense->payment_mode ,
-           'customer_name' => $expense->customer_name ??  'N/A',
+           'supplier_name'=> $expense->supplier_name ?? 'N/A',
 
         ];
     }
@@ -216,6 +220,8 @@ class Expense extends BaseController
    public function getExpenseReportAjax()
 {
     $model = new Expense_Model();
+     $session = session();
+    $companyId = $session->get('company_id');
 
     $date     = $this->request->getPost('date');       
     $month    = $this->request->getPost('month');
@@ -224,6 +230,7 @@ class Expense extends BaseController
     $toDate   = $this->request->getPost('toDate');
 
     $builder = $model->builder();
+    $builder->where('company_id', $companyId);
 
     
     if (!empty($fromDate) && !empty($toDate)) {

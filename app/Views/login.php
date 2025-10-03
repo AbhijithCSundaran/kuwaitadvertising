@@ -68,11 +68,11 @@
                     <select name="company_id" class="form-control form-control-lg px-4" required>
                       <option value=""> Select Company </option>
                       <?php foreach ($companies as $company): ?>
-                        <option value="<?= $company['company_id'] ?>">
-                          <?= esc($company['company_name']) ?>
-                        </option>
+                          <option value="<?= $company['company_id'] ?>">
+                              <?= esc(ucwords(strtolower($company['company_name']))) ?>
+                          </option>
                       <?php endforeach; ?>
-                    </select>
+                  </select>
                   </div>
                 <?php endif; ?>
 

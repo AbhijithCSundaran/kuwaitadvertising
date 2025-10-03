@@ -10,26 +10,29 @@ use App\Models\EstimateItemModel;
 use App\Models\Manageuser_Model;
 use App\Models\SalesModel;
 use App\Models\Managecompany_Model;
+use App\Models\TransactionModel;
+
 use Google\Cloud\Translate\V2\TranslateClient;
 
 class Invoice extends BaseController
 {
     public function add()
-    {
-        $customerModel = new customerModel();
+{
+    $customerModel = new customerModel();
+    $companyId = session()->get('company_id');
 
-        $companyId = session()->get('company_id');
-        $customers = $customerModel->where('company_id', $companyId)->findAll();
-        $data['customers'] = $customerModel
-            ->where('is_deleted', 0)
-            ->where('company_id', $companyId)
-            ->findAll();
+    // Only fetch active (not deleted) customers
+    $customers = $customerModel
+        ->where('is_deleted', 0)
+        ->where('company_id', $companyId)
+        ->findAll();
 
-        return view('invoice_form', [
-            'customers' => $customers,
-            'invoice' => []
-        ]);
-    }
+    return view('invoice_form', [
+        'customers' => $customers,
+        'invoice' => []
+    ]);
+}
+
 
     public function list()
     {
@@ -93,9 +96,9 @@ class Invoice extends BaseController
                 'invoice_no' => isset($row['invoice_no']) ? $row['invoice_no'] : '',
                 'customer_name' => $row['customer_name'],
                 'customer_address' => $row['customer_address'],
-                'subtotal' => number_format($subtotal, 2),
+                'subtotal' => $subtotal,  
                 'discount' => $row['discount'],
-                'total_amount' => round($row['total_amount'], 2),
+                'total_amount' => $row['total_amount'],
                 'status' => $row['status'] ?? 'unpaid',
                 'company_id' => $companyId,
                 'invoice_date' => date('d-m-Y', strtotime($row['invoice_date'])),
@@ -172,58 +175,62 @@ class Invoice extends BaseController
     }
 
 
-    public function save()
-    {
-        $request = $this->request;
-        $invoiceModel = new InvoiceModel();
-        $itemModel = new InvoiceItemModel();
-        $customerModel = new CustomerModel();
+  public function save()
+{
+    $request = $this->request;
+    $invoiceModel = new InvoiceModel();
+    $itemModel = new InvoiceItemModel();
+    $customerModel = new CustomerModel();
+    $transactionModel = new TransactionModel();
 
-        $discount = (float) $request->getPost('discount');
-        $customerId = $request->getPost('customer_id');
-        $customer = $customerModel->find($customerId);
-        $estimateId = $this->request->getPost('estimate_id');
+    $discount = (float) $request->getPost('discount');
+    $customerId = $request->getPost('customer_id');
+    $customer = $customerModel->find($customerId);
+    $estimateId = $this->request->getPost('estimate_id');
 
-        if (!$customer) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'Invalid customer selected.'
-            ]);
-        }
+    if (!$customer) {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Invalid customer selected.'
+        ]);
+    }
 
-        // ✅ Validation for discount
-        if (!empty($customer['max_discount']) && $discount > (float) $customer['max_discount']) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'Discount cannot exceed maximum allowed discount (' . $customer['max_discount'] . '%)'
-            ]);
-        }
+    // ✅ Validation for discount
+    if (!empty($customer['max_discount']) && $discount > (float) $customer['max_discount']) {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Discount cannot exceed maximum allowed discount (' . $customer['max_discount'] . '%)'
+        ]);
+    }
 
-        log_message('debug', 'Current user_id in session: ' . session()->get('user_id'));
+    $invoiceId = $request->getPost('invoice_id');
+    $originalStatus = $request->getPost('original_status');
+    $companyId = session()->get('company_id');
 
-        $invoiceId = $request->getPost('invoice_id');
-        $originalStatus = $request->getPost('original_status');
-        $companyId = session()->get('company_id');
+    $totalAmount = $this->calculateTotal($request);
 
-        $invoiceData = [
-            'customer_id' => $customerId,
-            'customer_address' => $customer['address'] ?? $request->getPost('customer_address') ?? '',
-            'phone_number' => $customer['phone_number'] ?? $request->getPost('phone_number') ?? '',
-            'lpo_no' => $request->getPost('lpo_no'),
-            'total_amount' => $this->calculateTotal($request),
-            'discount' => $discount,
-            'invoice_date' => date('Y-m-d'),
-            'user_id' => session()->get('user_id') ?? 1,
-            'status' => ($invoiceId && $originalStatus) ? $originalStatus : 'unpaid',
-            'company_id' => $companyId
-        ];
+    $invoiceData = [
+    'customer_id' => $customerId,
+    'customer_address' => $customer['address'] ?? $request->getPost('customer_address') ?? '',
+    'phone_number' => $customer['phone_number'] ?? $request->getPost('phone_number') ?? '',
+    'lpo_no' => $request->getPost('lpo_no'),
+    'total_amount' => $totalAmount,
+    'discount' => $discount,
+    'invoice_date' => date('Y-m-d'),
+    'user_id' => session()->get('user_id') ?? 1,
+    'status' => ($invoiceId && $originalStatus) ? $originalStatus : 'unpaid',
+    'company_id' => $companyId,
+    // ✅ Add these two lines to fix balance calculation
+    'paid_amount' => 0,
+    'balance_amount' => $totalAmount
+];
 
-        if ($invoiceId) {
-            $invoiceModel->update($invoiceId, $invoiceData);
-            $itemModel->where('invoice_id', $invoiceId)->delete();
-            $message = 'Invoice Updated Successfully';
-        } else {
-                    // ✅ Generate company-specific invoice_no
+    if ($invoiceId) {
+        $invoiceModel->update($invoiceId, $invoiceData);
+        $itemModel->where('invoice_id', $invoiceId)->delete();
+        $message = 'Invoice Updated Successfully';
+    } else {
+        //  Generate company-specific invoice_no
         $lastInvoice = $invoiceModel
             ->where('company_id', $companyId)
             ->orderBy('invoice_no', 'DESC')
@@ -233,43 +240,59 @@ class Invoice extends BaseController
         $invoiceData['invoice_no'] = $nextInvoiceNo;
 
         // Mark estimate as converted if applicable
-         if (!empty($estimateId)) {
-                $db = \Config\Database::connect();
-                $db->table('estimates')->where('estimate_id', $estimateId)->update(['is_converted' => 1]);
-            }
-
-            $invoiceModel->insert($invoiceData);
-            $invoiceId = $invoiceModel->getInsertID();
-            $message = 'Generating Invoice';
+        if (!empty($estimateId)) {
+            $db = \Config\Database::connect();
+            $db->table('estimates')->where('estimate_id', $estimateId)->update(['is_converted' => 1]);
         }
 
-          
-        // Save items
-        $descriptions = $request->getPost('description');
-        $quantities = $request->getPost('quantity');
-        $prices = $request->getPost('price');
+        $invoiceModel->insert($invoiceData);
+        $invoiceId = $invoiceModel->getInsertID();
+        $message = 'Generating Invoice';
 
-        if ($descriptions && $quantities && $prices) {
-            foreach ($descriptions as $i => $desc) {
-                if (!empty($desc) && $quantities[$i] > 0 && $prices[$i] > 0) {
-                    $itemModel->insert([
-                        'invoice_id' => $invoiceId,
-                        'item_name' => ucfirst(trim($desc)),
-                        'quantity' => $quantities[$i],
-                        'price' => $prices[$i]
-                    ]);
-                }
-            }
+        // ✅ Insert into transactions only if invoice is already "paid"
+        if ($invoiceData['status'] === 'paid') {
+            $transactionModel->insert([
+                'customer_id' => $customerId,
+                'invoice_id'  => $invoiceId,
+                'user_id'     => session()->get('user_id') ?? 1,
+                'company_id'  => $companyId,
+                'invoice_amount' => $totalAmount,
+                'paid_amount' => $totalAmount,   // full payment
+                'partial_paid_amount' => $totalAmount,
+                'payment_mode' => $request->getPost('payment_mode') ?? 'cash',
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ]);
         }
-
-        return $this->response->setJSON([
-            'status' => 'success',
-            'message' => $message,
-            'invoice_id'  => $invoiceId,
-             'invoice_no'  => $invoiceData['invoice_no'] ?? null,
-            'redirect' => site_url('invoice/print/' . $invoiceId)
-        ]);
     }
+
+    // Save items
+    $descriptions = $request->getPost('description');
+    $quantities = $request->getPost('quantity');
+    $prices = $request->getPost('price');
+
+    if ($descriptions && $quantities && $prices) {
+        foreach ($descriptions as $i => $desc) {
+            if (!empty($desc) && $quantities[$i] > 0 && $prices[$i] > 0) {
+                $itemModel->insert([
+                    'invoice_id' => $invoiceId,
+                    'item_name' => ucfirst(trim($desc)),
+                    'quantity' => $quantities[$i],
+                    'price' => $prices[$i]
+                ]);
+            }
+        }
+    }
+
+    return $this->response->setJSON([
+        'status' => 'success',
+        'message' => $message,
+        'invoice_id'  => $invoiceId,
+        'invoice_no'  => $invoiceData['invoice_no'] ?? null,
+        'redirect' => site_url('invoice/print/' . $invoiceId)
+    ]);
+}
+
 
     private function calculateTotal($request)
     {
@@ -291,6 +314,8 @@ class Invoice extends BaseController
         $invoiceModel = new InvoiceModel();
         $itemModel = new InvoiceItemModel();
         $customerModel = new customerModel();
+        $transactionModel = new TransactionModel();
+
 
         $invoice = $invoiceModel->find($id);
         if (!$invoice) {
@@ -323,8 +348,6 @@ class Invoice extends BaseController
 
         return view('invoice_form', $data);
     }
-
-
 
 
     public function delete($id = null)
@@ -445,6 +468,7 @@ class Invoice extends BaseController
         }
 
         $invoiceModel = new InvoiceModel();
+        
         $invoice = $invoiceModel->find($invoiceId);
 
         if (!$invoice) {
@@ -470,6 +494,26 @@ class Invoice extends BaseController
         $updated = $invoiceModel->update($invoiceId, $updateData);
 
         if ($updated) {
+        $transactionModel = new TransactionModel();
+        $oldPaid = floatval($invoice['paid_amount'] ?? 0);
+        $newPaid = floatval($updateData['paid_amount'] ?? $oldPaid);
+        $delta = $newPaid - $oldPaid;
+
+        if ($delta > 0) {
+            $transactionModel->insert([
+                'customer_id' => $invoice['customer_id'],
+                'invoice_id' => $invoiceId,
+                'user_id' => session()->get('user_id') ?? 1,
+                'company_id' => $invoice['company_id'],
+                'invoice_amount' => $invoice['total_amount'],
+                'paid_amount' => $delta,               // just this payment
+                'partial_paid_amount' => $newPaid,     // cumulative total paid
+                'payment_mode' => $paymentMode ?? $invoice['payment_mode'] ?? '',
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ]);
+        }
+
             return $this->response->setJSON([
                 'success' => true,
                 'status' => $status,
@@ -484,59 +528,78 @@ class Invoice extends BaseController
             ]);
         }
     }
-    public function update_partial_payment()
-    {
-        $this->response->setContentType('application/json');
+   public function update_partial_payment()
+{
+    $this->response->setContentType('application/json');
+    $json = $this->request->getJSON();
 
-        $json = $this->request->getJSON();
+    if (!$json || !isset($json->invoice_id) || !isset($json->paid_amount)) {
+        return $this->response->setJSON(['success' => false, 'message' => 'Missing data']);
+    }
 
-        if (!$json || !isset($json->invoice_id) || !isset($json->paid_amount)) {
-            return $this->response->setJSON(['success' => false, 'message' => 'Missing data']);
-        }
+    $invoice_id   = $json->invoice_id;
+    $new_payment  = floatval($json->paid_amount);
+    $payment_mode = trim($json->payment_mode);
 
-        $invoice_id = $json->invoice_id;
-        $new_payment = floatval($json->paid_amount);
-        $payment_mode = trim($json->payment_mode);
+    if ($new_payment <= 0) {
+        return $this->response->setJSON(['success' => false, 'message' => 'Invalid payment amount']);
+    }
 
-        $invoiceModel = new InvoiceModel();
-        $invoice = $invoiceModel->find($invoice_id);
+    $invoiceModel = new InvoiceModel();
+    $invoice = $invoiceModel->find($invoice_id);
 
-        if (!$invoice) {
-            return $this->response->setJSON(['success' => false, 'message' => 'Invoice not found']);
-        }
+    if (!$invoice) {
+        return $this->response->setJSON(['success' => false, 'message' => 'Invoice not found']);
+    }
 
-        $total = floatval($invoice['total_amount']);
-        $existing_paid = floatval($invoice['paid_amount'] ?? 0);
+    $total = floatval($invoice['total_amount']);
+    $existing_paid = floatval($invoice['paid_amount'] ?? 0);
 
-        $updated_paid = $existing_paid + $new_payment;
-        $balance = $total - $updated_paid;
+    $updated_paid = $existing_paid + $new_payment;
+    $balance = $total - $updated_paid;
 
-        // Determine status
-        if ($updated_paid >= $total) {
-            $status = 'paid';
-            $updated_paid = $total;// prevent overpayment
-            $balance = 0;
-        } else {
-            $status = 'partial paid';
-        }
+    // Determine status
+    if ($updated_paid >= $total) {
+        $status = 'paid';
+        $updated_paid = $total; // prevent overpayment
+        $balance = 0;
+    } else {
+        $status = 'partial paid';
+    }
 
-        $data = [
-            'status' => $status,
-            'paid_amount' => $updated_paid,
-            'balance_amount' => $balance,
-            'payment_mode' => $payment_mode
-        ];
+    $data = [
+        'status' => $status,
+        'paid_amount' => $updated_paid,
+        'balance_amount' => $balance,
+        'payment_mode' => $payment_mode
+    ];
 
-        $updated = $invoiceModel->update($invoice_id, $data);
+    $updated = $invoiceModel->update($invoice_id, $data);
 
-        return $this->response->setJSON([
-            'success' => $updated,
-            'message' => $updated ? 'Updated' : 'Failed to update',
-            'paid_amount' => $updated_paid,
-            'balance_amount' => $balance,
-            'status' => $status
+    if ($updated && $new_payment > 0) {
+        $transactionModel = new TransactionModel();
+        $transactionModel->insert([
+            'customer_id' => $invoice['customer_id'],
+            'invoice_id'  => $invoice_id,
+            'user_id'     => session()->get('user_id') ?? 1,
+            'company_id'  => $invoice['company_id'],
+            'invoice_amount' => $total,
+            'paid_amount'  => $new_payment,       // this payment only
+            'partial_paid_amount' => $updated_paid, // cumulative
+            'payment_mode'  => $payment_mode,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
         ]);
     }
+
+    return $this->response->setJSON([
+        'success' => $updated,
+        'message' => $updated ? 'Updated' : 'Failed to update',
+        'paid_amount' => $updated_paid,
+        'balance_amount' => $balance,
+        'status' => $status
+    ]);
+}
 
 
     public function report()

@@ -21,6 +21,7 @@ class Rolemanagement extends Controller
     'reports'           => 'Reports',
     'rolemanagement'    => 'Role Management',
     'customer'          => 'Customer List',
+    'supplier'          => 'Supplier List',
     'transactions'       => 'Transactions'  
 ];
     
@@ -221,7 +222,7 @@ if (empty($company_id)) {
 public function update($id)
 {
     $role_name_raw = $this->request->getPost('role_name');
-    $access_data = $this->request->getPost('access') ?? [];
+    $access_data   = $this->request->getPost('access') ?? [];
 
     $normalized_role_name = trim(preg_replace('/\s+/', ' ', strtolower($role_name_raw)));
 
@@ -232,7 +233,7 @@ public function update($id)
     }
 
     // Fetch existing role and permissions
-    $existingRole = $this->roleModel->find($id);
+    $existingRole        = $this->roleModel->find($id);
     $existingPermissions = $this->roleMenuModel->where('role_id', $id)->findAll();
 
     // Build old access array
@@ -246,10 +247,10 @@ public function update($id)
 
     // Check if role name is changed
     $currentRoleNameNormalized = strtolower(trim(preg_replace('/\s+/', ' ', $existingRole['role_name'])));
-    $isNameChanged = $currentRoleNameNormalized !== $normalized_role_name;
+    $isNameChanged   = $currentRoleNameNormalized !== $normalized_role_name;
     $isAccessChanged = $normalizedAccess !== $oldAccess;
 
-    // ✅ Perform duplicate check only if the name has changed
+    // ✅ Duplicate check only if name changed
     if ($isNameChanged) {
         $duplicate = $this->roleModel
             ->where('REPLACE(LOWER(TRIM(role_name)), " ", "") =', str_replace(' ', '', $normalized_role_name))
@@ -258,7 +259,7 @@ public function update($id)
 
         if ($duplicate) {
             return $this->response->setJSON([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'Role Name Already Exists.'
             ]);
         }
@@ -267,33 +268,35 @@ public function update($id)
     // If no changes were made, return info message
     if (!$isNameChanged && !$isAccessChanged) {
         return $this->response->setJSON([
-            'status' => 'info',
+            'status'  => 'info',
             'message' => 'No Changes Detected To Update.'
         ]);
     }
 
-    // Update role name only if it's changed
+    // ✅ Always update updated_at (and role_name if changed)
+    $updateData = [
+        'updated_at' => date('Y-m-d H:i:s')
+    ];
     if ($isNameChanged) {
-        $this->roleModel->update($id, [
-            'role_name' => ucwords($normalized_role_name),
-            'updated_at' => date('Y-m-d H:i:s'),
-        ]);
+        $updateData['role_name'] = ucwords($normalized_role_name);
     }
+
+    $this->roleModel->update($id, $updateData);
 
     // Update permissions
     $this->roleMenuModel->where('role_id', $id)->delete();
     foreach ($normalizedAccess as $menu => $value) {
         if ($value == 1) {
             $this->roleMenuModel->insert([
-                'role_id' => $id,
+                'role_id'   => $id,
                 'menu_name' => $menu,
-                'access' => 1
+                'access'    => 1
             ]);
         }
     }
 
     return $this->response->setJSON([
-        'status' => 'success',
+        'status'  => 'success',
         'message' => 'Role Updated Successfully.'
     ]);
 }
