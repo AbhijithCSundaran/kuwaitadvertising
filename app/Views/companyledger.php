@@ -147,12 +147,20 @@
 </div>
 <?php include "common/footer.php"; ?>
 <script>
+// function formatDate(dateStr) {
+//     const dateObj = new Date(dateStr);
+//     const day = String(dateObj.getDate()).padStart(2, '0');
+//     const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+//     const year = dateObj.getFullYear();
+//     return `${day}-${month}-${year}`;
+// }
 function formatDate(dateStr) {
-    const dateObj = new Date(dateStr);
-    const day = String(dateObj.getDate()).padStart(2, '0');
-    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-    const year = dateObj.getFullYear();
-    return `${day}-${month}-${year}`;
+    if (!dateStr) return '';
+    const parts = dateStr.split('-'); // ['2025','10','03']
+    const year = parts[0];
+    const month = parts[1];
+    const day = parts[2];
+    return `${day}-${month}-${year}`; // DD-MM-YYYY
 }
 
 $(document).ready(function () {

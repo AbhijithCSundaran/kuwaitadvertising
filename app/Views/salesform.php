@@ -1,67 +1,96 @@
 <?php include "common/header.php"; ?>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <style>
-        .-success{
-            background-color:#198754; !important;
-        }
-        
-        #salesTable th,
-        #salesTable td{
-            vertical-align: middle;
-            padding: 14px 25px;
-            font-size: 15px;
-        }
-        .input-group-text {
-    color: #000 !important;
+<style>
+    .input-group-text {
+        color: #000 !important;
+    }
+    .badge.bg-success {
+    background-color: #28a745 !important; /* Bootstrap green */
+    color: #fff !important; /* white text for contrast */
+    width: 80px;
 }
-.bg-success {
-    background-color: #28a745!important;
-    color: #ffffff !important;
+.badge.bg-danger{
+    width: 80px;
 }
-    </style>
+
+
+    #salesTable th,
+    #salesTable td {
+        vertical-align: middle;
+        padding: 16px 30px;
+        font-size: 14px;
+        text-align: left !important;
+    }
+
+    #salesTable th:nth-child(1),
+    #salesTable td:nth-child(1) {
+        width: 10%;
+    }
+
+    #salesTable th:nth-child(2),
+    #salesTable td:nth-child(2) {
+        width: 15%;
+    }
+
+    #salesTable th:nth-child(3),
+    #salesTable td:nth-child(3) {
+        width: 30%;
+    }
+
+    #salesTable th:nth-child(4),
+    #salesTable td:nth-child(4) {
+        width: 20%;
+    }
+
+    #salesTable th:nth-child(5),
+    #salesTable td:nth-child(5) {
+        width: 15%;
+    }
+
+    .filter_item {
+        width: 25%;
+    }
+
+    .alert {
+        z-index: 1050;
+    }
+</style>
+
 <div class="form-control mb-3 right_container">
     <div class="alert d-none text-center position-fixed" role="alert"></div>
 
-    <h3>Sales Report</h3>
+    <h3 class="mb-3">Sales Report</h3>
 
-    <form method="get" class="row g-3 mb-4">
-        <div class="col-md-3 filter-date p-3 position-relative">
+    <div class="d-flex gap-1 mb-3">
+        <div class="filter_item input-group">
             <div class="input-group-prepend">
                 <span class="input-group-text from-date">From</span>
             </div>
-            <input type="text" id="fromDate" name="from_date" class="form-control" placeholder="DD/MM/YYYY"
-                value="<?= esc($filters['from'] ?? '') ?>">
-            <span id="fromDate-icon" class="fromDate-icon input-suffix-icon"><i class="bi bi-calendar"></i></span>
+            <input type="date" id="fromDate" class="form-control">
         </div>
-        <div class="col-md-3 p-3 position-relative">
+
+        <div class="filter_item input-group">
             <div class="input-group-prepend">
                 <span class="input-group-text from-date">To</span>
             </div>
-            <input type="text" id="toDate" name="to_date" class="form-control" placeholder="DD/MM/YYYY"
-                value="<?= esc($filters['to'] ?? '') ?>">
-            <span id="toDate-icon" class="toDate-icon input-suffix-icon"><i class="bi bi-calendar"></i></span>
+            <input type="date" id="toDate" class="form-control">
         </div>
-        <div class="col-md-3 p-3">
+
+        <div class="filter_item input-group">
             <div class="input-group-prepend">
                 <span class="input-group-text from-date">Customer</span>
             </div>
-            <select id="customerId" name="customer_id" class="form-control">
+            <select id="customerId" class="form-control">
                 <option value="">All Customers</option>
                 <?php foreach ($customers as $cust): ?>
-                    <option value="<?= $cust['customer_id'] ?>" <?= ($filters['customer_id'] ?? '') == $cust['customer_id'] ? 'selected' : '' ?>>
-                        <?= esc($cust['name']) ?>
-                    </option>
+                    <option value="<?= $cust['customer_id'] ?>"><?= esc($cust['name']) ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
-        <div class="col-md-3 d-flex align-items-end p-3">
-            <button type="submit" class="btn btn-primary me-2" id="filterBtn"
-                style="height:51px; width:130px;">Filter</button>
-            <a href="<?= base_url('invoice/report') ?>" class="btn btn-secondary " id="resetBtn"
-                style="height:51px; width:130px; line-height: 2;">Reset</a>
-        </div>
-    </form>
+
+        <button id="filterBtn" class="btn btn-primary">Apply Filter</button>
+        <button id="resetBtn" class="btn btn-secondary">Reset</button>
+    </div>
+
     <table class="table table-bordered" id="salesTable">
         <thead>
             <tr>
@@ -72,35 +101,10 @@
                 <th><strong>Status</strong></th>
             </tr>
         </thead>
-        <tbody>
-            <?php
-            $grandTotal = 0;
-            foreach ($invoices as $i => $sale):
-                $grandTotal += (float) $sale['total_amount'];
-                ?>
-                <tr>
-                    <td><?= $i + 1 ?></td>
-                    <td><?= date('d/m/Y', strtotime($sale['invoice_date'])) ?></td>
-                    <td><?= esc($sale['customer_name']) ?></td>
-                    <td><?= number_format($sale['total_amount'], 3) ?> KWD</td>
-                    <td>
-                        <?php if ($sale['status'] === 'paid'): ?>
-                            <span class="badge bg-success">Paid</span>
-                        <?php elseif ($sale['status'] === 'unpaid'): ?>
-                            <span class="badge bg-danger">Unpaid</span>
-                        <?php elseif ($sale['status'] === 'partial paid'): ?>
-                            <span class="badge bg-warning text-white">Partial Paid</span>
-                        <?php else: ?>
-                            <span class="badge bg-secondary">Unknown</span>
-                        <?php endif; ?>
-
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
+        <tbody></tbody>
         <tfoot>
             <tr>
-                <th colspan="3" class="text-end">Grand Total:</th>
+                <th colspan="3" class="text-end">Total:</th>
                 <th id="totalAmount">0.000 KWD</th>
                 <th></th>
             </tr>
@@ -109,93 +113,100 @@
 </div>
 </div>
 <?php include "common/footer.php"; ?>
+
 <script>
-    const fromPicker = flatpickr("#fromDate", {
-        dateFormat: "d/m/Y",
-        allowInput: true
-    });
-
-    const toPicker = flatpickr("#toDate", {
-        dateFormat: "d/m/Y",
-        allowInput: true
-    });
-
-    document.getElementById("fromDate-icon").addEventListener("click", function () {
-        fromPicker.open();
-    });
-
-    document.getElementById("toDate-icon").addEventListener("click", function () {
-        toPicker.open();
-    });
-     function formatDate(dateStr) {
-        const date = new Date(dateStr);
-        return date.toLocaleDateString('en-GB');
+    function formatDate(dateStr) {
+        const dateObj = new Date(dateStr);
+        if (isNaN(dateObj.getTime())) return dateStr;
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const year = dateObj.getFullYear();
+        return `${day}-${month}-${year}`;
     }
 
-       function loadSales() {
-        $.ajax({
-            url: "<?= base_url('invoice/getSalesReportAjax') ?>",
-            type: "POST",
-            data: {
-                fromDate: $('#fromDate').val(),
-                toDate: $('#toDate').val(),
-                customerId: $('#customerId').val()
-            },
-            dataType: "json",
-            success: function (data) {
-                const sales = data.invoices;
-                let rows = '';
-                let grandTotal = 0;
+    $(document).ready(function () {
+        const alertBox = $('.alert');
+        let filterApplied = false;
 
-                if (sales.length > 0) {
-                    sales.forEach((item, index) => {
-                        const statusLabel = item.status === 'paid' ? 'Paid' : 
-                                            (item.status === 'unpaid' ? 'Unpaid' : 
-                                            (item.status === 'partial paid' ? 'Partial Paid' : 'Unknown'));
+        function showAlert(message) {
+            alertBox.removeClass('d-none alert-success alert-danger')
+                .addClass('alert alert-danger')
+                .text(message)
+                .fadeIn();
+            setTimeout(() => alertBox.fadeOut(), 2000);
+        }
 
-                        const badgeClass = item.status === 'paid' ? 'bg-success w-100' : 
-                                        (item.status === 'unpaid' ? 'bg-danger w-100' : 
-                                        (item.status === 'partial paid' ? 'bg-warning text-white w-100' : 'bg-secondary'));
+        function loadSales() {
+            $.ajax({
+                url: "<?= base_url('invoice/getSalesReportAjax') ?>",
+                type: "POST",
+                data: {
+                    fromDate: $('#fromDate').val(),
+                    toDate: $('#toDate').val(),
+                    customerId: $('#customerId').val()
+                },
+                dataType: "json",
+                success: function (data) {
+                    let rows = '';
+                    let grandTotal = 0;
 
-                        const totalAmount = parseFloat(item.total_amount);
-                        grandTotal += totalAmount;
+                    if (data.invoices.length > 0) {
+                        data.invoices.forEach((item, index) => {
+                            const totalAmount = parseFloat(item.total_amount);
+                            grandTotal += totalAmount;
 
-                        rows += `
-                            <tr>
-                                <td>${index + 1}</td>
-                                <td>${formatDate(item.invoice_date)}</td>
-                                <td>${item.customer_name}</td>
-                                <td>${totalAmount.toFixed(3)} KWD</td>
-                                <td><span class="badge ${badgeClass}">${statusLabel}</span></td>
-                            </tr>
-                        `;
-                    });
-                } else {
-                    rows = `<tr><td colspan="5" class="text-center">No records found.</td></tr>`;
+                            const statusMap = {
+                                'paid': {label: 'Paid', class: 'bg-success'},
+                                'unpaid': {label: 'Unpaid', class: 'bg-danger'},
+                                'partial paid': {label: 'Partial Paid', class: 'bg-warning text-white'}
+                            };
+                            const st = statusMap[item.status] || {label: 'Unknown', class: 'bg-secondary'};
+
+                            rows += `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${formatDate(item.invoice_date)}</td>
+                                    <td>${item.customer_name}</td>
+                                    <td>${totalAmount.toFixed(3)} KWD</td>
+                                    <td><span class="badge ${st.class}">${st.label}</span></td>
+                                </tr>`;
+                        });
+                    } else {
+                        rows = `<tr><td colspan="5" class="text-center">No records found.</td></tr>`;
+                    }
+
+                    $('#salesTable tbody').html(rows);
+                    $('#totalAmount').text(`${grandTotal.toFixed(3)} KWD`);
+                },
+                error: function () {
+                    $('#salesTable tbody').html('<tr><td colspan="5" class="text-center text-danger">Error loading data.</td></tr>');
+                    $('#totalAmount').text('0.000 KWD');
                 }
+            });
+        }
 
-                $('#salesTable tbody').html(rows);
-                $('#totalAmount').text(`${grandTotal.toFixed(3)} KWD`);
-            },
-            error: function (xhr, status, error) {
-                console.error("AJAX error:", status, error);
-                $('#salesTable tbody').html('<tr><td colspan="5" class="text-center text-danger">Error loading data.</td></tr>');
-                $('#totalAmount').text(`0.000 KWD`);
+        $('#filterBtn').click(function () {
+            const from = $('#fromDate').val();
+            const to = $('#toDate').val();
+
+            // Validate date range
+            if ((from && !to) || (!from && to)) {
+                showAlert('Please select both From and To dates.');
+                return;
             }
+
+            filterApplied = true;
+            loadSales();
         });
-    }
 
-    $('#filterBtn').click(function (e) {
-        e.preventDefault();
+        $('#resetBtn').click(function () {
+            $('#fromDate').val('');
+            $('#toDate').val('');
+            $('#customerId').val('');
+            filterApplied = false;
+            loadSales();
+        });
+
         loadSales();
     });
-
-    $('#resetBtn').click(function (e) {
-        e.preventDefault();
-        $('#fromDate').val('');
-        $('#toDate').val('');
-        $('#customerId').val('');
-        loadSales();
-    });
-    loadSales();
 </script>
