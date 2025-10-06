@@ -94,14 +94,14 @@
 
     table,
     th,
-     {
-      border: 1px solid black;
+    {
+    border: 1px solid black;
     }
 
     /* table.min_height {
       min-height: 350px;
     } */
-table.min_height {
+    table.min_height {
       width: 100%;
       border-collapse: collapse;
       table-layout: fixed;
@@ -122,20 +122,22 @@ table.min_height {
     tbody tr:last-child td {
       border-bottom: 1px solid black;
     }
-/* Remove inner cell borders inside tbody */
-tbody td {
-  border-top: none !important;
-  border-bottom: none !important;
-  border-left: 1px solid #000;
-  border-right: 1px solid #000;
-}
+
+    /* Remove inner cell borders inside tbody */
+    tbody td {
+      border-top: none !important;
+      border-bottom: none !important;
+      border-left: 1px solid #000;
+      border-right: 1px solid #000;
+    }
 
 
 
-/* Ensure the last row still has a bottom border */
-tbody tr:last-child {
-  border-bottom: 1px solid #000;
-}
+    /* Ensure the last row still has a bottom border */
+    tbody tr:last-child {
+      border-bottom: 1px solid #000;
+    }
+
     th {
       background-color: #cfc7c7ff;
       text-align: center;
@@ -206,7 +208,7 @@ tbody tr:last-child {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
-      
+
 
       .no-print,
       .header,
@@ -260,6 +262,7 @@ tbody tr:last-child {
     }
   </style>
 </head>
+
 <body>
   <div class="right_container">
     <div class="outer-container">
@@ -309,50 +312,72 @@ tbody tr:last-child {
           <?php endif; ?>
         </div>
       </div> -->
-      <div class="no-print" style="text-align: right; margin-bottom: 20px;"> 
-      <button onclick="window.print()" class="btn btn-sm" 
-              style="background-color: #991b36; color: white;">Print</button>
-      <button onclick="downloadPDF()" class="btn btn-sm" 
-              style="background-color: #991b36; color: white;">Download PDF</button>
-      <button onclick="window.location.href='<?= base_url('invoice/print/' . $invoice['invoice_id']) ?>'" 
+      <div class="no-print" style="text-align: right; margin-bottom: 20px;">
+        <button onclick="window.print()" class="btn btn-sm"
+          style="background-color: #991b36; color: white;">Print</button>
+        <button onclick="downloadPDF()" class="btn btn-sm" style="background-color: #991b36; color: white;">Download
+          PDF</button>
+        <button onclick="window.location.href='<?= base_url('invoice/print/' . $invoice['invoice_id']) ?>'"
           class="btn btn-sm" style="background-color: #991b36; color: white;">
-      Discard
-  </button>
+          Discard
+        </button>
 
+      </div>
+
+
+
+      <div class="container">
+        <div class="d-flex align-items-center text-center" style="margin-bottom: 5px; width:100%;">
+  <!-- Company Name (English) -->
+  <div class="col-4 text-start">
+    <span style="font-size: 13px; font-weight: bold;">
+      <?= esc(ucwords(strtolower($company['company_name'] ?? ''))) ?>
+    </span>
   </div>
 
+  <!-- Company Logo -->
+  <div class="col-4">
+    <?php if (!empty($company['company_logo'])): ?>
+      <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" alt="Company Logo"
+        style="max-height: 50px;">
+    <?php else: ?>
+      <img src="<?= base_url('public/uploads/default-logo.png') ?>" alt="Company Logo"
+        style="max-height: 50px;">
+    <?php endif; ?>
+  </div>
 
-      
-      <div class="container">
-        <div class="top-heading" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-          <span style="font-size: 14px; font-weight: bold;">Al Rai Printing Press</span>
-          <img src="<?php echo ASSET_PATH; ?>assets/images/invoice-heading.png" alt="Invoice Heading"
-            style="max-height: 50px;">
-          <span style="font-size: 14px; font-weight: bold; direction: rtl;">مطبعة الري الأعمال الطباعة</span>
-        </div>
+  <!-- Company Name (Arabic) -->
+  <div class="col-4 text-end">
+    <span style="font-size: 14px; font-weight: bold; direction: rtl;">
+      <?= esc($company['company_name_ar'] ?? '') ?>
+    </span>
+  </div>
+</div>
+
         <hr>
         <div class="row align-items-center" style="margin-bottom: 10px;">
           <div class="col-4 text-start">
             <div>
-    <label style="font-weight: bold; margin-right: 4px;">Invoice No :</label>
-    <span style="display: inline-block; width: 87px; height: 23px; line-height: 23px; text-align: left; color: black;">
-      <?= esc($invoice['invoice_no']) ?>
-    </span>
-  </div>
+              <label style="font-weight: bold; margin-right: 4px;">Invoice No :</label>
+              <span
+                style="display: inline-block; width: 87px; height: 23px; line-height: 23px; text-align: left; color: black;">
+                <?= esc($invoice['invoice_no']) ?>
+              </span>
+            </div>
 
           </div>
           <div class="col-4 text-center">
             <div
               style="background-color: #991b36; color: white; font-weight: bold; padding: 3px 15px; display: inline-block; border-radius: 4px; font-size: 13px;">
-            ملاحظة التسليم<br> DELIVERY NOTE
+              ملاحظة التسليم<br> DELIVERY NOTE
             </div>
           </div>
           <div class="col-4 text-end">
             <div class="delivery-date">
-              <strong>Delivery Date:</strong> 
-                <span id="deliveryDate" class="delivery-value" style="color: black;">
-                  <?= !empty($invoice['delivery_date']) ? date('d-m-Y', strtotime($invoice['delivery_date'])) : '' ?>
-                </span>
+              <strong>Delivery Date:</strong>
+              <span id="deliveryDate" class="delivery-value" style="color: black;">
+                <?= !empty($invoice['delivery_date']) ? date('d-m-Y', strtotime($invoice['delivery_date'])) : '' ?>
+              </span>
             </div>
 
           </div>
@@ -361,54 +386,54 @@ tbody tr:last-child {
         <div class="invoice-header">
           <div class="col-12">
             Address: <span><?= esc($customer['address'] ?? '') ?>
-  </span>:عنوان
+            </span>:عنوان
           </div>
         </div>
 
         <!-- Invoice Table -->
         <table class="min_height">
-    <thead>
-      <tr>
-        <th style="width: 10%; border: 1px solid #000; padding: 8px;">SR. NO</th>
-        <th style="width: 37%; border: 1px solid #000; padding: 8px;">DESCRIPTION</th>
-        <th style="width: 14%; border: 1px solid #000; padding: 8px;">Unit</th>
-        <th style="width: 10%; border: 1px solid #000; padding: 8px;">Qty</th>
-        <th style="width: 29%; border: 1px solid #000; padding: 8px;">LOCATION</th>
-      </tr>
-    </thead>
-    <tbody>
-      <?php
-      $i = 1;
-      foreach ($items as $item):
-      ?>
-        <tr>
-          <td style="border: 1px solid #000;  text-align: center;"><?= $i++ ?></td>
-          <td style="border: 1px solid #000; text-align: left;"><?= esc($item['item_name'] ?? '-') ?></td>
-          <td style="border: 1px solid #000; text-align: center;"><?= number_format($item['price'], 2) ?></td>
-          <td style="border: 1px solid #000; text-align: center;"><?= esc($item['quantity']) ?></td>
-          <td style="border: 1px solid #000; text-align: left;">--</td>
-        </tr>
-      <?php endforeach; ?>
-    </tbody>
-  </table>
+          <thead>
+            <tr>
+              <th style="width: 10%; border: 1px solid #000; padding: 8px;">SR. NO</th>
+              <th style="width: 37%; border: 1px solid #000; padding: 8px;">DESCRIPTION</th>
+              <th style="width: 14%; border: 1px solid #000; padding: 8px;">Unit</th>
+              <th style="width: 10%; border: 1px solid #000; padding: 8px;">Qty</th>
+              <th style="width: 29%; border: 1px solid #000; padding: 8px;">LOCATION</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php
+            $i = 1;
+            foreach ($items as $item):
+              ?>
+              <tr>
+                <td style="border: 1px solid #000;  text-align: center;"><?= $i++ ?></td>
+                <td style="border: 1px solid #000; text-align: left;"><?= esc($item['item_name'] ?? '-') ?></td>
+                <td style="border: 1px solid #000; text-align: center;"><?= number_format($item['price'], 3) ?></td>
+                <td style="border: 1px solid #000; text-align: center;"><?= esc($item['quantity']) ?></td>
+                <td style="border: 1px solid #000; text-align: left;">--</td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
 
-  <div class="d-flex w-100 position-relative" style="margin-top: 10px;">
-      <div class="col-6 ms-auto">
-          <hr>
-          <?php
-              $company_name = !empty($company['company_name']) ? $company['company_name'] : 'Unknown Company';
-          ?>
-          <div class="text-center" style="font-size: 15px;">
+        <div class="d-flex w-100 position-relative" style="margin-top: 10px;">
+          <div class="col-6 ms-auto">
+            <hr>
+            <?php
+            $company_name = !empty($company['company_name']) ? $company['company_name'] : 'Unknown Company';
+            ?>
+            <div class="text-center" style="font-size: 15px;">
               For <?= esc(ucwords(strtolower($company_name))) ?>
+            </div>
           </div>
-      </div>
-  </div>
+        </div>
 
-  <div class="table-footer">
+        <div class="table-footer">
           <div>Received By/ تم الاستلام بواسطة </div>
           <div style="text-align: right;">Issued By / صادرة عن</div>
         </div>
-  <div class="table-footer">
+        <div class="table-footer">
           <div> Signature / إمضاء</div>
           <div style="text-align: right;">Signature / إمضاء</div>
         </div>
@@ -426,8 +451,9 @@ tbody tr:last-child {
   </div>
 
   <!-- Partial Payment Modal -->
- 
+
 </body>
+
 </html>
 </div>
 <?php include "common/footer.php"; ?>
@@ -443,17 +469,17 @@ tbody tr:last-child {
     clone.querySelectorAll('.no-print').forEach(el => el.remove());
 
     const opt = {
-        margin: [0.5, 0.5, 0.5, 0.5],
-        filename: 'DeliveryNote-<?= $invoice['invoice_id'] ?>.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+      margin: [0.5, 0.5, 0.5, 0.5],
+      filename: 'DeliveryNote-<?= $invoice['invoice_id'] ?>.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
     };
 
     // Generate PDF from the clone
     html2pdf().set(opt).from(clone).save();
-}
+  }
 
 
   function formatDateToDDMMYYYY(date) {
@@ -464,7 +490,7 @@ tbody tr:last-child {
     return `${day}.${month}.${year}`;
   }
 
-  
+
   document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('deliveryDate').textContent = formatDateToDDMMYYYY(new Date());
   });

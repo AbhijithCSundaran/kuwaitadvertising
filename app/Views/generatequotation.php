@@ -32,6 +32,14 @@
       width: 100%;
       border-collapse: collapse;
     }
+/* Remove horizontal borders in tbody but keep vertical borders */
+.generate-table tbody td {
+    border-top: none;    /* Remove top horizontal line */
+    border-bottom: none; /* Remove bottom horizontal line */
+    border-left: 1px solid #000;  /* Keep vertical borders */
+    border-right: 1px solid #000; /* Keep vertical borders */
+}
+
 
     .generate-table.min_height {
       /* min-height: 350px; */
@@ -112,7 +120,7 @@
           style="background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px;">
           Print
         </button>
-       
+
         <?php if (isset($estimate['is_converted']) && $estimate['is_converted'] == 1): ?>
           <button disabled
             style="background-color:white; color: black; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
@@ -134,8 +142,8 @@
         <div class="top-heading"
           style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
           <span style="font-size: 15px; font-weight: bold;">
-            <?= esc($company['company_name']) ?>
-          </span>
+    <?= esc(ucwords(strtolower($company['company_name'] ?? ''))) ?>
+</span>
 
           <?php if (!empty($company['company_logo'])): ?>
             <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" alt="Company Logo"
@@ -197,20 +205,20 @@
           </thead>
           <tbody>
             <?php
-$si = 1;
-$grandTotal = '0.000';
-foreach ($items as $item):
-    // Ensure $item['total'] and $item['price'] are strings for BCMath
-    $grandTotal = bcadd($grandTotal, (string)$item['total'], 3);
-?>
-<tr>
-    <td><?= $si++ ?></td>
-    <td><?= esc($item['description']) ?></td>
-    <td><?= esc($item['quantity']) ?></td>
-    <td><?= number_format((float)$item['price'], 3, '.', '') ?></td>
-    <td><?= bcadd('0', (string)$item['total'], 3) ?></td>
-</tr>
-<?php endforeach; ?>
+            $si = 1;
+            $grandTotal = '0.000';
+            foreach ($items as $item):
+              // Ensure $item['total'] and $item['price'] are strings for BCMath
+              $grandTotal = bcadd($grandTotal, (string) $item['total'], 3);
+              ?>
+              <tr>
+                <td><?= $si++ ?></td>
+                <td><?= esc($item['description']) ?></td>
+                <td><?= esc($item['quantity']) ?></td>
+                <td><?= number_format((float) $item['price'], 3, '.', '') ?></td>
+                <td><?= bcadd('0', (string) $item['total'], 3) ?></td>
+              </tr>
+            <?php endforeach; ?>
 
             <?php
             $minRows = 8;
@@ -237,29 +245,29 @@ foreach ($items as $item):
 
             <!-- Subtotal -->
             <tfoot class="summary-row">
-    <tr>
-        <td colspan="4" style="text-align: right;">Subtotal</td>
-        <td style="text-align: right; font-weight: 100;">
-            <?= bcadd('0', (string)$grandTotal, 3) ?> KD
-        </td>
-    </tr>
+              <tr>
+                <td colspan="4" style="text-align: right;">Subtotal</td>
+                <td style="text-align: right; font-weight: 100;">
+                  <?= bcadd('0', (string) $grandTotal, 3) ?> KD
+                </td>
+              </tr>
 
-    <!-- Discount -->
-    <tr>
-        <td colspan="4" style="text-align: right;">Discount</td>
-        <td style="text-align: right; font-weight: 100;">
-            <?= sprintf("%.3f", $discount) ?>%
-        </td>
-    </tr>
+              <!-- Discount -->
+              <tr>
+                <td colspan="4" style="text-align: right;">Discount</td>
+                <td style="text-align: right; font-weight: 100;">
+                  <?= sprintf("%.3f", $discount) ?>%
+                </td>
+              </tr>
 
-    <!-- Grand Total -->
-    <tr>
-        <td colspan="4" style="text-align: right;">Grand Total</td>
-        <td style="text-align: right; font-weight: 100;">
-            <?= bcadd('0', (string)$totalAfterDiscount, 3) ?> KD
-        </td>
-    </tr>
-</tfoot>
+              <!-- Grand Total -->
+              <tr>
+                <td colspan="4" style="text-align: right;">Grand Total</td>
+                <td style="text-align: right; font-weight: 100;">
+                  <?= bcadd('0', (string) $totalAfterDiscount, 3) ?> KD
+                </td>
+              </tr>
+            </tfoot>
 
           </tbody>
         </table>
@@ -274,7 +282,8 @@ foreach ($items as $item):
             <?= ucwords($amountInWords ?? '') ?>
           </div>
           <div class="table-footer" style="font-size:13px;">
-            <div><b>Receipient Name /اسم المستلم:</b><br><?= esc($user_name ?? '') ?></div>
+            <div><b>Receipient Name /اسم المستلم:</b><br><?= esc(ucfirst(strtolower($user_name ?? ''))) ?>
+</div>
             <div style="text-align: right;"><b>Receipient Signature / توقيع المستلم</b></div>
           </div>
         </div>
@@ -410,10 +419,10 @@ foreach ($items as $item):
   }
 
   <?php
-$totalAmount = $estimate['total_amount'] ?? '0.000';
-$grandTotal = bcadd((string)$totalAmount, '0', 3); // exact 3 decimals, no rounding
-?>
-const grandTotal = <?= json_encode($grandTotal) ?>;
+  $totalAmount = $estimate['total_amount'] ?? '0.000';
+  $grandTotal = bcadd((string) $totalAmount, '0', 3); // exact 3 decimals, no rounding
+  ?>
+  const grandTotal = <?= json_encode($grandTotal) ?>;
   // const grandTotal = <?= json_encode(number_format($estimate['total_amount'] ?? 0, 3, '.', '')) ?>;
 
   let englishWords = numberToWords(grandTotal);

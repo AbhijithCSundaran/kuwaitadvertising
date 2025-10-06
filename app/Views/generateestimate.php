@@ -137,8 +137,9 @@
         <div class="top-heading"
           style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
           <span style="font-size: 15px; font-weight: bold;">
-            <?= esc($company['company_name']) ?>
-          </span>
+    <?= esc(ucwords(strtolower($company['company_name'] ?? ''))) ?>
+</span>
+
 
           <?php if (!empty($company['company_logo'])): ?>
             <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" alt="Company Logo"
