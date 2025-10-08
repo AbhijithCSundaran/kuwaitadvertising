@@ -463,39 +463,46 @@ foreach ($items as $index => $item):
           }
           ?>
           </tbody>
-          <?php $grandTotal = $totalAmount; ?>
           <?php
-          $subtotal = 0;
-          foreach ($items as $item) {
-            $lineTotal = $item['quantity'] * $item['price'];
-            $subtotal += $lineTotal;
-          }
-          $discountPercent = isset($invoice['discount']) ? floatval($invoice['discount']) : 0;
-          $totalDiscount = ($subtotal * $discountPercent) / 100;
-          $grandTotal = $subtotal - $totalDiscount;
-          ?>
-          <tfoot class="tfoot">
-            <?php if ($discountPercent > 0): ?>
-                <tr>
-                    <td colspan="5" style="text-align: right; font-weight: bold;">Subtotal</td>
-                    <td colspan="2" style="text-align: right;">
-                        <?= sprintf('%.3f', $subtotal) ?> KD
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="5" style="text-align: right; font-weight: bold;">Discount</td>
-                    <td colspan="2" style="text-align: right;">
-                        <?= $discountPercent ?>%
-                    </td>
-                </tr>
-            <?php endif; ?>
-              <tr>
-                  <td colspan="5" style="text-align: right; font-weight: bold;">Total Amount</td>
-                  <td colspan="2" style="text-align: right;" id="total-amount">
-                      <?= sprintf('%.3f', $grandTotal) ?> KD
-                  </td>
-              </tr>
-        </tfoot>
+$subtotal = 0;
+foreach ($items as $item) {
+    $lineTotal = $item['quantity'] * $item['price'];
+    $subtotal += $lineTotal;
+}
+
+// Discount in KWD (not percent)
+$discountKWD = isset($invoice['discount']) ? floatval($invoice['discount']) : 0;
+
+// Ensure discount does not exceed subtotal
+$effectiveDiscount = min($discountKWD, $subtotal);
+
+// Grand total after applying discount
+$grandTotal = $subtotal - $effectiveDiscount;
+?>
+
+<tfoot class="tfoot">
+    <?php if ($effectiveDiscount > 0): ?>
+    <tr>
+        <td colspan="5" style="text-align: right; font-weight: bold;">Subtotal</td>
+        <td colspan="2" style="text-align: right;">
+            <?= number_format($subtotal, 3) ?> KWD
+        </td>
+    </tr>
+    <tr>
+        <td colspan="5" style="text-align: right; font-weight: bold;">Discount</td>
+        <td colspan="2" style="text-align: right;">
+            <?= number_format($effectiveDiscount, 3) ?> KWD
+        </td>
+    </tr>
+    <?php endif; ?>
+    <tr>
+        <td colspan="5" style="text-align: right; font-weight: bold;">Total Amount</td>
+        <td colspan="2" style="text-align: right;" id="total-amount">
+            <?= number_format($grandTotal, 3) ?> KWD
+        </td>
+    </tr>
+</tfoot>
+
 
         </table>
 
@@ -569,6 +576,7 @@ foreach ($items as $index => $item):
             <select id="paymentMode" class="form-control form-control-lg border-primary">
               <option value="" selected disabled>Select payment mode</option>
               <option value="cash">Cash</option>
+              <option value="cheque">Cheque</option>
               <option value="bank_transfer">Bank Transfer</option>
               <option value="bank_link">Bank Link</option>
               <option value="wamd">WAMD</option>
@@ -600,6 +608,7 @@ foreach ($items as $index => $item):
             <select id="markPaidPaymentMode" class="form-control form-control-lg border-success">
               <option value="" selected disabled>Select payment mode</option>
               <option value="cash">Cash</option>
+              <option value="cheque">Cheque</option>
               <option value="bank_transfer">Bank Transfer</option>
               <option value="bank_link">Bank Link</option>
               <option value="wamd">WAMD</option>
@@ -803,14 +812,40 @@ foreach ($items as $index => $item):
 
   let isFirstPartialPayment = localStorage.getItem('firstPartialDone_<?= $invoice['invoice_id'] ?>') !== 'true';
 
-  function openPartialPayment() {
+  // function openPartialPayment() {
+  //   const modalTitle = document.querySelector('#partialPaymentModal .modal-title');
+  //   const inputLabel = document.querySelector('label[for="partialPaidInput"]');
+  //   const partialPaidInput = document.getElementById('partialPaidInput');
+  //   const paymentModeSelect = document.getElementById('paymentMode');
+
+  //   if (partialPaidInput) partialPaidInput.value = '';
+  //   if (paymentModeSelect) paymentModeSelect.value = '';
+
+  //   if (isFirstPartialPayment) {
+  //     modalTitle.innerText = "Advance Payment";
+  //     inputLabel.innerText = "Enter Amount";
+  //   } else {
+  //     modalTitle.innerText = "Partial Payment";
+  //     inputLabel.innerText = "Enter Amount";
+  //   }
+
+  //   document.getElementById('partialPaymentModal').style.display = 'block';
+  // }
+function openPartialPayment() {
     const modalTitle = document.querySelector('#partialPaymentModal .modal-title');
     const inputLabel = document.querySelector('label[for="partialPaidInput"]');
     const partialPaidInput = document.getElementById('partialPaidInput');
     const paymentModeSelect = document.getElementById('paymentMode');
+    const errorMsg = document.getElementById('partialErrorMsg');
+    const paymentModeError = document.getElementById('paymentModeError');
 
+    // Clear previous values
     if (partialPaidInput) partialPaidInput.value = '';
     if (paymentModeSelect) paymentModeSelect.value = '';
+
+    // Hide previous errors
+    if (errorMsg) errorMsg.style.display = 'none';
+    if (paymentModeError) paymentModeError.style.display = 'none';
 
     if (isFirstPartialPayment) {
       modalTitle.innerText = "Advance Payment";
@@ -821,7 +856,7 @@ foreach ($items as $index => $item):
     }
 
     document.getElementById('partialPaymentModal').style.display = 'block';
-  }
+}
 
   function closePartialModal() {
     document.getElementById('partialPaymentModal').style.display = 'none';
@@ -1024,21 +1059,37 @@ foreach ($items as $index => $item):
 
 let selectedInvoiceId = null;
 
+// function openMarkPaidModal(invoiceId) {
+//   selectedInvoiceId = invoiceId;
+
+//   // Open Bootstrap modal
+//   const markPaidModal = new bootstrap.Modal(document.getElementById('markPaidModal'));
+//   markPaidModal.show();
+
+//   // Auto-fill the amount with remaining balance (from PHP)
+// const balanceAmount = parseFloat(<?= json_encode($balanceAmount) ?>);
+// document.getElementById('markPaidAmount').value = balanceAmount.toFixed(3);
+
+
+//   // Set hidden field if needed
+//   $('#invoice_id').val(invoiceId);
+// }
 function openMarkPaidModal(invoiceId) {
-  selectedInvoiceId = invoiceId;
+    // Get the paid and total amounts from the DOM
+    const total = parseFloat(document.getElementById('total-amount').innerText.replace(/,/g,''));
+    const paid = parseFloat(document.getElementById('paidAmountValue')?.innerText || 0);
 
-  // Open Bootstrap modal
-  const markPaidModal = new bootstrap.Modal(document.getElementById('markPaidModal'));
-  markPaidModal.show();
+    // Calculate current balance
+    const balance = total - paid;
 
-  // Auto-fill the amount with remaining balance (from PHP)
-const balanceAmount = parseFloat(<?= json_encode($balanceAmount) ?>);
-document.getElementById('markPaidAmount').value = balanceAmount.toFixed(3);
+    // Open Bootstrap modal
+    const markPaidModal = new bootstrap.Modal(document.getElementById('markPaidModal'));
+    markPaidModal.show();
 
-
-  // Set hidden field if needed
-  $('#invoice_id').val(invoiceId);
+    // Set the amount field to remaining balance
+    document.getElementById('markPaidAmount').value = balance.toFixed(3);
 }
+
 
 $('#confirmMarkPaid').on('click', function () {
   const paymentMode = $('#markPaidPaymentMode').val();

@@ -113,10 +113,13 @@ class InvoiceModel extends Model
     ->where('invoices.invoice_id', $id)
     ->first();
 
-    if ($invoice) {
-        $itemModel = new InvoiceItemModel();
-        $invoice['items'] = $itemModel->where('invoice_id', $id)->findAll();
-    }
+   if ($invoice) {
+            $itemModel = new InvoiceItemModel();
+            $invoice['items'] = $itemModel
+                ->where('invoice_id', $id)
+                ->orderBy('item_order', 'ASC') // <-- fixed ordering
+                ->findAll();
+        }
 
     return $invoice;
 }
@@ -148,7 +151,7 @@ public function getMonthlyRevenue($companyId)
 
     return $row ? (float)$row->total_amount : 0;
 }
-  public function getInvoicesWithCustomer()
+   public function getInvoicesWithCustomer()
     {
         return $this->select('invoices.*, customers.name as customer_name')
                     ->join('customers', 'customers.customer_id = invoices.customer_id', 'left')

@@ -67,7 +67,7 @@
                       onclick="window.location.href='<?= base_url('expense/report') ?>'">
                       
                       <div class="icon-box me-4">
-                        <i class="mdi mdi-eye"></i>
+                        <i class="bi bi-cash"></i>
                       </div>
                       
                       <div class="d-flex flex-column justify-content-around">
@@ -81,7 +81,7 @@
                       onclick="window.location.href='<?= base_url('companyledger') ?>'">
                       
                       <div class="icon-box me-4">
-                          <i class="bi bi-cash"></i>
+                          <i class="mdi mdi-currency-usd"></i>
                       </div>
                       
                       <div class="d-flex flex-column justify-content-around">
@@ -95,7 +95,7 @@
                       onclick="window.location.href='<?= base_url('expense/report') ?>'">
                       
                       <div class="icon-box me-4">
-                        <i class="mdi mdi-flag"></i>
+                        <i class="bi bi-cash"></i>
                       </div>
                       <div class="d-flex flex-column justify-content-around">
                         <small class="mb-3 text-white"><b>Total Expenses Of The Month</b></small>

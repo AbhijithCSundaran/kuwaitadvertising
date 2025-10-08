@@ -152,13 +152,22 @@
                     <td><span id="sub_total_display">0.000</span> KWD</td>
                 </tr>
                 <tr>
+                <td><strong>Discount:</strong></td>
+                <td>
+                    <input type="number" name="discount" id="discount" class="form-control w-50 d-inline"
+    value="<?= isset($estimate['discount']) ? number_format((float)$estimate['discount'], 3, '.', '') : '0.000' ?>"
+    min="0" step="0.001"> KWD
+
+                </td>
+            </tr>
+                <!-- <tr>
                     <td><strong>Discount:</strong></td>
                     <td>
                         <input type="number" name="discount" id="discount" class="form-control w-50 d-inline"
                             value="<?= isset($estimate['discount']) ? $estimate['discount'] : '0' ?>" min="0">
                         %
                     </td>
-                </tr>
+                </tr> -->
                 <tr>
                     <td><strong>Total:</strong></td>
                     <td><strong><span id="total_display">0.000</span> KWD</strong></td>
@@ -198,9 +207,9 @@
                         </div>
                         <div class="alert alert-danger d-none" id="customerError"></div>
                         <div class="mb-3">
-                        <label>Maximum Discount (%)</label>
-                        <input type="number" name="max_discount" id="max_discount" class="form-control" min="0" max="100" step="0.01" placeholder="Enter discount percentage">
-                    </div>
+                    <label>Maximum Discount (KWD)</label>
+                    <input type="number" name="max_discount" id="max_discount" class="form-control" min="0" step="0.001" placeholder="Enter maximum discount amount">
+                </div>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary" id="saveCustomerBtn">Save</button>
@@ -272,32 +281,61 @@
             $('#customerModal').modal('show');
         });
 
-        function calculateTotals() {
+//         function calculateTotals() {
+//     let subtotal = 0;
+//     $('.item-row').each(function () {
+//         let qty = parseFloat($(this).find('.quantity').val()) || 0;
+//         let price = parseFloat($(this).find('.price').val()) || 0;
+//         let total = Number((qty * price).toFixed(3)); // fix decimals here
+//         $(this).find('.total').val(total.toFixed(3));
+//         subtotal = Number((subtotal + total).toFixed(3)); // accumulate with 3 decimals
+//     });
+
+//     $('#sub_total_display').text(subtotal.toFixed(3));
+
+//     let discount = parseFloat($('#discount').val()) || 0;
+//     let discountAmt = Number(((subtotal * discount) / 100).toFixed(3));
+//     let finalTotal = Number((subtotal - discountAmt).toFixed(3));
+//     $('#total_display').text(finalTotal.toFixed(3));
+// }
+function calculateTotals() {
     let subtotal = 0;
+
+    // Calculate subtotal from all item rows
     $('.item-row').each(function () {
         let qty = parseFloat($(this).find('.quantity').val()) || 0;
         let price = parseFloat($(this).find('.price').val()) || 0;
-        let total = Number((qty * price).toFixed(3)); // fix decimals here
+        let total = qty * price;
         $(this).find('.total').val(total.toFixed(3));
-        subtotal = Number((subtotal + total).toFixed(3)); // accumulate with 3 decimals
+        subtotal += total;
     });
 
     $('#sub_total_display').text(subtotal.toFixed(3));
 
-    let discount = parseFloat($('#discount').val()) || 0;
-    let discountAmt = Number(((subtotal * discount) / 100).toFixed(3));
-    let finalTotal = Number((subtotal - discountAmt).toFixed(3));
+    // Get the discount value from the input field
+    let discountFromInput = parseFloat($('#discount').val()) || 0;
+
+    // For calculation, the discount applied cannot be more than the subtotal
+    let effectiveDiscount = Math.min(discountFromInput, subtotal);
+
+    // Calculate the final total using the effective discount
+    let finalTotal = subtotal - effectiveDiscount;
+
+    // Ensure the total doesn't go below zero
+    if (finalTotal < 0) {
+        finalTotal = 0;
+    }
+
     $('#total_display').text(finalTotal.toFixed(3));
 }
-
 
         $('#add-item').click(function () {
             const newRow = $(` 
                 <tr class="item-row">
                     <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
-                    <td><input type="number" name="price[]" class="form-control price"></td>
+                    <td><input type="number" name="price[]" class="form-control price" step="0.001"></td>
                     <td><input type="number" name="quantity[]" class="form-control quantity"></td>
-                    <td><input type="number" name="total[]" class="form-control total" readonly></td>
+                    <td><input type="number" name="total[]" class="form-control total" step="0.001" readonly></td>
                     <td class="text-center">
                         <span class="remove-item-btn" title="Remove">
                             <i class="fas fa-trash text-danger"></i>
@@ -503,6 +541,10 @@ $('#customerForm').submit(function (e) {
             const formData = new FormData(this);
             formData.append('customer_name', customerName);
 
+             $('#item-container tr.item-row').each(function (index) {
+                formData.append('item_order[]', index + 1); // Save order starting from 1
+            });
+
                 $.ajax({
                     url: "<?= site_url('estimate/save') ?>",
                     type: "POST",
@@ -546,34 +588,74 @@ $('#customerForm').submit(function (e) {
         });
 
        let maxCustomerDiscount = 0;
+// $('#customer_id').on('change', function () {
+//     let customerId = $(this).val();
+//     if (customerId) {
+
+//         $.post("<?= site_url('customer/get-address') ?>", { customer_id: customerId }, function (res) {
+//             $('#customer_address').val(res.status === 'success' ? res.address : '');
+//         }, 'json');
+
+//         // Fetch max discount
+//         $.ajax({
+//             url: '<?= base_url("customer/get_discount") ?>/' + customerId,
+//             type: 'GET',
+//             dataType: 'json',
+//             success: function (res) {
+//                 maxCustomerDiscount = parseFloat(res.discount) || 0;
+
+//                 if (!$('#discount').val() || parseFloat($('#discount').val()) === 0) {
+//                     $('#discount').val(maxCustomerDiscount);
+//                 }
+//             }
+//         });
+
+//     } else {
+//         maxCustomerDiscount = 0;
+//         $('#discount').val(0);
+//         $('#customer_address').val('');
+//     }
+// });
 $('#customer_id').on('change', function () {
-    let customerId = $(this).val();
-    if (customerId) {
+            let customerId = $(this).val();
 
-        $.post("<?= site_url('customer/get-address') ?>", { customer_id: customerId }, function (res) {
-            $('#customer_address').val(res.status === 'success' ? res.address : '');
-        }, 'json');
+            if (customerId) {
+                // Fetch customer address
+                $.post("<?= site_url('customer/get_address') ?>", { customer_id: customerId }, function (res) {
+                    if (res.status === 'success') {
+                        $('#customer_address').val(res.address);
+                    } else {
+                        $('#customer_address').val('');
+                    }
+                }, 'json');
 
-        // Fetch max discount
-        $.ajax({
-            url: '<?= base_url("customer/get_discount") ?>/' + customerId,
-            type: 'GET',
-            dataType: 'json',
-            success: function (res) {
-                maxCustomerDiscount = parseFloat(res.discount) || 0;
-
-                if (!$('#discount').val() || parseFloat($('#discount').val()) === 0) {
-                    $('#discount').val(maxCustomerDiscount);
-                }
+                // Fetch customer-specific discount
+                $.ajax({
+                    url: '<?= base_url("customer/get_discount") ?>/' + customerId,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (res) {
+                        if (res.discount !== undefined) {
+                            maxCustomerDiscount = parseFloat(res.discount) || 0;
+                            // Set the discount input to the fetched value
+                            $('#discount').val(maxCustomerDiscount.toFixed(3));
+                        } else {
+                            // If customer has no discount, reset to 0
+                            maxCustomerDiscount = 0;
+                            $('#discount').val('0.000');
+                        }
+                        // Recalculate totals immediately after setting the discount
+                        calculateTotals();
+                    }
+                });
+            } else {
+                // If no customer is selected, reset everything
+                maxCustomerDiscount = 0;
+                $('#discount').val('0.000');
+                $('#customer_address').val('');
+                calculateTotals();
             }
         });
-
-    } else {
-        maxCustomerDiscount = 0;
-        $('#discount').val(0);
-        $('#customer_address').val('');
-    }
-});
 
 // Tooltip setup
 $('#discount').tooltip({

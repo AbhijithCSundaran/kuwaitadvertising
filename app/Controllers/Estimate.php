@@ -54,26 +54,202 @@ class Estimate extends BaseController
     }
  
  
-public function save()
-{
-    $estimateId = $this->request->getPost('estimate_id');
-    $customerId = $this->request->getPost('customer_id');
-    $address = trim($this->request->getPost('customer_address'));
-    $discount = (float) $this->request->getPost('discount');
-    $description = $this->request->getPost('description');
-    $price = $this->request->getPost('price');
-    $quantity = $this->request->getPost('quantity');
-    $total = $this->request->getPost('total');
-    $customerName = trim($this->request->getPost('customer_name'));
-    $phoneNumber = trim($this->request->getPost('phone_number'));
+// public function save()
+// {
+//     $estimateId = $this->request->getPost('estimate_id');
+//     $customerId = $this->request->getPost('customer_id');
+//     $address = trim($this->request->getPost('customer_address'));
+//     $discount = (float) $this->request->getPost('discount');
+//     $description = $this->request->getPost('description');
+//     $price = $this->request->getPost('price');
+//     $quantity = $this->request->getPost('quantity');
+//     $total = $this->request->getPost('total');
+//     $customerName = trim($this->request->getPost('customer_name'));
+//     $phoneNumber = trim($this->request->getPost('phone_number'));
 
+//     if (empty($customerId) || empty($address)) {
+//         return $this->response->setJSON([
+//             'status' => 'error',
+//             'message' => 'Please Fill Customer Name And Address.'
+//         ]);
+//     }
+
+//     $validItems = 0;
+//     foreach ($description as $desc) {
+//         if (!empty(trim($desc))) {
+//             $validItems++;
+//         }
+//     }
+//     if ($validItems === 0) {
+//         return $this->response->setJSON([
+//             'status' => 'error',
+//             'message' => 'Please Fill At Least One Item With Description.'
+//         ]);
+//     }
+
+//     // Recalculate totals
+//    $subtotal = '0.000';
+// foreach ($total as $t) {
+//     // Use bcadd to avoid floating-point rounding
+//     $subtotal = bcadd($subtotal, (string)$t, 3);
+// }
+
+// // Calculate discount
+// $discountAmount = bcmul($subtotal, bcdiv((string)$discount, '100', 3), 3);
+
+// // Grand total without rounding
+// $grandTotal = bcsub($subtotal, $discountAmount, 3);
+
+// $companyId = session()->get('company_id');
+// $estimateData = [
+//     'customer_id' => $customerId,
+//     'customer_address' => $address,
+//     'discount' => $discount,
+//     'total_amount' => $grandTotal, // Already 3 decimals, no rounding
+//     'date' => date('Y-m-d'),
+//     'phone_number' => $phoneNumber,
+//     'company_id' => $companyId
+// ];
+
+
+//     // Build items array
+//     $items = [];
+//     foreach ($description as $key => $desc) {
+//     $desc = trim($desc);
+//     $unitPrice = trim($price[$key]);
+//     $qty = trim($quantity[$key]);
+
+//     if ($desc === '' || $unitPrice === '' || $qty === '') {
+//         return $this->response->setJSON([
+//             'status' => 'error',
+//             'message' => 'Each Item Must Have Description, Unit Price, And Quantity Filled.'
+//         ]);
+//     }
+
+//     // Calculate total using BCMath to avoid rounding issues
+//     $lineTotal = bcmul((string)$unitPrice, (string)$qty, 3);
+
+//     $items[] = [
+//         'description' => $desc,
+//         'price' => bcadd((string)$unitPrice, '0', 3),   // ensures 3 decimals
+//         'quantity' => bcadd((string)$qty, '0', 3),
+//         'total' => $lineTotal
+//     ];
+// }
+
+
+//     $estimateModel = new EstimateModel();
+//     $estimateItemModel = new EstimateItemModel();
+//     $customerModel = new customerModel();
+//     $customer = $customerModel->find($customerId);
+
+//     if ($customer) {
+//         if ($customer['name'] !== $customerName || $customer['address'] !== $address) {
+//             $customerModel->update($customerId, [
+//                 'name' => $customerName,
+//                 'address' => $address
+//             ]);
+//         }
+
+//         $maxDiscount = isset($customer['fixed_discount']) ? (float)$customer['fixed_discount'] : 100;
+//         if ($discount > $maxDiscount) {
+//             return $this->response->setJSON([
+//                 'status' => 'error',
+//                 'message' => "Discount cannot exceed maximum allowed value of $maxDiscount%"
+//             ]);
+//         }
+//     }
+
+//     if (!empty($estimateId)) {
+//         // Existing estimate: update
+//         $existing = $estimateModel->find($estimateId);
+//         if (!$existing) {
+//             return $this->response->setJSON([
+//                 'status' => 'error',
+//                 'message' => 'Estimate Not Found.'
+//             ]);
+//         }
+
+//         $hasChanges = (
+//             $existing['customer_id'] != $customerId ||
+//             $existing['customer_address'] !== $address ||
+//             $existing['discount'] != $discount ||
+//             $existing['total_amount'] != $grandTotal
+//         );
+
+//         if ($hasChanges) {
+//             $estimateModel->update($estimateId, $estimateData);
+//             $estimateItemModel->where('estimate_id', $estimateId)->delete();
+//             foreach ($items as &$item) {
+//                 $item['estimate_id'] = $estimateId;
+//             }
+//             $estimateItemModel->insertBatch($items);
+
+//             return $this->response->setJSON([
+//                 'status' => 'success',
+//                 'message' => 'Estimate Updated Successfully.',
+//                 'estimate_id' => $estimateId
+//             ]);
+//         } else {
+//             return $this->response->setJSON([
+//                 'status' => 'nochange',
+//                 'message' => 'No Changes Detected.',
+//                 'estimate_id' => $estimateId
+//             ]);
+//         }
+//     } else {
+//         // NEW estimate: generate company-specific estimate_no
+//         $lastEstimate = $estimateModel
+//             ->where('company_id', $companyId)
+//             ->orderBy('estimate_no', 'DESC')
+//             ->first();
+
+//         $nextEstimateNo = $lastEstimate ? $lastEstimate['estimate_no'] + 1 : 1;
+//         $estimateData['estimate_no'] = $nextEstimateNo;
+
+//         $estimateId = $estimateModel->insert($estimateData);
+//         foreach ($items as &$item) {
+//             $item['estimate_id'] = $estimateId;
+//         }
+//         $estimateItemModel->insertBatch($items);
+
+//         return $this->response->setJSON([
+//             'status' => 'success',
+//             'message' => 'Generating Estimate.',
+//             'estimate_id' => $estimateId,
+//             'estimate_no' => $nextEstimateNo
+//         ]);
+//     }
+// }
+
+
+ public function save()
+{
+    $estimateId   = $this->request->getPost('estimate_id');
+    $customerId   = $this->request->getPost('customer_id');
+    $address      = trim($this->request->getPost('customer_address'));
+    $discount     = floatval($this->request->getPost('discount') ?? 0);
+    $description  = $this->request->getPost('description');
+    $price        = $this->request->getPost('price');
+    $quantity     = $this->request->getPost('quantity');
+    $total        = $this->request->getPost('total');
+    $customerName = trim($this->request->getPost('customer_name'));
+    $phoneNumber  = trim($this->request->getPost('phone_number'));
+    $maxDiscount  = floatval($this->request->getPost('max_discount') ?? 0); // KWD
+
+    // -------------------------
+    // 1. Validate customer info
+    // -------------------------
     if (empty($customerId) || empty($address)) {
         return $this->response->setJSON([
             'status' => 'error',
-            'message' => 'Please Fill Customer Name And Address.'
+            'message' => 'Please fill customer name and address.'
         ]);
     }
 
+    // -------------------------
+    // 2. Validate at least one item
+    // -------------------------
     $validItems = 0;
     foreach ($description as $desc) {
         if (!empty(trim($desc))) {
@@ -83,90 +259,101 @@ public function save()
     if ($validItems === 0) {
         return $this->response->setJSON([
             'status' => 'error',
-            'message' => 'Please Fill At Least One Item With Description.'
+            'message' => 'Please fill at least one item with description.'
         ]);
     }
 
-    // Recalculate totals
-   $subtotal = '0.000';
-foreach ($total as $t) {
-    // Use bcadd to avoid floating-point rounding
-    $subtotal = bcadd($subtotal, (string)$t, 3);
-}
+    // -------------------------
+    // 3. Calculate subtotal
+    // -------------------------
+    $subtotal = '0.000';
+    foreach ($total as $t) {
+        $subtotal = bcadd($subtotal, (string)$t, 3);
+    }
 
-// Calculate discount
-$discountAmount = bcmul($subtotal, bcdiv((string)$discount, '100', 3), 3);
-
-// Grand total without rounding
-$grandTotal = bcsub($subtotal, $discountAmount, 3);
-
-$companyId = session()->get('company_id');
-$estimateData = [
-    'customer_id' => $customerId,
-    'customer_address' => $address,
-    'discount' => $discount,
-    'total_amount' => $grandTotal, // Already 3 decimals, no rounding
-    'date' => date('Y-m-d'),
-    'phone_number' => $phoneNumber,
-    'company_id' => $companyId
-];
-
-
-    // Build items array
-    $items = [];
-    foreach ($description as $key => $desc) {
-    $desc = trim($desc);
-    $unitPrice = trim($price[$key]);
-    $qty = trim($quantity[$key]);
-
-    if ($desc === '' || $unitPrice === '' || $qty === '') {
+    // -------------------------
+    // 4. Validate discount in KWD
+    // -------------------------
+    if ($discount > $subtotal || ($maxDiscount > 0 && $discount > $maxDiscount)) {
+        $allowedDiscount = $maxDiscount > 0 ? min($subtotal, $maxDiscount) : $subtotal;
         return $this->response->setJSON([
             'status' => 'error',
-            'message' => 'Each Item Must Have Description, Unit Price, And Quantity Filled.'
+            'message' => "Discount cannot exceed maximum allowed: " . number_format($allowedDiscount, 3) . " KWD."
         ]);
     }
 
-    // Calculate total using BCMath to avoid rounding issues
-    $lineTotal = bcmul((string)$unitPrice, (string)$qty, 3);
+    // -------------------------
+    // 5. Calculate grand total
+    // -------------------------
+    $grandTotal = bcsub($subtotal, (string)$discount, 3);
 
-    $items[] = [
-        'description' => $desc,
-        'price' => bcadd((string)$unitPrice, '0', 3),   // ensures 3 decimals
-        'quantity' => bcadd((string)$qty, '0', 3),
-        'total' => $lineTotal
+    // -------------------------
+    // 6. Prepare estimate data
+    // -------------------------
+    $companyId = session()->get('company_id');
+    $estimateData = [
+        'customer_id'      => $customerId,
+        'customer_address' => $address,
+        'discount'         => $discount,
+        'total_amount'     => $grandTotal,
+        'date'             => date('Y-m-d'),
+        'phone_number'     => $phoneNumber,
+        'company_id'       => $companyId
     ];
-}
 
+    // -------------------------
+    // 7. Prepare items
+    // -------------------------
+    $itemsArray = [];
+    foreach ($description as $key => $desc) {
+        $desc      = trim($desc);
+        $unitPrice = floatval($price[$key] ?? 0);
+        $qty       = floatval($quantity[$key] ?? 0);
 
-    $estimateModel = new EstimateModel();
-    $estimateItemModel = new EstimateItemModel();
+        if ($desc === '' || $unitPrice <= 0 || $qty <= 0) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Each item must have description, unit price, and quantity.'
+            ]);
+        }
+
+        $lineTotal = bcmul((string)$unitPrice, (string)$qty, 3);
+        $itemsArray[] = [
+            'description' => $desc,
+            'price'       => number_format($unitPrice, 3, '.', ''),
+            'quantity'    => number_format($qty, 3, '.', ''),
+            'total'       => $lineTotal,
+            'item_order'  => $itemOrder[$key] ?? ($key + 1)
+        ];
+    }
+
+    // -------------------------
+    // 8. Update customer info if changed
+    // -------------------------
     $customerModel = new customerModel();
     $customer = $customerModel->find($customerId);
-
     if ($customer) {
         if ($customer['name'] !== $customerName || $customer['address'] !== $address) {
             $customerModel->update($customerId, [
-                'name' => $customerName,
+                'name'    => $customerName,
                 'address' => $address
-            ]);
-        }
-
-        $maxDiscount = isset($customer['fixed_discount']) ? (float)$customer['fixed_discount'] : 100;
-        if ($discount > $maxDiscount) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => "Discount cannot exceed maximum allowed value of $maxDiscount%"
             ]);
         }
     }
 
+    // -------------------------
+    // 9. Insert / Update Estimate
+    // -------------------------
+    $estimateModel = new EstimateModel();
+    $estimateItemModel = new EstimateItemModel();
+
     if (!empty($estimateId)) {
-        // Existing estimate: update
+        // Update existing
         $existing = $estimateModel->find($estimateId);
         if (!$existing) {
             return $this->response->setJSON([
                 'status' => 'error',
-                'message' => 'Estimate Not Found.'
+                'message' => 'Estimate not found.'
             ]);
         }
 
@@ -179,51 +366,49 @@ $estimateData = [
 
         if ($hasChanges) {
             $estimateModel->update($estimateId, $estimateData);
+
             $estimateItemModel->where('estimate_id', $estimateId)->delete();
-            foreach ($items as &$item) {
+            foreach ($itemsArray as &$item) {
                 $item['estimate_id'] = $estimateId;
             }
-            $estimateItemModel->insertBatch($items);
+            $estimateItemModel->insertBatch($itemsArray);
 
             return $this->response->setJSON([
                 'status' => 'success',
-                'message' => 'Estimate Updated Successfully.',
+                'message' => 'Estimate updated successfully.',
                 'estimate_id' => $estimateId
             ]);
         } else {
             return $this->response->setJSON([
                 'status' => 'nochange',
-                'message' => 'No Changes Detected.',
+                'message' => 'No changes detected.',
                 'estimate_id' => $estimateId
             ]);
         }
     } else {
-        // NEW estimate: generate company-specific estimate_no
+        // New estimate
         $lastEstimate = $estimateModel
             ->where('company_id', $companyId)
             ->orderBy('estimate_no', 'DESC')
             ->first();
-
         $nextEstimateNo = $lastEstimate ? $lastEstimate['estimate_no'] + 1 : 1;
         $estimateData['estimate_no'] = $nextEstimateNo;
 
         $estimateId = $estimateModel->insert($estimateData);
-        foreach ($items as &$item) {
+        foreach ($itemsArray as &$item) {
             $item['estimate_id'] = $estimateId;
         }
-        $estimateItemModel->insertBatch($items);
+        $estimateItemModel->insertBatch($itemsArray);
 
         return $this->response->setJSON([
             'status' => 'success',
-            'message' => 'Generating Estimate.',
+            'message' => 'Estimate Generated Successfully.',
             'estimate_id' => $estimateId,
             'estimate_no' => $nextEstimateNo
         ]);
     }
 }
 
-
- 
  public function estimatelistajax()
 {
     
@@ -331,7 +516,9 @@ $estimateData = [
 
     $data = [
         'estimate' => $estimate,
-        'items' => $estimateItemModel->where('estimate_id', $id)->findAll(),
+        // 'items' => $estimateItemModel->where('estimate_id', $id)->findAll(),
+        'items' => $estimateItemModel->where('estimate_id', $id)->orderBy('item_order', 'ASC')->findAll(),
+
         'customers' => $customerModel->where('is_deleted', 0)->orderBy('customer_id', 'DESC')->findAll(),
         'customer' => $customer
     ];
@@ -380,7 +567,9 @@ private function translateToArabic($text)
     }
 
     // Fetch related data
-    $items = $itemModel->where('estimate_id', $id)->findAll();
+    // $items = $itemModel->where('estimate_id', $id)->findAll();
+    $items = $itemModel->where('estimate_id', $id)->orderBy('item_order', 'ASC')->findAll();
+
     $userId = session()->get('user_id');
     $userName = session()->get('user_Name');
     $roleId = session()->get('role_Id'); 
@@ -449,7 +638,9 @@ private function translateToArabic($text)
     $estimates = $estimateModel->getRecentEstimatesWithCustomer(10); 
 
     foreach ($estimates as &$est) {
-        $items = $itemModel->where('estimate_id', $est['estimate_id'])->findAll();
+        // $items = $itemModel->where('estimate_id', $est['estimate_id'])->findAll();
+        $items = $itemModel->where('estimate_id', $est['estimate_id'])->orderBy('item_order', 'ASC')->findAll();
+
 
         $subtotal = '0.000';
         foreach ($items as $item) {
@@ -475,7 +666,9 @@ private function translateToArabic($text)
         ->findAll();
 
     foreach ($estimates as &$est) {
-        $items = $itemModel->where('estimate_id', $est['estimate_id'])->findAll();
+        // $items = $itemModel->where('estimate_id', $est['estimate_id'])->findAll();
+        $items = $itemModel->where('estimate_id', $est['estimate_id'])->orderBy('item_order', 'ASC')->findAll();
+
 
         // Calculate subtotal with 3 decimals
         $subtotal = '0.000';
