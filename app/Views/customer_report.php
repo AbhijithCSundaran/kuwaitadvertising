@@ -110,11 +110,15 @@ function loadReport(type){
     { data: null, orderable: false },          // SL No → no sort icon
     { data: 'no', orderable: false },          // No → no sort icon
     { data: 'customer' },                       // Customer → sortable
-    { data: 'subtotal', render: d => d + ' KWD' }, // Subtotal → sortable
-    { data: 'discount', render: d => d == 0 ? '-N/A-' : d + '%', orderable: false }, // Discount → no sort icon
-    { data: 'total', render: d => d + ' KWD' },     // Total → sortable
-    { data: 'paid', render: d => d !== null ? d + ' KWD' : '-' }, // Paid → sortable
-    { data: 'balance', render: d => d !== null ? d + ' KWD' : '-' }, // Balance → sortable
+    { 
+    data: 'subtotal', 
+    render: d => parseFloat(d).toFixed(3) + ' KWD' 
+    },// Subtotal → sortable
+    { data: 'discount', render: d => d == 0 ? '-N/A-' : d + ' KWD', orderable: false }, // Discount → no sort icon
+   { data: 'total', render: d => parseFloat(d).toFixed(3) + ' KWD' },
+{ data: 'paid', render: d => d !== null ? parseFloat(d).toFixed(3) + ' KWD' : '-' },
+{ data: 'balance', render: d => d !== null ? parseFloat(d).toFixed(3) + ' KWD' : '-' },
+ // Balance → sortable
     { 
         data: 'date',
         orderable: false,

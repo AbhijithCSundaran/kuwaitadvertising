@@ -207,7 +207,7 @@
               <tr>
                 <td><?= $si++ ?></td>
                 <td><?= esc($item['description']) ?></td>
-                <td><?= number_format($item['price'], 3, '.', '') ?></td>
+                <td><?= bcadd($item['price'], '0', 3) ?></td>
                 <td><?= $item['quantity'] ?></td>
                 <td><?= number_format($item['total'], 3, '.', '') ?></td>
               </tr>
@@ -243,7 +243,7 @@
             <tr>
               <td colspan="4" style="text-align: right;">DISCOUNT</td>
               <td style="text-align: right; font-weight: 100;">
-                <?= $estimate['discount'] ?>%
+                <?= $estimate['discount'] ?> KWD
               </td>
             </tr>
 

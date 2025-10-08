@@ -19,6 +19,9 @@
             font-size: 24px;
         }
 
+        .location {
+            text-transform: capitalize;
+        }
         .estimate-details {
             text-align: right;
             position: absolute;
@@ -137,6 +140,7 @@
                     <th>Unit Price</th>
                     <th>Quantity</th>
                     <th>Amount</th>
+                    <th>Location</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -153,6 +157,11 @@
                                     value="<?= $item['quantity'] ?>"></td>
                             <td><input type="number" class="form-control total" name="total[]" step="0.001"
                                     value="<?= $item['total'] ?>" readonly></td>
+                                    <td>
+        <input type="text" class="form-control location" name="location[]"
+            value="<?= esc(ucfirst($item['location'] ?? '')) ?>"
+            placeholder="Enter Delivery Location">
+    </td>
                             <td class="text-center">
                                 <span class="remove-item-btn" title="Remove"><i class="fas fa-trash text-danger"></i></span>
                             </td>
@@ -165,6 +174,11 @@
                                 inputmode="decimal"></td>
                         <td><input type="number" name="quantity[]" class="form-control quantity"></td>
                         <td><input type="number" name="total[]" class="form-control total" readonly></td>
+                         <td>
+                            <input type="text" class="form-control location" name="location[]" 
+                                value="<?= esc(ucfirst($item['location'] ?? '')) ?>" 
+                                placeholder="Enter Delivery Location">
+                        </td>
                         <td class="text-center">
                             <span class="remove-item-btn" title="Remove"><i class="fas fa-trash text-danger"></i></span>
                         </td>
@@ -185,9 +199,19 @@
                 <td><strong>Discount:</strong></td>
                 <td>
                     <input type="number" name="discount" id="discount" class="form-control w-50 d-inline"
-                        value="<?= esc($invoice['discount'] ?? 0) ?>" min="0"> %
+                        value="<?= isset($invoice['discount']) ? number_format((float)$invoice['discount'], 3, '.', '') : '0.000' ?>"
+                        min="0" step="0.001"> KWD
+
                 </td>
             </tr>
+
+            <!-- <tr>
+                <td><strong>Discount:</strong></td>
+                <td>
+                    <input type="number" name="discount" id="discount" class="form-control w-50 d-inline"
+                        value="<?= esc($invoice['discount'] ?? 0) ?>" min="0"> %
+                </td>
+            </tr> -->
             <tr>
                 <td><strong>Total:</strong></td>
                 <td><strong><span id="total_display">0.000</span> KWD</strong></td>
@@ -223,10 +247,10 @@
                     <label>Address</label>
                     <textarea id="popup_address" class="form-control" rows="3" required></textarea>
                     <div class="alert alert-danger d-none mt-2" id="customerError"></div>
-                    <div class="mb-3">
-                        <label>Maximum Discount (%)</label>
-                        <input type="number" name="max_discount" id="max_discount" class="form-control" min="0" max="100" step="0.01" placeholder="Enter discount percentage">
-                    </div>
+                     <div class="mb-3">
+                    <label>Maximum Discount (KWD)</label>
+                    <input type="number" name="max_discount" id="max_discount" class="form-control" min="0" step="0.001" placeholder="Enter maximum discount amount">
+                </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" id="saveCustomerBtn" class="btn btn-primary" disabled>Save</button>
@@ -278,19 +302,37 @@
             updateSaveButtonState();
         });
         function calculateTotals() {
-            let subtotal = 0;
-            $('.item-row').each(function () {
-                let qty = parseFloat($(this).find('.quantity').val()) || 0;
-                let price = parseFloat($(this).find('.price').val()) || 0;
-                let total = qty * price;
-                $(this).find('.total').val(total.toFixed(3));
-                subtotal += total;
-            });
-            $('#sub_total_display').text(subtotal.toFixed(3));
-            let discount = parseFloat($('#discount').val()) || 0;
-            let finalTotal = subtotal - (subtotal * discount / 100);
-            $('#total_display').text(finalTotal.toFixed(3));
-        }
+    let subtotal = 0;
+
+    // Calculate subtotal from all item rows
+    $('.item-row').each(function () {
+        let qty = parseFloat($(this).find('.quantity').val()) || 0;
+        let price = parseFloat($(this).find('.price').val()) || 0;
+        let total = qty * price;
+        $(this).find('.total').val(total.toFixed(3));
+        subtotal += total;
+    });
+
+    $('#sub_total_display').text(subtotal.toFixed(3));
+
+    // Get the discount value from the input field
+    let discountFromInput = parseFloat($('#discount').val()) || 0;
+
+    // For calculation, the discount applied cannot be more than the subtotal
+    let effectiveDiscount = Math.min(discountFromInput, subtotal);
+
+    // Calculate the final total using the effective discount
+    let finalTotal = subtotal - effectiveDiscount;
+
+    // Ensure the total doesn't go below zero
+    if (finalTotal < 0) {
+        finalTotal = 0;
+    }
+
+    $('#total_display').text(finalTotal.toFixed(3));
+}
+
+
 
         $('#add-item').click(function () {
             const row = `
@@ -299,6 +341,7 @@
                 <td><input type="text" name="price[]" class="form-control price" step="0.001"></td>
                 <td><input type="number" name="quantity[]" class="form-control quantity" step="0.01"></td>
                 <td><input type="number" name="total[]" class="form-control total" step="0.001" readonly></td>
+                <td><input type="text" name="location[]" class="form-control location" placeholder="Enter Delivery Location">
                 <td class="text-center"><span class="remove-item-btn" title="Remove"><i class="fas fa-trash text-danger"></i></span></td>
             </tr>`;
             $('#item-container').append(row);
@@ -421,10 +464,11 @@
         //     });
         // });
 
-        $('#customer_id').on('change', function () {
+       $('#customer_id').on('change', function () {
             let customerId = $(this).val();
 
             if (customerId) {
+                // Fetch customer address
                 $.post("<?= site_url('customer/get_address') ?>", { customer_id: customerId }, function (res) {
                     if (res.status === 'success') {
                         $('#customer_address').val(res.address);
@@ -433,23 +477,31 @@
                     }
                 }, 'json');
 
-                 $.ajax({
+                // Fetch customer-specific discount
+                $.ajax({
                     url: '<?= base_url("customer/get_discount") ?>/' + customerId,
                     type: 'GET',
                     dataType: 'json',
                     success: function (res) {
                         if (res.discount !== undefined) {
                             maxCustomerDiscount = parseFloat(res.discount) || 0;
-                            if (parseFloat($('#discount').val()) === 0) {
-                                $('#discount').val(maxCustomerDiscount);
-                            }
-
+                            // Set the discount input to the fetched value
+                            $('#discount').val(maxCustomerDiscount.toFixed(3));
+                        } else {
+                            // If customer has no discount, reset to 0
+                            maxCustomerDiscount = 0;
+                            $('#discount').val('0.000');
                         }
+                        // Recalculate totals immediately after setting the discount
+                        calculateTotals();
                     }
                 });
             } else {
+                // If no customer is selected, reset everything
                 maxCustomerDiscount = 0;
-                $('#discount').val(0);
+                $('#discount').val('0.000');
+                $('#customer_address').val('');
+                calculateTotals();
             }
         });
 

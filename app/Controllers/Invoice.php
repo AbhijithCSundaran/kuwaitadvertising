@@ -270,6 +270,7 @@ class Invoice extends BaseController
     $descriptions = $request->getPost('description');
     $quantities = $request->getPost('quantity');
     $prices = $request->getPost('price');
+    $locations = $request->getPost('location'); 
 
     if ($descriptions && $quantities && $prices) {
         foreach ($descriptions as $i => $desc) {
@@ -278,7 +279,9 @@ class Invoice extends BaseController
                     'invoice_id' => $invoiceId,
                     'item_name' => ucfirst(trim($desc)),
                     'quantity' => $quantities[$i],
-                    'price' => $prices[$i]
+                    'price' => $prices[$i],
+                    'location'   => $locations[$i] ?? null,
+                    'item_order' => $i + 1 
                 ]);
             }
         }
@@ -295,59 +298,69 @@ class Invoice extends BaseController
 
 
     private function calculateTotal($request)
-    {
-        $prices = $request->getPost('price');
-        $qtys = $request->getPost('quantity');
-        $discount = floatval($request->getPost('discount') ?? 0);
-        $subtotal = 0;
+{
+    $prices = $request->getPost('price') ?? [];
+    $qtys = $request->getPost('quantity') ?? [];
+    $discount = floatval($request->getPost('discount') ?? 0);
+    $subtotal = 0;
 
-        foreach ($prices as $i => $price) {
-            $subtotal += floatval($price) * floatval($qtys[$i]);
-        }
-
-        $discountAmt = ($subtotal * $discount) / 100;
-        return $subtotal - $discountAmt;
+    foreach ($prices as $i => $price) {
+        $subtotal += floatval($price) * floatval($qtys[$i]);
     }
 
-    public function edit($id)
-    {
-        $invoiceModel = new InvoiceModel();
-        $itemModel = new InvoiceItemModel();
-        $customerModel = new customerModel();
-        $transactionModel = new TransactionModel();
-
-
-        $invoice = $invoiceModel->find($id);
-        if (!$invoice) {
-            return redirect()->to(base_url('invoicelist'))->with('error', 'Invoice not found.');
-        }
-        // if (strtolower($invoice['status']) === 'paid') {
-        //     return redirect()->to(base_url('invoicelist'))->with('error', 'Cannot edit a paid invoice.');
-        // }
-
-        $customer = $customerModel->find($invoice['customer_id']);
-        if ($customer) {
-            $invoice['customer_name'] = $customer['customer_name'] ?? '';
-            $invoice['customer_address'] = $customer['address'] ?? '';
-        } else {
-            $invoice['customer_name'] = '';
-            $invoice['customer_address'] = '';
-        }
-        $items = $itemModel->where('invoice_id', $id)->findAll();
-
-        $companyId = session()->get('company_id');
-        $customers = $customerModel->where('company_id', $companyId)->findAll();
-        $data = [
-            'invoice' => $invoice,
-            'items' => $items,
-            'customers' => $customerModel
-                ->where('is_deleted', 0)
-                ->where('company_id', $companyId)
-                ->findAll()
-        ];
-
-        return view('invoice_form', $data);
+    // Cap discount to subtotal
+    if ($discount > $subtotal) {
+        $discount = $subtotal;
     }
+
+    // Calculate total and round to 3 decimals (KWD standard)
+    $total = round($subtotal - $discount, 3);
+    return $total;
+}
+
+
+ public function edit($id)
+{
+    $invoiceModel = new InvoiceModel();
+    $itemModel = new InvoiceItemModel();
+    $customerModel = new customerModel();
+    $transactionModel = new TransactionModel();
+
+    $invoice = $invoiceModel->find($id);
+    if (!$invoice) {
+        return redirect()->to(base_url('invoicelist'))->with('error', 'Invoice not found.');
+    }
+
+    // ✅ Fetch customer details
+    $customer = $customerModel->find($invoice['customer_id']);
+    if ($customer) {
+        $invoice['customer_name'] = $customer['name'] ?? '';
+        $invoice['customer_address'] = $customer['address'] ?? '';
+    } else {
+        $invoice['customer_name'] = '';
+        $invoice['customer_address'] = '';
+    }
+
+    // ✅ Fetch items in correct order
+    $items = $itemModel
+        ->where('invoice_id', $id)
+        ->orderBy('item_order', 'ASC') // <---- FIXED HERE
+        ->findAll();
+
+    $companyId = session()->get('company_id');
+    $customers = $customerModel
+        ->where('is_deleted', 0)
+        ->where('company_id', $companyId)
+        ->findAll();
+
+    $data = [
+        'invoice' => $invoice,
+        'items' => $items,
+        'customers' => $customers,
+    ];
+
+    return view('invoice_form', $data);
+}
 
 
     public function delete($id = null)
@@ -402,49 +415,51 @@ class Invoice extends BaseController
         ]);
 
     }
-    public function convertFromEstimate($estimateId)
-    {
-        $estimateModel = new EstimateModel();
-        $itemModel = new EstimateItemModel();
-        $customerModel = new customerModel();
-        $estimate = $estimateModel->find($estimateId);
+public function convertFromEstimate($estimateId)
+{
+    $estimateModel = new EstimateModel();
+    $itemModel = new EstimateItemModel();
+    $customerModel = new customerModel();
 
-        if (!$estimate) {
-            return redirect()->back()->with('error', 'Estimate not found.');
-        }
-        //  if ($estimate['is_converted'] == 0) {
-        //     $estimateModel->update($estimateId, ['is_converted' => 1]);
-        //     $estimate['is_converted'] = 1; // also update local array
-        // }
+    $estimate = $estimateModel->find($estimateId);
 
-        $customerModel = new customerModel();
-        $customer = $customerModel->find($estimate['customer_id']);
-
-        $items = $itemModel->where('estimate_id', $estimateId)->findAll();
-        $companyId = session()->get('company_id');
-        $customers = $customerModel
-            ->where('is_deleted', 0)
-            ->where('company_id', $companyId)
-            ->findAll();
-        $customer = $customerModel->find($estimate['customer_id']);
-
-        $estimate['customer_address'] = $customer['address'] ?? '';
-        $estimate['phone_number'] = $estimate['phone_number'] ?? '';
-
-        foreach ($items as &$item) {
-            $item['item_name'] = ucfirst($item['description'] ?? '');
-            $item['product_id'] = $item['product_id'] ?? '';
-        }
-
-        return view('invoice_form', [
-            'invoice' => $estimate,
-            'items' => $items,
-            'customers' => $customers,
-            'customer' => $customer,
-            'is_converted' => true,
-        ]);
-
+    if (!$estimate) {
+        return redirect()->back()->with('error', 'Estimate not found.');
     }
+
+    // ✅ Fetch customer details
+    $customer = $customerModel->find($estimate['customer_id']);
+
+    // ✅ Fetch items in correct order (important line)
+    $items = $itemModel
+        ->where('estimate_id', $estimateId)
+        ->orderBy('item_order', 'ASC') // ensures consistent order
+        ->findAll();
+
+    $companyId = session()->get('company_id');
+    $customers = $customerModel
+        ->where('is_deleted', 0)
+        ->where('company_id', $companyId)
+        ->findAll();
+
+    // ✅ Set additional fields safely
+    $estimate['customer_address'] = $customer['address'] ?? '';
+    $estimate['phone_number'] = $estimate['phone_number'] ?? '';
+
+    foreach ($items as &$item) {
+        $item['item_name'] = ucfirst($item['description'] ?? '');
+        $item['product_id'] = $item['product_id'] ?? '';
+    }
+
+    return view('invoice_form', [
+        'invoice' => $estimate,
+        'items' => $items,
+        'customers' => $customers,
+        'customer' => $customer,
+        'is_converted' => true,
+    ]);
+}
+
 
     public function update_status()
     {

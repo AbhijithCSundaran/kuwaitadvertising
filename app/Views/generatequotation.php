@@ -256,7 +256,7 @@
               <tr>
                 <td colspan="4" style="text-align: right;">Discount</td>
                 <td style="text-align: right; font-weight: 100;">
-                  <?= sprintf("%.3f", $discount) ?>%
+                  <?= sprintf("%.3f", $discount) ?>KWD
                 </td>
               </tr>
 

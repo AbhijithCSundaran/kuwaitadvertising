@@ -34,7 +34,7 @@ class Customer extends BaseController
         'name' => $name,
         'address' => $address,
          'company_id' => $session->get('company_id'), 
-        'max_discount'=> $max_discount ?? 0
+        'max_discount' => round((float)($max_discount ?? 0), 3)
     ];
 
     if (!empty($customer_id)) {
@@ -178,6 +178,10 @@ public function getCustomer($id)
     $customer = $model->find($id);
 
     if ($customer) {
+        $customer['max_discount'] = isset($customer['max_discount'])
+            ? round((float)$customer['max_discount'], 3)
+            : 0.000;
+
         return $this->response->setJSON($customer);
     } else {
         return $this->response->setJSON(['status' => 'error', 'message' => 'Customer Not Found']);
@@ -224,10 +228,12 @@ public function get_discount($id)
 
     if ($customer) {
         return $this->response->setJSON([
-            'discount' => $customer['max_discount'] ?? 0
+            'discount' => isset($customer['max_discount'])
+                ? round((float)$customer['max_discount'], 3)
+                : 0.000
         ]);
     } else {
-        return $this->response->setJSON(['discount' => 0]);
+        return $this->response->setJSON(['discount' => 0.000]);
     }
 }
 

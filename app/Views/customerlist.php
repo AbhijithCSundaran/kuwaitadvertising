@@ -55,9 +55,10 @@
                         <textarea name="address" id="address" class="form-control" required style="text-transform: capitalize;"></textarea>
                     </div>
                     <div class="mb-3">
-                        <label>Maximum Discount (%)</label>
-                        <input type="number" name="max_discount" id="max_discount" class="form-control" min="0" max="100" step="0.01" placeholder="Enter discount percentage">
-                    </div>
+                    <label>Maximum Discount (KWD)</label>
+                    <input type="number" name="max_discount" id="max_discount" class="form-control" min="0" step="0.001" placeholder="Enter maximum discount amount">
+                </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="submit" id="saveCustomerBtn" class="btn btn-primary" disabled>Save</button>

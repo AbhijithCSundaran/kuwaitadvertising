@@ -138,6 +138,7 @@ $(document).ready(function () {
                     if (row.payment_status.toLowerCase() === 'unpaid') return '-N/A-';
                     switch(data) {
                         case 'cash': return 'Cash';
+                        case 'cheque': return 'Cheque';
                         case 'bank_transfer': return 'Bank Transfer';
                         case 'bank_link': return 'Bank Link';
                         case 'wamd': return 'WAMD';

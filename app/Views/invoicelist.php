@@ -126,12 +126,16 @@ $(document).ready(function () {
     }
 },
 
-            {
-                data: 'discount',
-                render: function (data) {
-                    return data ? data + ' %' : '0 %';
-                }
-            },
+           {
+    data: 'discount',
+    render: function (data) {
+        if (data === null || data === '' || parseFloat(data) === 0) {
+            return '-N/A-';
+        }
+        return parseFloat(data).toFixed(3) + ' KWD';
+    }
+},
+
             {
                 data: "total_amount",
                 render: data => parseFloat(data).toFixed(3) + " KWD"

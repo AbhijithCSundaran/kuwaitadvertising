@@ -328,31 +328,30 @@
 
       <div class="container">
         <div class="d-flex align-items-center text-center" style="margin-bottom: 5px; width:100%;">
-  <!-- Company Name (English) -->
-  <div class="col-4 text-start">
-    <span style="font-size: 13px; font-weight: bold;">
-      <?= esc(ucwords(strtolower($company['company_name'] ?? ''))) ?>
-    </span>
-  </div>
+          <!-- Company Name (English) -->
+          <div class="col-4 text-start">
+            <span style="font-size: 13px; font-weight: bold;">
+              <?= esc(ucwords(strtolower($company['company_name'] ?? ''))) ?>
+            </span>
+          </div>
 
-  <!-- Company Logo -->
-  <div class="col-4">
-    <?php if (!empty($company['company_logo'])): ?>
-      <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" alt="Company Logo"
-        style="max-height: 50px;">
-    <?php else: ?>
-      <img src="<?= base_url('public/uploads/default-logo.png') ?>" alt="Company Logo"
-        style="max-height: 50px;">
-    <?php endif; ?>
-  </div>
+          <!-- Company Logo -->
+          <div class="col-4">
+            <?php if (!empty($company['company_logo'])): ?>
+              <img src="<?= base_url('public/uploads/' . $company['company_logo']) ?>" alt="Company Logo"
+                style="max-height: 50px;">
+            <?php else: ?>
+              <img src="<?= base_url('public/uploads/default-logo.png') ?>" alt="Company Logo" style="max-height: 50px;">
+            <?php endif; ?>
+          </div>
 
-  <!-- Company Name (Arabic) -->
-  <div class="col-4 text-end">
-    <span style="font-size: 14px; font-weight: bold; direction: rtl;">
-      <?= esc($company['company_name_ar'] ?? '') ?>
-    </span>
-  </div>
-</div>
+          <!-- Company Name (Arabic) -->
+          <div class="col-4 text-end">
+            <span style="font-size: 14px; font-weight: bold; direction: rtl;">
+              <?= esc($company['company_name_ar'] ?? '') ?>
+            </span>
+          </div>
+        </div>
 
         <hr>
         <div class="row align-items-center" style="margin-bottom: 10px;">
@@ -403,18 +402,33 @@
           </thead>
           <tbody>
             <?php
+            $minRows = 8; // minimum rows
             $i = 1;
             foreach ($items as $item):
               ?>
               <tr>
-                <td style="border: 1px solid #000;  text-align: center;"><?= $i++ ?></td>
-                <td style="border: 1px solid #000; text-align: left;"><?= esc($item['item_name'] ?? '-') ?></td>
+                <td style="border: 1px solid #000; text-align: center; "><?= $i++ ?></td>
+                <td style="border: 1px solid #000; text-align: left; padding-left: 6px;"><?= esc($item['item_name'] ?? '-') ?></td>
                 <td style="border: 1px solid #000; text-align: center;"><?= number_format($item['price'], 3) ?></td>
                 <td style="border: 1px solid #000; text-align: center;"><?= esc($item['quantity']) ?></td>
-                <td style="border: 1px solid #000; text-align: left;">--</td>
+                <td style="border: 1px solid #000; text-align: left; padding-left: 6px;""><?= esc(ucfirst($item['location'] ?? '-')) ?></td>
               </tr>
             <?php endforeach; ?>
+
+            <?php
+            $emptyRows = max(0, $minRows - count($items));
+            for ($j = 0; $j < $emptyRows; $j++):
+              ?>
+              <tr class="empty-row">
+                <td>&nbsp;</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            <?php endfor; ?>
           </tbody>
+
         </table>
 
         <div class="d-flex w-100 position-relative" style="margin-top: 10px;">

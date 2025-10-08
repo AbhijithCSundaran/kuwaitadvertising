@@ -6,5 +6,5 @@ class EstimateItemModel extends Model
 {
     protected $table = 'estimate_items';
     protected $primaryKey = 'item_id';
-    protected $allowedFields = ['estimate_id', 'description', 'price', 'quantity', 'total'];
+    protected $allowedFields = ['estimate_id', 'description', 'price', 'quantity', 'total','item_order'];
 }

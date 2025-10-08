@@ -35,7 +35,7 @@
                     <th>Customer</th>
                     <th>Address</th>
                     <th>Subtotal</th>
-                    <th>Discount (%)</th>
+                    <th>Discount</th>
                     <th>Total (KWD)</th>
                     <th>Date</th>
                     <th>Action</th>
@@ -113,9 +113,15 @@
                     render: data => parseFloat(data).toFixed(3) + " KWD"
                 },
                 {
-                    data: "discount",
-                    render: data => (!data || parseFloat(data) === 0) ? '-N/A-' : parseFloat(data).toFixed() + '%'
-                },
+    data: 'discount',
+    render: function (data) {
+        if (data === null || data === '' || parseFloat(data) === 0) {
+            return '-N/A-';
+        }
+        return parseFloat(data).toFixed(3) + ' KWD';
+    }
+},
+
                 {
                     data: "total_amount",
                     render: data => parseFloat(data).toFixed(3) + " KWD"
