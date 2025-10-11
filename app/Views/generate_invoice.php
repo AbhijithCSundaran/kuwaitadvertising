@@ -1061,19 +1061,47 @@ let selectedInvoiceId = null;
 
 function openMarkPaidModal(invoiceId) {
   selectedInvoiceId = invoiceId;
+  const total = parseFloat(document.getElementById('total-amount').innerText.replace(/,/g,''));
+
+  let paid = 0;
+   const paidElement = document.getElementById('paidAmountValue');
+    if (paidElement) {
+      paid = parseFloat(paidElement.innerText.replace(/,/g,'')) || 0;     }
+      const balance = total - paid;
 
   // Open Bootstrap modal
   const markPaidModal = new bootstrap.Modal(document.getElementById('markPaidModal'));
   markPaidModal.show();
 
   // Auto-fill the amount with remaining balance (from PHP)
-const balanceAmount = parseFloat(<?= json_encode($balanceAmount) ?>);
-document.getElementById('markPaidAmount').value = balanceAmount.toFixed(3);
-
+// const balanceAmount = parseFloat(<?= json_encode($balanceAmount) ?>);
+// document.getElementById('markPaidAmount').value = balanceAmount.toFixed(3);
+ document.getElementById('markPaidAmount').value = balance.toFixed(3);
 
   // Set hidden field if needed
   $('#invoice_id').val(invoiceId);
 }
+// function openMarkPaidModal(invoiceId) {
+//     // Get total from DOM
+//     const total = parseFloat(document.getElementById('total-amount').innerText.replace(/,/g,''));
+
+//     // Get paid amount from hidden input (recommended) or fetch dynamically
+//     let paid = 0;
+//     const paidElement = document.getElementById('paidAmountValue');
+//     if (paidElement) {
+//         paid = parseFloat(paidElement.innerText.replace(/,/g,'')) || 0;
+//     }
+
+//     const balance = total - paid;
+
+//     // Open modal
+//     const markPaidModal = new bootstrap.Modal(document.getElementById('markPaidModal'));
+//     markPaidModal.show();
+
+//     // Set amount
+//     document.getElementById('markPaidAmount').value = balance.toFixed(3);
+// }
+
 
 $('#confirmMarkPaid').on('click', function () {
   const paymentMode = $('#markPaidPaymentMode').val();
@@ -1164,88 +1192,6 @@ $('#confirmMarkPaid').on('click', function () {
 });
 
 
-//   function openMarkPaidModal(invoiceId) {
-//     selectedInvoiceId = invoiceId;
-//     $('#invoice_id').val(invoiceId);
-//     $('#markPaidModal').modal('show');
-//   }
-
-
-//   $('#confirmMarkPaid').on('click', function () {
-//     // debugger;
-//     const paymentMode = $('#markPaidPaymentMode').val();
-//     const errorMsg = $('#markPaidError');
-
-
-//     if (!paymentMode || paymentMode.trim() === '') {
-//       errorMsg.show();
-//       $('#markPaidPaymentMode').focus();
-//       return;
-//     } else {
-//       errorMsg.hide();
-//     }
-
-//     $('#confirmMarkPaid').prop('disabled', true).text('Submit');
-
-//     $.ajax({
-//       url: "<?= base_url('invoice/update_status') ?>",
-//       type: "POST",
-//       contentType: "application/json",
-//       data: JSON.stringify({
-//         invoice_id: selectedInvoiceId,
-//         status: "paid",
-//         payment_mode: paymentMode
-//       }),
-//       success: function (response) {
-//         const modalElement = document.getElementById('markPaidModal');
-//         const modal = bootstrap.Modal.getInstance(modalElement);
-//         modal.hide();
-//         // alert('success');
-
-//         const deliveryNoteBtn = $('#deliveryNoteBtn');
-//     if (deliveryNoteBtn.length) {
-//       deliveryNoteBtn.removeClass('d-none').addClass('d-inline-block');
-//     }
-//         const statusBtn = $('#statusBtn');
-//         if (statusBtn.length) {
-//           statusBtn.text('Paid');
-//           statusBtn.css('background-color', '#28a745');
-//           statusBtn.prop('disabled', true);
-//           statusBtn.attr('title', 'Fully paid invoice cannot be changed');
-//         }
-//         // debugger;
-//         const paymentBtn = $('#paymentBtn');
-//         if (paymentBtn.length) {
-//           paymentBtn.removeClass('d-none').addClass('d-inline-block')
-//           if (paymentMode === 'cash') {
-//             paymentBtn.text('Receipt Voucher');
-//             paymentBtn.off('click').on('click', function () {
-//               window.location.href = "<?= base_url('receiptvoucher/' . $invoice['invoice_id']) ?>";
-//             });
-//           } else {
-//             paymentBtn.text('Payment Voucher');
-//             paymentBtn.off('click').on('click', function () {
-//               window.location.href = "<?= base_url('paymentvoucher/' . $invoice['invoice_id']) ?>";
-//             });
-//           }
-//         }
-
-//  $('#paidAmountRow').hide();
-//       $('#balanceAmountRow').hide();
-//         $('#editinvoicebtn').hide();
-//       },
-//       error: function (xhr, status, error) {
-//         console.error("AJAX Error:", status, error, xhr.responseText);
-//         alert("Something went wrong. Please try again.");
-//       },
-//       complete: function () {
-//         $('#confirmMarkPaid').prop('disabled', false).text('Submit');
-//       }
-//     });
-//   });
-
-
-  
   document.getElementById('paymentMode').addEventListener('change', function () {
     const mode = this.value;
     const paymentBtn = document.getElementById('paymentBtn');

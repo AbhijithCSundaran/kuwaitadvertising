@@ -22,6 +22,7 @@
         .location {
             text-transform: capitalize;
         }
+
         .estimate-details {
             text-align: right;
             position: absolute;
@@ -114,7 +115,8 @@
                         <strong>Customer Address</strong> <span class="text-danger">*</span>
                     </label>
                     <textarea name="customer_address" id="customer_address" class="form-control capitalize"
-                        maxlength="150" style="resize: vertical;" rows="3"><?= isset($invoice['customer_address']) ? trim($invoice['customer_address']) : '' ?></textarea>
+                        maxlength="150" style="resize: vertical;"
+                        rows="3"><?= isset($invoice['customer_address']) ? trim($invoice['customer_address']) : '' ?></textarea>
                 </div>
             </div>
             <div class="row">
@@ -145,8 +147,8 @@
                 </tr>
             </thead>
             <tbody id="item-container">
-                <?php if (!empty($items)): ?>
-                    <?php foreach ($items as $index => $item): ?>
+                <?php if (!empty($invoiceformitems)): ?>
+                    <?php foreach ($invoiceformitems as $index => $item): ?>
                         <tr class="item-row">
                             <td><input type="text" name="description[]" class="form-control"
                                     value="<?= esc($item['description'] ?? $item['item_name'] ?? '') ?>"></td>
@@ -157,14 +159,14 @@
                                     value="<?= $item['quantity'] ?>"></td>
                             <td><input type="number" class="form-control total" name="total[]" step="0.001"
                                     value="<?= $item['total'] ?>" readonly></td>
-                                    <td>
-        <input type="text" class="form-control location" name="location[]"
-            value="<?= esc(ucfirst($item['location'] ?? '')) ?>"
-            placeholder="Enter Delivery Location">
-    </td>
+                            <td>
+                                <input type="text" class="form-control location" name="location[]"
+                                    value="<?= esc(ucfirst($item['location'] ?? '')) ?>" placeholder="Enter Delivery Location">
+                            </td>
                             <td class="text-center">
                                 <span class="remove-item-btn" title="Remove"><i class="fas fa-trash text-danger"></i></span>
                             </td>
+                            <input type="hidden" name="item_order[]" class="item-order" value="<?= $index + 1 ?>">
                         </tr>
                     <?php endforeach; ?>
                 <?php else: ?>
@@ -174,10 +176,9 @@
                                 inputmode="decimal"></td>
                         <td><input type="number" name="quantity[]" class="form-control quantity"></td>
                         <td><input type="number" name="total[]" class="form-control total" readonly></td>
-                         <td>
-                            <input type="text" class="form-control location" name="location[]" 
-                                value="<?= esc(ucfirst($item['location'] ?? '')) ?>" 
-                                placeholder="Enter Delivery Location">
+                        <td>
+                            <input type="text" class="form-control location" name="location[]"
+                                value="<?= esc(ucfirst($item['location'] ?? '')) ?>" placeholder="Enter Delivery Location">
                         </td>
                         <td class="text-center">
                             <span class="remove-item-btn" title="Remove"><i class="fas fa-trash text-danger"></i></span>
@@ -199,7 +200,7 @@
                 <td><strong>Discount:</strong></td>
                 <td>
                     <input type="number" name="discount" id="discount" class="form-control w-50 d-inline"
-                        value="<?= isset($invoice['discount']) ? number_format((float)$invoice['discount'], 3, '.', '') : '0.000' ?>"
+                        value="<?= isset($invoice['discount']) ? number_format((float) $invoice['discount'], 3, '.', '') : '0.000' ?>"
                         min="0" step="0.001"> KWD
 
                 </td>
@@ -217,7 +218,7 @@
                 <td><strong><span id="total_display">0.000</span> KWD</strong></td>
             </tr>
         </table>
-    <input type="hidden" name="estimate_id" value="<?= $invoice['estimate_id'] ?? '' ?>">
+        <input type="hidden" name="estimate_id" value="<?= $invoice['estimate_id'] ?? '' ?>">
         <input type="hidden" name="invoice_id"
             value="<?= isset($invoice['invoice_id']) ? $invoice['invoice_id'] : '' ?>">
         <input type="hidden" name="original_status"
@@ -225,8 +226,8 @@
         <input type="hidden" id="is_converted" value="<?= !empty($is_converted) ? 1 : 0 ?>">
         <div class="text-end">
             <a href="<?= base_url('invoicelist') ?>" class="btn btn-secondary">Discard</a>
-            <button type="submit" id="save-invoice-btn" class="btn btn-primary"
-                <?= (!empty($invoice) && empty($is_converted)) ? 'disabled' : '' ?>>
+            <!-- <button type="submit" id="save-invoice-btn" class="btn btn-primary" -->
+            <button type="submit" id="save-invoice-btn" class="btn btn-primary" <?= (!empty($invoice) && empty($is_converted)) ? 'disabled' : '' ?>>
                 Generate Invoice
             </button>
         </div>
@@ -247,10 +248,11 @@
                     <label>Address</label>
                     <textarea id="popup_address" class="form-control" rows="3" required></textarea>
                     <div class="alert alert-danger d-none mt-2" id="customerError"></div>
-                     <div class="mb-3">
-                    <label>Maximum Discount (KWD)</label>
-                    <input type="number" name="max_discount" id="max_discount" class="form-control" min="0" step="0.001" placeholder="Enter maximum discount amount">
-                </div>
+                    <div class="mb-3">
+                        <label>Maximum Discount (KWD)</label>
+                        <input type="number" name="max_discount" id="max_discount" class="form-control" min="0"
+                            step="0.001" placeholder="Enter maximum discount amount">
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" id="saveCustomerBtn" class="btn btn-primary" disabled>Save</button>
@@ -281,6 +283,38 @@
         } else {
             $('#save-invoice-btn').prop('disabled', true);
         }
+
+        function calculateTotals() {
+            let subtotal = 0;
+
+            // Calculate subtotal from all item rows
+            $('.item-row').each(function () {
+                let qty = parseFloat($(this).find('.quantity').val()) || 0;
+                let price = parseFloat($(this).find('.price').val()) || 0;
+                let total = qty * price;
+                $(this).find('.total').val(total.toFixed(3));
+                subtotal += total;
+            });
+
+            $('#sub_total_display').text(subtotal.toFixed(3));
+
+            // Get the discount value from the input field
+            let discountFromInput = parseFloat($('#discount').val()) || 0;
+
+            // For calculation, the discount applied cannot be more than the subtotal
+            let effectiveDiscount = Math.min(discountFromInput, subtotal);
+
+            // Calculate the final total using the effective discount
+            let finalTotal = subtotal - effectiveDiscount;
+
+            // Ensure the total doesn't go below zero
+            if (finalTotal < 0) {
+                finalTotal = 0;
+            }
+
+            $('#total_display').text(finalTotal.toFixed(3));
+        }
+
         function updateSaveButtonState() {
             if ($('#is_converted').val() === "1") {
                 $('#save-invoice-btn').prop('disabled', false);
@@ -296,41 +330,10 @@
             $(this).closest('tr').remove();
             calculateTotals();
             updateSaveButtonState();
+            const currentData = $('#invoice-form').serialize();
+            const hasChanged = currentData !== initialFormData;
+            $('#save-invoice-btn').prop('disabled', !hasChanged);
         });
-        $('#add-item').click(function () {
-            calculateTotals();
-            updateSaveButtonState();
-        });
-        function calculateTotals() {
-    let subtotal = 0;
-
-    // Calculate subtotal from all item rows
-    $('.item-row').each(function () {
-        let qty = parseFloat($(this).find('.quantity').val()) || 0;
-        let price = parseFloat($(this).find('.price').val()) || 0;
-        let total = qty * price;
-        $(this).find('.total').val(total.toFixed(3));
-        subtotal += total;
-    });
-
-    $('#sub_total_display').text(subtotal.toFixed(3));
-
-    // Get the discount value from the input field
-    let discountFromInput = parseFloat($('#discount').val()) || 0;
-
-    // For calculation, the discount applied cannot be more than the subtotal
-    let effectiveDiscount = Math.min(discountFromInput, subtotal);
-
-    // Calculate the final total using the effective discount
-    let finalTotal = subtotal - effectiveDiscount;
-
-    // Ensure the total doesn't go below zero
-    if (finalTotal < 0) {
-        finalTotal = 0;
-    }
-
-    $('#total_display').text(finalTotal.toFixed(3));
-}
 
 
 
@@ -346,6 +349,7 @@
             </tr>`;
             $('#item-container').append(row);
             calculateTotals();
+
 
             const currentFormData = $('#invoice-form').serialize();
             const hasChanged = currentFormData !== initialFormData;
@@ -375,14 +379,14 @@
             $(this).val(capitalized);
         });
 
-        $(document).on('click', '.remove-item-btn', function () {
-            $(this).closest('tr').remove();
-            calculateTotals();
+        // $(document).on('click', '.remove-item-btn', function () {
+        //     $(this).closest('tr').remove();
+        //     calculateTotals();
 
-            const currentFormData = $('#invoice-form').serialize();
-            const hasChanged = currentFormData !== initialFormData;
-            $('#save-invoice-btn').prop('disabled', !hasChanged);
-        });
+        //     const currentFormData = $('#invoice-form').serialize();
+        //     const hasChanged = currentFormData !== initialFormData;
+        //     $('#save-invoice-btn').prop('disabled', !hasChanged);
+        // });
 
         $(document).on('input', '.price', function () {
             let input = this;
@@ -408,68 +412,17 @@
         $('#addCustomerBtn').click(function () {
             $('#popup_name').val('');
             $('#popup_address').val('');
-            $('#customerModal').modal('show');
+            $('#CustomerModal').modal('show');
         });
 
-        // $('#customerForm').submit(function (e) {
-        //     e.preventDefault();
-        //     const name = $('#popup_name').val().trim();
-        //     const address = $('#popup_address').val().trim();
-        //     const max_discount = $('#max_discount').val().trim();
-
-        //     if (!name || !address) {
-        //         $('#customerError').removeClass('d-none').text('Name and address are required.');
-        //         return;
-        //     }
-
-        //     $.ajax({
-        //         url: "<?= base_url('customer/get-address') ?>",
-        //         type: "POST",
-        //         data: { name, address, max_discount },
-        //         dataType: "json",
-        //         success: function (res) {
-        //             if (res.status === 'success') {
-        //                 const newOption = new Option(res.customer.name, res.customer.customer_id, true, true);
-        //                 $('#customer_id').append(newOption).trigger('change');
-        //                 $('#popup_name').val('');
-        //                 $('#popup_address').val('');
-        //                 $('#max_discount').val('');
-        //                 $('#customerModal').modal('hide');
-        //                 $('.alert')
-        //                     .removeClass('d-none alert-danger')
-        //                     .addClass('alert-success')
-        //                     .text('Customer Created Successfully.')
-        //                     .fadeIn()
-        //                     .delay(3000)
-        //                     .fadeOut();
-        //             } else {
-        //                 $('.alert')
-        //                     .removeClass('d-none alert-success')
-        //                     .addClass('alert-danger')
-        //                     .text(res.message || 'Failed To Create Customer.')
-        //                     .fadeIn()
-        //                     .delay(3000)
-        //                     .fadeOut();
-        //             }
-        //         },
-        //         error: function () {
-        //             $('.alert')
-        //                 .removeClass('d-none alert-success')
-        //                 .addClass('alert-danger')
-        //                 .text('Server Error Occurred While Creating Customer.')
-        //                 .fadeIn()
-        //                 .delay(3000)
-        //                 .fadeOut();
-        //         }
-        //     });
-        // });
-
-       $('#customer_id').on('change', function () {
+        $('#customer_id').on('change', function () {
             let customerId = $(this).val();
 
             if (customerId) {
                 // Fetch customer address
-                $.post("<?= site_url('customer/get_address') ?>", { customer_id: customerId }, function (res) {
+                $.post("<?= site_url('customer/get_address') ?>", {
+                    customer_id: customerId
+                }, function (res) {
                     if (res.status === 'success') {
                         $('#customer_address').val(res.address);
                     } else {
@@ -514,7 +467,7 @@
                 success: function (res) {
                     if (res.discount !== undefined) {
                         maxCustomerDiscount = parseFloat(res.discount) || 0;
-                        
+
                     }
                 }
             });
@@ -594,7 +547,7 @@
 
         $('#discount').on('input', function () {
             let val = parseFloat($(this).val()) || 0;
-        
+
             if (maxCustomerDiscount === 0) {
                 $(this).val(0);
                 $(this).attr('data-bs-original-title', 'No discount is set for the selected customer').tooltip('show');
@@ -611,12 +564,12 @@
                 $(this).tooltip('hide');
             }
         });
- 
+
         function toggleCustomerSaveButton() {
             const name = $('#popup_name').val().trim();
             const address = $('#popup_address').val().trim();
 
-        
+
             if (name && address) {
                 $('#saveCustomerBtn').prop('disabled', false).removeClass('btn-secondary').addClass('btn-primary');
             } else {
@@ -643,7 +596,11 @@
             $.ajax({
                 url: "<?= base_url('customer/create') ?>",
                 type: "POST",
-                data: { name, address, max_discount },
+                data: {
+                    name,
+                    address,
+                    max_discount
+                },
                 dataType: "json",
                 success: function (res) {
                     if (res.status === 'success') {
@@ -686,7 +643,7 @@
                 }
             });
         });
-        
+
         function showAlert(message, type) {
             $('.alert')
                 .removeClass('d-none alert-success alert-danger')
@@ -694,7 +651,7 @@
                 .text(message)
                 .fadeIn().delay(3000).fadeOut();
         }
-         $(window).on('keydown', function (e) {
+        $(window).on('keydown', function (e) {
             if (e.ctrlKey && e.key === 'Enter') {
                 e.preventDefault();
                 $('#save-invoice-btn').trigger('click');
@@ -706,4 +663,13 @@
             }
         });
     });
+
+    function updateItemOrders() {
+        $('#item-container tr.item-row').each(function (index) {
+            $(this).find('.item-order').val(index + 1);
+        });
+    }
+
+    
+
 </script>

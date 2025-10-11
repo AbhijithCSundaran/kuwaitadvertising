@@ -375,7 +375,7 @@ class Estimate extends BaseController
 
             return $this->response->setJSON([
                 'status' => 'success',
-                'message' => 'Estimate updated successfully.',
+                'message' => 'Estimate Updated Successfully.',
                 'estimate_id' => $estimateId
             ]);
         } else {
