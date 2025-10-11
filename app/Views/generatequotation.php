@@ -238,17 +238,16 @@
             ?>
             <!-- <tr><td  class="padding-50"></td> <td></td><td></td><td></td><td></td></tr> -->
             <?php
-            $discount = $estimate['discount'] ?? 0;
-            $discountAmount = ($grandTotal * $discount) / 100;
-            $totalAfterDiscount = $grandTotal - $discountAmount;
-            ?>
+				$discount = $estimate['discount'] ?? 0; // fixed KWD value
+				$totalAfterDiscount = $grandTotal - $discount;
+			?>
 
             <!-- Subtotal -->
             <tfoot class="summary-row">
               <tr>
                 <td colspan="4" style="text-align: right;">Subtotal</td>
                 <td style="text-align: right; font-weight: 100;">
-                  <?= bcadd('0', (string) $grandTotal, 3) ?> KD
+                  <?= bcadd('0', (string) $grandTotal, 3) ?> KWD
                 </td>
               </tr>
 
@@ -259,12 +258,14 @@
                   <?= sprintf("%.3f", $discount) ?>KWD
                 </td>
               </tr>
+			  
+			  
 
               <!-- Grand Total -->
               <tr>
                 <td colspan="4" style="text-align: right;">Grand Total</td>
                 <td style="text-align: right; font-weight: 100;">
-                  <?= bcadd('0', (string) $totalAfterDiscount, 3) ?> KD
+                  <?= bcadd('0', (string) $totalAfterDiscount, 3) ?> KWD
                 </td>
               </tr>
             </tfoot>

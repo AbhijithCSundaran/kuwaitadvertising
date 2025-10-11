@@ -342,7 +342,7 @@ class Invoice extends BaseController
     }
 
     // ✅ Fetch items in correct order
-    $items = $itemModel
+    $invoiceformitems = $itemModel
         ->where('invoice_id', $id)
         ->orderBy('item_order', 'ASC') // <---- FIXED HERE
         ->findAll();
@@ -355,7 +355,8 @@ class Invoice extends BaseController
 
     $data = [
         'invoice' => $invoice,
-        'items' => $items,
+        'invoiceformitems_og' => $invoiceformitems,
+        'invoiceformitems' => $invoiceformitems,
         'customers' => $customers,
     ];
 
@@ -398,23 +399,56 @@ class Invoice extends BaseController
             'user_name' => $user_name,
         ]);
     }
+    // public function delivery_note($id)
+    // {
+    //     $invoiceModel = new InvoiceModel();
+    //     $itemModel = new InvoiceItemModel();
+
+    //     $invoice = $invoiceModel->find($id);
+    //     $items = $itemModel->where('invoice_id', $id)->findAll();
+    //     $customerModel = new customerModel();
+    //     $customer = $customerModel->find($invoice['customer_id']);
+
+    //     return view('delivery_note', [
+    //         'invoice' => $invoice,
+    //         'items' => $items,
+    //         'customer' => $customer
+    //     ]);
+
+    // }
     public function delivery_note($id)
-    {
-        $invoiceModel = new InvoiceModel();
-        $itemModel = new InvoiceItemModel();
+{
+    $invoiceModel = new InvoiceModel();
+    $itemModel = new InvoiceItemModel();
+    $customerModel = new customerModel();
 
-        $invoice = $invoiceModel->find($id);
-        $items = $itemModel->where('invoice_id', $id)->findAll();
-        $customerModel = new customerModel();
-        $customer = $customerModel->find($invoice['customer_id']);
-
-        return view('delivery_note', [
-            'invoice' => $invoice,
-            'items' => $items,
-            'customer' => $customer
-        ]);
-
+    // Find the invoice
+    $invoice = $invoiceModel->find($id);
+    if (!$invoice) {
+        // Invoice not found, handle gracefully
+        return redirect()->back()->with('error', 'Invoice not found.');
     }
+
+    // Get items for the invoice
+    $items = $itemModel->where('invoice_id', $id)->findAll();
+
+    // Get customer info safely
+    $customer = $customerModel->find($invoice['customer_id']);
+    if (!$customer) {
+        $customer = [
+            'name' => '-N/A-',
+            'email' => '-N/A-'
+        ];
+    }
+
+    // Return view
+    return view('delivery_note', [
+        'invoice' => $invoice,
+        'items' => $items,
+        'customer' => $customer
+    ]);
+}
+
 public function convertFromEstimate($estimateId)
 {
     $estimateModel = new EstimateModel();
@@ -453,7 +487,7 @@ public function convertFromEstimate($estimateId)
 
     return view('invoice_form', [
         'invoice' => $estimate,
-        'items' => $items,
+        'invoiceformitems' => $items,
         'customers' => $customers,
         'customer' => $customer,
         'is_converted' => true,

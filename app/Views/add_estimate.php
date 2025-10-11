@@ -222,44 +222,44 @@
     </div>
     <?php include "common/footer.php"; ?>
 <script>
-   $(document).ready(function () {
+    $(document).ready(function() {
         $('#customer_id').select2({
             placeholder: "Select Customer",
             width: 'calc(100% - 40px)',
             minimumResultsForSearch: 0
         });
 
-        $('#popup_name').on('input', function () {
+        $('#popup_name').on('input', function() {
             let value = $(this).val();
-            let capitalized = value.replace(/\b\w/g, function (char) {
+            let capitalized = value.replace(/\b\w/g, function(char) {
                 return char.toUpperCase();
             });
             $(this).val(capitalized);
         });
 
-       $('#popup_address').on('input', function () {
+        $('#popup_address').on('input', function() {
             let value = $(this).val();
-            let capitalized = value.replace(/\b\w/g, function (char) {
+            let capitalized = value.replace(/\b\w/g, function(char) {
                 return char.toUpperCase();
             });
 
             $(this).val(capitalized);
         });
 
-       document.getElementById('phone_number').addEventListener('input', function () {
+        document.getElementById('phone_number').addEventListener('input', function() {
             let val = this.value;
             this.value = val.replace(/(?!^)\+/g, '').replace(/[^0-9\s\-\(\)\+]/g, '');
         });
 
-        $(document).on('input', 'input[name="description[]"]', function () {
+        $(document).on('input', 'input[name="description[]"]', function() {
             let value = $(this).val();
-            let capitalized = value.replace(/\b\w/g, function (char) {
+            let capitalized = value.replace(/\b\w/g, function(char) {
                 return char.toUpperCase();
             });
             $(this).val(capitalized);
         });
 
-         $(document).on('input', '.price', function () {
+        $(document).on('input', '.price', function() {
             let input = this;
             let val = input.value;
             if (val === '' || val === '.') return;
@@ -277,59 +277,59 @@
             }
         });
 
-        $('#addCustomerBtn').on('click', function () {
+        $('#addCustomerBtn').on('click', function() {
             $('#customerModal').modal('show');
         });
 
-//         function calculateTotals() {
-//     let subtotal = 0;
-//     $('.item-row').each(function () {
-//         let qty = parseFloat($(this).find('.quantity').val()) || 0;
-//         let price = parseFloat($(this).find('.price').val()) || 0;
-//         let total = Number((qty * price).toFixed(3)); // fix decimals here
-//         $(this).find('.total').val(total.toFixed(3));
-//         subtotal = Number((subtotal + total).toFixed(3)); // accumulate with 3 decimals
-//     });
+        //         function calculateTotals() {
+        //     let subtotal = 0;
+        //     $('.item-row').each(function () {
+        //         let qty = parseFloat($(this).find('.quantity').val()) || 0;
+        //         let price = parseFloat($(this).find('.price').val()) || 0;
+        //         let total = Number((qty * price).toFixed(3)); // fix decimals here
+        //         $(this).find('.total').val(total.toFixed(3));
+        //         subtotal = Number((subtotal + total).toFixed(3)); // accumulate with 3 decimals
+        //     });
 
-//     $('#sub_total_display').text(subtotal.toFixed(3));
+        //     $('#sub_total_display').text(subtotal.toFixed(3));
 
-//     let discount = parseFloat($('#discount').val()) || 0;
-//     let discountAmt = Number(((subtotal * discount) / 100).toFixed(3));
-//     let finalTotal = Number((subtotal - discountAmt).toFixed(3));
-//     $('#total_display').text(finalTotal.toFixed(3));
-// }
-function calculateTotals() {
-    let subtotal = 0;
+        //     let discount = parseFloat($('#discount').val()) || 0;
+        //     let discountAmt = Number(((subtotal * discount) / 100).toFixed(3));
+        //     let finalTotal = Number((subtotal - discountAmt).toFixed(3));
+        //     $('#total_display').text(finalTotal.toFixed(3));
+        // }
+        function calculateTotals() {
+            let subtotal = 0;
 
-    // Calculate subtotal from all item rows
-    $('.item-row').each(function () {
-        let qty = parseFloat($(this).find('.quantity').val()) || 0;
-        let price = parseFloat($(this).find('.price').val()) || 0;
-        let total = qty * price;
-        $(this).find('.total').val(total.toFixed(3));
-        subtotal += total;
-    });
+            // Calculate subtotal from all item rows
+            $('.item-row').each(function() {
+                let qty = parseFloat($(this).find('.quantity').val()) || 0;
+                let price = parseFloat($(this).find('.price').val()) || 0;
+                let total = qty * price;
+                $(this).find('.total').val(total.toFixed(3));
+                subtotal += total;
+            });
 
-    $('#sub_total_display').text(subtotal.toFixed(3));
+            $('#sub_total_display').text(subtotal.toFixed(3));
 
-    // Get the discount value from the input field
-    let discountFromInput = parseFloat($('#discount').val()) || 0;
+            // Get the discount value from the input field
+            let discountFromInput = parseFloat($('#discount').val()) || 0;
 
-    // For calculation, the discount applied cannot be more than the subtotal
-    let effectiveDiscount = Math.min(discountFromInput, subtotal);
+            // For calculation, the discount applied cannot be more than the subtotal
+            let effectiveDiscount = Math.min(discountFromInput, subtotal);
 
-    // Calculate the final total using the effective discount
-    let finalTotal = subtotal - effectiveDiscount;
+            // Calculate the final total using the effective discount
+            let finalTotal = subtotal - effectiveDiscount;
 
-    // Ensure the total doesn't go below zero
-    if (finalTotal < 0) {
-        finalTotal = 0;
-    }
+            // Ensure the total doesn't go below zero
+            if (finalTotal < 0) {
+                finalTotal = 0;
+            }
 
-    $('#total_display').text(finalTotal.toFixed(3));
-}
+            $('#total_display').text(finalTotal.toFixed(3));
+        }
 
-        $('#add-item').click(function () {
+        $('#add-item').click(function() {
             const newRow = $(` 
                 <tr class="item-row">
                     <td><input type="text" name="description[]" class="form-control" placeholder="Description"></td>
@@ -348,25 +348,25 @@ function calculateTotals() {
         });
 
 
-        $(document).on('click', '.remove-item-btn', function () {
+        $(document).on('click', '.remove-item-btn', function() {
             $(this).closest('tr').remove();
             calculateTotals();
 
             const currentData = $('#estimate-form').serialize();
             const hasChanged = currentData !== initialEstimateData;
 
-    
-             $('#generate-btn').prop('disabled', !hasChanged);
+
+            $('#generate-btn').prop('disabled', !hasChanged);
         });
 
         $(document).on('input change', '.price, .quantity, #discount', calculateTotals);
         calculateTotals();
 
-        $('#cancelCustomerBtn, #closeCustomerModalBtn').on('click', function () {
+        $('#cancelCustomerBtn, #closeCustomerModalBtn').on('click', function() {
             $('#customerModal').modal('hide');
         });
 
-        $('#customer_id').on('change', function () {
+        $('#customer_id').on('change', function() {
             var customerId = $(this).val();
             if (customerId === '') {
                 $('#customer_address').val('');
@@ -374,18 +374,21 @@ function calculateTotals() {
             }
 
             $.ajax({
-                url: '<?= site_url('customer/get-address') ?>',
+                url: '<?= site_url('
+                customer / get-address ') ?>',
                 type: 'POST',
-                data: { customer_id: customerId },
+                data: {
+                    customer_id: customerId
+                },
                 dataType: 'json',
-                success: function (response) {
+                success: function(response) {
                     if (response.status === 'success') {
                         $('#customer_address').val(response.address);
                     } else {
                         $('#customer_address').val('');
                     }
                 },
-                error: function () {
+                error: function() {
                     $('#customer_address').val('');
                 }
             });
@@ -393,103 +396,108 @@ function calculateTotals() {
 
         const saveCustomerBtn = $('#saveCustomerBtn');
 
-// ✅ Disable button when modal opens
-$('#customerModal').on('show.bs.modal', function () {
-    saveCustomerBtn.prop('disabled', true);
-    $('#customerError').addClass('d-none');
-});
+        // ✅ Disable button when modal opens
+        $('#customerModal').on('show.bs.modal', function() {
+            saveCustomerBtn.prop('disabled', true);
+            $('#customerError').addClass('d-none');
+        });
 
-// ✅ Enable Save button only when required fields are filled
-$('#popup_name, #popup_address').on('input', function () {
-    let name = $('#popup_name').val().trim();
-    let address = $('#popup_address').val().trim();
+        // ✅ Enable Save button only when required fields are filled
+        $('#popup_name, #popup_address').on('input', function() {
+            let name = $('#popup_name').val().trim();
+            let address = $('#popup_address').val().trim();
 
-    if (name !== '' && address !== '') {
-        saveCustomerBtn.prop('disabled', false);
-    } else {
-        saveCustomerBtn.prop('disabled', true);
-    }
-});
-
-// ✅ Handle customer form submit
-$('#customerForm').submit(function (e) {
-    e.preventDefault();
-
-    let name = $('#popup_name').val().trim();
-    let address = $('#popup_address').val().trim();
-    let max_discount = $('#max_discount').val().trim();
-
-    name = name.replace(/\b\w/g, char => char.toUpperCase());
-    address = address.replace(/(^\s*\w|[.!?]\s*\w)/g, char => char.toUpperCase());
-
-    if (!name || !address) {
-        $('#customerError').removeClass('d-none').text('Please Enter Valid Name And Address');
-        return;
-    }
-
-    // ✅ Disable button after first click to prevent double submission
-    saveCustomerBtn.prop('disabled', true).text('Save');
-
-    $.ajax({
-        url: "<?= site_url('customer/create') ?>",
-        type: "POST",
-        data: { name, address, max_discount },
-        dataType: "json",
-        success: function (res) {
-            if (res.status === 'success') {
-                const newOption = new Option(res.customer.name, res.customer.customer_id, true, true);
-                $('#customer_id').append(newOption).trigger('change');
-                $('#popup_name').val('');
-                $('#popup_address').val('');
-                $('#max_discount').val('');
-                $('#customerModal').modal('hide');
-                $('.alert')
-                    .removeClass('d-none alert-danger')
-                    .addClass('alert-success')
-                    .text('Customer Created Successfully.')
-                    .fadeIn()
-                    .delay(3000)
-                    .fadeOut();
+            if (name !== '' && address !== '') {
+                saveCustomerBtn.prop('disabled', false);
             } else {
-                $('.alert')
-                    .removeClass('d-none alert-success')
-                    .addClass('alert-danger')
-                    .text(res.message || 'Failed To Create Customer.')
-                    .fadeIn()
-                    .delay(3000)
-                    .fadeOut();
+                saveCustomerBtn.prop('disabled', true);
             }
-        },
-        error: function () {
-            $('.alert')
-                .removeClass('d-none alert-success')
-                .addClass('alert-danger')
-                .text('Server Error Occurred While Creating Customer.')
-                .fadeIn()
-                .delay(3000)
-                .fadeOut();
-        },
-        complete: function () {
-            // ✅ Reset button after request is completed
+        });
+
+        // ✅ Handle customer form submit
+        $('#customerForm').submit(function(e) {
+            e.preventDefault();
+
+            let name = $('#popup_name').val().trim();
+            let address = $('#popup_address').val().trim();
+            let max_discount = $('#max_discount').val().trim();
+
+            name = name.replace(/\b\w/g, char => char.toUpperCase());
+            address = address.replace(/(^\s*\w|[.!?]\s*\w)/g, char => char.toUpperCase());
+
+            if (!name || !address) {
+                $('#customerError').removeClass('d-none').text('Please Enter Valid Name And Address');
+                return;
+            }
+
+            // ✅ Disable button after first click to prevent double submission
             saveCustomerBtn.prop('disabled', true).text('Save');
-        }
-    });
-});
-        
+
+            $.ajax({
+                url: "<?= site_url('customer/create') ?>",
+                type: "POST",
+                data: {
+                    name,
+                    address,
+                    max_discount
+                },
+                dataType: "json",
+                success: function(res) {
+                    if (res.status === 'success') {
+                        const newOption = new Option(res.customer.name, res.customer.customer_id, true, true);
+                        $('#customer_id').append(newOption).trigger('change');
+                        $('#popup_name').val('');
+                        $('#popup_address').val('');
+                        $('#max_discount').val('');
+                        $('#customerModal').modal('hide');
+                        $('.alert')
+                            .removeClass('d-none alert-danger')
+                            .addClass('alert-success')
+                            .text('Customer Created Successfully.')
+                            .fadeIn()
+                            .delay(3000)
+                            .fadeOut();
+                    } else {
+                        $('.alert')
+                            .removeClass('d-none alert-success')
+                            .addClass('alert-danger')
+                            .text(res.message || 'Failed To Create Customer.')
+                            .fadeIn()
+                            .delay(3000)
+                            .fadeOut();
+                    }
+                },
+                error: function() {
+                    $('.alert')
+                        .removeClass('d-none alert-success')
+                        .addClass('alert-danger')
+                        .text('Server Error Occurred While Creating Customer.')
+                        .fadeIn()
+                        .delay(3000)
+                        .fadeOut();
+                },
+                complete: function() {
+                    // ✅ Reset button after request is completed
+                    saveCustomerBtn.prop('disabled', true).text('Save');
+                }
+            });
+        });
+
         let initialEstimateData = $('#estimate-form').serialize();
         $('#generate-btn').prop('disabled', true);
-        $('#estimate-form').on('input change', 'input, select, textarea', function () {
+        $('#estimate-form').on('input change', 'input, select, textarea', function() {
             const currentData = $('#estimate-form').serialize();
             const hasChanged = currentData !== initialEstimateData;
             $('#generate-btn').prop('disabled', !hasChanged);
         });
+
         function updateInitialFormState() {
             initialEstimateData = $('#estimate-form').serialize();
-            $('#generate-btn').prop('disabled', true); 
+            $('#generate-btn').prop('disabled', true);
         }
 
 
-        $('#estimate-form').submit(function (e) {
+        $('#estimate-form').submit(function(e) {
             e.preventDefault();
 
             const customerId = $('#customer_id').val();
@@ -511,7 +519,7 @@ $('#customerForm').submit(function (e) {
                 return;
             }
             let validItemExists = false;
-            $('.item-row').each(function () {
+            $('.item-row').each(function() {
                 const desc = $(this).find('input[name="description[]"]').val().trim();
                 const price = parseFloat($(this).find('input[name="price[]"]').val()) || 0;
                 const qty = parseFloat($(this).find('input[name="quantity[]"]').val()) || 0;
@@ -526,7 +534,7 @@ $('#customerForm').submit(function (e) {
                 showAlert('Please Enter At Least One Valid Item With Description, Price, and Quantity.', 'danger');
                 return;
             }
-            $('.item-row').each(function () {
+            $('.item-row').each(function() {
                 const desc = $(this).find('input[name="description[]"]').val().trim();
                 const price = parseFloat($(this).find('input[name="price[]"]').val()) || 0;
                 const qty = parseFloat($(this).find('input[name="quantity[]"]').val()) || 0;
@@ -541,41 +549,41 @@ $('#customerForm').submit(function (e) {
             const formData = new FormData(this);
             formData.append('customer_name', customerName);
 
-             $('#item-container tr.item-row').each(function (index) {
+            $('#item-container tr.item-row').each(function(index) {
                 formData.append('item_order[]', index + 1); // Save order starting from 1
             });
 
-                $.ajax({
-                    url: "<?= site_url('estimate/save') ?>",
-                    type: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    dataType: "json",
-                    success: function (res) {
-                if (res.status === 'success') {
-                    showAlert(res.message, 'success');
+            $.ajax({
+                url: "<?= site_url('estimate/save') ?>",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: "json",
+                success: function(res) {
+                    if (res.status === 'success') {
+                        showAlert(res.message, 'success');
 
-                    updateInitialFormState(); 
+                        updateInitialFormState();
 
-                    setTimeout(function () {
-                        window.location.href = "<?= site_url('estimate/generateEstimate/') ?>" + res.estimate_id;
-                    }, 1500);
-                } else if (res.status === 'nochange') {
-                    showAlert(res.message, 'warning');
-                    $('#generate-btn').prop('disabled', true).text('Generate Estimate');
-                } else {
-                    showAlert(res.message || 'Failed To Save Estimate.', 'danger');
-                    $('#generate-btn').prop('disabled', false).text('Generate Estimate');
-                }
-            },
+                        setTimeout(function() {
+                            window.location.href = "<?= site_url('estimate/generateEstimate/') ?>" + res.estimate_id;
+                        }, 1500);
+                    } else if (res.status === 'nochange') {
+                        showAlert(res.message, 'warning');
+                        $('#generate-btn').prop('disabled', true).text('Generate Estimate');
+                    } else {
+                        showAlert(res.message || 'Failed To Save Estimate.', 'danger');
+                        $('#generate-btn').prop('disabled', false).text('Generate Estimate');
+                    }
+                },
 
-                error: function () {
+                error: function() {
                     showAlert('Something Went Wrong While Saving The Estimate.', 'danger');
                     $('#generate-btn').prop('disabled', false).text('Generate Estimate');
                 }
             });
-            
+
         });
 
         $('#discount').on('input', function() {
@@ -587,41 +595,43 @@ $('#customerForm').submit(function (e) {
             }
         });
 
-       let maxCustomerDiscount = 0;
-// $('#customer_id').on('change', function () {
-//     let customerId = $(this).val();
-//     if (customerId) {
+        let maxCustomerDiscount = 0;
+        // $('#customer_id').on('change', function () {
+        //     let customerId = $(this).val();
+        //     if (customerId) {
 
-//         $.post("<?= site_url('customer/get-address') ?>", { customer_id: customerId }, function (res) {
-//             $('#customer_address').val(res.status === 'success' ? res.address : '');
-//         }, 'json');
+        //         $.post("<?= site_url('customer/get-address') ?>", { customer_id: customerId }, function (res) {
+        //             $('#customer_address').val(res.status === 'success' ? res.address : '');
+        //         }, 'json');
 
-//         // Fetch max discount
-//         $.ajax({
-//             url: '<?= base_url("customer/get_discount") ?>/' + customerId,
-//             type: 'GET',
-//             dataType: 'json',
-//             success: function (res) {
-//                 maxCustomerDiscount = parseFloat(res.discount) || 0;
+        //         // Fetch max discount
+        //         $.ajax({
+        //             url: '<?= base_url("customer/get_discount") ?>/' + customerId,
+        //             type: 'GET',
+        //             dataType: 'json',
+        //             success: function (res) {
+        //                 maxCustomerDiscount = parseFloat(res.discount) || 0;
 
-//                 if (!$('#discount').val() || parseFloat($('#discount').val()) === 0) {
-//                     $('#discount').val(maxCustomerDiscount);
-//                 }
-//             }
-//         });
+        //                 if (!$('#discount').val() || parseFloat($('#discount').val()) === 0) {
+        //                     $('#discount').val(maxCustomerDiscount);
+        //                 }
+        //             }
+        //         });
 
-//     } else {
-//         maxCustomerDiscount = 0;
-//         $('#discount').val(0);
-//         $('#customer_address').val('');
-//     }
-// });
-$('#customer_id').on('change', function () {
+        //     } else {
+        //         maxCustomerDiscount = 0;
+        //         $('#discount').val(0);
+        //         $('#customer_address').val('');
+        //     }
+        // });
+        $('#customer_id').on('change', function() {
             let customerId = $(this).val();
 
             if (customerId) {
                 // Fetch customer address
-                $.post("<?= site_url('customer/get_address') ?>", { customer_id: customerId }, function (res) {
+                $.post("<?= site_url('customer/get_address') ?>", {
+                    customer_id: customerId
+                }, function(res) {
                     if (res.status === 'success') {
                         $('#customer_address').val(res.address);
                     } else {
@@ -634,7 +644,7 @@ $('#customer_id').on('change', function () {
                     url: '<?= base_url("customer/get_discount") ?>/' + customerId,
                     type: 'GET',
                     dataType: 'json',
-                    success: function (res) {
+                    success: function(res) {
                         if (res.discount !== undefined) {
                             maxCustomerDiscount = parseFloat(res.discount) || 0;
                             // Set the discount input to the fetched value
@@ -657,45 +667,45 @@ $('#customer_id').on('change', function () {
             }
         });
 
-// Tooltip setup
-$('#discount').tooltip({
-    trigger: 'manual',
-    placement: 'top'
-});
+        // Tooltip setup
+        $('#discount').tooltip({
+            trigger: 'manual',
+            placement: 'top'
+        });
 
-// Restrict discount to max but allow lower values
-$('#discount').on('input', function () {
-    let val = parseFloat($(this).val()) || 0;
+        // Restrict discount to max but allow lower values
+        $('#discount').on('input', function() {
+            let val = parseFloat($(this).val()) || 0;
 
-    if (maxCustomerDiscount === 0) {
-        // Customer has no discount
-        $(this).val(0);
-        $(this).attr('data-bs-original-title', 'No discount is set for the selected customer').tooltip('show');
-        setTimeout(() => $(this).tooltip('hide'), 2000);
-    } else if (val > maxCustomerDiscount) {
-        // Exceeds max discount
-        $(this).val(maxCustomerDiscount);
-        $(this).attr('data-bs-original-title', 'Cannot exceed max discount for this customer').tooltip('show');
-        setTimeout(() => $(this).tooltip('hide'), 2000);
-    } else {
-        $(this).tooltip('hide');
-    }
-});
+            if (maxCustomerDiscount === 0) {
+                // Customer has no discount
+                $(this).val(0);
+                $(this).attr('data-bs-original-title', 'No discount is set for the selected customer').tooltip('show');
+                setTimeout(() => $(this).tooltip('hide'), 2000);
+            } else if (val > maxCustomerDiscount) {
+                // Exceeds max discount
+                $(this).val(maxCustomerDiscount);
+                $(this).attr('data-bs-original-title', 'Cannot exceed max discount for this customer').tooltip('show');
+                setTimeout(() => $(this).tooltip('hide'), 2000);
+            } else {
+                $(this).tooltip('hide');
+            }
+        });
 
 
-// When editing existing invoice: just fetch max discount, do not overwrite field
-let existingCustomerId = $('#customer_id').val();
-if (existingCustomerId) {
-    $.ajax({
-        url: '<?= base_url("customer/get_discount") ?>/' + existingCustomerId,
-        type: 'GET',
-        dataType: 'json',
-        success: function (res) {
-            maxCustomerDiscount = parseFloat(res.discount) || 0;
-            // ⚠️ Do not auto-fill #discount here to preserve user's entered value
+        // When editing existing invoice: just fetch max discount, do not overwrite field
+        let existingCustomerId = $('#customer_id').val();
+        if (existingCustomerId) {
+            $.ajax({
+                url: '<?= base_url("customer/get_discount") ?>/' + existingCustomerId,
+                type: 'GET',
+                dataType: 'json',
+                success: function(res) {
+                    maxCustomerDiscount = parseFloat(res.discount) || 0;
+                    // ⚠️ Do not auto-fill #discount here to preserve user's entered value
+                }
+            });
         }
-    });
-}
 
         function showAlert(message, type = 'success') {
             $('.alert')
@@ -705,20 +715,20 @@ if (existingCustomerId) {
                 .fadeIn()
                 .delay(3000)
                 .fadeOut();
-             }
-        });
+        }
+    });
 
-        $(window).on('keydown', function (e) {
-            if (e.ctrlKey && e.key === 'Enter') {
-                e.preventDefault();
-                $('#generate-btn').trigger('click');
-            }
+$(window).on('keydown', function(e) {
+    if (e.ctrlKey && e.key === 'Enter') {
+        e.preventDefault();
+        $('#generate-btn').trigger('click');
+    }
 
-            if (e.ctrlKey && e.key.toLowerCase() === 'f') {
-                e.preventDefault();
-                $('#add-item').trigger('click');
-            }
-        });
+    if (e.ctrlKey && e.key.toLowerCase() === 'f') {
+        e.preventDefault();
+        $('#add-item').trigger('click');
+    }
+}); 
 </script>
 
 

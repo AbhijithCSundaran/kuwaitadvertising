@@ -404,6 +404,11 @@
             <?php
             $minRows = 8; // minimum rows
             $i = 1;
+
+            usort($items, function($a, $b) {
+        return $a['item_id'] <=> $b['item_id'];
+    });
+
             foreach ($items as $item):
               ?>
               <tr>

@@ -17,7 +17,7 @@
             <table class="table table-bordered align-middle text-center">
                 <thead>
                     <tr>
-                        <<th><strong>Estimate No</strong></th>
+                        <th><strong>Estimate No</strong></th>
 <th><strong>Estimate Date</strong></th>
 <th><strong>Items</strong></th>
 <th><strong>Subtotal</strong></th>
