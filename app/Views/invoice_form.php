@@ -84,7 +84,12 @@
                 <p class="mb-1">Invoice No:
                     <?= isset($invoice['invoice_no']) ? $invoice['invoice_no'] : '' ?>
                 </p>
-                <p>Date: <?= date('d-m-Y') ?></p>
+                <p>Date:
+                    <?= isset($invoice['invoice_date']) && !empty($invoice['invoice_date'])
+                        ? date('d-m-Y', strtotime($invoice['invoice_date']))
+                        : date('d-m-Y') ?>
+                </p>
+
             </div>
         </div>
     </div>
@@ -120,18 +125,31 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-4">
                     <label class="mt-3"><strong>LPO No</strong></label>
                     <input type="text" name="lpo_no" id="lpo_no" class="form-control"
                         value="<?= isset($invoice['lpo_no']) ? esc($invoice['lpo_no']) : '' ?>">
                 </div>
-                <div class="col-md-6">
+                <div class="col-4">
                     <label class="mt-3"><strong>Phone Number</strong><span class="text-danger">*</span></label>
                     <input type="text" name="phone_number" id="phone_number" class="form-control"
-                        value=" <?= esc($invoice['phone_number'] ?? '') ?>" minlength="7" maxlength="15"
+                        value="<?= esc($invoice['phone_number'] ?? '') ?>" minlength="7" maxlength="15"
                         pattern="^[\+0-9\s\-\(\)]{7,25}$"
                         title="Phone number must be 7 to 15 digits and can start with +" />
                 </div>
+                <div class="col-4">
+                    <label class="mt-3"><strong>Delivery Date</strong></label>
+                    <input type="text" name="delivery_date" id="delivery_date" class="form-control"
+                        value="<?= isset($invoice['delivery_date']) ? esc($invoice['delivery_date']) : '' ?>">
+                </div>
+
+                <!-- <div class="col-4">
+                    <label class="mt-3"><strong>Delivery Date</strong></label>
+                    <input type="text" name="delivery_date" id="delivery_date" class="form-control"
+                        placeholder="Select multiple dates"
+                        value="<?= isset($invoice['delivery_date']) ? esc($invoice['delivery_date']) : '' ?>">
+                </div> -->
+
             </div>
         </div>
 
@@ -247,11 +265,19 @@
                     <input type="text" id="popup_name" class="form-control mb-2" required>
                     <label>Address</label>
                     <textarea id="popup_address" class="form-control" rows="3" required></textarea>
-                    <div class="alert alert-danger d-none mt-2" id="customerError"></div>
+                    <div class="alert alert-danger d-none mt-2" id="customerError">
+                    </div>
+                    <div class="mb-3">
+                        <label>Contact Number</label>
+                        <!-- THIS is the phone input you were missing -->
+                        <input type="text" name="phone_number" id="popup_phone_number" class="form-control"
+                            minlength="7" maxlength="15" pattern="^[\+0-9\s\-\(\)]{7,25}$"
+                            title="Phone number must be 7 to 15 digits and can start with +" required />
+                    </div>
                     <div class="mb-3">
                         <label>Maximum Discount (KWD)</label>
                         <input type="number" name="max_discount" id="max_discount" class="form-control" min="0"
-                            step="0.001" placeholder="Enter maximum discount amount">
+                            step="0.0001" placeholder="Enter maximum discount amount">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -297,7 +323,6 @@
             });
 
             $('#sub_total_display').text(subtotal.toFixed(3));
-
             // Get the discount value from the input field
             let discountFromInput = parseFloat($('#discount').val()) || 0;
 
@@ -326,12 +351,15 @@
         }
         updateSaveButtonState();
         $('#invoice-form input, #invoice-form select, #invoice-form textarea').on('input change', updateSaveButtonState);
+        $('#invoice_date, #delivery_date').on('change', updateSaveButtonState);
+
         $(document).on('click', '.remove-item-btn', function () {
             $(this).closest('tr').remove();
             calculateTotals();
             updateSaveButtonState();
             const currentData = $('#invoice-form').serialize();
             const hasChanged = currentData !== initialFormData;
+
             $('#save-invoice-btn').prop('disabled', !hasChanged);
         });
 
@@ -347,6 +375,8 @@
                 <td><input type="text" name="location[]" class="form-control location" placeholder="Enter Delivery Location">
                 <td class="text-center"><span class="remove-item-btn" title="Remove"><i class="fas fa-trash text-danger"></i></span></td>
             </tr>`;
+
+
             $('#item-container').append(row);
             calculateTotals();
 
@@ -368,10 +398,12 @@
             $(this).val(capitalized);
         });
 
-        document.getElementById('phone_number').addEventListener('input', function () {
+
+        document.getElementById('popup_phone_number').addEventListener('input', function () {
             let val = this.value;
             this.value = val.replace(/(?!^)\+/g, '').replace(/[^0-9\s\-\(\)\+]/g, '');
         });
+
 
         $(document).on('input', 'input[name="description[]"]', function () {
             let value = $(this).val();
@@ -379,14 +411,6 @@
             $(this).val(capitalized);
         });
 
-        // $(document).on('click', '.remove-item-btn', function () {
-        //     $(this).closest('tr').remove();
-        //     calculateTotals();
-
-        //     const currentFormData = $('#invoice-form').serialize();
-        //     const hasChanged = currentFormData !== initialFormData;
-        //     $('#save-invoice-btn').prop('disabled', !hasChanged);
-        // });
 
         $(document).on('input', '.price', function () {
             let input = this;
@@ -412,7 +436,8 @@
         $('#addCustomerBtn').click(function () {
             $('#popup_name').val('');
             $('#popup_address').val('');
-            $('#CustomerModal').modal('show');
+            $('#popup_phone_number').val('');
+            $('#customerModal').modal('show');
         });
 
         $('#customer_id').on('change', function () {
@@ -429,6 +454,20 @@
                         $('#customer_address').val('');
                     }
                 }, 'json');
+                // Fetch phone number
+                $.post("<?= site_url('customer/get_phone') ?>",
+                    {
+                        customer_id: customerId
+                    },
+                    function (res) {
+                        if (res.status === 'success') {
+                            $('#phone_number').val(res.phone_number);  // ✅ correct key here
+                        } else {
+                            $('#phone_number').val('');
+                        }
+                    }, 'json');
+
+
 
                 // Fetch customer-specific discount
                 $.ajax({
@@ -550,7 +589,7 @@
 
             if (maxCustomerDiscount === 0) {
                 $(this).val(0);
-                $(this).attr('data-bs-original-title', 'No discount is set for the selected customer').tooltip('show');
+                $(this).attr('data-bs-original-title', 'No discount is Set for The Selected Customer').tooltip('show');
                 setTimeout(() => {
                     $('#discount').tooltip('hide');
                 }, 2000);
@@ -577,18 +616,87 @@
             }
         }
         $('#popup_name, #popup_address').on('input', toggleCustomerSaveButton);
+        // $('#customerForm').submit(function (e) {
+        //     e.preventDefault();
+
+        //     const $submitBtn = $('#saveCustomerBtn');
+        //     $submitBtn.prop('disabled', true).text();
+
+        //     const name = $('#popup_name').val().trim();
+        //     const address = $('#popup_address').val().trim();
+        //     const max_discount = $('#max_discount').val().trim();
+
+        //     if (!name || !address) {
+        //         $('#customerError').removeClass('d-none').text('Name and address are required.');
+        //         $submitBtn.prop('disabled', false).text('Save');
+        //         return;
+        //     }
+
+        //     $.ajax({
+        //         url: "<?= base_url('customer/create') ?>",
+        //         type: "POST",
+        //         data: {
+        //             name,
+        //             address,
+        //             phone_number: $('#popup_phone_number').val().trim(),
+        //             max_discount
+        //         },
+        //         dataType: "json",
+        //         success: function (res) {
+        //             if (res.status === 'success') {
+        //                 const newOption = new Option(res.customer.name, res.customer.customer_id, true, true);
+        //                 $('#customer_id').append(newOption).trigger('change');
+
+        //                 $('#popup_name').val('');
+        //                 $('#popup_address').val('');
+        //                 $('#max_discount').val('');
+        //                 $('#customerModal').modal('hide');
+        //                 toggleCustomerSaveButton(); // Reset button state
+
+        //                 $('.alert')
+        //                     .removeClass('d-none alert-danger')
+        //                     .addClass('alert-success')
+        //                     .text('Customer Created Successfully.')
+        //                     .fadeIn()
+        //                     .delay(3000)
+        //                     .fadeOut();
+        //             } else {
+        //                 $('.alert')
+        //                     .removeClass('d-none alert-success')
+        //                     .addClass('alert-danger')
+        //                     .text(res.message || 'Failed To Create Customer.')
+        //                     .fadeIn()
+        //                     .delay(3000)
+        //                     .fadeOut();
+        //                 $submitBtn.prop('disabled', false).text('Save');
+        //             }
+        //         },
+        //         error: function () {
+        //             $('.alert')
+        //                 .removeClass('d-none alert-success')
+        //                 .addClass('alert-danger')
+        //                 .text('Server Error Occurred While Creating Customer.')
+        //                 .fadeIn()
+        //                 .delay(3000)
+        //                 .fadeOut();
+        //             $submitBtn.prop('disabled', false).text('Save');
+        //         }
+        //     });
+        // });
+
         $('#customerForm').submit(function (e) {
             e.preventDefault();
 
             const $submitBtn = $('#saveCustomerBtn');
-            $submitBtn.prop('disabled', true).text();
+            $submitBtn.prop('disabled', true).text('Saving...');
 
             const name = $('#popup_name').val().trim();
             const address = $('#popup_address').val().trim();
+            const phone_number = $('#popup_phone_number').val().trim();
             const max_discount = $('#max_discount').val().trim();
 
-            if (!name || !address) {
-                $('#customerError').removeClass('d-none').text('Name and address are required.');
+            if (!name || !address || !phone_number) {
+                $('#customerError').removeClass('d-none').text('All fields including phone number are required.');
                 $submitBtn.prop('disabled', false).text('Save');
                 return;
             }
@@ -597,9 +705,10 @@
                 url: "<?= base_url('customer/create') ?>",
                 type: "POST",
                 data: {
-                    name,
-                    address,
-                    max_discount
+                    name: name,
+                    address: address,
+                    phone_number: phone_number,
+                    max_discount: max_discount
                 },
                 dataType: "json",
                 success: function (res) {
@@ -609,9 +718,10 @@
 
                         $('#popup_name').val('');
                         $('#popup_address').val('');
+                        $('#popup_phone_number').val('');
                         $('#max_discount').val('');
+
                         $('#customerModal').modal('hide');
-                        toggleCustomerSaveButton(); // Reset button state
 
                         $('.alert')
                             .removeClass('d-none alert-danger')
@@ -628,8 +738,8 @@
                             .fadeIn()
                             .delay(3000)
                             .fadeOut();
-                        $submitBtn.prop('disabled', false).text('Save');
                     }
+                    $submitBtn.prop('disabled', false).text('Save');
                 },
                 error: function () {
                     $('.alert')
@@ -639,10 +749,12 @@
                         .fadeIn()
                         .delay(3000)
                         .fadeOut();
+
                     $submitBtn.prop('disabled', false).text('Save');
                 }
             });
         });
+
 
         function showAlert(message, type) {
             $('.alert')
@@ -669,7 +781,5 @@
             $(this).find('.item-order').val(index + 1);
         });
     }
-
-    
 
 </script>

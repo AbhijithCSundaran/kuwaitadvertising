@@ -143,6 +143,7 @@
                 position:relative;
                 left:80px;
             }
+            
             @media print {
             * {
                 -webkit-print-color-adjust: exact !important;
@@ -154,6 +155,10 @@
                 padding: 0;
                 font-size: 14px;
                 line-height: 1.4;
+            }
+            @page {
+                size: auto;
+                margin: 1 !important;
             }
 
             .no-print,
@@ -228,7 +233,7 @@
                 </div> 
                 <div class="voucher-meta">
                 
-                    Date:<span class="dots" style=" width: 20%; text-align: center;"> <?= date('d-m-Y') ?></span> التاريخ:
+                    Date:<span class="dots" style=" width: 20%; text-align: center;"> </span> التاريخ:
                 </div>
                 <div class="field">
                     <span class="label">Received From Mr/Ms: </span>

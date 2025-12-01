@@ -16,7 +16,7 @@
         /* border: 1px solid #ced4da; */
         border-radius: 0px;
         margin-left: 9px;
-        width: 480px;
+        width: 570px;
     }
 
     .select2-container--default .select2-selection--single .select2-selection__arrow b {

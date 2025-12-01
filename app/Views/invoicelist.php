@@ -130,7 +130,7 @@ $(document).ready(function () {
     data: 'discount',
     render: function (data) {
         if (data === null || data === '' || parseFloat(data) === 0) {
-            return '-N/A-';
+            return '0.000 KWD';
         }
         return parseFloat(data).toFixed(3) + ' KWD';
     }

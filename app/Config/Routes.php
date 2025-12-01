@@ -107,6 +107,7 @@ $routes->post('customer/fetch', 'Customer::fetch');
 $routes->post('customer/create', 'Customer::create');
 $routes->post('customer/delete', 'Customer::delete');
 $routes->post('customer/get_address', 'Customer::get_address');
+$routes->post('customer/get_phone', 'Customer::get_phone');
 $routes->get('customer/edit/(:num)', 'Customer::edit/$1'); 
 $routes->get('customer/getCustomer/(:num)', 'Customer::getCustomer/$1');
 $routes->get('estimate/customer/(:num)', 'Estimate::viewByCustomer/$1');

@@ -38,12 +38,16 @@ class Invoice extends BaseController
     {
         return view('invoicelist');
     }
+
+
     public function fetchInvoices()
     {
         $invoiceModel = new InvoiceModel();
         $data = $invoiceModel->getInvoiceListWithCustomer();
         return $this->response->setJSON(['data' => $data]);
     }
+
+    
     public function invoicelistajax()
     {
         $session = session();
@@ -187,6 +191,7 @@ class Invoice extends BaseController
     $customerId = $request->getPost('customer_id');
     $customer = $customerModel->find($customerId);
     $estimateId = $this->request->getPost('estimate_id');
+    
 
     if (!$customer) {
         return $this->response->setJSON([
@@ -199,7 +204,7 @@ class Invoice extends BaseController
     if (!empty($customer['max_discount']) && $discount > (float) $customer['max_discount']) {
         return $this->response->setJSON([
             'status' => 'error',
-            'message' => 'Discount cannot exceed maximum allowed discount (' . $customer['max_discount'] . '%)'
+            'message' => 'Discount cannot exceed maximum allowed discount (' . $customer['max_discount'] . 'KWD)'
         ]);
     }
 
@@ -208,22 +213,27 @@ class Invoice extends BaseController
     $companyId = session()->get('company_id');
 
     $totalAmount = $this->calculateTotal($request);
+    
 
     $invoiceData = [
     'customer_id' => $customerId,
     'customer_address' => $customer['address'] ?? $request->getPost('customer_address') ?? '',
-    'phone_number' => $customer['phone_number'] ?? $request->getPost('phone_number') ?? '',
+    'phone_number' => $request->getPost('phone_number') ?: ($customer['phone_number'] ?? ''),
     'lpo_no' => $request->getPost('lpo_no'),
     'total_amount' => $totalAmount,
     'discount' => $discount,
+    'delivery_date' => $request->getPost('delivery_date'),
     'invoice_date' => date('Y-m-d'),
+    // 'invoice_date' => $request->getPost('invoice_date') ?: date('Y-m-d'),
     'user_id' => session()->get('user_id') ?? 1,
     'status' => ($invoiceId && $originalStatus) ? $originalStatus : 'unpaid',
     'company_id' => $companyId,
     // ✅ Add these two lines to fix balance calculation
     'paid_amount' => 0,
+    
     'balance_amount' => $totalAmount
 ];
+// echo $invoiceData['invoice_date'];exit();
 
     if ($invoiceId) {
         $invoiceModel->update($invoiceId, $invoiceData);
@@ -313,7 +323,7 @@ class Invoice extends BaseController
         $discount = $subtotal;
     }
 
-    // Calculate total and round to 3 decimals (KWD standard)
+    // Calculate total and round to 4 decimals (KWD standard)
     $total = round($subtotal - $discount, 3);
     return $total;
 }
@@ -336,9 +346,11 @@ class Invoice extends BaseController
     if ($customer) {
         $invoice['customer_name'] = $customer['name'] ?? '';
         $invoice['customer_address'] = $customer['address'] ?? '';
+        $invoice['phone_number'] = $customer['phone_number'] ?? ''; 
     } else {
         $invoice['customer_name'] = '';
         $invoice['customer_address'] = '';
+        $invoice['phone_number'] = '';
     }
 
     // ✅ Fetch items in correct order
@@ -399,23 +411,7 @@ class Invoice extends BaseController
             'user_name' => $user_name,
         ]);
     }
-    // public function delivery_note($id)
-    // {
-    //     $invoiceModel = new InvoiceModel();
-    //     $itemModel = new InvoiceItemModel();
-
-    //     $invoice = $invoiceModel->find($id);
-    //     $items = $itemModel->where('invoice_id', $id)->findAll();
-    //     $customerModel = new customerModel();
-    //     $customer = $customerModel->find($invoice['customer_id']);
-
-    //     return view('delivery_note', [
-    //         'invoice' => $invoice,
-    //         'items' => $items,
-    //         'customer' => $customer
-    //     ]);
-
-    // }
+    
     public function delivery_note($id)
 {
     $invoiceModel = new InvoiceModel();
@@ -478,7 +474,9 @@ public function convertFromEstimate($estimateId)
 
     // ✅ Set additional fields safely
     $estimate['customer_address'] = $customer['address'] ?? '';
-    $estimate['phone_number'] = $estimate['phone_number'] ?? '';
+    // $estimate['phone_number'] = $estimate['phone_number'] ?? '';
+    $estimate['phone_number'] = $customer['phone_number'] ?? '';
+
 
     foreach ($items as &$item) {
         $item['item_name'] = ucfirst($item['description'] ?? '');

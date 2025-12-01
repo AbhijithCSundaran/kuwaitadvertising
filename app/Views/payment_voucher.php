@@ -129,11 +129,13 @@
                 position:relative;
                 left:90px;
             }
-                      @media print {
+    
+         @media print {
             * {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
+
 
             body {
                 margin: 0;
@@ -141,6 +143,12 @@
                 font-size: 14px;
                 line-height: 1.4;
             }
+
+            @page {
+                size: auto;
+                margin: 1; /* no top/bottom header/footer */
+            }
+         
 
             .no-print,
             .header button,
@@ -168,6 +176,7 @@
                 box-sizing: border-box;
             }
         }
+        
 
         </style>
     </head>
@@ -211,7 +220,7 @@
                 </div> 
                 <div class="voucher-meta">
                 
-                    Date<span class="dots" style=" width: 20%; text-align: center;"> <?= date('d-m-Y') ?></span>: التاريخ
+                    Date<span class="dots" style=" width: 20%; text-align: center;"></span>: التاريخ
                 </div>
                 <div class="field">
                     <span class="label">Paid To Mr./Mrs.: </span>

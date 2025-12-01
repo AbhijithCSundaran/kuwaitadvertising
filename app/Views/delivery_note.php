@@ -202,6 +202,10 @@
       min-width: 100px;
     }
 
+    @page {
+      margin: 0;
+      size: auto;
+    }
 
     @media print {
       * {
@@ -255,10 +259,9 @@
         background: none !important;
       }
 
-      /* .container {
-        min-width: 690px;
-        min-height: 900px;
-      } */
+      @page {
+        margin: 0 !important;
+      }
     }
   </style>
 </head>
@@ -357,9 +360,9 @@
         <div class="row align-items-center" style="margin-bottom: 10px;">
           <div class="col-4 text-start">
             <div>
-              <label style="font-weight: bold; margin-right: 4px;">Invoice No :</label>
+              <label style="font-weight: bold; margin-right: 1px;">Invoice No:</label>
               <span
-                style="display: inline-block; width: 87px; height: 23px; line-height: 23px; text-align: left; color: black;">
+                style="display: inline-block; width: 70px; height: 23px; line-height: 23px; text-align: left; color: black;">
                 <?= esc($invoice['invoice_no']) ?>
               </span>
             </div>
@@ -371,15 +374,36 @@
               ملاحظة التسليم<br> DELIVERY NOTE
             </div>
           </div>
-          <div class="col-4 text-end">
-            <div class="delivery-date">
-              <strong>Delivery Date:</strong>
-              <span id="deliveryDate" class="delivery-value" style="color: black;">
+          <!-- <div class="col-4 text-end">
+            <div class="delivery-date" style="white-space: nowrap;">
+              <strong style="margin-right: 1px; display: inline-block;">Delivery Date:</strong>
+              <span style="display: inline-block; min-width: 76px; text-align: center;">
                 <?= !empty($invoice['delivery_date']) ? date('d-m-Y', strtotime($invoice['delivery_date'])) : '' ?>
               </span>
             </div>
+          </div> -->
 
+          <?php
+          $dates = explode(',', $invoice['delivery_date']);
+          $formattedDates = [];
+
+          foreach ($dates as $d) {
+            $d = trim($d);
+            if (!empty($d) && strtotime($d) !== false) {
+              $formattedDates[] = date('d-m-Y', strtotime($d)) . ' ';
+            }
+          }
+          ?>
+
+          <div class="col-4 text-end">
+            <div class="delivery-date" style="white-space: nowrap;">
+              <strong>Delivery Date:</strong><br>
+              <span>
+                <?= implode('<br>', $formattedDates); ?>
+              </span>
+            </div>
           </div>
+
         </div>
 
         <div class="invoice-header">
@@ -397,7 +421,7 @@
               <th style="width: 37%; border: 1px solid #000; padding: 8px;">DESCRIPTION</th>
               <th style="width: 14%; border: 1px solid #000; padding: 8px;">Unit</th>
               <th style="width: 10%; border: 1px solid #000; padding: 8px;">Qty</th>
-              <th style="width: 29%; border: 1px solid #000; padding: 8px;">LOCATION</th>
+              <th style="width: 14%; border: 1px solid #000; padding: 8px;">LOCATION</th>
             </tr>
           </thead>
           <tbody>
@@ -405,15 +429,16 @@
             $minRows = 8; // minimum rows
             $i = 1;
 
-            usort($items, function($a, $b) {
-        return $a['item_id'] <=> $b['item_id'];
-    });
+            usort($items, function ($a, $b) {
+              return $a['item_id'] <=> $b['item_id'];
+            });
 
             foreach ($items as $item):
               ?>
               <tr>
                 <td style="border: 1px solid #000; text-align: center; "><?= $i++ ?></td>
-                <td style="border: 1px solid #000; text-align: left; padding-left: 6px;"><?= esc($item['item_name'] ?? '-') ?></td>
+                <td style="border: 1px solid #000; text-align: left; padding-left: 6px;">
+                  <?= esc($item['item_name'] ?? '-') ?></td>
                 <td style="border: 1px solid #000; text-align: center;"><?= number_format($item['price'], 3) ?></td>
                 <td style="border: 1px solid #000; text-align: center;"><?= esc($item['quantity']) ?></td>
                 <td style="border: 1px solid #000; text-align: left; padding-left: 6px;""><?= esc(ucfirst($item['location'] ?? '-')) ?></td>
@@ -424,7 +449,7 @@
             $emptyRows = max(0, $minRows - count($items));
             for ($j = 0; $j < $emptyRows; $j++):
               ?>
-              <tr class="empty-row">
+              <tr class=" empty-row">
                 <td>&nbsp;</td>
                 <td></td>
                 <td></td>
