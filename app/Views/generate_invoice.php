@@ -98,7 +98,7 @@
       border: 1px solid black;
     }
 
-    
+
     table.min_height {
       width: 100%;
       border-collapse: collapse;
@@ -183,6 +183,7 @@
 
     .tfoot {
       background-color: #cfc7c7ff;
+       display: table-footer-group;
     }
 
     .partial-row {
@@ -201,13 +202,19 @@
       text-align: right;
       min-width: 100px;
     }
+    
 
+    @page {
+      margin: 0;
+      size: auto;
+    }
 
     @media print {
       * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
+    
 
       .no-print,
       .header,
@@ -223,6 +230,18 @@
         font-size: 12px;
         line-height: 1.4;
       }
+      .page-bottom-line {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    border-bottom: 2px solid #000;
+}
+
+      @page {
+        margin: 0 !important;
+      }
+
 
       table {
         border-collapse: collapse;
@@ -254,11 +273,12 @@
         background: none !important;
       }
 
-      /* 
-       .container {
-        min-width: 690px;
-        min-height: 900px;
-      }   */
+      tfoot {
+        display: table-row-group !important;  /* prevents automatic repeating */
+    }
+
+
+
     }
   </style>
 </head>
@@ -280,35 +300,35 @@
         <?php endif; ?>
         <button id="deliveryNoteBtn"
           onclick="window.location.href='<?= base_url('invoice/delivery_note/' . $invoice['invoice_id']) ?>'"
-          style="display: <?= in_array(strtolower($invoice['status']), ['paid', 'partial paid']) ? 'inline-block' : 'none' ?>;
+          style="display: <?= in_array(strtolower($invoice['status']), ['paid', 'partial paid', 'unpaid']) ? 'inline-block' : 'none' ?>;
                     background-color: #991b36; color: white; padding: 8px 16px; border: none; border-radius: 5px; margin-left: 10px;">
           Delivery Note
         </button>
         <?php
-          $paymentMode = isset($invoice['payment_mode']) ? strtolower($invoice['payment_mode']) : '';
+        $paymentMode = isset($invoice['payment_mode']) ? strtolower($invoice['payment_mode']) : '';
 
-          if ($paymentMode === 'cash') {
-              $btnPaymentLabel = 'Receipt Voucher';
-              $btnUrl = base_url('receiptvoucher/' . $invoice['invoice_id']);
-          } elseif ($paymentMode === 'bank' || $paymentMode === 'bank transfer') {
-              $btnPaymentLabel = ' Payment Voucher';
-              $btnUrl = base_url('paymentvoucher/' . $invoice['invoice_id']);
-          } else {
-              // fallback for other modes
-              $btnPaymentLabel = 'Payment Voucher';
-              $btnUrl = base_url('paymentvoucher/' . $invoice['invoice_id']);
-          }
+        if ($paymentMode === 'cash') {
+          $btnPaymentLabel = 'Receipt Voucher';
+          $btnUrl = base_url('receiptvoucher/' . $invoice['invoice_id']);
+        } elseif ($paymentMode === 'bank' || $paymentMode === 'bank transfer') {
+          $btnPaymentLabel = ' Payment Voucher';
+          $btnUrl = base_url('paymentvoucher/' . $invoice['invoice_id']);
+        } else {
+          // fallback for other modes
+          $btnPaymentLabel = 'Payment Voucher';
+          $btnUrl = base_url('paymentvoucher/' . $invoice['invoice_id']);
+        }
 
-          // Status button settings
-          $status = strtolower($invoice['status'] ?? 'unpaid');
-          $btnStatusLabel = ucfirst($status);
-          $btnColor = $status === 'paid' ? '#28a745' : ($status === 'partial paid' ? '#ffc107' : '#991b36');
-          $btnShow = in_array($status, ['paid', 'partial paid']) ? 'd-inline-block' : 'd-none';
-          ?>
-          <button id="paymentBtn" class="btn <?= $btnShow ?>" style="background-color: #991b36 ; color: white;"
-            onclick="window.location.href='<?= $btnUrl ?>'">
-            <?= $btnPaymentLabel ?>
-          </button>
+        // Status button settings
+        $status = strtolower($invoice['status'] ?? 'unpaid');
+        $btnStatusLabel = ucfirst($status);
+        $btnColor = $status === 'paid' ? '#28a745' : ($status === 'partial paid' ? '#ffc107' : '#991b36');
+        $btnShow = in_array($status, ['paid', 'partial paid']) ? 'd-inline-block' : 'd-none';
+        ?>
+        <button id="paymentBtn" class="btn <?= $btnShow ?>" style="background-color: #991b36 ; color: white;"
+          onclick="window.location.href='<?= $btnUrl ?>'">
+          <?= $btnPaymentLabel ?>
+        </button>
 
 
         <div class="btn-group ml-2 position-relative" style="z-index: 1000; margin-left: 10px;">
@@ -374,14 +394,46 @@
           <div class="col-4 text-end">
             <div style="white-space: nowrap;">
               <label style="font-weight: bold; margin-right: 6px; margin-top: 17px;">Date / التاريخ:</label>
-              <input type="text" readonly value="<?= date('d-m-Y', strtotime($invoice['invoice_date'])) ?>"
+              <input type="text" value="<?= date('d-m-Y', strtotime($invoice['invoice_date'])) ?>"
                 style="width: 80px; height: 23px; text-align: center;">
             </div>
+            <!-- <div style="margin-top: 4px; white-space: nowrap;">
+              <label style="font-weight: bold; margin-right: 6px;">Delivery At:</label>
+
+              <?php foreach (explode(',', $invoice['delivery_date']) as $d): ?>
+                <?= trim($d) ?><br>
+              <?php endforeach; ?>
+            </div> -->
+
             <div style="margin-top: 4px; white-space: nowrap;">
-              <label style="font-weight: bold; margin-right: 6px;">Delivery Date :</label>
-              <span id="deliveryDateCell">
-                <?= !empty($invoice['delivery_date']) ? date('d-m-Y', strtotime($invoice['delivery_date'])) : '' ?>
-              </span>
+              <label style="font-weight: bold; margin-right: 6px;">Delivery At:</label>
+
+              <?php
+              $dates = explode(',', $invoice['delivery_date']);
+
+              foreach ($dates as $d):
+                $d = trim($d);
+                if (empty($d))
+                  continue;
+
+                // Normalize formats
+                if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $d)) {
+                  $dateObj = DateTime::createFromFormat('Y-m-d', $d);
+                } elseif (preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $d)) {
+                  $dateObj = DateTime::createFromFormat('d/m/Y', $d);
+                } elseif (preg_match('/^\d{2}-\d{2}-\d{4}$/', $d)) {
+                  $dateObj = DateTime::createFromFormat('d-m-Y', $d);
+                } else {
+                  $dateObj = date_create($d); // fallback
+                }
+
+                if ($dateObj):
+                  ?>
+                  <?= $dateObj->format('d-m-Y') ?><br>
+                  <?php
+                endif;
+              endforeach;
+              ?>
             </div>
           </div>
         </div>
@@ -413,44 +465,44 @@
             </tr>
           </thead>
           <tbody>
-           <?php
-$totalAmount = '0.000';
-foreach ($items as $index => $item):
-    $quantity = (string)$item['quantity'];
-    $price = (string)$item['price'];
+            <?php
+            $totalAmount = '0.000';
+            foreach ($items as $index => $item):
+              $quantity = (string) $item['quantity'];
+              $price = (string) $item['price'];
 
-    // Calculate line total with 3 decimals
-    $lineTotal = bcmul($quantity, $price, 3);
+              // Calculate line total with 4 decimals
+              $lineTotal = bcmul($quantity, $price, 3);
 
-    // Split KD and Fils for item price (1 KD = 1000 Fils)
-    $kd = floor($price);
-    $fils = str_pad(bcmul(bcsub($price, (string)$kd, 3), '1000', 0), 3, '0', STR_PAD_LEFT);
+              // Split KD and Fils for item price (1 KD = 10000 Fils)
+              $kd = floor($price);
+              $fils = str_pad(bcmul(bcsub($price, (string) $kd, 3), '1000', 0), 3, '0', STR_PAD_LEFT);
 
-    // Split KD and Fils for line total
-    $lineKd = floor($lineTotal);
-    $lineFils = str_pad(bcmul(bcsub($lineTotal, (string)$lineKd, 3), '1000', 0), 3, '0', STR_PAD_LEFT);
+              // Split KD and Fils for line total
+              $lineKd = floor($lineTotal);
+              $lineFils = str_pad(bcmul(bcsub($lineTotal, (string) $lineKd, 3), '1000', 0), 3, '0', STR_PAD_LEFT);
 
-    // Add to total amount
-    $totalAmount = bcadd($totalAmount, $lineTotal, 3);
-?>
-<tr>
-    <td><?= $index + 1 ?></td>
-    <td style="text-align: left;"><?= esc($item['item_name'] ?? '-') ?></td>
-    <td><?= $quantity ?></td>
-    <td><?= $kd ?></td>
-    <td><?= $fils ?></td>
-    <td><?= $lineKd ?></td>
-    <td><?= $lineFils ?></td>
-</tr>
-<?php endforeach; ?>
+              // Add to total amount
+              $totalAmount = bcadd($totalAmount, $lineTotal, 3);
+              ?>
+              <tr>
+                <td><?= $index + 1 ?></td>
+                <td style="text-align: left;"><?= esc($item['item_name'] ?? '-') ?></td>
+                <td><?= $quantity ?></td>
+                <td><?= $kd ?></td>
+                <td><?= $fils ?></td>
+                <td><?= $lineKd ?></td>
+                <td><?= $lineFils ?></td>
+              </tr>
+            <?php endforeach; ?>
 
-          <?php
-          // Fill empty rows to maintain table layout
-          $minRows = 8;
-          $currentRows = is_array($items) ? count($items) : 0;
-          $emptyRows = max(0, $minRows - $currentRows);
+            <?php
+            // Fill empty rows to maintain table layout
+            $minRows = 8;
+            $currentRows = is_array($items) ? count($items) : 0;
+            $emptyRows = max(0, $minRows - $currentRows);
 
-          for ($i = 0; $i < $emptyRows; $i++) {
+            for ($i = 0; $i < $emptyRows; $i++) {
               echo '<tr class="empty-row">
                         <td>&nbsp;</td>
                         <td></td>
@@ -460,55 +512,76 @@ foreach ($items as $index => $item):
                         <td></td>
                         <td></td>
                     </tr>';
-          }
-          ?>
+            }
+            ?>
           </tbody>
           <?php
-$subtotal = 0;
-foreach ($items as $item) {
-    $lineTotal = $item['quantity'] * $item['price'];
-    $subtotal += $lineTotal;
-}
+          $subtotal = 0;
+          foreach ($items as $item) {
+            $lineTotal = $item['quantity'] * $item['price'];
+            $subtotal += $lineTotal;
+          }
 
-// Discount in KWD (not percent)
-$discountKWD = isset($invoice['discount']) ? floatval($invoice['discount']) : 0;
+          // Discount in KWD (not percent)
+          $discountKWD = isset($invoice['discount']) ? floatval($invoice['discount']) : 0;
 
-// Ensure discount does not exceed subtotal
-$effectiveDiscount = min($discountKWD, $subtotal);
+          // Ensure discount does not exceed subtotal
+          $effectiveDiscount = min($discountKWD, $subtotal);
 
-// Grand total after applying discount
-$grandTotal = $subtotal - $effectiveDiscount;
-?>
+          // Grand total after applying discount
+          $grandTotal = $subtotal - $effectiveDiscount;
+          ?>
 
-<tfoot class="tfoot">
-    <?php if ($effectiveDiscount > 0): ?>
-    <tr>
-        <td colspan="5" style="text-align: right; font-weight: bold;">Subtotal</td>
-        <td colspan="2" style="text-align: right;">
-            <?= number_format($subtotal, 3) ?> KWD
-        </td>
-    </tr>
-    <tr>
-        <td colspan="5" style="text-align: right; font-weight: bold;">Discount</td>
-        <td colspan="2" style="text-align: right;">
-            <?= number_format($effectiveDiscount, 3) ?> KWD
-        </td>
-    </tr>
-    <?php endif; ?>
-    <tr>
-        <td colspan="5" style="text-align: right; font-weight: bold;">Total Amount</td>
-        <td colspan="2" style="text-align: right;" id="total-amount">
-            <?= number_format($grandTotal, 3) ?> KWD
-        </td>
-    </tr>
-</tfoot>
+          <tfoot class="tfoot">
+            <?php if ($effectiveDiscount > 0): ?>
+              <tr>
+                <td colspan="5" style="text-align: right; font-weight: bold;">Subtotal</td>
+                <td colspan="2" style="text-align: right;">
+                  <?= number_format($subtotal, 3) ?> KWD
+                </td>
+              </tr>
+              <tr>
+                <td colspan="5" style="text-align: right; font-weight: bold;">Discount</td>
+                <td colspan="2" style="text-align: right;">
+                  <?= number_format($effectiveDiscount, 3) ?> KWD
+                </td>
+              </tr>
+            <?php endif; ?>
+            <tr>
+              <td colspan="5" style="text-align: right; font-weight: bold;">Total Amount</td>
+              <td colspan="2" style="text-align: right;" id="total-amount">
+                <?= number_format($grandTotal, 3) ?> KWD
+              </td>
+            </tr>
+          </tfoot>
 
 
         </table>
+        
+        
 
         <div class="amount-words">
           المبلغ (بالكلمات): <span id="amount-words"></span>
         </div>
+
+        <div class=" d-flex">
+          <div class="col-6 terms mt-3" style="font-size:11px;">
+            <strong>Cheque Must be Issued Under the Name of:</strong><br>
+             A/c Name : Alshaya International Printing Co<br>
+             Account No: 2024772174 <br>
+             Bank : National Bank of Kuwait (S.A.K.P)<br>
+             Branch : Al Ghazali Branch <br>
+             Swift Code : NBOKKWKW <br>
+             IBAN : KW31NBOK0000000000002024772174
+          </div>
+          <div class="col-6 mt-3" style="font-size:12px;">
+            <div class="text-end ">
+
+            </div>
+          </div>
+        </div>
+
+         
 
         <?php
         $paidAmount = floatval($invoice['paid_amount'] ?? 0);
@@ -619,7 +692,8 @@ $grandTotal = $subtotal - $effectiveDiscount;
             <label for="markPaidAmount" class="form-label">
               Amount <span style="color:red;">*</span>
             </label>
-            <input type="number" id="markPaidAmount" class="form-control form-control-lg border-success" step="0.001" readonly>
+            <input type="number" id="markPaidAmount" class="form-control form-control-lg border-success" step="0.001"
+              readonly>
             <small id="markPaidAmountError" style="color:red; display:none;">Amount is required.</small>
           </div>
         </div>
@@ -728,7 +802,7 @@ $grandTotal = $subtotal - $effectiveDiscount;
     num = num.toString().replace(/,/g, '');
     let [dinars, fils] = num.split('.');
     dinars = parseInt(dinars || '0', 10);
-    fils = parseInt((fils || '0').padEnd(3, '0').slice(0, 3));
+    fils = parseInt((fils || '0').padEnd(3, '0').slice(0, 4));
 
     let words = '';
     if (dinars > 0) words += convertNumber(dinars) + ' دينار';
@@ -736,7 +810,7 @@ $grandTotal = $subtotal - $effectiveDiscount;
     return words || 'صفر';
   }
 
-  const grandTotal = <?= json_encode(number_format($grandTotal, 3, '.', '')) ?>;
+  const grandTotal = <?= json_encode(number_format($grandTotal, 4, '.', '')) ?>;
 
   const englishWords = numberToWords(grandTotal);
   const arabicWords = numberToArabicWords(grandTotal);
@@ -768,20 +842,6 @@ $grandTotal = $subtotal - $effectiveDiscount;
     return `${day}.${month}.${year}`;
   }
 
-  document.addEventListener('DOMContentLoaded', function () {
-    const deliveryCell = document.getElementById('deliveryDateCell');
-    if (deliveryCell) {
-      deliveryCell.textContent = formatDateToDDMMYYYY(new Date());
-    }
-  });
-
-  window.onbeforeprint = function () {
-    const deliveryCell = document.getElementById('deliveryDateCell');
-    if (deliveryCell) {
-      deliveryCell.textContent = formatDateToDDMMYYYY(new Date());
-    }
-  };
-
   function toggleStatusOptions() {
     const dropdown = document.getElementById('statusOptions');
     dropdown.classList.toggle('show');
@@ -812,26 +872,8 @@ $grandTotal = $subtotal - $effectiveDiscount;
 
   let isFirstPartialPayment = localStorage.getItem('firstPartialDone_<?= $invoice['invoice_id'] ?>') !== 'true';
 
-  // function openPartialPayment() {
-  //   const modalTitle = document.querySelector('#partialPaymentModal .modal-title');
-  //   const inputLabel = document.querySelector('label[for="partialPaidInput"]');
-  //   const partialPaidInput = document.getElementById('partialPaidInput');
-  //   const paymentModeSelect = document.getElementById('paymentMode');
 
-  //   if (partialPaidInput) partialPaidInput.value = '';
-  //   if (paymentModeSelect) paymentModeSelect.value = '';
-
-  //   if (isFirstPartialPayment) {
-  //     modalTitle.innerText = "Advance Payment";
-  //     inputLabel.innerText = "Enter Amount";
-  //   } else {
-  //     modalTitle.innerText = "Partial Payment";
-  //     inputLabel.innerText = "Enter Amount";
-  //   }
-
-  //   document.getElementById('partialPaymentModal').style.display = 'block';
-  // }
-function openPartialPayment() {
+  function openPartialPayment() {
     const modalTitle = document.querySelector('#partialPaymentModal .modal-title');
     const inputLabel = document.querySelector('label[for="partialPaidInput"]');
     const partialPaidInput = document.getElementById('partialPaidInput');
@@ -856,7 +898,7 @@ function openPartialPayment() {
     }
 
     document.getElementById('partialPaymentModal').style.display = 'block';
-}
+  }
 
   function closePartialModal() {
     document.getElementById('partialPaymentModal').style.display = 'none';
@@ -870,52 +912,52 @@ function openPartialPayment() {
     errorMsg.style.display = 'none';
     if (paymentModeError) paymentModeError.style.display = 'none';
 
-    
+
     if (isNaN(paid)) {
-        errorMsg.innerText = 'Please enter an amount.';
-        errorMsg.style.display = 'block';
-        return;
+      errorMsg.innerText = 'Please enter an amount.';
+      errorMsg.style.display = 'block';
+      return;
     }
 
-    
+
     if (paid <= 0) {
-        errorMsg.innerText = 'Amount must be greater than zero.';
-        errorMsg.style.display = 'block';
-        return;
+      errorMsg.innerText = 'Amount must be greater than zero.';
+      errorMsg.style.display = 'block';
+      return;
     }
 
-   
+
     if (paid > grandTotal) {
-        errorMsg.innerText = 'Entered amount exceeds total balance.';
-        errorMsg.style.display = 'block';
-        return;
+      errorMsg.innerText = 'Entered amount exceeds total balance.';
+      errorMsg.style.display = 'block';
+      return;
     }
 
-    
+
     if (!paymentMode) {
-        if (!paymentModeError) {
-            const error = document.createElement("small");
-            error.id = "paymentModeError";
-            error.style.color = "red";
-            error.innerText = "Please select a payment mode.";
-            document.getElementById("paymentMode").insertAdjacentElement("afterend", error);
-        } else {
-            paymentModeError.style.display = "block";
-        }
-        document.getElementById("paymentMode").focus();
-        return;
+      if (!paymentModeError) {
+        const error = document.createElement("small");
+        error.id = "paymentModeError";
+        error.style.color = "red";
+        error.innerText = "Please select a payment mode.";
+        document.getElementById("paymentMode").insertAdjacentElement("afterend", error);
+      } else {
+        paymentModeError.style.display = "block";
+      }
+      document.getElementById("paymentMode").focus();
+      return;
     }
 
-    
+
     const alreadyPaid = parseFloat(document.getElementById('paidAmountValue')?.innerText || 0);
     const balanceRemaining = grandTotal - alreadyPaid;
 
     if (paid > balanceRemaining) {
-        errorMsg.innerText = 'Entered amount exceeds remaining balance.';
-        errorMsg.style.display = 'block';
-        return;
+      errorMsg.innerText = 'Entered amount exceeds remaining balance.';
+      errorMsg.style.display = 'block';
+      return;
     } else {
-        errorMsg.style.display = 'none';
+      errorMsg.style.display = 'none';
     }
 
 
@@ -938,12 +980,12 @@ function openPartialPayment() {
           const balanceRow = document.getElementById('balanceAmountRow');
           const paidVal = document.getElementById('paidAmountValue');
           const balanceVal = document.getElementById('balanceAmountValue');
-          
-          const deliveryBtn = $('#deliveryNoteBtn');  
+
+          const deliveryBtn = $('#deliveryNoteBtn');
           deliveryBtn.removeClass('d-none').addClass('d-inline-block');
 
-          const editinvoicebtn = $('#editinvoicebtn');   
-          editinvoicebtn.addClass('d-none');  
+          const editinvoicebtn = $('#editinvoicebtn');
+          editinvoicebtn.addClass('d-none');
 
           const paymentBtn = $('#paymentBtn');
           paymentBtn.removeClass('d-none').addClass('d-inline-block')
@@ -1057,139 +1099,140 @@ function openPartialPayment() {
   }
 
 
-let selectedInvoiceId = null;
+  let selectedInvoiceId = null;
 
-function openMarkPaidModal(invoiceId) {
-  selectedInvoiceId = invoiceId;
-  const total = parseFloat(document.getElementById('total-amount').innerText.replace(/,/g,''));
+  function openMarkPaidModal(invoiceId) {
+    selectedInvoiceId = invoiceId;
+    const total = parseFloat(document.getElementById('total-amount').innerText.replace(/,/g, ''));
 
-  let paid = 0;
-   const paidElement = document.getElementById('paidAmountValue');
+    let paid = 0;
+    const paidElement = document.getElementById('paidAmountValue');
     if (paidElement) {
-      paid = parseFloat(paidElement.innerText.replace(/,/g,'')) || 0;     }
-      const balance = total - paid;
-
-  // Open Bootstrap modal
-  const markPaidModal = new bootstrap.Modal(document.getElementById('markPaidModal'));
-  markPaidModal.show();
-
-  // Auto-fill the amount with remaining balance (from PHP)
-// const balanceAmount = parseFloat(<?= json_encode($balanceAmount) ?>);
-// document.getElementById('markPaidAmount').value = balanceAmount.toFixed(3);
- document.getElementById('markPaidAmount').value = balance.toFixed(3);
-
-  // Set hidden field if needed
-  $('#invoice_id').val(invoiceId);
-}
-// function openMarkPaidModal(invoiceId) {
-//     // Get total from DOM
-//     const total = parseFloat(document.getElementById('total-amount').innerText.replace(/,/g,''));
-
-//     // Get paid amount from hidden input (recommended) or fetch dynamically
-//     let paid = 0;
-//     const paidElement = document.getElementById('paidAmountValue');
-//     if (paidElement) {
-//         paid = parseFloat(paidElement.innerText.replace(/,/g,'')) || 0;
-//     }
-
-//     const balance = total - paid;
-
-//     // Open modal
-//     const markPaidModal = new bootstrap.Modal(document.getElementById('markPaidModal'));
-//     markPaidModal.show();
-
-//     // Set amount
-//     document.getElementById('markPaidAmount').value = balance.toFixed(3);
-// }
-
-
-$('#confirmMarkPaid').on('click', function () {
-  const paymentMode = $('#markPaidPaymentMode').val();
-  const amount = parseFloat($('#markPaidAmount').val());
-  const errorMode = $('#markPaidError');
-  const errorAmount = $('#markPaidAmountError');
-
-  // Hide errors first
-  errorMode.hide();
-  errorAmount.hide();
-
-  // Validate payment mode
-  if (!paymentMode || paymentMode.trim() === '') {
-    errorMode.show();
-    $('#markPaidPaymentMode').focus();
-    return;
-  }
-
-  // Validate amount
-  if (isNaN(amount) || amount <= 0) {
-    errorAmount.show();
-    $('#markPaidAmount').focus();
-    return;
-  }
-
-  $('#confirmMarkPaid').prop('disabled', true).text('Submit');
-
-  $.ajax({
-    url: "<?= base_url('invoice/update_status') ?>",
-    type: "POST",
-    contentType: "application/json",
-    data: JSON.stringify({
-      invoice_id: selectedInvoiceId,
-      status: "paid",
-      payment_mode: paymentMode,
-      paid_amount: amount
-    }),
-    success: function (response) {
-      const modalElement = document.getElementById('markPaidModal');
-      const modal = bootstrap.Modal.getInstance(modalElement);
-      modal.hide();
-
-      // Show Delivery Note button
-      const deliveryNoteBtn = $('#deliveryNoteBtn');
-      if (deliveryNoteBtn.length) {
-        deliveryNoteBtn.removeClass('d-none').addClass('d-inline-block');
-      }
-
-      // Update status button
-      const statusBtn = $('#statusBtn');
-      if (statusBtn.length) {
-        statusBtn.text('Paid');
-        statusBtn.css('background-color', '#28a745');
-        statusBtn.prop('disabled', true);
-        statusBtn.attr('title', 'Fully paid invoice cannot be changed');
-      }
-
-      // Update Payment button
-      const paymentBtn = $('#paymentBtn');
-      if (paymentBtn.length) {
-        paymentBtn.removeClass('d-none').addClass('d-inline-block');
-        if (paymentMode === 'cash') {
-          paymentBtn.text('Receipt Voucher');
-          paymentBtn.off('click').on('click', function () {
-            window.location.href = "<?= base_url('receiptvoucher/' . $invoice['invoice_id']) ?>";
-          });
-        } else {
-          paymentBtn.text('Payment Voucher');
-          paymentBtn.off('click').on('click', function () {
-            window.location.href = "<?= base_url('paymentvoucher/' . $invoice['invoice_id']) ?>";
-          });
-        }
-      }
-
-      // Hide amount rows + edit button
-      $('#paidAmountRow').hide();
-      $('#balanceAmountRow').hide();
-      $('#editinvoicebtn').hide();
-    },
-    error: function (xhr, status, error) {
-      console.error("AJAX Error:", status, error, xhr.responseText);
-      alert("Something went wrong. Please try again.");
-    },
-    complete: function () {
-      $('#confirmMarkPaid').prop('disabled', false).text('Submit');
+      paid = parseFloat(paidElement.innerText.replace(/,/g, '')) || 0;
     }
+    const balance = total - paid;
+
+    // Open Bootstrap modal
+    const markPaidModal = new bootstrap.Modal(document.getElementById('markPaidModal'));
+    markPaidModal.show();
+
+    // Auto-fill the amount with remaining balance (from PHP)
+    // const balanceAmount = parseFloat(<?= json_encode($balanceAmount) ?>);
+    // document.getElementById('markPaidAmount').value = balanceAmount.toFixed(3);
+    document.getElementById('markPaidAmount').value = balance.toFixed(3);
+
+    // Set hidden field if needed
+    $('#invoice_id').val(invoiceId);
+  }
+  // function openMarkPaidModal(invoiceId) {
+  //     // Get total from DOM
+  //     const total = parseFloat(document.getElementById('total-amount').innerText.replace(/,/g,''));
+
+  //     // Get paid amount from hidden input (recommended) or fetch dynamically
+  //     let paid = 0;
+  //     const paidElement = document.getElementById('paidAmountValue');
+  //     if (paidElement) {
+  //         paid = parseFloat(paidElement.innerText.replace(/,/g,'')) || 0;
+  //     }
+
+  //     const balance = total - paid;
+
+  //     // Open modal
+  //     const markPaidModal = new bootstrap.Modal(document.getElementById('markPaidModal'));
+  //     markPaidModal.show();
+
+  //     // Set amount
+  //     document.getElementById('markPaidAmount').value = balance.toFixed(3);
+  // }
+
+
+  $('#confirmMarkPaid').on('click', function () {
+    const paymentMode = $('#markPaidPaymentMode').val();
+    const amount = parseFloat($('#markPaidAmount').val());
+    const errorMode = $('#markPaidError');
+    const errorAmount = $('#markPaidAmountError');
+
+    // Hide errors first
+    errorMode.hide();
+    errorAmount.hide();
+
+    // Validate payment mode
+    if (!paymentMode || paymentMode.trim() === '') {
+      errorMode.show();
+      $('#markPaidPaymentMode').focus();
+      return;
+    }
+
+    // Validate amount
+    if (isNaN(amount) || amount <= 0) {
+      errorAmount.show();
+      $('#markPaidAmount').focus();
+      return;
+    }
+
+    $('#confirmMarkPaid').prop('disabled', true).text('Submit');
+
+    $.ajax({
+      url: "<?= base_url('invoice/update_status') ?>",
+      type: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({
+        invoice_id: selectedInvoiceId,
+        status: "paid",
+        payment_mode: paymentMode,
+        paid_amount: amount
+      }),
+      success: function (response) {
+        const modalElement = document.getElementById('markPaidModal');
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        modal.hide();
+
+        // Show Delivery Note button
+        const deliveryNoteBtn = $('#deliveryNoteBtn');
+        if (deliveryNoteBtn.length) {
+          deliveryNoteBtn.removeClass('d-none').addClass('d-inline-block');
+        }
+
+        // Update status button
+        const statusBtn = $('#statusBtn');
+        if (statusBtn.length) {
+          statusBtn.text('Paid');
+          statusBtn.css('background-color', '#28a745');
+          statusBtn.prop('disabled', true);
+          statusBtn.attr('title', 'Fully paid invoice cannot be changed');
+        }
+
+        // Update Payment button
+        const paymentBtn = $('#paymentBtn');
+        if (paymentBtn.length) {
+          paymentBtn.removeClass('d-none').addClass('d-inline-block');
+          if (paymentMode === 'cash') {
+            paymentBtn.text('Receipt Voucher');
+            paymentBtn.off('click').on('click', function () {
+              window.location.href = "<?= base_url('receiptvoucher/' . $invoice['invoice_id']) ?>";
+            });
+          } else {
+            paymentBtn.text('Payment Voucher');
+            paymentBtn.off('click').on('click', function () {
+              window.location.href = "<?= base_url('paymentvoucher/' . $invoice['invoice_id']) ?>";
+            });
+          }
+        }
+
+        // Hide amount rows + edit button
+        $('#paidAmountRow').hide();
+        $('#balanceAmountRow').hide();
+        $('#editinvoicebtn').hide();
+      },
+      error: function (xhr, status, error) {
+        console.error("AJAX Error:", status, error, xhr.responseText);
+        alert("Something went wrong. Please try again.");
+      },
+      complete: function () {
+        $('#confirmMarkPaid').prop('disabled', false).text('Submit');
+      }
+    });
   });
-});
 
 
   document.getElementById('paymentMode').addEventListener('change', function () {

@@ -87,7 +87,14 @@
     .table-footer div {
       width: 48%;
     }
-
+    .tfoot {
+      background-color: #cfc7c7ff;
+       display: table-footer-group;
+    }
+    @page {
+              margin: 0;
+              size: auto;
+            } 
     @media print {
       * {
         -webkit-print-color-adjust: exact !important;
@@ -108,6 +115,13 @@
         font-size: 12px;
         line-height: 1;
       }
+      @page {
+        margin: 0 !important;
+      }
+      
+      tfoot {
+        display: table-row-group !important;  /* prevents automatic repeating */
+    }
     }
   </style>
 </head>
@@ -185,8 +199,8 @@
           <div class="col-8" style=" font-size: 13px;">
             Person Name:
             <?= esc($estimate['customer_name'] ?? '') ?><br>
-            Business Name:
-            <?= esc($company_name) ?><br>
+            <!-- Business Name:
+            <?= esc($company_name) ?><br> -->
             Address:
             <?= nl2br(esc($estimate['customer_address'] ?? '')) ?><br>
             Contact Number:
@@ -273,10 +287,27 @@
           </tbody>
         </table>
 
+ <div class="row mt-3">
 
-        <div class="mt-2" style="font-size: 13px;">
-          <strong>دفعة مقدمة 70% والرصيد 30% بعد التسليم <br>Advance 70% Balance 30% After Delivery</strong>
-        </div>
+    <!-- LEFT SIDE -->
+    <div class="col-6 terms" style="font-size:11px;">
+        <strong>STANDARD TERMS & CONDITIONS</strong><br>
+        1. This estimate is valid for 60 days.<br>
+        2. Additional amount will be added according to the requirements.<br>
+        3. Full payment is required to process the order.<br>
+        4. Cancellation of processed order will not be accepted.
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="col-6 text-end" style="font-size: 13px;">
+        <strong>
+            دفعة مقدمة 70% والرصيد 30% بعد التسليم <br>
+            Advance 70% Balance 30% After Delivery
+        </strong>
+    </div>
+
+</div>
+
         <div class="row mt-2">
           <div class="amount-words col-6" style="font-size: 13px;">
             <b>بالكلمات:</b><br><span id="amount-words" style="font-size: 13px; "></span>
@@ -323,7 +354,7 @@
 
     if (dinars.length > 9) return 'overflow';
     dinars = parseInt(dinars, 10);
-    fils = parseInt((fils || '0').padEnd(3, '0').slice(0, 3));
+    fils = parseInt((fils || '0').padEnd(6, '0').slice(0, 3));
 
     const convert = (n) => {
       if (n < 20) return a[n];
@@ -411,7 +442,7 @@
     num = num.toString().replace(/,/g, '');
     let [dinars, fils] = num.split('.');
     dinars = parseInt(dinars || '0', 10);
-    fils = parseInt((fils || '0').padEnd(3, '0').slice(0, 3));
+    fils = parseInt((fils || '0').padEnd(6, '0').slice(0, 3));
 
     let words = '';
     if (dinars > 0) words += convertNumber(dinars) + ' دينار';

@@ -14,13 +14,14 @@ class Customer extends BaseController
             exit;
         }
     }
-   public function create()
+public function create()
 {
     $session = session();
     $name = ucwords(strtolower(trim($this->request->getPost('name'))));
     $address = ucfirst(strtolower(trim($this->request->getPost('address'))));
     $customer_id = $this->request->getPost('customer_id'); 
     $max_discount = $this->request->getPost('max_discount');
+    $phone_number = $this->request->getPost('phone_number'); 
 
     if (empty($name) || empty($address)) {
         return $this->response->setJSON([
@@ -33,7 +34,8 @@ class Customer extends BaseController
     $data = [
         'name' => $name,
         'address' => $address,
-         'company_id' => $session->get('company_id'), 
+        'company_id' => $session->get('company_id'), 
+        'phone_number' => $phone_number, // <-- Now works
         'max_discount' => round((float)($max_discount ?? 0), 3)
     ];
 
@@ -86,6 +88,22 @@ class Customer extends BaseController
             return $this->response->setJSON(['status' => 'error', 'message' => 'Customer Not Found']);
         }
     }
+
+    public function get_phone()
+{
+      $customer_id = $this->request->getPost('customer_id');
+        $model = new customerModel();
+        $customer = $model->find($customer_id);
+        
+
+        if ($customer) {
+            return $this->response->setJSON(['status' => 'success', 'phone_number' => $customer['phone_number']]);
+        } else {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Customer Not Found']);
+        }
+}
+
+
     public function search()
 {
     $term = $this->request->getGet('term');
@@ -143,7 +161,7 @@ public function fetch()
     $columnMap = [
         0 => 'customer_id',
         1 => 'name',
-        2 => 'address'
+        2 => 'address',
     ];
     $orderColumn = $columnMap[$columnIndex] ?? 'customer_id';
 
@@ -179,8 +197,8 @@ public function getCustomer($id)
 
     if ($customer) {
         $customer['max_discount'] = isset($customer['max_discount'])
-            ? round((float)$customer['max_discount'], 3)
-            : 0.000;
+            ? round((float)$customer['max_discount'], 4)
+            : 0.0000;
 
         return $this->response->setJSON($customer);
     } else {
@@ -229,11 +247,11 @@ public function get_discount($id)
     if ($customer) {
         return $this->response->setJSON([
             'discount' => isset($customer['max_discount'])
-                ? round((float)$customer['max_discount'], 3)
-                : 0.000
+                ? round((float)$customer['max_discount'], 4)
+                : 0.0000
         ]);
     } else {
-        return $this->response->setJSON(['discount' => 0.000]);
+        return $this->response->setJSON(['discount' => 0.0000]);
     }
 }
 

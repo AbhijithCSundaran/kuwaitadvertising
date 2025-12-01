@@ -114,7 +114,7 @@ function loadReport(type){
     data: 'subtotal', 
     render: d => parseFloat(d).toFixed(3) + ' KWD' 
     },// Subtotal → sortable
-    { data: 'discount', render: d => d == 0 ? '-N/A-' : d + ' KWD', orderable: false }, // Discount → no sort icon
+    { data: 'discount', render: d => d == 0 ? '0.000' : d + ' KWD', orderable: false }, // Discount → no sort icon
    { data: 'total', render: d => parseFloat(d).toFixed(3) + ' KWD' },
 { data: 'paid', render: d => d !== null ? parseFloat(d).toFixed(3) + ' KWD' : '-' },
 { data: 'balance', render: d => d !== null ? parseFloat(d).toFixed(3) + ' KWD' : '-' },

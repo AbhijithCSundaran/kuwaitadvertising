@@ -95,7 +95,12 @@
                     <div class="estimate-details">
                         <p class="mb-1" id="estimate-id-display">Estimate No :
                             <?= isset($estimate['estimate_no']) ? $estimate['estimate_no'] : '' ?></p>
-                        <p>Date : <?= date('d-m-Y') ?></p>
+                        <!-- <p>Date : <?= date('d-m-Y') ?></p> -->
+                        <p>Date :
+    <?= isset($estimate['date']) && !empty($estimate['date'])
+        ? date('d-m-Y', strtotime($estimate['date']))
+        : date('d-m-Y') ?>
+</p>
                     </div>
                 </div>
             </div>
@@ -116,7 +121,7 @@
                                 <tr class="item-row">
                                     <td><input type="text" name="description[]" class="form-control"
                                             value="<?= $item['description'] ?>"></td>
-                                    <td><input type="number" class="form-control price" step="0.001" min="0" inputmode="decimal" name="price[]" value="<?= $item['price'] ?>">
+                                    <td><input type="number" class="form-control price" step="0.0001" min="0" inputmode="decimal" name="price[]" value="<?= $item['price'] ?>">
                             </td>
                                     <td><input type="number" name="quantity[]" class="form-control quantity"
                                             value="<?= $item['quantity'] ?>"></td>
@@ -154,9 +159,9 @@
                 <tr>
                 <td><strong>Discount:</strong></td>
                 <td>
-                    <input type="number" name="discount" id="discount" class="form-control w-50 d-inline"
-    value="<?= isset($estimate['discount']) ? number_format((float)$estimate['discount'], 3, '.', '') : '0.000' ?>"
-    min="0" step="0.001"> KWD
+                    <input type="number" name="discount" id="discount" class="form-control col-7 d-inline"
+                        value="<?= isset($estimate['discount']) ? number_format((float)$estimate['discount'], 3, '.', '') : '0.000' ?>"
+                        min="0" step="0.001"> KWD
 
                 </td>
             </tr>
@@ -196,7 +201,8 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label>Customer Name</label>
-                            <input type="text" class="form-control" id="popup_name" required>
+                            <!-- <input type="text" class="form-control" id="popup_name" required> -->
+                            <input type="text" name="name" id="popup_name" class="form-control">
                             <!-- <textarea class="form-control" id="popup_address" rows="3" required></textarea> -->
 
                         </div>
@@ -206,6 +212,12 @@
                             <textarea class="form-control" id="popup_address" rows="3" required></textarea>
                         </div>
                         <div class="alert alert-danger d-none" id="customerError"></div>
+                        <div class="mb-3">
+                        <label>Contact Number</label>
+                        <input type="text" name="phone_number" id="popup_phone_number" class="form-control"
+    minlength="7" maxlength="15" pattern="^[\+0-9\s\-\(\)]{7,25}$"
+    title="Phone number must be 7 to 15 digits and can start with +" required />
+                    </div>
                         <div class="mb-3">
                     <label>Maximum Discount (KWD)</label>
                     <input type="number" name="max_discount" id="max_discount" class="form-control" min="0" step="0.001" placeholder="Enter maximum discount amount">
@@ -281,23 +293,7 @@
             $('#customerModal').modal('show');
         });
 
-        //         function calculateTotals() {
-        //     let subtotal = 0;
-        //     $('.item-row').each(function () {
-        //         let qty = parseFloat($(this).find('.quantity').val()) || 0;
-        //         let price = parseFloat($(this).find('.price').val()) || 0;
-        //         let total = Number((qty * price).toFixed(3)); // fix decimals here
-        //         $(this).find('.total').val(total.toFixed(3));
-        //         subtotal = Number((subtotal + total).toFixed(3)); // accumulate with 3 decimals
-        //     });
 
-        //     $('#sub_total_display').text(subtotal.toFixed(3));
-
-        //     let discount = parseFloat($('#discount').val()) || 0;
-        //     let discountAmt = Number(((subtotal * discount) / 100).toFixed(3));
-        //     let finalTotal = Number((subtotal - discountAmt).toFixed(3));
-        //     $('#total_display').text(finalTotal.toFixed(3));
-        // }
         function calculateTotals() {
             let subtotal = 0;
 
@@ -437,10 +433,12 @@
                 url: "<?= site_url('customer/create') ?>",
                 type: "POST",
                 data: {
-                    name,
-                    address,
-                    max_discount
-                },
+    name,
+    address,
+    phone_number: $('#popup_phone_number').val().trim(),
+    max_discount
+},
+
                 dataType: "json",
                 success: function(res) {
                     if (res.status === 'success') {
@@ -596,34 +594,7 @@
         });
 
         let maxCustomerDiscount = 0;
-        // $('#customer_id').on('change', function () {
-        //     let customerId = $(this).val();
-        //     if (customerId) {
-
-        //         $.post("<?= site_url('customer/get-address') ?>", { customer_id: customerId }, function (res) {
-        //             $('#customer_address').val(res.status === 'success' ? res.address : '');
-        //         }, 'json');
-
-        //         // Fetch max discount
-        //         $.ajax({
-        //             url: '<?= base_url("customer/get_discount") ?>/' + customerId,
-        //             type: 'GET',
-        //             dataType: 'json',
-        //             success: function (res) {
-        //                 maxCustomerDiscount = parseFloat(res.discount) || 0;
-
-        //                 if (!$('#discount').val() || parseFloat($('#discount').val()) === 0) {
-        //                     $('#discount').val(maxCustomerDiscount);
-        //                 }
-        //             }
-        //         });
-
-        //     } else {
-        //         maxCustomerDiscount = 0;
-        //         $('#discount').val(0);
-        //         $('#customer_address').val('');
-        //     }
-        // });
+        
         $('#customer_id').on('change', function() {
             let customerId = $(this).val();
 
@@ -638,6 +609,14 @@
                         $('#customer_address').val('');
                     }
                 }, 'json');
+
+                  $.post("<?= site_url('customer/get_phone') ?>", { customer_id: customerId }, function(res) {
+            if (res.status === 'success') {
+                $('#phone_number').val(res.phone_number);
+            } else {
+                $('#phone_number').val('');
+            }
+        }, 'json');
 
                 // Fetch customer-specific discount
                 $.ajax({
@@ -702,7 +681,7 @@
                 dataType: 'json',
                 success: function(res) {
                     maxCustomerDiscount = parseFloat(res.discount) || 0;
-                    // ⚠️ Do not auto-fill #discount here to preserve user's entered value
+                    //  Do not auto-fill #discount here to preserve user's entered value
                 }
             });
         }

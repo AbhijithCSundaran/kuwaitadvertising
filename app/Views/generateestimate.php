@@ -82,7 +82,15 @@
       font-weight: bold;
       background: #cfc7c7ff;
     }
+    .tfoot {
+      background-color: #cfc7c7ff;
+       display: table-footer-group;
+    }
 
+    @page {
+              margin: 0;
+              size: auto;
+            } 
     @media print {
       * {
         -webkit-print-color-adjust: exact !important;
@@ -103,6 +111,12 @@
         font-size: 12px;
         line-height: 1;
       }
+      @page {
+        margin: 0 !important;
+      }
+       tfoot {
+        display: table-row-group !important;  /* prevents automatic repeating */
+    }
     }
   </style>
 </head>
@@ -137,8 +151,8 @@
         <div class="top-heading"
           style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
           <span style="font-size: 15px; font-weight: bold;">
-    <?= esc(ucwords(strtolower($company['company_name'] ?? ''))) ?>
-</span>
+            <?= esc(ucwords(strtolower($company['company_name'] ?? ''))) ?>
+          </span>
 
 
           <?php if (!empty($company['company_logo'])): ?>
@@ -243,7 +257,7 @@
             <tr>
               <td colspan="4" style="text-align: right;">DISCOUNT</td>
               <td style="text-align: right; font-weight: 100;">
-                <?= $estimate['discount'] ?> KWD
+                <?= sprintf('%.3f', $estimate['discount'] ?? 0) ?> KWD
               </td>
             </tr>
 
@@ -262,7 +276,7 @@
 
         <div class=" d-flex">
           <div class="col-6 terms mt-3" style="font-size:11px;">
-            <strong>TERMS & CONDITIONS</strong><br>
+            <strong>STANDARD TERMS & CONDITIONS</strong><br>
             1. This estimate is valid for 60 days.<br>
             2. Additional amount will be added according to the requirements.<br>
             3. Full payment is required to process the order.<br>

@@ -54,174 +54,6 @@ class Estimate extends BaseController
     }
  
  
-// public function save()
-// {
-//     $estimateId = $this->request->getPost('estimate_id');
-//     $customerId = $this->request->getPost('customer_id');
-//     $address = trim($this->request->getPost('customer_address'));
-//     $discount = (float) $this->request->getPost('discount');
-//     $description = $this->request->getPost('description');
-//     $price = $this->request->getPost('price');
-//     $quantity = $this->request->getPost('quantity');
-//     $total = $this->request->getPost('total');
-//     $customerName = trim($this->request->getPost('customer_name'));
-//     $phoneNumber = trim($this->request->getPost('phone_number'));
-
-//     if (empty($customerId) || empty($address)) {
-//         return $this->response->setJSON([
-//             'status' => 'error',
-//             'message' => 'Please Fill Customer Name And Address.'
-//         ]);
-//     }
-
-//     $validItems = 0;
-//     foreach ($description as $desc) {
-//         if (!empty(trim($desc))) {
-//             $validItems++;
-//         }
-//     }
-//     if ($validItems === 0) {
-//         return $this->response->setJSON([
-//             'status' => 'error',
-//             'message' => 'Please Fill At Least One Item With Description.'
-//         ]);
-//     }
-
-//     // Recalculate totals
-//    $subtotal = '0.000';
-// foreach ($total as $t) {
-//     // Use bcadd to avoid floating-point rounding
-//     $subtotal = bcadd($subtotal, (string)$t, 3);
-// }
-
-// // Calculate discount
-// $discountAmount = bcmul($subtotal, bcdiv((string)$discount, '100', 3), 3);
-
-// // Grand total without rounding
-// $grandTotal = bcsub($subtotal, $discountAmount, 3);
-
-// $companyId = session()->get('company_id');
-// $estimateData = [
-//     'customer_id' => $customerId,
-//     'customer_address' => $address,
-//     'discount' => $discount,
-//     'total_amount' => $grandTotal, // Already 3 decimals, no rounding
-//     'date' => date('Y-m-d'),
-//     'phone_number' => $phoneNumber,
-//     'company_id' => $companyId
-// ];
-
-
-//     // Build items array
-//     $items = [];
-//     foreach ($description as $key => $desc) {
-//     $desc = trim($desc);
-//     $unitPrice = trim($price[$key]);
-//     $qty = trim($quantity[$key]);
-
-//     if ($desc === '' || $unitPrice === '' || $qty === '') {
-//         return $this->response->setJSON([
-//             'status' => 'error',
-//             'message' => 'Each Item Must Have Description, Unit Price, And Quantity Filled.'
-//         ]);
-//     }
-
-//     // Calculate total using BCMath to avoid rounding issues
-//     $lineTotal = bcmul((string)$unitPrice, (string)$qty, 3);
-
-//     $items[] = [
-//         'description' => $desc,
-//         'price' => bcadd((string)$unitPrice, '0', 3),   // ensures 3 decimals
-//         'quantity' => bcadd((string)$qty, '0', 3),
-//         'total' => $lineTotal
-//     ];
-// }
-
-
-//     $estimateModel = new EstimateModel();
-//     $estimateItemModel = new EstimateItemModel();
-//     $customerModel = new customerModel();
-//     $customer = $customerModel->find($customerId);
-
-//     if ($customer) {
-//         if ($customer['name'] !== $customerName || $customer['address'] !== $address) {
-//             $customerModel->update($customerId, [
-//                 'name' => $customerName,
-//                 'address' => $address
-//             ]);
-//         }
-
-//         $maxDiscount = isset($customer['fixed_discount']) ? (float)$customer['fixed_discount'] : 100;
-//         if ($discount > $maxDiscount) {
-//             return $this->response->setJSON([
-//                 'status' => 'error',
-//                 'message' => "Discount cannot exceed maximum allowed value of $maxDiscount%"
-//             ]);
-//         }
-//     }
-
-//     if (!empty($estimateId)) {
-//         // Existing estimate: update
-//         $existing = $estimateModel->find($estimateId);
-//         if (!$existing) {
-//             return $this->response->setJSON([
-//                 'status' => 'error',
-//                 'message' => 'Estimate Not Found.'
-//             ]);
-//         }
-
-//         $hasChanges = (
-//             $existing['customer_id'] != $customerId ||
-//             $existing['customer_address'] !== $address ||
-//             $existing['discount'] != $discount ||
-//             $existing['total_amount'] != $grandTotal
-//         );
-
-//         if ($hasChanges) {
-//             $estimateModel->update($estimateId, $estimateData);
-//             $estimateItemModel->where('estimate_id', $estimateId)->delete();
-//             foreach ($items as &$item) {
-//                 $item['estimate_id'] = $estimateId;
-//             }
-//             $estimateItemModel->insertBatch($items);
-
-//             return $this->response->setJSON([
-//                 'status' => 'success',
-//                 'message' => 'Estimate Updated Successfully.',
-//                 'estimate_id' => $estimateId
-//             ]);
-//         } else {
-//             return $this->response->setJSON([
-//                 'status' => 'nochange',
-//                 'message' => 'No Changes Detected.',
-//                 'estimate_id' => $estimateId
-//             ]);
-//         }
-//     } else {
-//         // NEW estimate: generate company-specific estimate_no
-//         $lastEstimate = $estimateModel
-//             ->where('company_id', $companyId)
-//             ->orderBy('estimate_no', 'DESC')
-//             ->first();
-
-//         $nextEstimateNo = $lastEstimate ? $lastEstimate['estimate_no'] + 1 : 1;
-//         $estimateData['estimate_no'] = $nextEstimateNo;
-
-//         $estimateId = $estimateModel->insert($estimateData);
-//         foreach ($items as &$item) {
-//             $item['estimate_id'] = $estimateId;
-//         }
-//         $estimateItemModel->insertBatch($items);
-
-//         return $this->response->setJSON([
-//             'status' => 'success',
-//             'message' => 'Generating Estimate.',
-//             'estimate_id' => $estimateId,
-//             'estimate_no' => $nextEstimateNo
-//         ]);
-//     }
-// }
-
 
  public function save()
 {
@@ -243,7 +75,7 @@ class Estimate extends BaseController
     if (empty($customerId) || empty($address)) {
         return $this->response->setJSON([
             'status' => 'error',
-            'message' => 'Please fill customer name and address.'
+            'message' => 'Please Fill Customer Name and Address.'
         ]);
     }
 
@@ -259,14 +91,14 @@ class Estimate extends BaseController
     if ($validItems === 0) {
         return $this->response->setJSON([
             'status' => 'error',
-            'message' => 'Please fill at least one item with description.'
+            'message' => 'Please Fill at Least One Item With Description.'
         ]);
     }
 
     // -------------------------
     // 3. Calculate subtotal
     // -------------------------
-    $subtotal = '0.000';
+    $subtotal = '0.0000';
     foreach ($total as $t) {
         $subtotal = bcadd($subtotal, (string)$t, 3);
     }

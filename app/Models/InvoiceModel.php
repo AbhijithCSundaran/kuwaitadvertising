@@ -103,6 +103,7 @@ class InvoiceModel extends Model
          invoices.status,
          invoices.lpo_no,
          invoices.invoice_date,
+         invoices.delivery_date,
          company.company_name AS company_name,
          customers.name AS customer_name, 
          customers.address AS customer_address'
@@ -128,28 +129,28 @@ public function getTodayRevenue($companyId)
     $today = date('Y-m-d');
     $tomorrow = date('Y-m-d', strtotime('+1 day'));
 
-    $row = $this->selectSum('total_amount')
+    $row = $this->selectSum('paid_amount')
         ->where('company_id', $companyId)
         ->where('invoice_date >=', $today)
         ->where('invoice_date <', $tomorrow)
         ->get()
         ->getRow();
 
-    return $row ? (float)$row->total_amount : 0;
+    return $row ? (float)$row->paid_amount : 0;;
 }
 public function getMonthlyRevenue($companyId)
 {
     $start = date('Y-m-01');
     $end = date('Y-m-t');
 
-    $row = $this->selectSum('total_amount')
+    $row = $this->selectSum('paid_amount')
         ->where('company_id', $companyId)
         ->where('invoice_date >=', $start)
         ->where('invoice_date <=', $end)
         ->get()
         ->getRow();
 
-    return $row ? (float)$row->total_amount : 0;
+    return $row ? (float)$row->paid_amount : 0; 
 }
    public function getInvoicesWithCustomer()
     {

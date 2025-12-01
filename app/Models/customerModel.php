@@ -7,7 +7,7 @@ class customerModel extends Model
 {
     protected $table = 'customers';
     protected $primaryKey = 'customer_id';
-    protected $allowedFields = ['name', 'address','company_id','shipping_address','is_deleted', 'max_discount'];
+    protected $allowedFields = ['name', 'address','company_id','shipping_address','is_deleted', 'phone_number', 'max_discount'];
     protected $returnType = 'array';
 
     public function getAllCustomerCount()

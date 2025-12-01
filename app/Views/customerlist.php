@@ -55,8 +55,15 @@
                         <textarea name="address" id="address" class="form-control" required style="text-transform: capitalize;"></textarea>
                     </div>
                     <div class="mb-3">
+                        <label>Contact Number</label>
+                        <input type="text" name="phone_number" id="phone_number" class="form-control"
+                        value=" <?= esc($customers['phone_number'] ?? '') ?>" minlength="7" maxlength="15"
+                        pattern="^[\+0-9\s\-\(\)]{7,25}$"
+                        title="Phone number must be 7 to 15 digits and can start with +" />
+                    </div>
+                    <div class="mb-3">
                     <label>Maximum Discount (KWD)</label>
-                    <input type="number" name="max_discount" id="max_discount" class="form-control" min="0" step="0.001" placeholder="Enter maximum discount amount">
+                    <input type="number" name="max_discount" id="max_discount" class="form-control" min="0" step="0.000001" placeholder="Enter maximum discount amount">
                 </div>
 
                 </div>
@@ -173,11 +180,13 @@ $(document).ready(function () {
                 $('#customer_id').val(data.customer_id);
                 $('#name').val(data.name);
                 $('#address').val(data.address);
+                $('#phone_number').val(data.phone_number);
                  $('#max_discount').val(data.max_discount || '');
                 $('#customerModalLabel').text('Edit Customer');
 
                 originalName = data.name.trim();
                 originalAddress = data.address.trim();
+                originalPhoneNumber = data.phone_number.trim();
                 originalMaxDiscount = data.max_discount ? data.max_discount.toString() : '';
 
                 $('#saveCustomerBtn').prop('disabled', true);
@@ -189,15 +198,22 @@ $(document).ready(function () {
     });
 
     // Check if input values changed from original (only in Edit)
-    $('#name, #address, #max_discount').on('input', function () {
+   // Check if input values changed from original (only in Edit)
+$('#name, #address, #phone_number, #max_discount').on('input', function () {
     const isEdit = $('#customer_id').val() !== '';
     if (!isEdit) return;
 
     const currentName = $('#name').val().trim();
     const currentAddress = $('#address').val().trim();
+    const currentPhoneNumber = $('#phone_number').val().trim();
     const currentMaxDiscount = $('#max_discount').val().trim();
 
-    const hasChanged = currentName !== originalName || currentAddress !== originalAddress || currentMaxDiscount !== originalMaxDiscount;
+    const hasChanged =
+        currentName !== originalName ||
+        currentAddress !== originalAddress ||
+        currentPhoneNumber !== originalPhoneNumber ||
+        currentMaxDiscount !== originalMaxDiscount;
+
     $('#saveCustomerBtn').prop('disabled', !hasChanged);
 });
 
