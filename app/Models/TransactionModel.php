@@ -11,7 +11,7 @@ class TransactionModel extends Model
     protected $allowedFields = [
         'customer_id', 'invoice_id', 'user_id', 'company_id',
         'invoice_amount', 'paid_amount', 'partial_paid_amount',
-        'payment_mode', 'created_at', 'updated_at'
+        'payment_mode', 'created_at', 'updated_at', 'cash_cheque_knet', 'being_of'
     ];
 
     // If your transactions table has created_at and updated_at columns:

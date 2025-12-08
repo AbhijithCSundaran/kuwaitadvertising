@@ -311,12 +311,12 @@
           $btnPaymentLabel = 'Receipt Voucher';
           $btnUrl = base_url('receiptvoucher/' . $invoice['invoice_id']);
         } elseif ($paymentMode === 'bank' || $paymentMode === 'bank transfer') {
-          $btnPaymentLabel = ' Payment Voucher';
-          $btnUrl = base_url('paymentvoucher/' . $invoice['invoice_id']);
+          $btnPaymentLabel = ' Receipt Voucher';
+          $btnUrl = base_url('receiptvoucher/' . $invoice['invoice_id']);
         } else {
           // fallback for other modes
-          $btnPaymentLabel = 'Payment Voucher';
-          $btnUrl = base_url('paymentvoucher/' . $invoice['invoice_id']);
+          $btnPaymentLabel = 'Receipt Voucher';
+          $btnUrl = base_url('receiptvoucher/' . $invoice['invoice_id']);
         }
 
         // Status button settings
@@ -325,10 +325,10 @@
         $btnColor = $status === 'paid' ? '#28a745' : ($status === 'partial paid' ? '#ffc107' : '#991b36');
         $btnShow = in_array($status, ['paid', 'partial paid']) ? 'd-inline-block' : 'd-none';
         ?>
-        <button id="paymentBtn" class="btn <?= $btnShow ?>" style="background-color: #991b36 ; color: white;"
+        <!-- <button id="paymentBtn" class="btn <?= $btnShow ?>" style="background-color: #991b36 ; color: white;"
           onclick="window.location.href='<?= $btnUrl ?>'">
           <?= $btnPaymentLabel ?>
-        </button>
+        </button> -->
 
 
         <div class="btn-group ml-2 position-relative" style="z-index: 1000; margin-left: 10px;">
@@ -900,9 +900,9 @@
     document.getElementById('partialPaymentModal').style.display = 'block';
   }
 
-  function closePartialModal() {
-    document.getElementById('partialPaymentModal').style.display = 'none';
-  }
+  const dbGrandTotal = parseFloat("<?= $invoice['total_amount'] ?>");
+const dbAlreadyPaid = parseFloat("<?= $invoice['paid_amount'] ?>");
+
 
   function submitPartialPayment() {
     const paid = parseFloat(document.getElementById('partialPaidInput').value);
@@ -911,6 +911,8 @@
     const paymentModeError = document.getElementById('paymentModeError');
     errorMsg.style.display = 'none';
     if (paymentModeError) paymentModeError.style.display = 'none';
+
+    
 
 
     if (isNaN(paid)) {
@@ -949,8 +951,11 @@
     }
 
 
-    const alreadyPaid = parseFloat(document.getElementById('paidAmountValue')?.innerText || 0);
-    const balanceRemaining = grandTotal - alreadyPaid;
+     const alreadyPaid = dbAlreadyPaid;
+    const balanceRemaining = dbGrandTotal - dbAlreadyPaid;
+
+    // const alreadyPaid = parseFloat(document.getElementById('paidAmountValue')?.innerText || 0);
+    // const balanceRemaining = grandTotal - alreadyPaid;
 
     if (paid > balanceRemaining) {
       errorMsg.innerText = 'Entered amount exceeds remaining balance.';
@@ -1025,6 +1030,10 @@
       });
   }
 
+  
+    function closePartialModal() {
+    document.getElementById('partialPaymentModal').style.display = 'none';
+  }
 
   function updateStatus(newStatus) {
     // debugger;
@@ -1212,9 +1221,9 @@
               window.location.href = "<?= base_url('receiptvoucher/' . $invoice['invoice_id']) ?>";
             });
           } else {
-            paymentBtn.text('Payment Voucher');
+            paymentBtn.text('Receipt Voucher');
             paymentBtn.off('click').on('click', function () {
-              window.location.href = "<?= base_url('paymentvoucher/' . $invoice['invoice_id']) ?>";
+              window.location.href = "<?= base_url('receiptvoucher/' . $invoice['invoice_id']) ?>";
             });
           }
         }
@@ -1242,8 +1251,8 @@
       paymentBtn.innerText = 'Receipt Voucher';
       paymentBtn.onclick = () => window.location.href = '<?= base_url('receiptvoucher/' . $invoice['invoice_id']) ?>';
     } else {
-      paymentBtn.innerText = 'Payment Voucher';
-      paymentBtn.onclick = () => window.location.href = '<?= base_url('paymentvoucher/' . $invoice['invoice_id']) ?>';
+      paymentBtn.innerText = 'Receipt Voucher';
+      paymentBtn.onclick = () => window.location.href = '<?= base_url('receiptvoucher/' . $invoice['invoice_id']) ?>';
     }
   });
 

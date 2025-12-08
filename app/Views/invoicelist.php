@@ -182,7 +182,11 @@ $(document).ready(function () {
                                 ${isPaidOrPartial ? 'onclick="event.preventDefault(); showEditAlert();"' : ''}>
                                     <i class="bi bi-pencil-fill"></i>
                             </a>
-
+                            <a href="<?= base_url('invoice/transactions/') ?>${id}" 
+                                title="View Transactions" 
+                                style="color:#0d6efd;">
+                                    <i class="bi bi-list-ul"></i>
+                                </a>
 
                             <a href="javascript:void(0);" class="delete-invoice" data-id="${id}" title="Delete" style="color: #dc3545;">
                                 <i class="bi bi-trash-fill"></i>
