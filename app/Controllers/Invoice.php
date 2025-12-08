@@ -11,27 +11,29 @@ use App\Models\Manageuser_Model;
 use App\Models\SalesModel;
 use App\Models\Managecompany_Model;
 use App\Models\TransactionModel;
+use App\Models\ReceiptVoucherModel;
+
 
 use Google\Cloud\Translate\V2\TranslateClient;
 
 class Invoice extends BaseController
 {
     public function add()
-{
-    $customerModel = new customerModel();
-    $companyId = session()->get('company_id');
+    {
+        $customerModel = new customerModel();
+        $companyId = session()->get('company_id');
 
-    // Only fetch active (not deleted) customers
-    $customers = $customerModel
-        ->where('is_deleted', 0)
-        ->where('company_id', $companyId)
-        ->findAll();
+        // Only fetch active (not deleted) customers
+        $customers = $customerModel
+            ->where('is_deleted', 0)
+            ->where('company_id', $companyId)
+            ->findAll();
 
-    return view('invoice_form', [
-        'customers' => $customers,
-        'invoice' => []
-    ]);
-}
+        return view('invoice_form', [
+            'customers' => $customers,
+            'invoice' => []
+        ]);
+    }
 
 
     public function list()
@@ -47,7 +49,7 @@ class Invoice extends BaseController
         return $this->response->setJSON(['data' => $data]);
     }
 
-    
+
     public function invoicelistajax()
     {
         $session = session();
@@ -100,7 +102,7 @@ class Invoice extends BaseController
                 'invoice_no' => isset($row['invoice_no']) ? $row['invoice_no'] : '',
                 'customer_name' => $row['customer_name'],
                 'customer_address' => $row['customer_address'],
-                'subtotal' => $subtotal,  
+                'subtotal' => $subtotal,
                 'discount' => $row['discount'],
                 'total_amount' => $row['total_amount'],
                 'status' => $row['status'] ?? 'unpaid',
@@ -191,7 +193,6 @@ class Invoice extends BaseController
     $customerId = $request->getPost('customer_id');
     $customer = $customerModel->find($customerId);
     $estimateId = $this->request->getPost('estimate_id');
-    
 
     if (!$customer) {
         return $this->response->setJSON([
@@ -200,7 +201,7 @@ class Invoice extends BaseController
         ]);
     }
 
-    // ✅ Validation for discount
+    // Validation for discount
     if (!empty($customer['max_discount']) && $discount > (float) $customer['max_discount']) {
         return $this->response->setJSON([
             'status' => 'error',
@@ -213,34 +214,29 @@ class Invoice extends BaseController
     $companyId = session()->get('company_id');
 
     $totalAmount = $this->calculateTotal($request);
-    
 
     $invoiceData = [
-    'customer_id' => $customerId,
-    'customer_address' => $customer['address'] ?? $request->getPost('customer_address') ?? '',
-    'phone_number' => $request->getPost('phone_number') ?: ($customer['phone_number'] ?? ''),
-    'lpo_no' => $request->getPost('lpo_no'),
-    'total_amount' => $totalAmount,
-    'discount' => $discount,
-    'delivery_date' => $request->getPost('delivery_date'),
-    'invoice_date' => date('Y-m-d'),
-    // 'invoice_date' => $request->getPost('invoice_date') ?: date('Y-m-d'),
-    'user_id' => session()->get('user_id') ?? 1,
-    'status' => ($invoiceId && $originalStatus) ? $originalStatus : 'unpaid',
-    'company_id' => $companyId,
-    // ✅ Add these two lines to fix balance calculation
-    'paid_amount' => 0,
-    
-    'balance_amount' => $totalAmount
-];
-// echo $invoiceData['invoice_date'];exit();
+        'customer_id' => $customerId,
+        'customer_address' => $customer['address'] ?? $request->getPost('customer_address') ?? '',
+        'phone_number' => $request->getPost('phone_number') ?: ($customer['phone_number'] ?? ''),
+        'lpo_no' => $request->getPost('lpo_no'),
+        'total_amount' => $totalAmount,
+        'discount' => $discount,
+        'delivery_date' => $request->getPost('delivery_date'),
+        'invoice_date' => date('Y-m-d'),
+        'user_id' => session()->get('user_id') ?? 1,
+        'status' => ($invoiceId && $originalStatus) ? $originalStatus : 'unpaid',
+        'company_id' => $companyId,
+        'paid_amount' => 0,
+        'balance_amount' => $totalAmount
+    ];
 
     if ($invoiceId) {
         $invoiceModel->update($invoiceId, $invoiceData);
         $itemModel->where('invoice_id', $invoiceId)->delete();
         $message = 'Invoice Updated Successfully';
     } else {
-        //  Generate company-specific invoice_no
+        // Generate company-specific invoice_no
         $lastInvoice = $invoiceModel
             ->where('company_id', $companyId)
             ->orderBy('invoice_no', 'DESC')
@@ -259,16 +255,38 @@ class Invoice extends BaseController
         $invoiceId = $invoiceModel->getInsertID();
         $message = 'Generating Invoice';
 
-        // ✅ Insert into transactions only if invoice is already "paid"
+        // ✅ Fix: calculate paid amounts correctly
+        $paidAmountInput = (float)$request->getPost('paid_amount'); 
+$kdAmount = floor($paidAmountInput);
+$filsAmount = round(($paidAmountInput - $kdAmount) * 100);
+
+$db = \Config\Database::connect();
+$db->table('receipt_vouchers')->insert([
+    'invoice_id' => $invoiceId,
+    'customer_id' => $customerId,
+    'user_id' => session()->get('user_id') ?? 1,
+    'company_id' => $companyId,
+    'invoice_amount' => $totalAmount,
+    'paid_amount' => $kdAmount,
+    'partial_paid_amount' => $filsAmount,
+    'payment_mode' => $request->getPost('payment_mode') ?? 'cash',
+    'created_at' => date('Y-m-d H:i:s'),
+    'updated_at' => date('Y-m-d H:i:s'),
+]);
+
+
+        $receiptId = $db->insertID();
+
+        // Insert into transactions only if invoice is fully paid
         if ($invoiceData['status'] === 'paid') {
             $transactionModel->insert([
                 'customer_id' => $customerId,
-                'invoice_id'  => $invoiceId,
-                'user_id'     => session()->get('user_id') ?? 1,
-                'company_id'  => $companyId,
+                'invoice_id' => $invoiceId,
+                'user_id' => session()->get('user_id') ?? 1,
+                'company_id' => $companyId,
                 'invoice_amount' => $totalAmount,
-                'paid_amount' => $totalAmount,   // full payment
-                'partial_paid_amount' => $totalAmount,
+                'paid_amount' => $kdAmount,
+                'partial_paid_amount' => $filsAmount,
                 'payment_mode' => $request->getPost('payment_mode') ?? 'cash',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
@@ -280,7 +298,7 @@ class Invoice extends BaseController
     $descriptions = $request->getPost('description');
     $quantities = $request->getPost('quantity');
     $prices = $request->getPost('price');
-    $locations = $request->getPost('location'); 
+    $locations = $request->getPost('location');
 
     if ($descriptions && $quantities && $prices) {
         foreach ($descriptions as $i => $desc) {
@@ -290,8 +308,8 @@ class Invoice extends BaseController
                     'item_name' => ucfirst(trim($desc)),
                     'quantity' => $quantities[$i],
                     'price' => $prices[$i],
-                    'location'   => $locations[$i] ?? null,
-                    'item_order' => $i + 1 
+                    'location' => $locations[$i] ?? null,
+                    'item_order' => $i + 1
                 ]);
             }
         }
@@ -300,80 +318,81 @@ class Invoice extends BaseController
     return $this->response->setJSON([
         'status' => 'success',
         'message' => $message,
-        'invoice_id'  => $invoiceId,
-        'invoice_no'  => $invoiceData['invoice_no'] ?? null,
+        'invoice_id' => $invoiceId,
+        'invoice_no' => $invoiceData['invoice_no'] ?? null,
         'redirect' => site_url('invoice/print/' . $invoiceId)
     ]);
 }
 
 
+
     private function calculateTotal($request)
-{
-    $prices = $request->getPost('price') ?? [];
-    $qtys = $request->getPost('quantity') ?? [];
-    $discount = floatval($request->getPost('discount') ?? 0);
-    $subtotal = 0;
+    {
+        $prices = $request->getPost('price') ?? [];
+        $qtys = $request->getPost('quantity') ?? [];
+        $discount = floatval($request->getPost('discount') ?? 0);
+        $subtotal = 0;
 
-    foreach ($prices as $i => $price) {
-        $subtotal += floatval($price) * floatval($qtys[$i]);
+        foreach ($prices as $i => $price) {
+            $subtotal += floatval($price) * floatval($qtys[$i]);
+        }
+
+        // Cap discount to subtotal
+        if ($discount > $subtotal) {
+            $discount = $subtotal;
+        }
+
+        // Calculate total and round to 4 decimals (KWD standard)
+        $total = round($subtotal - $discount, 3);
+        return $total;
     }
 
-    // Cap discount to subtotal
-    if ($discount > $subtotal) {
-        $discount = $subtotal;
+
+    public function edit($id)
+    {
+        $invoiceModel = new InvoiceModel();
+        $itemModel = new InvoiceItemModel();
+        $customerModel = new customerModel();
+        $transactionModel = new TransactionModel();
+
+        $invoice = $invoiceModel->find($id);
+        if (!$invoice) {
+            return redirect()->to(base_url('invoicelist'))->with('error', 'Invoice not found.');
+        }
+
+        // ✅ Fetch customer details
+        $customer = $customerModel->find($invoice['customer_id']);
+        if ($customer) {
+            $invoice['customer_name'] = $customer['name'] ?? '';
+            $invoice['customer_address'] = $customer['address'] ?? '';
+            $invoice['phone_number'] = $customer['phone_number'] ?? '';
+        } else {
+            $invoice['customer_name'] = '';
+            $invoice['customer_address'] = '';
+            $invoice['phone_number'] = '';
+        }
+
+        // ✅ Fetch items in correct order
+        $invoiceformitems = $itemModel
+            ->where('invoice_id', $id)
+            ->orderBy('item_order', 'ASC') // <---- FIXED HERE
+            ->findAll();
+
+        $companyId = session()->get('company_id');
+        $customers = $customerModel
+            ->where('is_deleted', 0)
+            ->where('company_id', $companyId)
+            ->findAll();
+
+        $data = [
+            'invoice' => $invoice,
+            'invoiceformitems_og' => $invoiceformitems,
+            'invoiceformitems' => $invoiceformitems,
+            'customers' => $customers,
+        ];
+
+        return view('invoice_form', $data);
     }
-
-    // Calculate total and round to 4 decimals (KWD standard)
-    $total = round($subtotal - $discount, 3);
-    return $total;
-}
-
-
- public function edit($id)
-{
-    $invoiceModel = new InvoiceModel();
-    $itemModel = new InvoiceItemModel();
-    $customerModel = new customerModel();
-    $transactionModel = new TransactionModel();
-
-    $invoice = $invoiceModel->find($id);
-    if (!$invoice) {
-        return redirect()->to(base_url('invoicelist'))->with('error', 'Invoice not found.');
-    }
-
-    // ✅ Fetch customer details
-    $customer = $customerModel->find($invoice['customer_id']);
-    if ($customer) {
-        $invoice['customer_name'] = $customer['name'] ?? '';
-        $invoice['customer_address'] = $customer['address'] ?? '';
-        $invoice['phone_number'] = $customer['phone_number'] ?? ''; 
-    } else {
-        $invoice['customer_name'] = '';
-        $invoice['customer_address'] = '';
-        $invoice['phone_number'] = '';
-    }
-
-    // ✅ Fetch items in correct order
-    $invoiceformitems = $itemModel
-        ->where('invoice_id', $id)
-        ->orderBy('item_order', 'ASC') // <---- FIXED HERE
-        ->findAll();
-
-    $companyId = session()->get('company_id');
-    $customers = $customerModel
-        ->where('is_deleted', 0)
-        ->where('company_id', $companyId)
-        ->findAll();
-
-    $data = [
-        'invoice' => $invoice,
-        'invoiceformitems_og' => $invoiceformitems,
-        'invoiceformitems' => $invoiceformitems,
-        'customers' => $customers,
-    ];
-
-    return view('invoice_form', $data);
-}
 
 
     public function delete($id = null)
@@ -411,86 +430,86 @@ class Invoice extends BaseController
             'user_name' => $user_name,
         ]);
     }
-    
+
     public function delivery_note($id)
-{
-    $invoiceModel = new InvoiceModel();
-    $itemModel = new InvoiceItemModel();
-    $customerModel = new customerModel();
+    {
+        $invoiceModel = new InvoiceModel();
+        $itemModel = new InvoiceItemModel();
+        $customerModel = new customerModel();
 
-    // Find the invoice
-    $invoice = $invoiceModel->find($id);
-    if (!$invoice) {
-        // Invoice not found, handle gracefully
-        return redirect()->back()->with('error', 'Invoice not found.');
+        // Find the invoice
+        $invoice = $invoiceModel->find($id);
+        if (!$invoice) {
+            // Invoice not found, handle gracefully
+            return redirect()->back()->with('error', 'Invoice not found.');
+        }
+
+        // Get items for the invoice
+        $items = $itemModel->where('invoice_id', $id)->findAll();
+
+        // Get customer info safely
+        $customer = $customerModel->find($invoice['customer_id']);
+        if (!$customer) {
+            $customer = [
+                'name' => '-N/A-',
+                'email' => '-N/A-'
+            ];
+        }
+
+        // Return view
+        return view('delivery_note', [
+            'invoice' => $invoice,
+            'items' => $items,
+            'customer' => $customer
+        ]);
     }
 
-    // Get items for the invoice
-    $items = $itemModel->where('invoice_id', $id)->findAll();
+    public function convertFromEstimate($estimateId)
+    {
+        $estimateModel = new EstimateModel();
+        $itemModel = new EstimateItemModel();
+        $customerModel = new customerModel();
 
-    // Get customer info safely
-    $customer = $customerModel->find($invoice['customer_id']);
-    if (!$customer) {
-        $customer = [
-            'name' => '-N/A-',
-            'email' => '-N/A-'
-        ];
+        $estimate = $estimateModel->find($estimateId);
+
+        if (!$estimate) {
+            return redirect()->back()->with('error', 'Estimate not found.');
+        }
+
+        // ✅ Fetch customer details
+        $customer = $customerModel->find($estimate['customer_id']);
+
+        // ✅ Fetch items in correct order (important line)
+        $items = $itemModel
+            ->where('estimate_id', $estimateId)
+            ->orderBy('item_order', 'ASC') // ensures consistent order
+            ->findAll();
+
+        $companyId = session()->get('company_id');
+        $customers = $customerModel
+            ->where('is_deleted', 0)
+            ->where('company_id', $companyId)
+            ->findAll();
+
+        // ✅ Set additional fields safely
+        $estimate['customer_address'] = $customer['address'] ?? '';
+        // $estimate['phone_number'] = $estimate['phone_number'] ?? '';
+        $estimate['phone_number'] = $customer['phone_number'] ?? '';
+
+
+        foreach ($items as &$item) {
+            $item['item_name'] = ucfirst($item['description'] ?? '');
+            $item['product_id'] = $item['product_id'] ?? '';
+        }
+
+        return view('invoice_form', [
+            'invoice' => $estimate,
+            'invoiceformitems' => $items,
+            'customers' => $customers,
+            'customer' => $customer,
+            'is_converted' => true,
+        ]);
     }
-
-    // Return view
-    return view('delivery_note', [
-        'invoice' => $invoice,
-        'items' => $items,
-        'customer' => $customer
-    ]);
-}
-
-public function convertFromEstimate($estimateId)
-{
-    $estimateModel = new EstimateModel();
-    $itemModel = new EstimateItemModel();
-    $customerModel = new customerModel();
-
-    $estimate = $estimateModel->find($estimateId);
-
-    if (!$estimate) {
-        return redirect()->back()->with('error', 'Estimate not found.');
-    }
-
-    // ✅ Fetch customer details
-    $customer = $customerModel->find($estimate['customer_id']);
-
-    // ✅ Fetch items in correct order (important line)
-    $items = $itemModel
-        ->where('estimate_id', $estimateId)
-        ->orderBy('item_order', 'ASC') // ensures consistent order
-        ->findAll();
-
-    $companyId = session()->get('company_id');
-    $customers = $customerModel
-        ->where('is_deleted', 0)
-        ->where('company_id', $companyId)
-        ->findAll();
-
-    // ✅ Set additional fields safely
-    $estimate['customer_address'] = $customer['address'] ?? '';
-    // $estimate['phone_number'] = $estimate['phone_number'] ?? '';
-    $estimate['phone_number'] = $customer['phone_number'] ?? '';
-
-
-    foreach ($items as &$item) {
-        $item['item_name'] = ucfirst($item['description'] ?? '');
-        $item['product_id'] = $item['product_id'] ?? '';
-    }
-
-    return view('invoice_form', [
-        'invoice' => $estimate,
-        'invoiceformitems' => $items,
-        'customers' => $customers,
-        'customer' => $customer,
-        'is_converted' => true,
-    ]);
-}
 
 
     public function update_status()
@@ -515,7 +534,7 @@ public function convertFromEstimate($estimateId)
         }
 
         $invoiceModel = new InvoiceModel();
-        
+
         $invoice = $invoiceModel->find($invoiceId);
 
         if (!$invoice) {
@@ -541,25 +560,25 @@ public function convertFromEstimate($estimateId)
         $updated = $invoiceModel->update($invoiceId, $updateData);
 
         if ($updated) {
-        $transactionModel = new TransactionModel();
-        $oldPaid = floatval($invoice['paid_amount'] ?? 0);
-        $newPaid = floatval($updateData['paid_amount'] ?? $oldPaid);
-        $delta = $newPaid - $oldPaid;
+            $transactionModel = new TransactionModel();
+            $oldPaid = floatval($invoice['paid_amount'] ?? 0);
+            $newPaid = floatval($updateData['paid_amount'] ?? $oldPaid);
+            $delta = $newPaid - $oldPaid;
 
-        if ($delta > 0) {
-            $transactionModel->insert([
-                'customer_id' => $invoice['customer_id'],
-                'invoice_id' => $invoiceId,
-                'user_id' => session()->get('user_id') ?? 1,
-                'company_id' => $invoice['company_id'],
-                'invoice_amount' => $invoice['total_amount'],
-                'paid_amount' => $delta,               // just this payment
-                'partial_paid_amount' => $newPaid,     // cumulative total paid
-                'payment_mode' => $paymentMode ?? $invoice['payment_mode'] ?? '',
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
-            ]);
-        }
+            if ($delta > 0) {
+                $transactionModel->insert([
+                    'customer_id' => $invoice['customer_id'],
+                    'invoice_id' => $invoiceId,
+                    'user_id' => session()->get('user_id') ?? 1,
+                    'company_id' => $invoice['company_id'],
+                    'invoice_amount' => $invoice['total_amount'],
+                    'paid_amount' => $delta,               // just this payment
+                    'partial_paid_amount' => $newPaid,     // cumulative total paid
+                    'payment_mode' => $paymentMode ?? $invoice['payment_mode'] ?? '',
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s'),
+                ]);
+            }
 
             return $this->response->setJSON([
                 'success' => true,
@@ -575,79 +594,126 @@ public function convertFromEstimate($estimateId)
             ]);
         }
     }
-   public function update_partial_payment()
-{
-    $this->response->setContentType('application/json');
-    $json = $this->request->getJSON();
+    public function update_partial_payment()
+    {
+        $this->response->setContentType('application/json');
+        $json = $this->request->getJSON();
 
-    if (!$json || !isset($json->invoice_id) || !isset($json->paid_amount)) {
-        return $this->response->setJSON(['success' => false, 'message' => 'Missing data']);
-    }
+        if (!$json || !isset($json->invoice_id) || !isset($json->paid_amount)) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Missing data']);
+        }
 
-    $invoice_id   = $json->invoice_id;
-    $new_payment  = floatval($json->paid_amount);
-    $payment_mode = trim($json->payment_mode);
+        $invoice_id = $json->invoice_id;
+        $new_payment = floatval($json->paid_amount);
+        $payment_mode = trim($json->payment_mode);
 
-    if ($new_payment <= 0) {
-        return $this->response->setJSON(['success' => false, 'message' => 'Invalid payment amount']);
-    }
+        if ($new_payment <= 0) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Invalid payment amount']);
+        }
 
-    $invoiceModel = new InvoiceModel();
-    $invoice = $invoiceModel->find($invoice_id);
+        $invoiceModel = new InvoiceModel();
+        $invoice = $invoiceModel->find($invoice_id);
 
-    if (!$invoice) {
-        return $this->response->setJSON(['success' => false, 'message' => 'Invoice not found']);
-    }
+        if (!$invoice) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Invoice not found']);
+        }
 
-    $total = floatval($invoice['total_amount']);
-    $existing_paid = floatval($invoice['paid_amount'] ?? 0);
+        $total = floatval($invoice['total_amount']);
+        $existing_paid = floatval($invoice['paid_amount'] ?? 0);
 
-    $updated_paid = $existing_paid + $new_payment;
-    $balance = $total - $updated_paid;
+        $updated_paid = $existing_paid + $new_payment;
+        $balance = $total - $updated_paid;
 
-    // Determine status
-    if ($updated_paid >= $total) {
-        $status = 'paid';
-        $updated_paid = $total; // prevent overpayment
-        $balance = 0;
-    } else {
-        $status = 'partial paid';
-    }
+        // Determine status
+        if ($updated_paid >= $total) {
+            $status = 'paid';
+            $updated_paid = $total; // prevent overpayment
+            $balance = 0;
+        } else {
+            $status = 'partial paid';
+        }
 
-    $data = [
-        'status' => $status,
-        'paid_amount' => $updated_paid,
-        'balance_amount' => $balance,
-        'payment_mode' => $payment_mode
-    ];
+        $data = [
+            'status' => $status,
+            'paid_amount' => $updated_paid,
+            'balance_amount' => $balance,
+            'payment_mode' => $payment_mode
+        ];
 
-    $updated = $invoiceModel->update($invoice_id, $data);
+        $updated = $invoiceModel->update($invoice_id, $data);
 
-    if ($updated && $new_payment > 0) {
-        $transactionModel = new TransactionModel();
-        $transactionModel->insert([
-            'customer_id' => $invoice['customer_id'],
-            'invoice_id'  => $invoice_id,
-            'user_id'     => session()->get('user_id') ?? 1,
-            'company_id'  => $invoice['company_id'],
-            'invoice_amount' => $total,
-            'paid_amount'  => $new_payment,       // this payment only
-            'partial_paid_amount' => $updated_paid, // cumulative
-            'payment_mode'  => $payment_mode,
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s'),
+        if ($updated && $new_payment > 0) {
+            $transactionModel = new TransactionModel();
+            $transactionModel->insert([
+                'customer_id' => $invoice['customer_id'],
+                'invoice_id' => $invoice_id,
+                'user_id' => session()->get('user_id') ?? 1,
+                'company_id' => $invoice['company_id'],
+                'invoice_amount' => $total,
+                'paid_amount' => $new_payment,       // this payment only
+                'partial_paid_amount' => $updated_paid, // cumulative
+                'payment_mode' => $payment_mode,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ]);
+
+            $receiptVoucherModel = new ReceiptVoucherModel();
+$receiptVoucherModel->insert([
+    'invoice_id'            => $invoice_id,
+    'customer_id'           => $invoice['customer_id'],
+    'user_id'               => session()->get('user_id') ?? 1,
+    'company_id'            => $invoice['company_id'],
+    'invoice_amount'        => $total,
+    'paid_amount'           => $new_payment,        // only this payment
+    'partial_paid_amount'   => $updated_paid,       // total paid so far
+    'payment_mode'          => $payment_mode,
+    'created_at'            => date('Y-m-d H:i:s'),
+    'updated_at'            => date('Y-m-d H:i:s'),
+]);
+        }
+
+        return $this->response->setJSON([
+            'success' => $updated,
+            'message' => $updated ? 'Updated' : 'Failed to update',
+            'paid_amount' => $updated_paid,
+            'balance_amount' => $balance,
+            'status' => $status
         ]);
     }
 
-    return $this->response->setJSON([
-        'success' => $updated,
-        'message' => $updated ? 'Updated' : 'Failed to update',
-        'paid_amount' => $updated_paid,
-        'balance_amount' => $balance,
-        'status' => $status
-    ]);
-}
 
+    public function savePartialPayment()
+    {
+        $invoiceId = $this->request->getPost('invoice_id');
+        $paidAmount = $this->request->getPost('paid_amount');
+        $paymentMode = $this->request->getPost('payment_mode');
+
+        if (!$invoiceId || !$paidAmount || !$paymentMode) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid data.']);
+        }
+
+        $invoiceModel = new InvoiceModel();
+
+        // Update invoice
+        $invoiceModel->update($invoiceId, [
+            'paid_amount' => $paidAmount,
+            'payment_mode' => $paymentMode
+        ]);
+
+          $transactionModel->insert([
+        'customer_id' => $invoice['customer_id'],
+        'invoice_id' => $invoiceId,
+        'user_id' => session()->get('user_id') ?? 1,
+        'company_id' => $invoice['company_id'],
+        'invoice_amount' => $invoice['total_amount'],
+        'paid_amount' => floatval($paidAmount),       // this payment only
+        'partial_paid_amount' => $totalPaid,          // cumulative total
+        'payment_mode' => $paymentMode,              // <-- save payment mode here
+        'created_at' => date('Y-m-d H:i:s'),
+        'updated_at' => date('Y-m-d H:i:s'),
+    ]);
+        return $this->response->setJSON(['status' => 'success']);
+    }
 
     public function report()
     {
@@ -677,25 +743,28 @@ public function convertFromEstimate($estimateId)
 
         return $this->response->setJSON(['invoices' => $data]);
     }
-    public function savePartialPayment()
+
+    public function transactions($invoice_id)
     {
-        $invoiceId = $this->request->getPost('invoice_id');
-        $paidAmount = $this->request->getPost('paid_amount');
-        $paymentMode = $this->request->getPost('payment_mode');
-
-        if (!$invoiceId || !$paidAmount || !$paymentMode) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Invalid data.']);
-        }
-
-        $invoiceModel = new InvoiceModel();
-
-        // Update invoice
-        $invoiceModel->update($invoiceId, [
-            'paid_amount' => $paidAmount,
-            'payment_mode' => $paymentMode
-        ]);
-
-        return $this->response->setJSON(['status' => 'success']);
+        $data['invoice_id'] = $invoice_id;
+        return view('transactionslist', $data);
     }
+public function transactionListJson()
+{
+    $invoice_id = $this->request->getPost('invoice_id');
+
+    $transactionModel = new TransactionModel();
+    $rows = $transactionModel
+                ->where('invoice_id', $invoice_id)
+                ->orderBy('created_at', 'DESC')
+                ->findAll();
+
+    return $this->response->setJSON([
+        'data' => $rows   // your AJAX expects this
+    ]);
+}
+
+
+    
 
 }

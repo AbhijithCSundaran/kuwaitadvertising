@@ -154,7 +154,7 @@ $routes->get('invoice/report', 'Invoice::report');
 $routes->get('invoice/print/(:num)', 'InvoiceController::printInvoice/$1');
 
 
-$routes->get('receiptvoucher/(:num)', 'ReceiptVoucher::index/$1');
+$routes->get('receiptvoucher/(:num)', 'ReceiptVoucher::index/$1'); // View receipt
 $routes->get('paymentvoucher/(:num)', 'PaymentVoucher::index/$1');
 
 $routes->get('cashlist', 'CashReceipt::index');
@@ -162,10 +162,37 @@ $routes->get('print_receipt', 'ReceiptVoucher::index');
 $routes->post('cashreceipt/ajaxListJson', 'CashReceipt::ajaxListJson');
 $routes->post('cashreceipt/delete', 'CashReceipt::delete');
 
-$routes->get('/payment_voucher', 'PaymentVoucher::index');
-$routes->get('/print_receipt', 'ReceiptVoucher::index');
-$routes->get('receiptvoucher/print/(:num)', 'ReceiptVoucher::index/$1');
-$routes->get('paymentvoucher/print/(:num)', 'PaymentVoucher::index/$1');
+
+//  $routes->get('/print_receipt', 'ReceiptVoucher::index');
+  $routes->get('receiptvoucher/print/(:num)', 'ReceiptVoucher::index/$1');
+//  $routes->get('receiptvoucher/edit/(:num)', 'ReceiptVoucher::edit/$1'); // Edit receipt
+//  $routes->post('receiptvoucher/update/(:num)', 'ReceiptVoucher::update/$1'); // Save edited receipt
+
+//  $routes->get('/print_receipt/(:num)', 'ReceiptVoucher::index/$1');
+
+
+// VIEW receipt
+$routes->get('receiptvoucher/view/(:num)', 'ReceiptVoucher::view/$1');
+
+// PRINT receipt
+ $routes->get('receiptvoucher/index/(:num)', 'ReceiptVoucher::index/$1');
+
+// EDIT receipt
+$routes->get('receiptvoucher/edit/(:num)', 'ReceiptVoucher::edit/$1');
+
+// UPDATE receipt
+$routes->post('receiptvoucher/update/(:num)', 'ReceiptVoucher::update/$1');
+
+
+$routes->get('invoice/transactions/(:num)', 'Invoice::transactions/$1');
+$routes->post('invoice/transactionListJson', 'Invoice::transactionListJson');
+
+
+
+
+
+
+
 
 
  
