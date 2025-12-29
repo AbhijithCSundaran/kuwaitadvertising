@@ -150,42 +150,71 @@ $(document).ready(function () {
                 data: 'payment_id',
                 orderable: false,
                 searchable: false,
-                render: function(id, type, row) {
+//                 render: function(id, type, row) {
+//     let printBtn = '';
+//     let viewBtn = '';
+
+//     if (row.payment_status.toLowerCase() !== 'unpaid') {
+//        if (row.payment_mode === 'cash') {
+//                 // CASH
+//                 viewBtn = `<a href="<?= base_url('receiptvoucher/print/') ?>${id}" title="View" style="color: rgb(13, 162, 199);">
+//                             <i class="bi bi-eye-fill"></i>
+//                         </a>`;
+//                 printBtn = `<a href="<?= base_url('receiptvoucher/print/') ?>${id}" title="Print" style="color:green;">
+//                             <i class="bi bi-printer-fill"></i>
+//                         </a>`;
+//             }
+//             else {
+//             // NON-CASH
+//             viewBtn = `<a href="<?= base_url('paymentvoucher/print/') ?>${id}" title="View" style="color: rgb(13, 162, 199);">
+//                           <i class="bi bi-eye-fill"></i>
+//                        </a>`;
+//             printBtn = `<a href="<?= base_url('paymentvoucher/print/') ?>${id}" title="Print" style="color:green;">
+//                           <i class="bi bi-printer-fill"></i>
+//                        </a>`;
+//         }
+//     } else {
+//         // UNPAID
+//         viewBtn = `<a href="javascript:void(0);" title="Unable to view unpaid receipt" style="color:gray;">
+//                       <i class="bi bi-eye-fill"></i>
+//                    </a>`;
+//         printBtn = `<a href="javascript:void(0);" title="Unable to print unpaid receipt" style="color:gray;">
+//                       <i class="bi bi-printer-fill"></i>
+//                    </a>`;
+//     }
+
+//     return `
+//         <div class="d-flex gap-2">
+//             ${viewBtn}
+//             ${printBtn}
+//             <a href="javascript:void(0);" class="delete-cashreceipt" data-id="${id}" title="Delete" style="color: #dc3545;">
+//                 <i class="bi bi-trash-fill"></i>
+//             </a>
+//         </div>
+//     `;
+// }
+
+render: function(id, type, row) {
     let printBtn = '';
-    let viewBtn = '';
 
     if (row.payment_status.toLowerCase() !== 'unpaid') {
-       if (row.payment_mode === 'cash') {
-                // CASH
-                viewBtn = `<a href="<?= base_url('receiptvoucher/print/') ?>${id}" title="View" style="color: rgb(13, 162, 199);">
-                            <i class="bi bi-eye-fill"></i>
-                        </a>`;
-                printBtn = `<a href="<?= base_url('receiptvoucher/print/') ?>${id}" title="Print" style="color:green;">
+        if (row.payment_mode === 'cash') {
+            printBtn = `<a href="<?= base_url('receiptvoucher/print/') ?>${id}" title="Print" style="color:green;">
                             <i class="bi bi-printer-fill"></i>
                         </a>`;
-            }
-            else {
-            // NON-CASH
-            viewBtn = `<a href="<?= base_url('paymentvoucher/print/') ?>${id}" title="View" style="color: rgb(13, 162, 199);">
-                          <i class="bi bi-eye-fill"></i>
-                       </a>`;
+        } else {
             printBtn = `<a href="<?= base_url('paymentvoucher/print/') ?>${id}" title="Print" style="color:green;">
-                          <i class="bi bi-printer-fill"></i>
-                       </a>`;
+                            <i class="bi bi-printer-fill"></i>
+                        </a>`;
         }
     } else {
-        // UNPAID
-        viewBtn = `<a href="javascript:void(0);" title="Unable to view unpaid receipt" style="color:gray;">
-                      <i class="bi bi-eye-fill"></i>
-                   </a>`;
         printBtn = `<a href="javascript:void(0);" title="Unable to print unpaid receipt" style="color:gray;">
-                      <i class="bi bi-printer-fill"></i>
-                   </a>`;
+                        <i class="bi bi-printer-fill"></i>
+                    </a>`;
     }
 
     return `
         <div class="d-flex gap-2">
-            ${viewBtn}
             ${printBtn}
             <a href="javascript:void(0);" class="delete-cashreceipt" data-id="${id}" title="Delete" style="color: #dc3545;">
                 <i class="bi bi-trash-fill"></i>
@@ -193,6 +222,7 @@ $(document).ready(function () {
         </div>
     `;
 }
+
 
             }
         ],
